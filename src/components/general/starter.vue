@@ -1,5 +1,5 @@
 <template>
-    <div class="ikfb-starter-container">
+    <div class="fabulous-starter-container">
         <fv-button
             v-show="step > 2"
             theme="dark"
@@ -260,7 +260,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-starter-container {
+.fabulous-starter-container {
     @include HcenterVcenter;
 
     position: fixed;

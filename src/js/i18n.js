@@ -7,8 +7,8 @@ export default {
         "en": "Cancel",
         "cn": "取消"
     },
-    "IKFB": {
-        "en": "IKFB",
+    "Fabulous": {
+        "en": "Fabulous",
         "cn": "快卷"
     },
     "Setting": {

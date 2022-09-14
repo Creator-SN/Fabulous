@@ -2,7 +2,7 @@
     <transition :name="itemCarrier.itemsX.length > 0 ? 'move-right-to-left' : 'move-left-to-right'">
         <div
             v-show="itemCarrier.itemsX.length > 0"
-            class="ikfb-item-carrier"
+            class="fabulous-item-carrier"
             :class="[{ dark: theme == 'dark', show: show.panel }]"
         >
             <div
@@ -295,7 +295,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-item-carrier {
+.fabulous-item-carrier {
     position: fixed;
     width: 35px;
     height: 60px;

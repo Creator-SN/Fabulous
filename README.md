@@ -1,8 +1,8 @@
 <div align="center">
     <img src="./src/assets/logo.svg" width="60" style="width: 80px;"/>
-    <p>IKFB</p>
-    <p><img src="https://img.shields.io/github/v/release/Creator-SN/IKFB" /></p>
-    <p><img src="https://img.shields.io/github/downloads/Creator-SN/IKFB/total?color=green&style=flat-square">
+    <p>Fabulous</p>
+    <p><img src="https://img.shields.io/github/v/release/Creator-SN/Fabulous" /></p>
+    <p><img src="https://img.shields.io/github/downloads/Creator-SN/Fabulous/total?color=green&style=flat-square">
 </div>
 
 <p align="center">
@@ -11,9 +11,9 @@
     </a>
 </p>
 
-# IKFB
+# Fabulous
 
-Involution King Fun Book (IKFB, Chinese: 快卷, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
+Involution King Fun Book (Fabulous, Chinese: 快卷, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
 
 The Application is **Cross Platform** and powered by Electron.
 
@@ -21,9 +21,9 @@ The Application is **Cross Platform** and powered by Electron.
 
 [中文文档(Chinese)](./doc/Chinese.md)
 
-### 🤔 Why we need IKFB?
+### 🤔 Why we need Fabulous?
 
-The **IKFB** aims to provide a complete article management and well-performanced notion user experience. We provide automatic retrieval of literature metadata, and our notebook supports rich text edition and even markdown typing (like typroa).
+The **Fabulous** aims to provide a complete article management and well-performanced notion user experience. We provide automatic retrieval of literature metadata, and our notebook supports rich text edition and even markdown typing (like typroa).
 
 ## 🎈 Platform
 
@@ -35,7 +35,7 @@ The **IKFB** aims to provide a complete article management and well-performanced
 
 **Installation**
 
-From the releases page, choose the lateset stable version and download the `.zip` file. Then unzip the file and choose the file named like `ikfb_Setup_xxx.exe` to setup the **IKFB**.
+From the releases page, choose the lateset stable version and download the `.zip` file. Then unzip the file and choose the file named like `fabulous_Setup_xxx.exe` to setup the **Fabulous**.
 
 **First time useage**
 
@@ -44,7 +44,7 @@ From the releases page, choose the lateset stable version and download the `.zip
 For the first time to start up, there is a user guide page. And don't worry, just follow the guide page step by step, it's easy and quick to finish the set up. Just click the `Start` button to move on.
 
 In this step, you're going to add a new data source. And you need to choose folder to create the new data source folder.
-> A data source is a physical folder to store all the files, and the database would be store in the `data_structure.json` file. Of course, you don't need to be concerned about what's in the folder, and I don't suggest you change the files in the folder, just ignore it, everything is work fine by **IKFB**😊.
+> A data source is a physical folder to store all the files, and the database would be store in the `data_structure.json` file. Of course, you don't need to be concerned about what's in the folder, and I don't suggest you change the files in the folder, just ignore it, everything is work fine by **Fabulous**😊.
 
 Or, if you already have a data source folder and you want to link to it, you can click the `Exists Data Source` button to switch the mode.
 
@@ -66,11 +66,11 @@ When you're ready, just click `Confirm` to finish setup.
 
 - The root `Partition` or `Group` can be add by the below `Add` button. The group `Partitions` can be create by right click the current `Group`.
 
-> You should be known that the `Group` can't directly contain the articles, it is just a collection of `Partition`. You can create groups nested, however, the **IKFB** database is constructed based on a lightwight database. Therefore nesting too deeply may cause performance decrease.
+> You should be known that the `Group` can't directly contain the articles, it is just a collection of `Partition`. You can create groups nested, however, the **Fabulous** database is constructed based on a lightwight database. Therefore nesting too deeply may cause performance decrease.
 
 **Add Articles**
 
-- You can click the `Import` button to import articles in each `Partition` page. **IKFB** would automatically create an `Item` for each article.
+- You can click the `Import` button to import articles in each `Partition` page. **Fabulous** would automatically create an `Item` for each article.
 
 - You can even drag the `pdf` files into the application, the function is the same as `Import`.
 
@@ -187,7 +187,7 @@ yarn lint
 
 - Data Structure
     * root/
-        * ikfb_files/
+        * fabulous_files/
             * items[i]
                 * *.pdf
                 * *.ipcnb

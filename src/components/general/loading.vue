@@ -1,5 +1,5 @@
 <template>
-    <div class="ikfb-loading-container" :class="[{dark: theme === 'dark'}]">
+    <div class="fabulous-loading-container" :class="[{dark: theme === 'dark'}]">
         <p class="title">{{title}}</p>
     </div>
 </template>
@@ -22,7 +22,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-loading-container {
+.fabulous-loading-container {
     @include HcenterVcenter;
 
     position: absolute;

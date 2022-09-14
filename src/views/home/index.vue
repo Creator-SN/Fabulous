@@ -1,6 +1,6 @@
 <template>
     <div
-        class="ikfb-home-container"
+        class="fabulous-home-container"
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
@@ -354,7 +354,7 @@ import pdf from "@/assets/home/pdf.svg";
 import metadata from "@/assets/home/metadata.svg";
 import folder from "@/assets/home/folder.svg";
 import viewer from "@/assets/home/viewer.svg";
-import ikfb from "@/assets/logo.svg";
+import fabulous from "@/assets/logo.svg";
 
 const { ipcRenderer: ipc } = require("electron");
 const path = require("path");
@@ -479,7 +479,7 @@ export default {
                 metadata: metadata,
                 folder: folder,
                 viewer: viewer,
-                ikfb: ikfb,
+                fabulous: fabulous,
             },
             show: {
                 add: false,
@@ -940,7 +940,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-home-container {
+.fabulous-home-container {
     position: relative;
     width: 100%;
     height: 100%;

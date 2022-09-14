@@ -19,7 +19,7 @@ logger.transports.file.level = "debug"
 autoUpdater.logger = logger
 
 autoUpdater.setFeedURL({
-    repo: "IKFB",
+    repo: "Fabulous",
     provider: "github",
     owner: "Creator-SN",
 })

@@ -1,6 +1,6 @@
 <template>
     <div
-        class="ikfb-callout-base-container"
+        class="fabulous-callout-base-container"
         :class="[{ dark: theme === 'dark' }]"
     >
         <fv-callout
@@ -39,22 +39,22 @@
                 name="trigger"
                 :show="triggerShow"
             ></slot>
-            <fv-drawer v-model="thisShow" class="ikfb-callout-base-mobile-container" length="calc(100% - 50px)">
-                <div class="ikfb-c-b-m-banner">
+            <fv-drawer v-model="thisShow" class="fabulous-callout-base-mobile-container" length="calc(100% - 50px)">
+                <div class="fabulous-c-b-m-banner">
                     <slot
                         name="header"
                         :title="title"
                     >
                         <p style="width: 50px"></p>
-                        <p class="ikfb-c-b-m-title">{{ title }}</p>
+                        <p class="fabulous-c-b-m-title">{{ title }}</p>
                     </slot>
                     <p
-                        class="ikfb-c-b-m-close"
+                        class="fabulous-c-b-m-close"
                         @click="thisShow = false"
                     >Cancel</p>
                 </div>
                 <div
-                    class="ikfb-c-b-m-content-block"
+                    class="fabulous-c-b-m-content-block"
                     :class="popperClass"
                 >
                     <div
@@ -113,16 +113,16 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-callout-base-container {
+.fabulous-callout-base-container {
     &.dark {
-        .ikfb-callout-base-mobile-container {
+        .fabulous-callout-base-mobile-container {
             background: rgba(36, 36, 36, 0.9);
 
-            .ikfb-c-b-m-banner {
+            .fabulous-c-b-m-banner {
                 background: rgba(47, 52, 55, 0.95);
                 color: whitesmoke;
 
-                .ikfb-c-b-m-close
+                .fabulous-c-b-m-close
                 {
                     color: rgba(46, 170, 220, 1);
                 }
@@ -134,7 +134,7 @@ export default {
         }
     }
 
-    .ikfb-callout-base-mobile-container {
+    .fabulous-callout-base-mobile-container {
         background: rgba(247, 246, 243, 0.9);
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
@@ -142,7 +142,7 @@ export default {
         flex-direction: column;
         z-index: 9;
 
-        .ikfb-c-b-m-banner {
+        .fabulous-c-b-m-banner {
             position: relative;
             width: 100%;
             height: 45px;
@@ -152,12 +152,12 @@ export default {
             justify-content: space-between;
             align-items: center;
 
-            .ikfb-c-b-m-title {
+            .fabulous-c-b-m-title {
                 font-size: 16px;
                 user-select: none;
             }
 
-            .ikfb-c-b-m-close {
+            .fabulous-c-b-m-close {
                 width: 60px;
                 color: rgba(0, 90, 158, 1);
                 text-align: center;
@@ -166,7 +166,7 @@ export default {
             }
         }
 
-        .ikfb-c-b-m-content-block {
+        .fabulous-c-b-m-content-block {
             position: relative;
             width: 100%;
             height: 100%;

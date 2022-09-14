@@ -4,14 +4,14 @@
         :mobileMode="mobileMode"
         :title="'Emoji'"
         :theme="theme"
-        :popperClass="['ikfb-emoji-callout']"
+        :popperClass="['fabulous-emoji-callout']"
     >
         <template v-slot:trigger>
-            <p class="ikfb-emoji-callout-content">{{value}}</p>
+            <p class="fabulous-emoji-callout-content">{{value}}</p>
         </template>
 
         <template v-slot:header="x">
-            <div class="ikfb-emoji-banner">
+            <div class="fabulous-emoji-banner">
                 <p style="font-size: 13.8px">{{ x.title }}</p>
                 <fv-button
                     :theme="theme"
@@ -27,12 +27,12 @@
             >
                 <template v-slot:default="x">
                     <div
-                        class="ikfb-emoji-list"
+                        class="fabulous-emoji-list"
                         v-for="(group, index) in x.dynamicValue"
                         :key="`type:${index}`"
                     >
                         <p class="title">{{ group.name }}</p>
-                        <div class="ikfb-emoji-group">
+                        <div class="fabulous-emoji-group">
                             <i
                                 v-for="(item, i) in group.emojis"
                                 :key="i"
@@ -94,7 +94,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-emoji-callout-content {
+.fabulous-emoji-callout-content {
     position: relative;
     padding: 2px;
     border-radius: 6px;
@@ -113,8 +113,8 @@ export default {
     }
 }
 
-.ikfb-emoji-callout {
-    .ikfb-emoji-banner {
+.fabulous-emoji-callout {
+    .fabulous-emoji-banner {
         position: relative;
         width: 100%;
         height: 35px;
@@ -136,7 +136,7 @@ export default {
         align-items: center;
         overflow: auto;
 
-        .ikfb-emoji-list {
+        .fabulous-emoji-list {
             position: relative;
             width: 100%;
             height: auto;
@@ -145,7 +145,7 @@ export default {
                 font-size: 12px;
             }
 
-            .ikfb-emoji-group {
+            .fabulous-emoji-group {
                 position: relative;
                 width: 100%;
                 height: auto;
@@ -176,8 +176,8 @@ export default {
     }
 }
 
-.ikfb-c-b-m-banner {
-    .ikfb-emoji-banner {
+.fabulous-c-b-m-banner {
+    .fabulous-emoji-banner {
         position: relative;
         width: 50%;
         height: 35px;

@@ -1,6 +1,6 @@
 <template>
     <div
-        class="ikfb-templates-grid"
+        class="fabulous-templates-grid"
         :class="[{dark: theme === 'dark'}]"
     >
         <div
@@ -311,7 +311,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-templates-grid {
+.fabulous-templates-grid {
     @include FullRelative;
 
     padding: 15px;

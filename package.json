@@ -1,8 +1,8 @@
 {
-  "name": "ikfb",
+  "name": "fabulous",
   "version": "3.0.1",
   "private": true,
-  "description": "Involution King Fun Book (IKFB, Chinese: 快卷, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the VFluent, which is inspired by the Microsft Fluent Design System.",
+  "description": "Involution King Fun Book (Fabulous, Chinese: 快卷, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the VFluent, which is inspired by the Microsft Fluent Design System.",
   "author": {
     "name": "Creator-SN",
     "ulr": "https://github.com/Creator-SN"
@@ -19,11 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Creator-SN/IKFB"
+    "url": "https://github.com/Creator-SN/Fabulous"
   },
   "main": "background.js",
   "dependencies": {
-    "@creatorsn/powereditor": "^0.6.6",
+    "@creatorsn/powereditor": "^0.8.1",
     "axios": "^0.21.4",
     "core-js": "^3.6.5",
     "electron-log": "^4.4.7",

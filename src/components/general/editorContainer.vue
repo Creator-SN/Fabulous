@@ -2,7 +2,7 @@
     <transition :name="show_editor ? 'move-right-to-left' : 'move-left-to-right'">
         <div
             v-show="show_editor"
-            class="ikfb-editor-container"
+            class="fabulous-editor-container"
             :class="[{ dark: theme == 'dark', fullScreen: fullScreen }]"
         >
             <div class="control-banner">
@@ -739,7 +739,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-editor-container {
+.fabulous-editor-container {
     position: fixed;
     width: calc(100% - 350px);
     height: 100%;

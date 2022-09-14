@@ -1,6 +1,6 @@
 <template>
     <fv-navigation-panel
-        :title="local('IKFB')"
+        :title="local('Fabulous')"
         class="navigation-view"
         :expand.sync="expand"
         :theme="theme"

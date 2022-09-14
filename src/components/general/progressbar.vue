@@ -1,5 +1,5 @@
 <template>
-<div v-show="progress > 0 && progress <= 100" class="ikfb-global-progress-bar">
+<div v-show="progress > 0 && progress <= 100" class="fabulous-global-progress-bar">
     <fv-progress-bar :value="progress" background="transparent" foreground="rgba(252, 194, 0, 1)" style="width: 100%;"></fv-progress-bar>
 </div>
 </template>
@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-global-progress-bar
+.fabulous-global-progress-bar
 {
     position: fixed;
     left: 0px;

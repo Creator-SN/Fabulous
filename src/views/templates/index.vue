@@ -1,6 +1,6 @@
 <template>
     <div
-        class="ikfb-templates-container"
+        class="fabulous-templates-container"
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
@@ -238,7 +238,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-templates-container {
+.fabulous-templates-container {
     position: relative;
     width: 100%;
     height: 100%;

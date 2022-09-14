@@ -1,6 +1,6 @@
 <template>
     <div
-        class="ikfb-pdf-container"
+        class="fabulous-pdf-container"
         :class="[{dark: theme === 'dark'}]"
     >
         <div
@@ -42,10 +42,10 @@
         <transition name="move-top-to-bottom">
             <div
                 v-show="container.width !== 0"
-                class="ikfb-pdf-tool-bar"
+                class="fabulous-pdf-tool-bar"
                 :style="{left: `${container.left + 60}px`, top: `${container.top + 35}px`, width: `${container.width - 120}px`}"
             >
-                <div class="ikfb-pdf-tool-bar-wrapper">
+                <div class="fabulous-pdf-tool-bar-wrapper">
                     <div class="left-block">
                         <fv-text-box
                             v-model="currentPageStr"
@@ -113,7 +113,7 @@
                 <transition :name="show.translate ? 'move-right-to-left' : 'move-left-to-right'">
                     <div
                         v-show="show.translate"
-                        class="ikfb-pdf-translation-panel"
+                        class="fabulous-pdf-translation-panel"
                     >
                         <div class="control-banner">
                             <fv-button
@@ -212,7 +212,7 @@ export default {
     props: {
         url: {
             default:
-                "C:/Users/Alever/OneDrive/Documents/Papers/IKFB/root/items/c8732a00/c8732a00.pdf",
+                "C:/Users/Alever/OneDrive/Documents/Papers/Fabulous/root/items/c8732a00/c8732a00.pdf",
         },
         disabledEditor: {
             default: false,
@@ -721,7 +721,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-pdf-container {
+.fabulous-pdf-container {
     position: relative;
     width: 100%;
     height: 100%;
@@ -736,13 +736,13 @@ export default {
             }
         }
 
-        .ikfb-pdf-tool-bar {
-            .ikfb-pdf-tool-bar-wrapper {
+        .fabulous-pdf-tool-bar {
+            .fabulous-pdf-tool-bar-wrapper {
                 background: rgba(50, 50, 50, 0.8);
                 color: whitesmoke;
             }
 
-            .ikfb-pdf-translation-panel {
+            .fabulous-pdf-translation-panel {
                 background: rgba(50, 50, 50, 0.8);
             }
         }
@@ -830,7 +830,7 @@ export default {
         }
     }
 
-    .ikfb-pdf-tool-bar {
+    .fabulous-pdf-tool-bar {
         position: fixed;
         left: 15px;
         top: 50px;
@@ -840,7 +840,7 @@ export default {
         transition: all 0.3s;
         z-index: 3;
 
-        .ikfb-pdf-tool-bar-wrapper {
+        .fabulous-pdf-tool-bar-wrapper {
             @include Vcenter;
 
             position: relative;
@@ -880,7 +880,7 @@ export default {
             }
         }
 
-        .ikfb-pdf-translation-panel {
+        .fabulous-pdf-translation-panel {
             @include VcenterC;
 
             position: absolute;

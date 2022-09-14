@@ -2,7 +2,7 @@
     <transition :name="value ? 'move-right-to-left' : 'move-left-to-right'">
         <div
             v-show="value"
-            class="ikfb-pdf-importer"
+            class="fabulous-pdf-importer"
             :class="[{ dark: theme == 'dark' }]"
         >
             <input
@@ -318,7 +318,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-pdf-importer {
+.fabulous-pdf-importer {
     position: fixed;
     width: 350px;
     height: auto;

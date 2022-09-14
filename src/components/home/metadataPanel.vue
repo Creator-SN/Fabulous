@@ -663,7 +663,7 @@ export default {
                 }
                 return r;
             };
-            let bib = `@${this.bibTexValue.key} {ikfb${this.$Guid()},
+            let bib = `@${this.bibTexValue.key} {fabulous${this.$Guid()},
                 ${midContent()}
             }`;
 

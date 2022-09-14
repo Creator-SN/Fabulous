@@ -42,13 +42,13 @@ jobs:
         uses: dawidd6/action-get-tag@v1
 
       # - name: Archive Release
-      #   run: powershell Compress-Archive -Path ./dist_electron/ -DestinationPath win_x64_IKFB_${{steps.tag.outputs.tag}}.zip
+      #   run: powershell Compress-Archive -Path ./dist_electron/ -DestinationPath win_x64_Fabulous_${{steps.tag.outputs.tag}}.zip
 
       - name: Rename
         run: |
           $v="${{steps.tag.outputs.tag}}".Substring(1)
-          mv "./dist_electron/IKFB Setup $v.exe" "IKFB-Setup-$v.exe"
-          mv "./dist_electron/IKFB Setup $v.exe.blockmap" "IKFB-Setup-$v.exe.blockmap"
+          mv "./dist_electron/Fabulous Setup $v.exe" "Fabulous-Setup-$v.exe"
+          mv "./dist_electron/Fabulous Setup $v.exe.blockmap" "Fabulous-Setup-$v.exe.blockmap"
           mv "./dist_electron/latest.yml" "latest.yml"
 
       - name: Upload Prerelease
@@ -94,10 +94,10 @@ jobs:
         run: |
           v=${{steps.tag.outputs.tag}}
           v=${v:1}
-          mv ./dist_electron/IKFB-$v.dmg ./IKFB-$v.dmg
-          mv ./dist_electron/IKFB-$v.dmg.blockmap ./IKFB-$v.dmg.blockmap
-          mv ./dist_electron/IKFB-$v-mac.zip ./IKFB-$v-mac.zip
-          mv ./dist_electron/IKFB-$v-mac.zip.blockmap ./IKFB-$v-mac.zip.blockmap
+          mv ./dist_electron/Fabulous-$v.dmg ./Fabulous-$v.dmg
+          mv ./dist_electron/Fabulous-$v.dmg.blockmap ./Fabulous-$v.dmg.blockmap
+          mv ./dist_electron/Fabulous-$v-mac.zip ./Fabulous-$v-mac.zip
+          mv ./dist_electron/Fabulous-$v-mac.zip.blockmap ./Fabulous-$v-mac.zip.blockmap
           mv ./dist_electron/latest-mac.yml ./latest-mac.yml
 
       - name: Upload Prerelease

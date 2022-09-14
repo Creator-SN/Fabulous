@@ -2,7 +2,7 @@
     <transition name="zoom-in-top">
         <div
             v-show="thisValue"
-            class="ikfb-rightMenu"
+            class="fabulous-rightMenu"
             :class="[{dark: theme === 'dark'}]"
             :style="{left: posX + 'px', top: posY + 'px', width: rightMenuWidth + 'px'}"
         >
@@ -70,7 +70,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ikfb-rightMenu {
+.fabulous-rightMenu {
     position: fixed;
     top: 100%;
     width: 200px;

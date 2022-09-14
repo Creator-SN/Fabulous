@@ -94,7 +94,7 @@ export default {
             try {
                 let idx = rangeNodes[0].index;
                 let container = document.querySelectorAll(
-                    ".ikfb-pdf-container"
+                    ".fabulous-pdf-container"
                 );
                 let root = document.querySelectorAll(
                     ".pdf-display-scroll-view"
