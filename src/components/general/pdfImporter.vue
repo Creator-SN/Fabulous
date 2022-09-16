@@ -82,7 +82,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
         }),
         inputInspectClick() {
@@ -101,7 +101,7 @@ export default {
                     let item = this.items.find((it) => it.id === this.item.id);
                     item.pdf = `${item.id}`;
                     item.metadata = _metadata;
-                    this.reviseDS({
+                    this.reviseData({
                         $index: this.data_index,
                         items: this.items,
                     });
@@ -140,7 +140,7 @@ export default {
                     _item.pdf = `${_item.id}`;
                     _item.metadata = _metadata;
                     this.items.push(_item);
-                    this.reviseDS({
+                    this.reviseData({
                         $index: this.data_index,
                         items: this.items,
                     });
@@ -186,7 +186,7 @@ export default {
                 _item.pdf = `${_item.id}`;
                 _item.metadata = _metadata;
                 this.items.push(_item);
-                this.reviseDS({
+                this.reviseData({
                     $index: this.data_index,
                     items: this.items,
                 });
@@ -220,7 +220,7 @@ export default {
                     partitions[i].items.push(item.id);
                 }
             }
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,

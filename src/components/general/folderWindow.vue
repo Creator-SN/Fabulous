@@ -102,7 +102,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         refreshTreeList() {
             let result = [];

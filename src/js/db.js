@@ -17,6 +17,12 @@ export class DBManager {
 
     }
 
+    getDB(path) {
+        let dbAdapter = new FileSync(path);
+        let db = Datastore(dbAdapter);
+        return db;
+    }
+
     getConfigDB() {
         let configDB = this.getDB(path.join(STORE_PATH, '/config.json'));
         if (!configDB.has('init_status').value()) { // 先判断该值存不存在
@@ -26,10 +32,9 @@ export class DBManager {
         return configDB;
     }
 
-    getDB(path) {
-        let dbAdapter = new FileSync(path);
-        let db = Datastore(dbAdapter);
-        return db;
+    getDataDB(dir) {
+        let dataDB = this.getDB(path.join(dir, '/data_structure.json'));
+        return dataDB;
     }
 
     existsDB(path) {

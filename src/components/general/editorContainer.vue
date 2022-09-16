@@ -475,7 +475,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),

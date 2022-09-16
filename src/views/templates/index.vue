@@ -137,7 +137,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
@@ -168,7 +168,7 @@ export default {
                         )
                     );
                     this.templates.splice(index, 1);
-                    this.reviseDS({
+                    this.reviseData({
                         $index: this.data_index,
                         templates: this.templates,
                     });
@@ -205,7 +205,7 @@ export default {
                                 this.templates.find((it) => it.id === el.id)
                             );
                             this.templates.splice(index, 1);
-                            this.reviseDS({
+                            this.reviseData({
                                 $index: this.data_index,
                                 templates: this.templates,
                             });

@@ -179,7 +179,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             toggleEditor: "toggleEditor",
         }),
         async loadTemplates() {

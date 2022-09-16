@@ -225,7 +225,7 @@ import navEmpty from "@/components/general/empty/navEmpty.vue";
 import rightMenu from "@/components/general/rightMenu.vue";
 import emojiCallout from "@/components/general/callout/emojiCallout.vue";
 import { mapMutations, mapState, mapGetters } from "vuex";
-import { data_structure, group, partition } from "@/js/data_sample";
+import { group, partition } from "@/js/data_sample";
 
 export default {
     components: {
@@ -293,9 +293,6 @@ export default {
         };
     },
     watch: {
-        data_index() {
-            this.syncDS();
-        },
         groups() {
             this.refreshTreeList();
         },
@@ -305,6 +302,7 @@ export default {
     },
     computed: {
         ...mapState({
+            DataDB: (state) => state.DataDB,
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
             language: (state) => state.config.language,
@@ -314,13 +312,13 @@ export default {
             partitions: (state) => state.data_structure.partitions,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
+        ...mapGetters(["local"]),
         navigationViewBackground() {
             if (this.theme == "light") return "rgba(242, 242, 242, 0.8)";
             return "rgba(0, 0, 0, 0.8)";
         },
         SourceDisabled() {
-            if (this.ds_db === null) return true;
+            if (!this.DataDB) return true;
             if (!this.ds_id) return true;
             return false;
         },
@@ -335,34 +333,13 @@ export default {
         },
     },
     mounted() {
-        this.syncDS();
         this.refreshTreeList();
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             reviseI18N: "reviseI18N",
         }),
-        syncDS() {
-            if (!this.ds_db) return 0;
-            let _data_structure = JSON.parse(JSON.stringify(data_structure));
-            for (let key in _data_structure) {
-                _data_structure[key] = this.ds_db.get(key).write();
-                if (!_data_structure[key]) {
-                    let object = {
-                        $index: this.data_index,
-                    };
-                    object[key] = data_structure[key];
-                    this.reviseDS(object);
-                } else {
-                    let object = {
-                        $index: this.data_index,
-                    };
-                    object[key] = _data_structure[key];
-                    this.reviseDS(object);
-                }
-            }
-        },
         refreshTreeList() {
             let result = [];
             this.saveExpandedStatus();
@@ -424,8 +401,7 @@ export default {
             _group.editable = true;
             if (target) target.groups.push(_group);
             else this.groups.push(_group);
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
             });
             setTimeout(() => {
@@ -443,8 +419,7 @@ export default {
             _partition.editable = true;
             if (target) target.partitions.push(_partition);
             else this.partitions.push(_partition);
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 partitions: this.partitions,
             });
             setTimeout(() => {
@@ -473,8 +448,7 @@ export default {
                     break;
                 }
             }
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -500,8 +474,7 @@ export default {
                     break;
                 }
             }
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -527,8 +500,7 @@ export default {
                     break;
                 }
             }
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -551,8 +523,7 @@ export default {
                     break;
                 }
             }
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -609,8 +580,7 @@ export default {
                     }
                 }
             }
-            this.reviseDS({
-                $index: this.data_index,
+            this.reviseData({
                 groups: this.groups,
                 partitions: this.partitions,
             });

@@ -153,7 +153,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
             reviseItemCarrier: "reviseItemCarrier",
         }),
@@ -244,7 +244,7 @@ export default {
                 let _item = JSON.parse(JSON.stringify(itemX.item));
                 _item.createDate = this.$SDate.DateToString(new Date());
                 this.items.push(_item);
-                this.reviseDS({
+                this.reviseData({
                     $index: this.data_index,
                     items: this.items,
                 });
@@ -284,7 +284,7 @@ export default {
                     partitions[i].items.push(item.id);
                 }
             }
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,

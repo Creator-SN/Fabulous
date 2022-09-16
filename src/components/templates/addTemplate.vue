@@ -81,7 +81,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         async add() {
             if (!this.ds_db || this.name === "") return;
@@ -91,7 +91,7 @@ export default {
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
             this.templates.push(_page);
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 templates: this.templates,
             });

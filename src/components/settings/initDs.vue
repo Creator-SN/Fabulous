@@ -81,7 +81,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         initDs() {
             if (this.db_index < 0 || this.name === "") return;
@@ -94,7 +94,7 @@ export default {
             ds.id = id;
             ds.name = name;
             ds.createDate = this.$SDate.DateToString(new Date());
-            this.reviseDS({
+            this.reviseData({
                 $index: this.db_index,
                 ...ds
             });

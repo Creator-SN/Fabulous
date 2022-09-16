@@ -98,7 +98,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
@@ -118,7 +118,7 @@ export default {
             let item = this.items.find((it) => it.id === this.item.id);
             item.pages.push(_page);
             this.item.pages = item.pages;
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });

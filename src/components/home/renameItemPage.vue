@@ -85,7 +85,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         async rename() {
             if (!this.ds_db || !this.value || !this.item || this.name === "")
@@ -94,7 +94,7 @@ export default {
             let _page = item.pages.find((it) => it.id === this.value.id);
             _page.name = this.name;
             this.value.name = this.name;
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });

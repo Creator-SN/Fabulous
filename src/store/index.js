@@ -60,7 +60,6 @@ export default new Vuex.Store({
         },
         //
         progress: 0,
-        dbList: [],
         i18n: {}
     },
     mutations: {
@@ -80,19 +79,11 @@ export default new Vuex.Store({
                 await state.ConfigDB.set(key, state.config[key]).write();
             }
         },
-        reviseDS(state, obj) {
-            for (let key in obj) {
-                if (key === '$index' || state.data_structure[key] === undefined)
-                    continue;
-                state.data_structure[key] = obj[key];
-                state.dbList[obj.$index].set(key, state.data_structure[key]).write();
-            }
-        },
         reviseData(state, obj) {
             for (let key in obj) {
-                if (state[key] === undefined)
+                if (state.data_structure[key] === undefined)
                     continue;
-                state[key] = obj[key];
+                state.data_structure[key] = obj[key];
             }
         },
         reviseEditor(state, obj) {
@@ -144,11 +135,7 @@ export default new Vuex.Store({
             return result[state.config.language];
         },
         ds_db: state => {
-            if (state.config.data_index < 0)
-                return null;
-            if (!state.dbList[state.config.data_index])
-                return null;
-            return state.dbList[state.config.data_index];
+            return state.DataDB;
         }
     },
     modules: {

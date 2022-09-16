@@ -27,7 +27,7 @@
             </fv-Collapse>
             <div class="s-item-block">
                 <fv-list-view
-                    :value="thisDBList"
+                    :value="thisPathList"
                     :theme="theme"
                     :choosen-background="'rgba(0, 98, 158, 0.1)'"
                     style="width: 100%; height: auto; margin-top: 15px;"
@@ -50,7 +50,7 @@
                                 class="ms-Icon ms-Icon--Link"
                             ></i>
                             <p class="item-name">{{x.item.name}}</p>
-                            <fv-button
+                            <!-- <fv-button
                                 v-show="x.item.status == 502 || SourceIndexDisabled(x.index)"
                                 :theme="theme"
                                 class="control-btn"
@@ -60,7 +60,7 @@
                                 @click="showInitDS(x.index)"
                             >
                                 <i class="ms-Icon ms-Icon--EraseTool"></i>
-                            </fv-button>
+                            </fv-button> -->
                             <fv-button
                                 :theme="theme"
                                 class="control-btn"
@@ -166,7 +166,7 @@ export default {
                 { key: "en", text: "English" },
                 { key: "cn", text: "简体中文" },
             ],
-            thisDBList: [],
+            thisPathList: [],
             db_index: -1,
             img: {
                 OneDrive,
@@ -203,7 +203,6 @@ export default {
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
             DataDB: (state) => state.DataDB,
-            dbList: (state) => state.dbList,
             language: (state) => state.config.language,
             theme: (state) => state.config.theme,
         }),
@@ -213,9 +212,8 @@ export default {
         },
         SourceIndexDisabled() {
             return (index) => {
-                if (!this.dbList[index]) return true;
-                let id = this.dbList[index].get("id").write();
-                return id === null;
+                if (!this.data_path[index]) return true;
+                return false;
             };
         },
     },
@@ -226,7 +224,6 @@ export default {
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
-            reviseDS: "reviseDS",
             reviseData: "reviseData",
             toggleTheme: "toggleTheme",
             syncDS: "syncDS",
@@ -245,7 +242,7 @@ export default {
             // 此函数初始化数据源的DB //
             // 同时也会初始化ListView列表项目 //
             let pathList = this.data_path;
-            if (this.DataDB.status == 404 && !this.init_status) {
+            if (pathList.length === 0) {
                 this.$barWarning(
                     this.local(
                         "There is no source, please add a data source to getting started."
@@ -257,22 +254,18 @@ export default {
                 );
                 return;
             }
-            let dbXList = this.DataDB.dbXList;
-            let thisDBList = [];
-            dbXList.forEach((el, idx) => {
-                thisDBList.push({
+            let thisPathList = [];
+            pathList.forEach((el, idx) => {
+                thisPathList.push({
                     key: idx,
                     name: pathList[idx],
                     path: pathList[idx],
                     choosen: idx === this.data_index,
-                    status: el.status,
-                    msg: el.msg,
-                    disabled: () => el.status === 500 || !this.lock.switchDataIndex,
-                    db: el.db,
+                    disabled: () => false,
                 });
             });
-            this.thisDBList.splice(0, this.thisDBList.length);
-            this.thisDBList = thisDBList;
+            this.thisPathList.splice(0, this.thisPathList.length);
+            this.thisPathList = thisPathList;
         },
         async addSource() {
             let path = (
@@ -326,7 +319,7 @@ export default {
                             this.reviseConfig({
                                 data_index: index - 1,
                             });
-                        else if(this.data_path.length > 0)
+                        else if (this.data_path.length > 0)
                             this.reviseConfig({
                                 data_index: 0,
                             });

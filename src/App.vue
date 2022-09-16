@@ -43,8 +43,7 @@ import navigationView from "@/components/general/navigationView.vue";
 import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
-import { config } from "@/js/data_sample";
-import { DataDB } from "@/js/dbManager.js";
+import { config, data_structure } from "@/js/data_sample";
 import { mapMutations, mapState, mapGetters } from "vuex";
 
 export default {
@@ -69,8 +68,11 @@ export default {
         $route() {
             this.pdfImporterInit();
         },
-        data_path() {
+        currentPath() {
             this.dataDBInit();
+        },
+        DataDB() {
+            this.syncDataStructure();
         },
     },
     computed: {
@@ -78,12 +80,18 @@ export default {
             ConfigDB: (state) => state.ConfigDB,
             DataDB: (state) => state.DataDB,
             init_status: (state) => state.config.init_status,
+            data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
             show_editor: (state) => state.editor.show,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
+        currentPath() {
+            if (this.data_path[this.data_index])
+                return this.data_path[this.data_index];
+            else return null;
+        },
     },
     mounted() {
         this.configDBInit();
@@ -115,25 +123,22 @@ export default {
         },
         dataDBInit() {
             let pathList = this.data_path;
-            let dataDB = new DataDB(pathList);
+            let dataDB = null;
+            if (!pathList || pathList.length === 0) return;
+            if (this.data_index >= pathList.length || this.data_index < 0) {
+                dataDB = this.$DBM.getDataDB(pathList[0]);
+            } else dataDB = this.$DBM.getDataDB(pathList[this.data_index]);
             this.initDB({
                 DataDB: dataDB,
             });
-            if (dataDB.status == 404 && !this.init_status) {
-                this.$barWarning(
-                    this.local(
-                        "There is no source, please add a data source to getting started."
-                    ),
-                    {
-                        status: "warning",
-                        autoClose: -1,
-                    }
-                );
-                return;
+        },
+        syncDataStructure() {
+            if (!this.DataDB) return;
+            let _data_structure = JSON.parse(JSON.stringify(data_structure));
+            for (let key in _data_structure) {
+                _data_structure[key] = this.DataDB.get(key).write();
             }
-            this.reviseData({
-                dbList: dataDB.dbList,
-            });
+            this.reviseData(_data_structure);
         },
         pdfImporterInit() {
             this.revisePdfImporter({

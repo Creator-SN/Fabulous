@@ -537,7 +537,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         metadataInit() {
             if (!this.item.metadata) return;
@@ -599,7 +599,7 @@ export default {
             let item = this.items.find((it) => it.id === this.item.id);
             item.metadata = JSON.parse(JSON.stringify(this.metadata));
             this.item.metadata = JSON.parse(JSON.stringify(this.metadata));
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });

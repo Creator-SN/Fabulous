@@ -171,8 +171,7 @@ export default {
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
-            reviseData: "reviseData",
-            reviseDS: "reviseDS",
+            reviseData: "reviseData"
         }),
         languageInit() {
             this.cur_language = this.languages.find(
@@ -223,7 +222,7 @@ export default {
             ds.id = this.$Guid();
             ds.name = this.name;
             ds.createDate = this.$SDate.DateToString(new Date());
-            await this.reviseDS({
+            await this.reviseData({
                 $index: index,
                 ...ds,
             });

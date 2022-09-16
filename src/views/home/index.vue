@@ -570,7 +570,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             revisePdfImporter: "revisePdfImporter",
             reviseItemCarrier: "reviseItemCarrier",
@@ -612,7 +612,7 @@ export default {
                         this.items.find((it) => it.id === this.currentItem.id)
                     );
                     this.items.splice(index, 1);
-                    this.reviseDS({
+                    this.reviseData({
                         $index: this.data_index,
                         items: this.items,
                     });
@@ -647,7 +647,7 @@ export default {
                             this.items.find((it) => it.id === el.id)
                         );
                         this.items.splice(index, 1);
-                        this.reviseDS({
+                        this.reviseData({
                             $index: this.data_index,
                             items: this.items,
                         });
@@ -771,7 +771,7 @@ export default {
                 result[idx].items = p.items;
             });
             this.currentChoosen = [];
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
@@ -826,7 +826,7 @@ export default {
                 }
             }
             this.currentChoosen = [];
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
@@ -847,7 +847,7 @@ export default {
             let _item = this.items.find((it) => it.id === item.id);
             _item.emoji = emoji;
             item.emoji = emoji;
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });
@@ -858,7 +858,7 @@ export default {
             let _page = _item.pages.find((it) => it.id === page.id);
             _page.emoji = emoji;
             page.emoji = emoji;
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });
@@ -901,7 +901,7 @@ export default {
                     resolve(1);
                 });
             });
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });
@@ -919,7 +919,7 @@ export default {
                         item.pages.find((page) => page.id === pageId)
                     );
                     item.pages.splice(index, 1);
-                    await this.reviseDS({
+                    await this.reviseData({
                         $index: this.data_index,
                         items: this.items,
                     });

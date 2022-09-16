@@ -137,7 +137,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseDS: "reviseDS",
+            reviseData: "reviseData",
         }),
         async confirm() {
             if (!this.ds_db || !this.value || this.name === "") return;
@@ -146,7 +146,7 @@ export default {
             _item.labels = this.labels;
             this.value.name = this.name;
             this.value.labels = this.labels;
-            this.reviseDS({
+            this.reviseData({
                 $index: this.data_index,
                 items: this.items,
             });
