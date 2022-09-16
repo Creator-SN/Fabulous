@@ -305,14 +305,14 @@ export default {
     },
     computed: {
         ...mapState({
-            data_path: (state) => state.data_path,
-            data_index: (state) => state.data_index,
-            language: (state) => state.language,
+            data_path: (state) => state.config.data_path,
+            data_index: (state) => state.config.data_index,
+            language: (state) => state.config.language,
             ds_id: (state) => state.data_structure.id,
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
             partitions: (state) => state.data_structure.partitions,
-            theme: (state) => state.theme,
+            theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
         navigationViewBackground() {

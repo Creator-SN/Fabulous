@@ -15,7 +15,7 @@ export default {
     },
     computed: {
         ...mapState({
-            theme: (state) => state.theme,
+            theme: (state) => state.config.theme,
         })
     },
 };

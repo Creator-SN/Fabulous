@@ -4,7 +4,7 @@ import App from './App.vue'
 import router from "@/router";
 import store from "@/store";
 
-import VueFluent from "vfluentdesign";
+// import VueFluent from "vfluentdesign";
 import PowerEditor from "@creatorsn/powereditor";
 import "vfluentdesign/lib/index.css";
 import "@creatorsn/powereditor/lib/powereditor.css";
@@ -20,9 +20,11 @@ let PDFJS = require("pdfjs-dist");
 const pdfjsWorker = require('pdfjs-dist/build/pdf.worker.entry');
 PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
+import { DBManager } from "@/js/db.js";
+
 Vue.use(VueAxios, axios);
 
-Vue.use(VueFluent);
+// Vue.use(VueFluent);
 Vue.use(PowerEditor);
 
 Vue.config.productionTip = false
@@ -33,6 +35,7 @@ new Vue({
     render: h => h(App),
     beforeCreate () {
         Vue.prototype.$PDFJS = PDFJS;
+        Vue.prototype.$DBM = new DBManager();
         Vue.prototype.$Go = str => {
             this.$router.push(str);
         };

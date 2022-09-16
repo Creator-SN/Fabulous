@@ -199,13 +199,13 @@ export default {
     },
     computed: {
         ...mapState({
-            init_status: (state) => state.init_status,
-            data_index: (state) => state.data_index,
-            data_path: (state) => state.data_path,
+            init_status: (state) => state.config.init_status,
+            data_index: (state) => state.config.data_index,
+            data_path: (state) => state.config.data_path,
             DataDB: (state) => state.DataDB,
             dbList: (state) => state.dbList,
-            language: (state) => state.language,
-            theme: (state) => state.theme,
+            language: (state) => state.config.language,
+            theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
         v() {

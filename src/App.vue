@@ -25,7 +25,10 @@
             ref="drop"
         ></div>
         <transition name="scale-up-to-up">
-            <starter v-if="init_status" @refresh-data-db="dataDBInit"></starter>
+            <starter
+                v-if="init_status"
+                @refresh-data-db="dataDBInit"
+            ></starter>
         </transition>
         <progress-bar></progress-bar>
     </div>
@@ -41,7 +44,7 @@ import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
 import { config } from "@/js/data_sample";
-import { ConfigDB, DataDB } from "@/js/dbManager.js";
+import { DataDB } from "@/js/dbManager.js";
 import { mapMutations, mapState, mapGetters } from "vuex";
 
 export default {
@@ -72,11 +75,13 @@ export default {
     },
     computed: {
         ...mapState({
-            init_status: (state) => state.init_status,
-            data_path: (state) => state.data_path,
-            language: (state) => state.language,
+            ConfigDB: (state) => state.ConfigDB,
+            DataDB: (state) => state.DataDB,
+            init_status: (state) => state.config.init_status,
+            data_path: (state) => state.config.data_path,
+            language: (state) => state.config.language,
             show_editor: (state) => state.editor.show,
-            theme: (state) => state.theme,
+            theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
     },
@@ -100,12 +105,11 @@ export default {
             this.reviseI18N(i18n);
         },
         configDBInit() {
-            let configDB = new ConfigDB();
+            let configDB = this.$DBM.getConfigDB();
             this.initDB({ ConfigDB: configDB });
-            this.$config_db = configDB.config_db;
             let _config = JSON.parse(JSON.stringify(config));
             for (let key in _config) {
-                _config[key] = this.$config_db.get(key).write();
+                _config[key] = this.ConfigDB.get(key).write();
             }
             this.reviseConfig(_config);
         },
@@ -113,7 +117,7 @@ export default {
             let pathList = this.data_path;
             let dataDB = new DataDB(pathList);
             this.initDB({
-                DataDB: dataDB
+                DataDB: dataDB,
             });
             if (dataDB.status == 404 && !this.init_status) {
                 this.$barWarning(

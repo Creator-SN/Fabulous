@@ -69,10 +69,10 @@ export default {
     },
     computed: {
         ...mapState({
-            data_path: (state) => state.data_path,
-            language: (state) => state.language,
+            data_path: (state) => state.config.data_path,
+            language: (state) => state.config.language,
             dbList: (state) => state.dbList,
-            theme: (state) => state.theme,
+            theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
         v() {

@@ -85,11 +85,11 @@ export default {
     },
     computed: {
         ...mapState({
-            data_index: (state) => state.data_index,
-            data_path: (state) => state.data_path,
+            data_index: (state) => state.config.data_index,
+            data_path: (state) => state.config.data_path,
             templates: (state) => state.data_structure.templates,
             items: (state) => state.data_structure.items,
-            theme: (state) => state.theme,
+            theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
         v() {

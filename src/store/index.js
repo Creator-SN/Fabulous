@@ -5,15 +5,17 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        // config //
-        init_status: true,
-        data_path: [],
-        data_index: -1,
-        language: 'en',
-        theme: 'light',
         // DBClass //
         ConfigDB: null,
         DataDB: null,
+        // config //
+        config: {
+            init_status: true,
+            data_path: [],
+            data_index: -1,
+            language: 'en',
+            theme: 'light'
+        },
         // ds //
         data_structure: {
             id: null,
@@ -72,10 +74,10 @@ export default new Vuex.Store({
         async reviseConfig(state, obj) {
             if (!state.ConfigDB) return;
             for (let key in obj) {
-                if (state[key] === undefined) // 要用undefined比较好, 因为其他情况也有可能false.
+                if (state.config[key] === undefined) // 要用undefined比较好, 因为其他情况也有可能false.
                     continue;
-                state[key] = obj[key];
-                await state.ConfigDB.config_db.set(key, state[key]).write();
+                state.config[key] = obj[key];
+                await state.ConfigDB.set(key, state.config[key]).write();
             }
         },
         reviseDS(state, obj) {
@@ -122,12 +124,12 @@ export default new Vuex.Store({
         },
         async toggleTheme(state) {
             if (!state.ConfigDB) return;
-            if (state.theme == 'light') {
-                state.theme = 'dark'
+            if (state.config.theme == 'light') {
+                state.config.theme = 'dark'
             } else {
-                state.theme = 'light'
+                state.config.theme = 'light'
             }
-            await state.ConfigDB.config_db.set('theme', state.theme).write();
+            await state.ConfigDB.set('theme', state.config.theme).write();
         },
         toggleEditor(state, status) {
             state.editor.show = status;
@@ -139,14 +141,14 @@ export default new Vuex.Store({
             let result = state.i18n[text];
             if (!result)
                 return text;
-            return result[state.language];
+            return result[state.config.language];
         },
         ds_db: state => {
-            if (state.data_index < 0)
+            if (state.config.data_index < 0)
                 return null;
-            if (!state.dbList[state.data_index])
+            if (!state.dbList[state.config.data_index])
                 return null;
-            return state.dbList[state.data_index];
+            return state.dbList[state.config.data_index];
         }
     },
     modules: {
