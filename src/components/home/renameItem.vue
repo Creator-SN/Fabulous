@@ -147,7 +147,6 @@ export default {
             this.value.name = this.name;
             this.value.labels = this.labels;
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
             this.thisShow = false;

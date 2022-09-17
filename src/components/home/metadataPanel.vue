@@ -600,7 +600,6 @@ export default {
             item.metadata = JSON.parse(JSON.stringify(this.metadata));
             this.item.metadata = JSON.parse(JSON.stringify(this.metadata));
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
             await this.saveMetadata(this.metadata, item.id);

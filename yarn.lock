@@ -1015,7 +1015,7 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^0.8.3":
+"@creatorsn/powereditor@^0.8.4":
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-0.8.3.tgz#286fe410afaa04e91640446c55164fe0caaceb4f"
   integrity sha512-8LC2Vn1VQQZqGk0Q0gsTb9Ac1v6GPZtGw5WxXIxiskhYYv0cVfbuFZpADnfHC8yKML5AQaq70Fq1Fa36qZrRQA==

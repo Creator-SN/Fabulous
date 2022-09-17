@@ -102,7 +102,6 @@ export default {
                     item.pdf = `${item.id}`;
                     item.metadata = _metadata;
                     this.reviseData({
-                        $index: this.data_index,
                         items: this.items,
                     });
                     await this.copyPdf(file.path);
@@ -141,7 +140,6 @@ export default {
                     _item.metadata = _metadata;
                     this.items.push(_item);
                     this.reviseData({
-                        $index: this.data_index,
                         items: this.items,
                     });
                     this.copyToPartition(_item);
@@ -187,7 +185,6 @@ export default {
                 _item.metadata = _metadata;
                 this.items.push(_item);
                 this.reviseData({
-                    $index: this.data_index,
                     items: this.items,
                 });
                 this.copyToPartition(_item);
@@ -221,7 +218,6 @@ export default {
                 }
             }
             this.reviseData({
-                $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
             });

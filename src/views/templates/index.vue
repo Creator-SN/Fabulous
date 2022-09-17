@@ -169,7 +169,6 @@ export default {
                     );
                     this.templates.splice(index, 1);
                     this.reviseData({
-                        $index: this.data_index,
                         templates: this.templates,
                     });
                     ipc.send(
@@ -206,7 +205,6 @@ export default {
                             );
                             this.templates.splice(index, 1);
                             this.reviseData({
-                                $index: this.data_index,
                                 templates: this.templates,
                             });
                             ipc.send(

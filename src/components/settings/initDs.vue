@@ -95,7 +95,6 @@ export default {
             ds.name = name;
             ds.createDate = this.$SDate.DateToString(new Date());
             this.reviseData({
-                $index: this.db_index,
                 ...ds
             });
         },

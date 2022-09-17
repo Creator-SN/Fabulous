@@ -119,7 +119,6 @@ export default {
             item.pages.push(_page);
             this.item.pages = item.pages;
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
             let url = path.join(

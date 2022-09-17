@@ -15,12 +15,11 @@
             <fv-search-box
                 :options="flatPartitions"
                 icon="Search"
-                :placeholder="local('Search Partitions')"
+                :placeholder="` ` + local('Search Partitions')"
                 :theme="theme"
+                borderWidth="1"
+                :border-radius="30"
                 :revealBorder="true"
-                borderWidth="2"
-                borderRadius="6"
-                :isBoxShadow="true"
                 style="width: 95%;"
                 @choose-result="SwitchPartition"
             ></fv-search-box>
@@ -54,7 +53,11 @@
                                 class="tree-view-custom-item"
                                 @contextmenu="rightClick($event, x.item)"
                             >
-                                <emoji-callout :value="x.item.emoji" :theme="theme" @insert-emoji="reviseEmoji(x.item, $event)"></emoji-callout>
+                                <emoji-callout
+                                    :value="x.item.emoji"
+                                    :theme="theme"
+                                    @insert-emoji="reviseEmoji(x.item, $event)"
+                                ></emoji-callout>
                                 <!-- <p>{{x.item.emoji}}</p> -->
                                 <p
                                     v-show="!x.item.editable"
@@ -168,10 +171,13 @@
                 :posX="posX"
                 :posY="posY"
                 :rightMenuWidth="rightMenuWidth"
-            @update-height="rightMenuHeight = $event"
+                @update-height="rightMenuHeight = $event"
             >
                 <div>
-                    <span v-if="false" v-show="rightMenuItem.type === 'partition'">
+                    <span
+                        v-if="false"
+                        v-show="rightMenuItem.type === 'partition'"
+                    >
                         <i
                             class="ms-Icon ms-Icon--Add"
                             style="color: rgba(0, 153, 204, 1);"
@@ -232,12 +238,12 @@ export default {
         loading,
         navEmpty,
         rightMenu,
-        emojiCallout
+        emojiCallout,
     },
     props: {
         rightMenuWidth: {
             default: 200,
-        }
+        },
     },
     data() {
         return {

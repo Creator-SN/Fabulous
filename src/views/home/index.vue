@@ -10,14 +10,15 @@
             <div class="row between">
                 <fv-text-box
                     v-model="currentSearch.value"
-                    :placeholder="local('Filtering from current content')"
+                    :placeholder="` ` + local('Filtering from current content')"
                     :theme="theme"
                     :background="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(255, 255, 255, 1)'"
                     icon="Filter"
-                    borderWidth="2"
+                    borderWidth="1"
+                    :border-radius="30"
                     :revealBorder="true"
+                    :is-box-shadow="true"
                     @debounce-input="currentSearch.debounce = $event"
-                    style="box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1)"
                 ></fv-text-box>
                 <div class="sort-block">
                     <fv-combobox
@@ -613,7 +614,6 @@ export default {
                     );
                     this.items.splice(index, 1);
                     this.reviseData({
-                        $index: this.data_index,
                         items: this.items,
                     });
                     ipc.send(
@@ -648,7 +648,6 @@ export default {
                         );
                         this.items.splice(index, 1);
                         this.reviseData({
-                            $index: this.data_index,
                             items: this.items,
                         });
                         ipc.send(
@@ -772,7 +771,6 @@ export default {
             });
             this.currentChoosen = [];
             this.reviseData({
-                $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -827,7 +825,6 @@ export default {
             }
             this.currentChoosen = [];
             this.reviseData({
-                $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
             });
@@ -848,7 +845,6 @@ export default {
             _item.emoji = emoji;
             item.emoji = emoji;
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
         },
@@ -859,7 +855,6 @@ export default {
             _page.emoji = emoji;
             page.emoji = emoji;
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
             this.thisShow = false;
@@ -902,7 +897,6 @@ export default {
                 });
             });
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
         },
@@ -920,7 +914,6 @@ export default {
                     );
                     item.pages.splice(index, 1);
                     await this.reviseData({
-                        $index: this.data_index,
                         items: this.items,
                     });
                     ipc.send(

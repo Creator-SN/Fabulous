@@ -156,7 +156,6 @@ export default {
             _item.createDate = this.$SDate.DateToString(new Date());
             this.items.push(_item);
             this.reviseData({
-                $index: this.data_index,
                 items: this.items,
             });
             this.copyToPartition(_item);
@@ -192,7 +191,6 @@ export default {
                 }
             }
             this.reviseData({
-                $index: this.data_index,
                 groups: this.groups,
                 partitions: this.partitions,
             });

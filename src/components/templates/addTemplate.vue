@@ -92,7 +92,6 @@ export default {
             _page.createDate = this.$SDate.DateToString(new Date());
             this.templates.push(_page);
             this.reviseData({
-                $index: this.data_index,
                 templates: this.templates,
             });
             let url = path.join(

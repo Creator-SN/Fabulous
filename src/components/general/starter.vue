@@ -223,7 +223,6 @@ export default {
             ds.name = this.name;
             ds.createDate = this.$SDate.DateToString(new Date());
             await this.reviseData({
-                $index: index,
                 ...ds,
             });
             this.$emit('refresh-data-db');

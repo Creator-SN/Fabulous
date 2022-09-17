@@ -90,7 +90,6 @@ export default {
             _page.name = this.name;
             this.value.name = this.name;
             this.reviseData({
-                $index: this.data_index,
                 templates: this.templates,
             });
             this.thisShow = false;
