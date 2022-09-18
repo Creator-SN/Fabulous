@@ -14,6 +14,7 @@ export default new Vuex.Store({
             data_path: [],
             data_index: -1,
             language: 'en',
+            autoSave: false,
             theme: 'light'
         },
         // ds //

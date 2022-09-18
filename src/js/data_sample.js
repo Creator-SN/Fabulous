@@ -3,6 +3,7 @@ export const config = {
     data_path: [],
     data_index: -1,
     language: "en",
+    autoSave: false,
     theme: "light"
 }
 

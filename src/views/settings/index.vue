@@ -95,6 +95,26 @@
             <fv-Collapse
                 :disabledCollapse="true"
                 :theme="theme"
+                :icon="'Save'"
+                :title="local('Auto Save')"
+                :content="local('Auto Save')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <fv-toggle-switch
+                        :title="local('Auto Save')"
+                        v-model="auto_save"
+                        :on="local('Turn Off Auto Save')"
+                        :off="local('Turn On Auto Save')"
+                        :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                        :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    >
+                    </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
                 :icon="'DeveloperTools'"
                 :title="local('Dev Tools')"
                 :content="local('Dev Tools for Developer')"
@@ -142,6 +162,7 @@ export default {
                 { key: "cn", text: "简体中文" },
             ],
             thisPathList: [],
+            auto_save: this.autoSave,
             db_index: -1,
             img: {
                 OneDrive,
@@ -168,6 +189,12 @@ export default {
         language() {
             this.languageInit();
         },
+        auto_save() {
+            this.switchAutoSave();
+        },
+        autoSave () {
+            this.auto_save = this.autoSave;
+        },
         "show.initDS"() {
             this.refreshDBList();
         },
@@ -179,6 +206,7 @@ export default {
             data_path: (state) => state.config.data_path,
             DataDB: (state) => state.DataDB,
             language: (state) => state.config.language,
+            autoSave: (state) => state.config.autoSave,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -241,6 +269,11 @@ export default {
             });
             this.thisPathList.splice(0, this.thisPathList.length);
             this.thisPathList = thisPathList;
+        },
+        switchAutoSave() {
+            this.reviseConfig({
+                autoSave: this.auto_save
+            });
         },
         async addSource() {
             let path = (

@@ -358,6 +358,12 @@ export default {
             this.unsave = false;
             this.refreshContent();
         },
+        auto_save() {
+            this.switchAutoSave();
+        },
+        autoSave () {
+            this.auto_save = this.autoSave;
+        },
         target() {
             this.unsave = false;
             this.refreshContent();
@@ -375,6 +381,7 @@ export default {
             data_index: (state) => state.config.data_index,
             templates: (state) => state.data_structure.templates,
             language: (state) => state.config.language,
+            autoSave: (state) => state.config.autoSave,
             theme: (state) => state.config.theme,
             show_editor: (state) => state.editor.show,
             type: (state) => state.editor.type,
@@ -476,11 +483,12 @@ export default {
     methods: {
         ...mapMutations({
             reviseData: "reviseData",
+            reviseConfig: "reviseConfig",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
         TimeoutInit() {
-            this.timeout.autoSave = setInterval(this.editorSave, 1000);
+            this.timeout.autoSave = setInterval(this.editorSave, 10000);
         },
         TimeoutDestroy() {
             clearInterval(this.timeout.autoSave);
@@ -546,9 +554,14 @@ export default {
             if (this.content === "") this.$refs.editor.focus();
         },
         editorSave() {
-            if (this.auto_save && this.show_editor && this.unsave) {
+            if (this.auto_save && this.show_editor) {
                 this.$refs.editor.save();
             }
+        },
+        switchAutoSave() {
+            this.reviseConfig({
+                autoSave: this.auto_save
+            });
         },
         async saveContent(json) {
             if (!this.type || !this.target.id) return;

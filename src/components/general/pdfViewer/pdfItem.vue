@@ -5,7 +5,8 @@
     >
         <canvas
             ref="pdfCanvas"
-            @transitionend="transitionHandler"
+            @transitionstart="transitionStartHandler"
+            @transitionend="transitionEndHandler"
         ></canvas>
         <div ref="textLayer"></div>
         <note-layer
@@ -60,6 +61,9 @@ export default {
         scrollTop: {
             default: 0,
         },
+        scrollTopRatio: {
+            default: 0,
+        },
         pdfNoteInfo: {
             default: () => ({}),
         },
@@ -86,6 +90,9 @@ export default {
             thisValue: this.value,
             thisCurrentScale: this.currentScale,
             textContent: null,
+            timer: {
+                scrollTopFormater: null,
+            },
         };
     },
     watch: {
@@ -121,9 +128,16 @@ export default {
     methods: {
         scrollHandler(isResize = false) {
             if (isResize) this.resizePage();
-            this.transitionHandler();
+            this.transitionEndHandler();
         },
-        transitionHandler() {
+        transitionStartHandler() {
+            this.timer.scrollTopFormater = setInterval(() => {
+                this.root.scrollTop =
+                    this.scrollTopRatio * this.root.scrollHeight;
+            }, 10);
+        },
+        transitionEndHandler() {
+            clearInterval(this.timer.scrollTopFormater);
             if (!this.inVisual()) return;
             if (
                 this.hmrVersion !== this.thisValue.version &&
@@ -305,6 +319,9 @@ export default {
             return false;
         },
     },
+    beforeDestroy () {
+        clearInterval(this.timer.scrollTopFormater);
+    }
 };
 </script>
 

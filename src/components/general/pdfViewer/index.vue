@@ -22,6 +22,7 @@
                 :currentScale.sync="currentScale"
                 :additionScaleRatio="additionScaleRatio"
                 :scrollTop="container.scrollTop"
+                :scrollTopRatio="container.scrollTopRatio"
                 :pdfNoteInfo="pdfNoteInfo"
                 :pdfNoteList="pdfNoteList"
                 :highlightNodes="highlightNodes"
@@ -240,6 +241,7 @@ export default {
                 width: 0,
                 height: 0,
                 scrollTop: 0,
+                scrollTopRatio: 0
             },
             scroller: {
                 width: `100%`,
@@ -274,6 +276,7 @@ export default {
             lock: {
                 init: true,
                 page: [],
+                scaling: false
             },
         };
     },
@@ -549,12 +552,14 @@ export default {
             this.$set(this.pdfPages, index, obj);
         },
         scaleUp() {
+            this.container.scrollTopRatio = this.$el.scrollTop / this.$el.scrollHeight;
             if (this.currentScale + this.additionScaleRatio < 5.7) {
                 this.additionScaleRatio += 0.3;
                 this.widthFormat();
             }
         },
         scaleDown() {
+            this.container.scrollTopRatio = this.$el.scrollTop / this.$el.scrollHeight;
             if (this.currentScale + this.additionScaleRatio > 0.6) {
                 this.additionScaleRatio -= 0.3;
                 this.widthFormat();
