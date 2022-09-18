@@ -29,48 +29,21 @@
                 <fv-list-view
                     :value="thisPathList"
                     :theme="theme"
-                    :choosen-background="'rgba(0, 98, 158, 0.1)'"
+                    :rowHeight="60"
+                    :choosen-background="'rgba(255, 255, 255, 0.1)'"
                     style="width: 100%; height: auto; margin-top: 15px;"
                     @chooseItem="switchDataIndex($event.item)"
                 >
                     <template v-slot:listItem="x">
-                        <div
-                            class="list-view-item"
-                            :class="[{choosen: data_index === x.index, disabled: SourceIndexDisabled(x.index)}]"
-                        >
-                            <img
-                                v-if="x.item.path.indexOf('OneDrive') > -1"
-                                draggable="false"
-                                class="icon-img"
-                                :src="img.OneDrive"
-                                alt=""
-                            >
-                            <i
-                                v-else
-                                class="ms-Icon ms-Icon--Link"
-                            ></i>
-                            <p class="item-name">{{x.item.name}}</p>
-                            <!-- <fv-button
-                                v-show="x.item.status == 502 || SourceIndexDisabled(x.index)"
-                                :theme="theme"
-                                class="control-btn"
-                                background="rgba(255, 200, 0, 1)"
-                                :is-box-shadow="true"
-                                :title="local(`Can't find data_structure.json on this source, shall we init new one ?`)"
-                                @click="showInitDS(x.index)"
-                            >
-                                <i class="ms-Icon ms-Icon--EraseTool"></i>
-                            </fv-button> -->
-                            <fv-button
-                                :theme="theme"
-                                class="control-btn"
-                                :is-box-shadow="true"
-                                :title="local(`Unlink this source`)"
-                                @click="removeDS(x.item)"
-                            >
-                                <i class="ms-Icon ms-Icon--RemoveLink"></i>
-                            </fv-button>
-                        </div>
+                        <data-path-item
+                            :value="x.item"
+                            :choosen="data_index === x.index"
+                            :disabled="SourceIndexDisabled(x.index)"
+                            :local="local"
+                            :theme="theme"
+                            @remove-ds="removeDS(x.item)"
+                            @show-init-ds="showInitDS(x.item)"
+                        ></data-path-item>
                     </template>
                 </fv-list-view>
             </div>
@@ -150,6 +123,7 @@
 <script>
 import { mapMutations, mapState, mapGetters } from "vuex";
 import initDs from "@/components/settings/initDs.vue";
+import dataPathItem from "@/components/settings/dataPathItem.vue";
 
 import OneDrive from "@/assets/settings/OneDrive.svg";
 
@@ -158,6 +132,7 @@ const { dialog } = require("electron").remote;
 export default {
     components: {
         initDs,
+        dataPathItem,
     },
     data() {
         return {
@@ -298,8 +273,9 @@ export default {
             });
             this.lock.switchDataIndex = true;
         },
-        showInitDS(db_index) {
-            this.db_index = db_index;
+        showInitDS(item) {
+            let index = this.data_path.indexOf(item.path);
+            this.db_index = index;
             this.show.initDS = true;
         },
         removeDS(db_item) {

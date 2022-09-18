@@ -571,6 +571,7 @@ export default {
             let fn = [
                 this.metaAPI.cref_getInfoByTitle,
                 this.metaAPI.semanticScholar_getInfoByTitle,
+                this.metaAPI.dataCite_getInfoByTitle
             ];
             for (let f of fn) {
                 p.push(f(this.metadata.title, this.axios));

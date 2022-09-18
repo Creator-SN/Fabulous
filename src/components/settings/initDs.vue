@@ -5,17 +5,19 @@
         :theme="theme"
     >
         <template v-slot:content>
-            <div class="w-p-block">
+            <div class="w-p-block" @keyup.enter="initDs">
                 <p class="w-title">{{local('Data Source Name')}}</p>
+                <p class="w-info">{{local('Path')}}: {{data_path[db_index]}}</p>
                 <fv-text-box
                     v-model="name"
                     :placeholder="local('Input data source name...')"
                     :theme="theme"
                     :font-size="18"
                     underline
+                    :border-radius="6"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
                     :is-box-shadow="true"
-                    style="width: 100%; height: 60px; margin-top: 15px;"
+                    style="width: 100%; height: 50px; margin-top: 15px;"
                     @keyup.enter="initDs"
                 ></fv-text-box>
             </div>
@@ -23,12 +25,13 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 153, 204, 1)"
+                background="rgba(0, 98, 158, 1)"
                 :disabled="db_index < 0 || name === ''"
                 @click="initDs"
             >{{local('Confirm')}}</fv-button>
             <fv-button
                 :theme="theme"
+                style="margin-left: 5px;"
                 @click="thisShow = false"
             >{{local('Cancel')}}</fv-button>
         </template>
@@ -71,7 +74,6 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
-            dbList: (state) => state.dbList,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
@@ -95,7 +97,7 @@ export default {
             ds.name = name;
             ds.createDate = this.$SDate.DateToString(new Date());
             this.reviseData({
-                ...ds
+                ...ds,
             });
         },
     },

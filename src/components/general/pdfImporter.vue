@@ -294,7 +294,7 @@ export default {
         },
         async getMetaInfo(title) {
             let p = [];
-            let fn = [this.metaAPI.cref_getInfoByTitle, this.metaAPI.semanticScholar_getInfoByTitle];
+            let fn = [this.metaAPI.cref_getInfoByTitle, this.metaAPI.semanticScholar_getInfoByTitle, this.metaAPI.dataCite_getInfoByTitle];
             for(let f of fn) {
                 p.push(f(title, this.axios));
             }

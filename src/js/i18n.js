@@ -502,5 +502,13 @@ export default {
     "Open in Browser": {
         "en": "Open in Browser",
         "cn": "用浏览器打开"
+    },
+    "Input data source name...": {
+        "en": "Input data source name...",
+        "cn": "输入数据源名称..."
+    },
+    "Path": {
+        "en": "Path",
+        "cn": "路径"
     }
 }

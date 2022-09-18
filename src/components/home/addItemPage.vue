@@ -5,7 +5,7 @@
         :theme="theme"
     >
         <template v-slot:content>
-            <div class="w-p-block">
+            <div class="p-col">
                 <p class="w-title">{{local('Page Name')}}</p>
                 <fv-text-box
                     v-model="name"
@@ -20,9 +20,9 @@
                     @keyup.enter="add"
                 ></fv-text-box>
             </div>
-            <div class="w-p-block">
+            <div class="p-col full">
                 <p class="w-title">{{local('From Template')}}</p>
-                <div style="height: 300px; flex: 1;">
+                <div style="width: 100%; height: 300px; flex: 1; overflow: auto;">
                     <template-grid
                         :value="templates"
                         @choose-items="currentChoosen = $event"

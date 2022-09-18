@@ -136,7 +136,10 @@ export default {
             if (!this.DataDB) return;
             let _data_structure = JSON.parse(JSON.stringify(data_structure));
             for (let key in _data_structure) {
-                _data_structure[key] = this.DataDB.get(key).write();
+                let keyValue = this.DataDB.get(key).write();
+                if (!keyValue && Array.isArray(_data_structure[key])) {
+                    _data_structure[key] = [];
+                } else _data_structure[key] = this.DataDB.get(key).write();
             }
             this.reviseData(_data_structure);
         },

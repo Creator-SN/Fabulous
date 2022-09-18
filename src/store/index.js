@@ -73,7 +73,7 @@ export default new Vuex.Store({
         async reviseConfig(state, obj) {
             if (!state.ConfigDB) return;
             for (let key in obj) {
-                if (state.config[key] === undefined) // 要用undefined比较好, 因为其他情况也有可能false.
+                if (!Object.prototype.hasOwnProperty.call(state.config, key)) // 要用undefined比较好, 因为其他情况也有可能false.
                     continue;
                 state.config[key] = obj[key];
                 await state.ConfigDB.set(key, state.config[key]).write();
@@ -81,28 +81,29 @@ export default new Vuex.Store({
         },
         reviseData(state, obj) {
             for (let key in obj) {
-                if (state.data_structure[key] === undefined)
+                if (!Object.prototype.hasOwnProperty.call(state.data_structure, key))
                     continue;
                 state.data_structure[key] = obj[key];
+                state.DataDB.set(key, state.data_structure[key]).write();
             }
         },
         reviseEditor(state, obj) {
             for (let key in obj) {
-                if (state.editor[key] === undefined)
+                if (!Object.prototype.hasOwnProperty.call(state.editor, key))
                     continue;
                 state.editor[key] = obj[key];
             }
         },
         revisePdfImporter(state, obj) {
             for (let key in obj) {
-                if (state.pdfImporter[key] === undefined)
+                if (!Object.prototype.hasOwnProperty.call(state.pdfImporter, key))
                     continue;
                 state.pdfImporter[key] = obj[key];
             }
         },
         reviseItemCarrier(state, obj) {
             for (let key in obj) {
-                if (state.itemCarrier[key] === undefined)
+                if (!Object.prototype.hasOwnProperty.call(state.itemCarrier, key))
                     continue;
                 state.itemCarrier[key] = obj[key];
             }

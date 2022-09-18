@@ -129,6 +129,63 @@ export class META_API {
         return result;
     }
 
+    static async dataCite_getInfoByTitle(title, axios) {
+        let baseUrl =
+            "https://api.datacite.org/dois";
+        title = title.replace(/ +/g, " ");
+        try {
+            return await new Promise((resolve) => {
+                axios
+                    .get(
+                        baseUrl,
+                        {
+                            params: {
+                                "query": `titles.title:"${title}"`,
+                            },
+                        },
+                        {
+                            timeout: 10000,
+                        }
+                    )
+                    .then((response) => {
+                        resolve(META_API.formatDataCite(response.data.data));
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        resolve([]);
+                    });
+            });
+        } catch (e) {
+            return [];
+        }
+    }
+
+    static formatDataCite(data) {
+        let result = [];
+        data.forEach((it) => {
+            let _metadata = JSON.parse(JSON.stringify(metadata));
+            let authors = [];
+            _metadata.title = it.attributes.titles[0].title;
+            _metadata.DOI = it.id;
+            _metadata.abstract = it.attributes.descriptions[0] ? it.attributes.descriptions[0].description : "";
+            _metadata.year = it.attributes.publicationYear.toString();
+            _metadata.publisher = it.attributes.publisher;
+            _metadata.url = it.url;
+            it.attributes.creators.forEach((el, idx) => {
+                let _author = JSON.parse(JSON.stringify(author));
+                _author.first = el.givenName;
+                _author.last = el.familyName;
+                _author.sequence = idx == 0 ? 'first' : 'additional';
+                authors.push(_author);
+            });
+            _metadata.authors = authors;
+            _metadata.from = 'Data Cite';
+            result.push(_metadata);
+        });
+
+        return result;
+    }
+
     static titleSimilar(s, t, f) {
         if (!s || !t) {
             return 0
