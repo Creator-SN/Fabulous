@@ -131,10 +131,15 @@ export default {
             this.transitionEndHandler();
         },
         transitionStartHandler() {
-            this.timer.scrollTopFormater = setInterval(() => {
-                this.root.scrollTop =
-                    this.scrollTopRatio * this.root.scrollHeight;
-            }, 10);
+            clearInterval(this.timer.scrollTopFormater);
+            if (this.pageIdx === 1) {
+                this.timer.scrollTopFormater = setInterval(() => {
+                    window.requestAnimationFrame(() => {
+                        this.root.scrollTop =
+                            this.scrollTopRatio * this.root.scrollHeight;
+                    });
+                }, 1);
+            }
         },
         transitionEndHandler() {
             clearInterval(this.timer.scrollTopFormater);
@@ -319,9 +324,9 @@ export default {
             return false;
         },
     },
-    beforeDestroy () {
+    beforeDestroy() {
         clearInterval(this.timer.scrollTopFormater);
-    }
+    },
 };
 </script>
 
