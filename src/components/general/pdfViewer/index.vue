@@ -241,7 +241,7 @@ export default {
                 width: 0,
                 height: 0,
                 scrollTop: 0,
-                scrollTopRatio: 0
+                scrollTopRatio: 0,
             },
             scroller: {
                 width: `100%`,
@@ -276,7 +276,7 @@ export default {
             lock: {
                 init: true,
                 page: [],
-                scaling: false
+                scaling: false,
             },
         };
     },
@@ -552,14 +552,16 @@ export default {
             this.$set(this.pdfPages, index, obj);
         },
         scaleUp() {
-            this.container.scrollTopRatio = this.$el.scrollTop / this.$el.scrollHeight;
+            this.container.scrollTopRatio =
+                this.$el.scrollTop / this.$el.scrollHeight;
             if (this.currentScale + this.additionScaleRatio < 5.7) {
                 this.additionScaleRatio += 0.3;
                 this.widthFormat();
             }
         },
         scaleDown() {
-            this.container.scrollTopRatio = this.$el.scrollTop / this.$el.scrollHeight;
+            this.container.scrollTopRatio =
+                this.$el.scrollTop / this.$el.scrollHeight;
             if (this.currentScale + this.additionScaleRatio > 0.6) {
                 this.additionScaleRatio -= 0.3;
                 this.widthFormat();
@@ -733,14 +735,6 @@ export default {
     overflow: auto;
 
     &.dark {
-        .pdf-display-scroll-view {
-            .pdf-item {
-                canvas {
-                    // filter: invert(100%);
-                }
-            }
-        }
-
         .fabulous-pdf-tool-bar {
             .fabulous-pdf-tool-bar-wrapper {
                 background: rgba(50, 50, 50, 0.8);
@@ -776,10 +770,6 @@ export default {
             box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
             overflow: visible;
             overflow-x: visible;
-
-            canvas {
-                transition: all 0.3s ease-out;
-            }
 
             &.hide {
                 .textLayer {

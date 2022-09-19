@@ -3,11 +3,7 @@
         class="pdf-item"
         :key="pageIdx"
     >
-        <canvas
-            ref="pdfCanvas"
-            @transitionstart="transitionStartHandler"
-            @transitionend="transitionEndHandler"
-        ></canvas>
+        <canvas ref="pdfCanvas"></canvas>
         <div ref="textLayer"></div>
         <note-layer
             v-if="show.quickNote"
@@ -23,6 +19,7 @@
 </template>
 
 <script>
+import gsap from "gsap";
 import noteLayer from "./noteLayer.vue";
 import { TextLayerBuilder } from "pdfjs-dist/web/pdf_viewer";
 
@@ -89,10 +86,7 @@ export default {
             height: 0,
             thisValue: this.value,
             thisCurrentScale: this.currentScale,
-            textContent: null,
-            timer: {
-                scrollTopFormater: null,
-            },
+            textContent: null
         };
     },
     watch: {
@@ -131,24 +125,29 @@ export default {
             this.transitionEndHandler();
         },
         transitionStartHandler() {
-            clearInterval(this.timer.scrollTopFormater);
-            if (this.pageIdx === 1) {
-                this.timer.scrollTopFormater = setInterval(() => {
-                    window.requestAnimationFrame(() => {
-                        this.root.scrollTop =
-                            this.scrollTopRatio * this.root.scrollHeight;
-                    });
-                }, 1);
-            }
+            this.root.scrollTop = this.scrollTopRatio * this.root.scrollHeight;
         },
         transitionEndHandler() {
-            clearInterval(this.timer.scrollTopFormater);
             if (!this.inVisual()) return;
             if (
                 this.hmrVersion !== this.thisValue.version &&
                 this.textContent !== null
             )
                 this.renderText(this.textContent);
+        },
+        goResize(el, width, height) {
+            gsap.to(el.style, {
+                duration: 0.3,
+                width: `${width}px`,
+                height: `${height}px`,
+                ease: "power2.out",
+                onComplete: () => {
+                    this.transitionEndHandler();
+                },
+                onUpdate: () => {
+                    this.transitionStartHandler();
+                },
+            });
         },
         async renderPage(fixed_scale = null) {
             let pageX = this.thisValue;
@@ -256,8 +255,10 @@ export default {
             });
 
             // 展示尺寸
-            canvas.style.width = `${viewport.width}px`;
-            canvas.style.height = `${viewport.height}px`;
+            // canvas.style.width = `${viewport.width}px`;
+            // canvas.style.height = `${viewport.height}px`;
+
+            this.goResize(canvas, viewport.width, viewport.height);
         },
         getRatio(ctx) {
             let dpr = window.devicePixelRatio || 1;
@@ -323,10 +324,7 @@ export default {
                 return true;
             return false;
         },
-    },
-    beforeDestroy() {
-        clearInterval(this.timer.scrollTopFormater);
-    },
+    }
 };
 </script>
 
@@ -342,7 +340,7 @@ export default {
     overflow-x: visible;
 
     canvas {
-        transition: all 0.3s ease-out;
+        // transition: all 0.3s ease-out;
     }
 
     &.hide {
