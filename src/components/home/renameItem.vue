@@ -23,28 +23,36 @@
             <div class="w-p-block">
                 <p class="w-title">{{local('Item Labels')}}</p>
             </div>
-            <div class="w-p-row">
-                <fv-check-box
-                    v-model="item.check"
+            <div
+                class="label-text-box-block"
+                style="line-height: 2;"
+            >
+                <div
                     v-for="(item, index) in colorList"
+                    class="label-text-item"
                     :key="index"
-                    :border-color="item.color"
-                    :background="item.color"
-                    @click="chooseColor(index)"
-                ></fv-check-box>
+                >
+                    <p
+                        class="label-text-item-sample"
+                        :style="{background: item.color}"
+                    ></p>
+                    <fv-text-box
+                        v-model="item.content"
+                        :placeholder="local('New item label (Press Enter)')"
+                        icon="Tag"
+                        :theme="theme"
+                        :border-color="item.color"
+                        :focus-border-color="item.color"
+                        :is-box-shadow="true"
+                        style="margin: 5px 0px;"
+                        @keyup.enter="addLabel(item)"
+                    ></fv-text-box>
+                </div>
             </div>
-            <div class="w-p-block">
-                <fv-text-box
-                    v-model="label"
-                    :placeholder="local('New item label (Press Enter)')"
-                    icon="Tag"
-                    :theme="theme"
-                    :border-color="currentColor"
-                    :focus-border-color="currentColor"
-                    @keyup.enter="addLabel"
-                ></fv-text-box>
-            </div>
-            <div class="w-p-block" style="overflow-x: auto;">
+            <div
+                class="w-p-block"
+                style="height: 130px; overflow-x: auto;"
+            >
                 <fv-tag
                     v-model="labels"
                     :theme="theme"
@@ -55,12 +63,13 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 153, 204, 1)"
+                background="rgba(0, 98, 158, 1)"
                 :disabled="!value || name === '' || !ds_db"
                 @click="confirm"
             >{{local('Confirm')}}</fv-button>
             <fv-button
                 :theme="theme"
+                style="margin-left: 5px;"
                 @click="thisShow = false"
             >{{local('Cancel')}}</fv-button>
         </template>
@@ -87,21 +96,20 @@ export default {
         return {
             thisShow: this.show,
             name: "",
-            label: "",
             labels: [],
             colorList: [
-                { name: "purple", color: "#958DF1", check: false },
-                { name: "red", color: "#F98181", check: false },
-                { name: "orange", color: "rgba(234, 152, 101, 1)", check: false },
-                { name: "yellow", color: "rgba(243, 228, 102, 1)", check: false },
-                { name: "blue", color: "#70CFF8", check: false },
-                { name: "teal", color: "rgba(103, 224, 192, 1)", check: false },
-                { name: "green", color: "#B9F18D", check: false },
-                { name: "red", color: "#ffa8a8", check: false },
-                { name: "orange", color: "#ffc078", check: false },
-                { name: "green", color: "#8ce99a", check: false },
-                { name: "blue", color: "#74c0fc", check: false },
-                { name: "purple", color: "#b197fc", check: false },
+                { name: "purple", color: "#958DF1", check: false, content: "" },
+                { name: "red", color: "#F98181", check: false, content: "" },
+                { name: "orange", color: "#FBBC88", check: false, content: "" },
+                { name: "yellow", color: "#ffd747", check: false, content: "" },
+                { name: "blue", color: "#70CFF8", check: false, content: "" },
+                { name: "teal", color: "#53deae", check: false, content: "" },
+                { name: "green", color: "#ace887", check: false, content: "" },
+                { name: "red", color: "#ffa8a8", check: false, content: "" },
+                { name: "orange", color: "#ffc078", check: false, content: "" },
+                { name: "green", color: "#8ce99a", check: false, content: "" },
+                { name: "blue", color: "#74c0fc", check: false, content: "" },
+                { name: "pink", color: "#e28deb", check: false, content: "" },
             ],
         };
     },
@@ -113,7 +121,8 @@ export default {
             this.$emit("update:show", val);
             if (this.value.name) this.name = this.value.name;
             else this.name = "";
-            if (this.value.labels) this.labels = JSON.parse(JSON.stringify(this.value.labels));
+            if (this.value.labels)
+                this.labels = JSON.parse(JSON.stringify(this.value.labels));
             else this.labels = [];
         },
     },
@@ -127,12 +136,6 @@ export default {
         ...mapGetters(["local", "ds_db"]),
         v() {
             return this;
-        },
-        currentColor() {
-            for (let item of this.colorList) {
-                if (item.check) return item.color;
-            }
-            return "rgba(25, 106, 167, 1)";
         },
     },
     methods: {
@@ -151,18 +154,20 @@ export default {
             });
             this.thisShow = false;
         },
-        addLabel() {
-            if (this.label === "") return;
+        addLabel(item) {
+            if (item.content === "") return;
             this.labels.push({
-                text: this.label,
-                background: this.currentColor,
+                text: item.content,
+                background: item.color,
             });
-            this.label = "";
+            item.content = "";
+            this.$set(this.colorList, this.colorList.indexOf(item), item);
         },
         chooseColor(index) {
             this.colorList.forEach((el, idx) => {
                 if (index !== idx) {
                     el.check = false;
+                    el.content = "";
                     this.$set(this.colorList, idx, el);
                 }
             });
@@ -172,4 +177,22 @@ export default {
 </script>
 
 <style lang="scss">
+.label-text-box-block {
+    width: 100%;
+    height: 500px;
+    overflow: auto;
+
+    .label-text-item {
+        @include Vcenter;
+
+        flex: 1;
+
+        .label-text-item-sample {
+            width: 25px;
+            height: 25px;
+            margin-right: 20px;
+            border-radius: 50%;
+        }
+    }
+}
 </style>

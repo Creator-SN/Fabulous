@@ -6,8 +6,10 @@
         :theme="theme"
         :background="navigationViewBackground"
         :settingTitle="local('Setting')"
+        :mobileDisplay="mobileDisplay"
         :expandWidth="350"
-        style="z-index: 1;"
+        :showNav="windowWidth < mobileDisplay"
+        :style="{'z-index': windowWidth < mobileDisplay ? 2 : 1}"
         @setting-click="Go(`/settings`)"
         @back="$Back"
     >
@@ -31,7 +33,12 @@
                     class="navigation-view-current-ds-block"
                     @click="Go(`/settings`)"
                 >
-                    <p>⚡</p>
+                    <img
+                        draggable="false"
+                        :src="img.dataSource"
+                        alt=""
+                        class="icon-img"
+                    >
                     <p class="title">{{!name ? local('Unselected') : name}}</p>
                 </div>
                 <div
@@ -69,6 +76,10 @@
                                     :theme="theme"
                                     :ref="`t:${x.item.id}`"
                                     class="tree-view-custom-text-box"
+                                    background="rgba(255, 255, 255, 0.3)"
+                                    border-color="rgba(250, 176, 70, 0.3)"
+                                    focus-border-color="rgba(250, 176, 70, 1)"
+                                    underline
                                     @keyup.native.enter="rename(x.item)"
                                 ></fv-text-box>
                                 <fv-button
@@ -89,80 +100,23 @@
                         :title="local('Choose a source to start.')"
                     ></loading>
                 </div>
-                <div
-                    v-show="expand"
-                    class="navigation-view-command-bar-block"
-                >
-                    <fv-command-bar
-                        :options="cmdList"
-                        :theme="theme"
-                        toward="up"
-                    ></fv-command-bar>
-                </div>
-                <div
-                    v-show="!expand"
-                    class="navigation-view-command-bar-block-collapse"
-                >
-                    <fv-button
-                        :theme="theme"
-                        class="collapse-command-btn"
-                        :disabled="SourceDisabled"
-                        :borderWidth="1"
-                        :borderRadius="0"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)'"
-                        :title="local('All')"
-                        @click="Go(`/`)"
+                <div class="navigation-view-command-bar-block">
+                    <div
+                        v-for="(item, index) in cmdList"
+                        :key="`command-bar-item: ${index}`"
+                        class="command-item"
+                        :class="[{disabled: item.disabled()}]"
+                        @click="() => {item.disabled() ? null : item.func()}"
                     >
-                        <i
-                            class="ms-Icon ms-Icon--PrintAllPages"
-                            style="color: rgba(0, 90, 158, 1);"
-                        ></i>
-                    </fv-button>
-                    <fv-button
-                        :theme="theme"
-                        class="collapse-command-btn"
-                        :disabled="SourceDisabled"
-                        :borderWidth="1"
-                        :borderRadius="0"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)'"
-                        :title="local('Templates')"
-                        @click="Go(`/templates`)"
-                    >
-                        <i
-                            class="ms-Icon ms-Icon--FileTemplate"
-                            style="color: rgba(0, 153, 204, 1);"
-                        ></i>
-                    </fv-button>
-                    <fv-button
-                        :theme="theme"
-                        class="collapse-command-btn"
-                        :disabled="SourceDisabled"
-                        :borderWidth="1"
-                        :borderRadius="0"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)'"
-                        :title="local('Add Partition')"
-                        @click="collapseFunc(addPartition)"
-                    >
-                        <i
-                            class="ms-Icon ms-Icon--Dictionary"
-                            style="color: rgba(213, 99, 70, 1);"
-                        ></i>
-                    </fv-button>
-                    <fv-button
-                        :theme="theme"
-                        class="collapse-command-btn"
-                        :disabled="SourceDisabled"
-                        :borderWidth="1"
-                        :borderRadius="0"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)'"
-                        :title="local('Add Group')"
-                        @click="collapseFunc(addGroup)"
-                    >
-                        <i
-                            class="ms-Icon ms-Icon--ViewListGroup"
-                            style="color: rgba(172, 84, 206, 1);"
-                        ></i>
-                    </fv-button>
+                        <span class="command-item-icon">
+                            <img
+                                :src="img[item.img]"
+                                alt=""
+                                class="icon-img"
+                            >
+                        </span>
+                        <p class="command-item-content">{{item.name()}}</p>
+                    </div>
                 </div>
             </div>
             <right-menu
@@ -188,20 +142,24 @@
                         v-show="rightMenuItem.type === 'group'"
                         @click="addPartitionAt(rightMenuItem)"
                     >
-                        <i
-                            class="ms-Icon ms-Icon--Dictionary"
-                            style="color: rgba(213, 99, 70, 1);"
-                        ></i>
+                        <img
+                            draggable="false"
+                            :src="img.partition"
+                            alt=""
+                            class="icon-img"
+                        >
                         <p>{{local("New Partition")}}</p>
                     </span>
                     <span
                         v-show="rightMenuItem.type === 'group'"
                         @click="addGroupAt(rightMenuItem)"
                     >
-                        <i
-                            class="ms-Icon ms-Icon--ViewListGroup"
-                            style="color: rgba(172, 84, 206, 1);"
-                        ></i>
+                        <img
+                            draggable="false"
+                            :src="img.group"
+                            alt=""
+                            class="icon-img"
+                        >
                         <p>{{local("New Group")}}</p>
                     </span>
                     <hr>
@@ -233,6 +191,12 @@ import emojiCallout from "@/components/general/callout/emojiCallout.vue";
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { group, partition } from "@/js/data_sample";
 
+import dataSource from "@/assets/nav/dataSource.svg";
+import groupImg from "@/assets/nav/group.svg";
+import partitionImg from "@/assets/nav/partition.svg";
+import templatesImg from "@/assets/nav/template.svg";
+import allImg from "@/assets/nav/all.svg";
+
 export default {
     components: {
         loading,
@@ -250,43 +214,39 @@ export default {
             expand: true,
             cmdList: [
                 {
-                    name: () => this.local("Add"),
-                    icon: "Add",
-                    iconColor: "rgba(0, 90, 158, 1)",
+                    name: () => this.local("Add Partition"),
+                    func: this.addPartition,
+                    img: "partition",
                     disabled: () => this.SourceDisabled,
-                    secondary: [
-                        {
-                            name: () => this.local("New Partition"),
-                            func: this.addPartition,
-                            icon: "Dictionary",
-                            disabled: () => this.SourceDisabled,
-                            iconColor: "rgba(213, 99, 70, 1)",
-                        },
-                        { type: "divider" },
-                        {
-                            name: () => this.local("New Group"),
-                            func: this.addGroup,
-                            icon: "ViewListGroup",
-                            disabled: () => this.SourceDisabled,
-                            iconColor: "rgba(172, 84, 206, 1)",
-                        },
-                    ],
+                    iconColor: "rgba(213, 99, 70, 1)",
                 },
                 {
-                    name: () => this.local("Templates"),
-                    icon: "FileTemplate",
-                    iconColor: "rgba(0, 153, 204, 1)",
+                    name: () => this.local("Add Group"),
+                    func: this.addGroup,
+                    img: "group",
+                    disabled: () => this.SourceDisabled,
+                    iconColor: "rgba(172, 84, 206, 1)",
+                },
+                {
+                    name: () => this.local("Templates Page"),
+                    img: "templates",
                     func: () => this.Go("/templates"),
                     disabled: () => this.SourceDisabled,
                 },
                 {
-                    name: () => this.local("All Items"),
-                    icon: "PrintAllPages",
-                    iconColor: "rgba(0, 90, 158, 1)",
+                    name: () => this.local("All Content"),
+                    img: "all",
                     func: () => this.Go("/"),
                     disabled: () => this.SourceDisabled,
                 },
             ],
+            img: {
+                dataSource,
+                group: groupImg,
+                partition: partitionImg,
+                templates: templatesImg,
+                all: allImg,
+            },
             treeList: [],
             FLAT: [],
             posX: 0,
@@ -316,6 +276,8 @@ export default {
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
             partitions: (state) => state.data_structure.partitions,
+            windowWidth: (state) => state.window.width,
+            mobileDisplay: (state) => state.window.mobileDisplay,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
@@ -644,19 +606,22 @@ export default {
 
         .navigation-view-current-ds-block {
             position: relative;
-            width: 100%;
+            width: calc(100% - 40px);
+            margin: 3px 20px;
             padding: 8px 15px;
+            border-radius: 6px;
             box-sizing: border-box;
             display: flex;
             align-items: center;
+            transition: all 0.6s;
             user-select: none;
 
             &:hover {
-                background: rgba(200, 200, 200, 0.3);
+                background: rgba(200, 200, 200, 0.1);
             }
 
             &:active {
-                background: rgba(200, 200, 200, 0.6);
+                background: rgba(200, 200, 200, 0.3);
             }
 
             .title {
@@ -705,6 +670,61 @@ export default {
 
         .navigation-view-command-bar-block {
             position: relative;
+            width: calc(100% - 40px);
+            height: 200px;
+            margin: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+
+            .command-item {
+                @include Vcenter;
+
+                position: relative;
+                width: calc(100% - 30px);
+                height: 45px;
+                margin: 3px 15px;
+                padding: 0px 15px;
+                border-radius: 6px;
+                box-sizing: border-box;
+                transition: all 0.3s;
+
+                &:hover {
+                    background: rgba(120, 120, 120, 0.1);
+                }
+
+                &:active {
+                    background: rgba(120, 120, 120, 0.2);
+                }
+
+                &.disabled {
+                    filter: grayscale(1);
+                }
+
+                .command-item-icon {
+                    @include HcenterVcenter;
+
+                    position: relative;
+                    width: 30px;
+                    height: 30px;
+                    background: rgba(245, 245, 245, 1);
+                    border-radius: 35px;
+
+                    .icon-img {
+                        width: 15px;
+                        height: auto;
+                    }
+                }
+
+                .command-item-content {
+                    @include nowrap;
+
+                    margin-left: 15px;
+                    font-size: 13.8px;
+                    font-weight: 600;
+                    color: rgba(53, 55, 62, 1);
+                    user-select: none;
+                }
+            }
         }
 
         .navigation-view-command-bar-block-collapse {
@@ -719,6 +739,12 @@ export default {
                 flex: 1;
             }
         }
+    }
+
+    .icon-img {
+        width: 15px;
+        height: auto;
+        user-select: none;
     }
 }
 </style>

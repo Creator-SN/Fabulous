@@ -394,15 +394,17 @@ export default {
         }),
         timerInit() {
             this.timer.width = setInterval(() => {
-                const { left, top, right, bottom } =
-                    this.$el.getBoundingClientRect();
-                this.container.left = left;
-                this.container.top = top;
-                this.container.right = right;
-                this.container.bottom = bottom;
-                this.container.width = right - left;
-                this.container.height = bottom - top;
-            }, 50);
+                window.requestAnimationFrame(() => {
+                    const { left, top, right, bottom } =
+                        this.$el.getBoundingClientRect();
+                    this.container.left = left;
+                    this.container.top = top;
+                    this.container.right = right;
+                    this.container.bottom = bottom;
+                    this.container.width = right - left;
+                    this.container.height = bottom - top;
+                });
+            }, 10);
         },
         eventInit() {
             this.$el.addEventListener("scroll", () => {
@@ -544,7 +546,7 @@ export default {
             arr.sort((a, b) => {
                 return a.value - b.value;
             });
-            this.currentPage = arr[0].i;
+            if (arr[0]) this.currentPage = arr[0].i;
         },
         revisePdfPage(idx, obj) {
             let index = this.pdfPages.findIndex((item) => item.num === idx);

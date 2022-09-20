@@ -93,6 +93,26 @@ export default {
         user-select: none;
     }
 
+    .w-p-block {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 15px 0px;
+        box-sizing: border-box;
+        line-height: 3;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .w-p-row {
+        position: relative;
+        width: 100%;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+    }
+
     .p-row {
         @include Vcenter;
 

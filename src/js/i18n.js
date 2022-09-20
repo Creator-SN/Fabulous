@@ -510,5 +510,21 @@ export default {
     "Path": {
         "en": "Path",
         "cn": "路径"
+    },
+    "Add Partition": {
+        "en": "Add Partition",
+        "cn": "添加分区"
+    },
+    "Add Group": {
+        "en": "Add Group",
+        "cn": "添加分组"
+    },
+    "Templates Page": {
+        "en": "Templates Page",
+        "cn": "模板页面"
+    },
+    "All Content": {
+        "en": "All Content",
+        "cn": "全部内容"
     }
 }

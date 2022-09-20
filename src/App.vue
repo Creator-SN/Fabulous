@@ -8,6 +8,7 @@
             <title-bar
                 class="title-bar"
                 :theme="theme"
+                :left-offset="windowWidth <= mobileDisplay ? 80 : 0"
                 style="background: transparent;"
             ></title-bar>
             <div class="global-container">
@@ -84,6 +85,8 @@ export default {
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
             show_editor: (state) => state.editor.show,
+            windowWidth: (state) => state.window.width,
+            mobileDisplay: (state) => state.window.mobileDisplay,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
@@ -98,6 +101,7 @@ export default {
         this.pdfImporterInit();
         this.dropFilesInit();
         this.i18nInit();
+        this.refreshWindowSizeInit();
         if (this.$route.path !== "/") this.$Go("/");
     },
     methods: {
@@ -107,6 +111,7 @@ export default {
             reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
             reviseProgress: "reviseProgress",
+            setWindowSize: 'setWindowSize',
             reviseI18N: "reviseI18N",
         }),
         i18nInit() {
@@ -221,6 +226,16 @@ export default {
                 });
             });
         },
+        refreshWindowSizeInit() {
+            this.timer = setInterval(() => {
+                let width = document.body.clientWidth;
+                let height = document.body.clientHeight;
+                this.setWindowSize({
+                    width,
+                    height
+                });
+            }, 100);
+        },
         updateProgress(value) {
             this.reviseProgress(value);
         },
@@ -282,6 +297,7 @@ export default {
         height: 100%;
         display: flex;
         overflow: hidden;
+        z-index: 1;
 
         .title-bar {
             position: absolute;

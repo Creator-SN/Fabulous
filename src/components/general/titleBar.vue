@@ -1,5 +1,10 @@
 <template>
-    <div draggable="false" class="title-bar" :class="{dark: theme == 'dark'}" :style="{background: background}">
+    <div
+        draggable="false"
+        class="title-bar"
+        :class="{dark: theme == 'dark'}"
+        :style="{width: `calc(100% - ${leftOffset + rightOffset}px)`, margin: `0 ${rightOffset}px 0 ${leftOffset}px`, background: background}"
+    >
         <div class="left-block">
             <slot name="left">
             </slot>
@@ -10,17 +15,26 @@
         </div>
         <slot name="right">
             <div class="control-block">
-                <i class="btn ms-Icon ms-Icon--ChromeMinimize" @click="minimize"></i>
-                <i class="btn ms-Icon" :class="[isMaximized ? 'ms-Icon--ChromeRestore' : 'ms-Icon--ChromeMaximize']" @click="maximize"></i>
-                <i class="btn close ms-Icon ms-Icon--ChromeClose" @click="close"></i>
+                <i
+                    class="btn ms-Icon ms-Icon--ChromeMinimize"
+                    @click="minimize"
+                ></i>
+                <i
+                    class="btn ms-Icon"
+                    :class="[isMaximized ? 'ms-Icon--ChromeRestore' : 'ms-Icon--ChromeMaximize']"
+                    @click="maximize"
+                ></i>
+                <i
+                    class="btn close ms-Icon ms-Icon--ChromeClose"
+                    @click="close"
+                ></i>
             </div>
         </slot>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.title-bar
-{
+.title-bar {
     position: relative;
     width: 100%;
     min-height: 32px;
@@ -32,46 +46,36 @@
     user-select: none;
     -webkit-app-region: drag;
 
-    &.dark
-    {
+    &.dark {
         background: black;
 
-        .left-block
-        {
+        .left-block {
             color: white;
         }
 
-        .mid-block
-        {
+        .mid-block {
             color: white;
         }
-    
-        .control-block
-        {
-            .btn
-            {
+
+        .control-block {
+            .btn {
                 color: white;
-                
-                &:hover
-                {
+
+                &:hover {
                     background: rgba(255, 255, 255, 0.2);
                 }
 
-                &:active
-                {
+                &:active {
                     background: rgba(255, 255, 255, 0.1);
                 }
 
-                &.close
-                {
-                    &:hover
-                    {
+                &.close {
+                    &:hover {
                         background: rgba(215, 20, 37, 1);
                         color: white;
                     }
 
-                    &:active
-                    {
+                    &:active {
                         background: rgba(155, 11, 23, 1);
                     }
                 }
@@ -79,14 +83,12 @@
         }
     }
 
-    .left-block
-    {
+    .left-block {
         padding-left: 10px;
         font-size: 13px;
     }
 
-    .mid-block
-    {
+    .mid-block {
         font-size: 13px;
         flex: 1;
         display: flex;
@@ -94,17 +96,15 @@
         align-items: center;
     }
 
-    .control-block
-    {
+    .control-block {
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         user-select: none;
         -webkit-app-region: no-drag;
-        
-        .btn
-        {
+
+        .btn {
             width: 50px;
             height: 100%;
             font-size: 12px;
@@ -112,26 +112,21 @@
             justify-content: center;
             align-items: center;
 
-            &:hover
-            {
+            &:hover {
                 background: rgba(167, 167, 167, 0.2);
             }
 
-            &:active
-            {
+            &:active {
                 background: rgba(128, 128, 128, 0.2);
             }
 
-            &.close
-            {
-                &:hover
-                {
+            &.close {
+                &:hover {
                     background: rgba(232, 17, 35, 1);
                     color: white;
                 }
 
-                &:active
-                {
+                &:active {
                     background: rgba(189, 11, 26, 1);
                 }
             }
@@ -147,43 +142,49 @@ const { ipcRenderer: ipc } = require("electron");
 export default {
     props: {
         background: {
-            default: ""
+            default: "",
+        },
+        leftOffset: {
+            default: 0,
+        },
+        rightOffset: {
+            default: 0,
         },
         theme: {
-            default: "light"
-        }
+            default: "light",
+        },
     },
-    data () {
+    data() {
         return {
             isMaximized: remote.getCurrentWindow().isMaximized(),
             timer: {
-                windowStatus: {}
-            }
-        }
+                windowStatus: {},
+            },
+        };
     },
-    mounted () {
+    mounted() {
         this.timerInit();
     },
     methods: {
-        timerInit () {
+        timerInit() {
             this.timer.windowStatus = setInterval(() => {
                 this.isMaximized = remote.getCurrentWindow().isMaximized();
             }, 50);
         },
-        minimize () {
+        minimize() {
             ipc.send("min");
         },
-        maximize () {
+        maximize() {
             ipc.send("max");
         },
-        close () {
+        close() {
             ipc.send("close");
-        }
+        },
     },
-    beforeDestroy () {
-        for(let key in this.timer) {
+    beforeDestroy() {
+        for (let key in this.timer) {
             clearInterval(this.timer[key]);
         }
-    }
-}
+    },
+};
 </script>

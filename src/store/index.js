@@ -60,6 +60,11 @@ export default new Vuex.Store({
             itemsX: []
         },
         //
+        window: {
+            width: 0,
+            height: 0,
+            mobileDisplay: 1024
+        },
         progress: 0,
         i18n: {}
     },
@@ -70,6 +75,10 @@ export default new Vuex.Store({
                     state[key] = obj[key];
                 }
             }
+        },
+        setWindowSize(state, obj) {
+            state.window.width = obj.width;
+            state.window.height = obj.height;
         },
         async reviseConfig(state, obj) {
             if (!state.ConfigDB) return;

@@ -79,6 +79,7 @@
                 <div class="control-right-block">
                     <fv-toggle-switch
                         :title="local('Auto Save')"
+                        v-show="displayMode !== 1"
                         v-model="auto_save"
                         class="save-btn"
                         :on="local('Turn Off Auto Save')"
@@ -361,7 +362,7 @@ export default {
         auto_save() {
             this.switchAutoSave();
         },
-        autoSave () {
+        autoSave() {
             this.auto_save = this.autoSave;
         },
         target() {
@@ -463,7 +464,12 @@ export default {
             };
         },
         showNav() {
-            return this.type === "item" && this.item.name && this.target && this.target.name;
+            return (
+                this.type === "item" &&
+                this.item.name &&
+                this.target &&
+                this.target.name
+            );
         },
         pdfUrl() {
             if (this.type !== "item") return false;
@@ -507,6 +513,11 @@ export default {
 
                 if (event.keyCode === 9) {
                     event.preventDefault();
+                    if (
+                        this.$refs.editor.editor.isActive("bulletList") ||
+                        this.$refs.editor.editor.isActive("orderedList")
+                    )
+                        return;
                     this.$refs.editor.editor.commands.insertContent("    ");
                 }
             });
@@ -560,11 +571,11 @@ export default {
         },
         switchAutoSave() {
             this.reviseConfig({
-                autoSave: this.auto_save
+                autoSave: this.auto_save,
             });
         },
         async saveContent(json) {
-            if (!this.type || !this.target.id) return;
+            if (!this.type || !this.target.id || this.displayMode === 1) return;
             let folder =
                 this.type === "template" ? "root/templates" : "root/items";
             if (this.type === "item") {
@@ -617,8 +628,7 @@ export default {
             );
             ipc.send("open-file", url);
             ipc.on("open-file-callback", (event, data) => {
-                if(data.length)
-                    console.log(data.length);
+                if (data.length) console.log(data.length);
             });
         },
         addPDFNote(event) {

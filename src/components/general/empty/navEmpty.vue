@@ -11,14 +11,18 @@
         >
         <div class="nec-d1">
             <div class="nec-icon-block">
-                <i
-                    class="ms-Icon ms-Icon--ViewListGroup"
-                    style="color: rgba(172, 84, 206, 1);"
-                ></i>
-                <i
-                    class="ms-Icon ms-Icon--Dictionary"
-                    style="color: rgba(213, 99, 70, 1);"
-                ></i>
+                <img
+                    draggable="false"
+                    :src="img.partition"
+                    alt=""
+                    class="empty-icon-img"
+                />
+                <img
+                    draggable="false"
+                    :src="img.group"
+                    alt=""
+                    class="empty-icon-img"
+                />
             </div>
             <p class="nec-content">{{local('No any Content')}}</p>
             <p class="nec-content">{{local('Click + to Add New Group & Partition')}}</p>
@@ -29,7 +33,18 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
+import partitionImg from "@/assets/nav/partition.svg";
+import groupImg from "@/assets/nav/group.svg";
+
 export default {
+    data() {
+        return {
+            img: {
+                partition: partitionImg,
+                group: groupImg,
+            },
+        };
+    },
     computed: {
         ...mapState({
             theme: (state) => state.config.theme,
@@ -90,6 +105,27 @@ export default {
 
         .nec-content {
             font-size: 12px;
+        }
+    }
+
+    .empty-icon-img {
+        width: 45px;
+        height: auto;
+        margin: 0px 10px;
+        user-select: none;
+        animation: empty-icon-shake 0.1s infinite linear alternate-reverse;
+    }
+
+    @keyframes empty-icon-shake
+    {
+        0%
+        {
+            transform: rotate(5deg);
+        }
+
+        100%
+        {
+            transform: rotate(-5deg);
         }
     }
 }
