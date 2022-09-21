@@ -526,5 +526,13 @@ export default {
     "All Content": {
         "en": "All Content",
         "cn": "全部内容"
+    },
+    "Input template name...": {
+        "en": "Input template name...",
+        "cn": "输入模板名称..."
+    },
+    "Folder": {
+        "en": "Folder",
+        "cn": "文件夹"
     }
 }

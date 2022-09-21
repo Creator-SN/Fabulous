@@ -30,7 +30,7 @@
                 <fv-button
                     theme="dark"
                     :disabled="stop"
-                    background="rgba(0, 153, 204, 1)"
+                    background="rgba(0, 98, 158, 1)"
                     style="margin-top: 15px"
                     @click="cancel"
                 >{{ local("Cancel") }}</fv-button>
@@ -322,7 +322,8 @@ export default {
     right: 15px;
     padding: 15px 5px;
     background: rgba(32, 102, 156, 0.9);
-    border-radius: 8px;
+    border: rgba(36, 36, 36, 0.1) solid thin;
+    border-radius: 6px;
     color: whitesmoke;
     box-sizing: border-box;
     display: flex;

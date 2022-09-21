@@ -15,6 +15,7 @@ export default new Vuex.Store({
             data_index: -1,
             language: 'en',
             autoSave: false,
+            dynamicEffect: true,
             theme: 'light'
         },
         // ds //

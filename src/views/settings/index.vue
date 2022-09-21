@@ -4,7 +4,7 @@
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
-            <p class="s-title">{{local('Setting')}}</p>
+            <p class="s-title" style="margin-top: 20px;">{{local('Setting')}}</p>
         </div>
         <div class="scroll-view">
             <fv-Collapse
@@ -115,6 +115,25 @@
             <fv-Collapse
                 :disabledCollapse="true"
                 :theme="theme"
+                :icon="'SpecialEffectSize'"
+                :title="local('Dynamic Effect')"
+                :content="local('Dynamic Effect Background')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;">
+                <template v-slot:extension>
+                    <fv-toggle-switch
+                        :title="local('Dynamic Effect')"
+                        v-model="dynamic_effect"
+                        :on="local('Dynamic Effect ON')"
+                        :off="local('Dynamic Effect OFF')"
+                        :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                        :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    >
+                    </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
                 :icon="'DeveloperTools'"
                 :title="local('Dev Tools')"
                 :content="local('Dev Tools for Developer')"
@@ -163,6 +182,7 @@ export default {
             ],
             thisPathList: [],
             auto_save: this.autoSave,
+            dynamic_effect: this.dynamicEffect,
             db_index: -1,
             img: {
                 OneDrive,
@@ -195,6 +215,12 @@ export default {
         autoSave () {
             this.auto_save = this.autoSave;
         },
+        dynamic_effect () {
+            this.switchDynamicEffect();
+        },
+        dynamicEffect () {
+            this.dynamic_effect = this.dynamicEffect;
+        },
         "show.initDS"() {
             this.refreshDBList();
         },
@@ -207,6 +233,7 @@ export default {
             DataDB: (state) => state.DataDB,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
+            dynamicEffect: (state) => state.config.dynamicEffect,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -273,6 +300,11 @@ export default {
         switchAutoSave() {
             this.reviseConfig({
                 autoSave: this.auto_save
+            });
+        },
+        switchDynamicEffect() {
+            this.reviseConfig({
+                dynamicEffect: this.dynamic_effect
             });
         },
         async addSource() {
@@ -350,14 +382,14 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: whitesmoke;
+    background: rgba(245, 245, 245, 0.9);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transition: all 0.3s;
 
     &.dark {
-        background: rgba(36, 36, 36, 1);
+        background: rgba(36, 36, 36, 0.9);
 
         .s-title {
             color: whitesmoke;

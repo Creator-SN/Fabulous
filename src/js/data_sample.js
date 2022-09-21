@@ -4,6 +4,7 @@ export const config = {
     data_index: -1,
     language: "en",
     autoSave: false,
+    dynamicEffect: true,
     theme: "light"
 }
 

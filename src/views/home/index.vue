@@ -3,7 +3,10 @@
         class="fabulous-home-container"
         :class="[{dark: theme === 'dark'}]"
     >
-        <div class="s-row">
+        <div
+            class="s-row"
+            style="margin-top: 45px;"
+        >
             <p class="s-title">{{pid === false ? local('All') : pname}}</p>
         </div>
         <div class="m-home-block">
@@ -12,7 +15,7 @@
                     v-model="currentSearch.value"
                     :placeholder="` ` + local('Filtering from current content')"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(255, 255, 255, 1)'"
+                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                     icon="Filter"
                     borderWidth="1"
                     :border-radius="30"
@@ -49,8 +52,8 @@
                 <fv-command-bar
                     :options="cmd"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'transparent' : 'rgba(245, 245, 245, 1)'"
-                    style="flex: 1;"
+                    :background="theme === 'dark' ? 'transparent' : 'rgba(245, 245, 245, 0)'"
+                    style="flex: 1; background: transparent;"
                 ></fv-command-bar>
             </div>
             <div class="row main-table">
@@ -411,6 +414,7 @@ export default {
                     disabled: () => this.ds_db === null || !this.lock,
                     func: () => {
                         this.editable ^= true;
+                        if (!this.editable) this.currentChoosen = [];
                     },
                 },
                 {
@@ -440,6 +444,8 @@ export default {
                     name: () => this.local("Remove From Partition"),
                     icon: "RemoveFrom",
                     iconColor: "rgba(220, 62, 72, 1)",
+                    show: () =>
+                        this.currentChoosen.length > 0 && this.lock && this.pid,
                     disabled: () =>
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
@@ -450,6 +456,12 @@ export default {
                     name: () => this.local("Delete"),
                     icon: "Delete",
                     iconColor: "rgba(220, 62, 72, 1)",
+                    show: () =>
+                        !(
+                            this.currentChoosen.length === 0 ||
+                            !this.lock ||
+                            this.pid !== false
+                        ),
                     disabled: () =>
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
@@ -503,7 +515,7 @@ export default {
         },
         c() {
             this.refreshFilterItems();
-        },
+        }
     },
     computed: {
         ...mapState({
@@ -937,7 +949,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 1);
+    background: rgba(245, 245, 245, 0.9);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -945,7 +957,7 @@ export default {
     z-index: 1;
 
     &.dark {
-        background: rgba(36, 36, 36, 1);
+        background: rgba(36, 36, 36, 0.9);
 
         .s-title {
             color: whitesmoke;
@@ -954,7 +966,7 @@ export default {
         .m-home-block {
             .row {
                 &.main-table {
-                    background: black;
+                    background: rgba(0, 0, 0, 0.6);
                 }
 
                 .row-item-info {
@@ -1017,7 +1029,7 @@ export default {
                 flex: 1;
                 margin: 8px 12px;
                 padding: 0px;
-                background: white;
+                background: rgba(255, 255, 255, 0.6);
                 border-radius: 5px;
                 box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
                 overflow: hidden;

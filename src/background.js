@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, ipcMain, BrowserWindow, shell, globalShortcut } from 'electron'
+import { app, protocol, ipcMain, BrowserWindow, shell, globalShortcut, screen } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { autoUpdater } from 'electron-updater'
@@ -154,6 +154,32 @@ async function createWindow() {
             else
                 event.reply('translate-callback', res);
         })
+    });
+
+    let positionInfo = () => {
+        let position = win.getPosition();
+        let displays = screen.getAllDisplays();
+        let maxXDisplay = displays[0];
+        let maxYDisplay = displays[0];
+        displays.sort((a, b) => b.bounds.x - a.bounds.x);
+        maxXDisplay = displays[0];
+        displays.sort((a, b) => b.bounds.y - a.bounds.y);
+        maxYDisplay = displays[0];
+        return {
+            left: position[0],
+            top: position[1],
+            totalScreenWidth: maxXDisplay.bounds.x + maxXDisplay.bounds.width,
+            totalScreenHeight: maxYDisplay.bounds.y + maxYDisplay.bounds.height
+        }
+
+    }
+
+    ipcMain.on("move", (event) => {
+        event.reply("move", positionInfo());
+    });
+
+    win.on("move", () => {
+        win.webContents.send("move", positionInfo());
     });
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {

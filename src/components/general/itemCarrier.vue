@@ -98,13 +98,13 @@
                         icon="Delete"
                         borderRadius="3"
                         :disabled="currentChoosen.length <= 0"
-                        style="width: 100px;"
+                        style="width: 100px; margin-left: 5px;"
                         @click="remove"
                     >{{local('Remove')}}</fv-button>
                     <fv-button
                         :theme="theme"
                         borderRadius="3"
-                        style="width: 100px;"
+                        style="width: 100px; margin-left: 5px;"
                         @click="show.panel = false"
                     >{{local('Close')}}</fv-button>
                 </template>

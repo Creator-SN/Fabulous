@@ -3,6 +3,7 @@
         id="app"
         :class="{dark: theme == 'dark'}"
     >
+        <dynamic-b-g :theme="theme" :disabled="!dynamicEffect"></dynamic-b-g>
         <navigation-view></navigation-view>
         <div class="addition-container">
             <title-bar
@@ -44,6 +45,7 @@ import navigationView from "@/components/general/navigationView.vue";
 import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
+import dynamicBG from "@/components/general/dynamicBG.vue";
 import { config, data_structure } from "@/js/data_sample";
 import { mapMutations, mapState, mapGetters } from "vuex";
 
@@ -57,6 +59,7 @@ export default {
         editorContainer,
         pdfImporter,
         itemCarrier,
+        dynamicBG,
     },
     data() {
         return {
@@ -84,6 +87,7 @@ export default {
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
+            dynamicEffect: (state) => state.config.dynamicEffect,
             show_editor: (state) => state.editor.show,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
@@ -111,7 +115,7 @@ export default {
             reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
             reviseProgress: "reviseProgress",
-            setWindowSize: 'setWindowSize',
+            setWindowSize: "setWindowSize",
             reviseI18N: "reviseI18N",
         }),
         i18nInit() {
@@ -232,7 +236,7 @@ export default {
                 let height = document.body.clientHeight;
                 this.setWindowSize({
                     width,
-                    height
+                    height,
                 });
             }, 100);
         },
@@ -287,7 +291,7 @@ export default {
 
         &:hover {
             width: 16px;
-            background-color: rgba(191, 190, 189, 1);
+            background-color: rgba(191, 190, 189, 0.6);
         }
     }
 

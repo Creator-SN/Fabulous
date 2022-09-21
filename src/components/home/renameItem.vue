@@ -24,6 +24,17 @@
                 <p class="w-title">{{local('Item Labels')}}</p>
             </div>
             <div
+                v-show="labels.length > 0"
+                class="w-p-block"
+                style="height: 120px; padding: 0px; overflow-x: auto;"
+            >
+                <fv-tag
+                    v-model="labels"
+                    :theme="theme"
+                    :isDel="true"
+                ></fv-tag>
+            </div>
+            <div
                 class="label-text-box-block"
                 style="line-height: 2;"
             >
@@ -48,16 +59,6 @@
                         @keyup.enter="addLabel(item)"
                     ></fv-text-box>
                 </div>
-            </div>
-            <div
-                class="w-p-block"
-                style="height: 130px; overflow-x: auto;"
-            >
-                <fv-tag
-                    v-model="labels"
-                    :theme="theme"
-                    :isDel="true"
-                ></fv-tag>
             </div>
         </template>
         <template v-slot:control>

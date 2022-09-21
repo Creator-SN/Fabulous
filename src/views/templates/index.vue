@@ -4,7 +4,7 @@
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
-            <p class="s-title">{{local('Templates')}}</p>
+            <p class="s-title" style="margin-top: 20px;">{{local('Templates')}}</p>
         </div>
         <div class="m-templates-block">
             <div class="row between">
@@ -12,7 +12,7 @@
                     v-model="currentSearch"
                     :placeholder="local('Filtering from current content')"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(245, 245, 245, 1)'"
+                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
                     icon="Filter"
                     borderWidth="2"
                     :revealBorder="true"
@@ -23,8 +23,8 @@
                 <fv-command-bar
                     :options="cmd"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'transparent' : 'rgba(245, 245, 245, 1)'"
-                    style="flex: 1"
+                    :background="theme === 'dark' ? 'transparent' : 'rgba(245, 245, 245, 0)'"
+                    style="flex: 1; background: transparent;"
                 ></fv-command-bar>
             </div>
             <div class="row main-table">
@@ -240,14 +240,14 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 1);
+    background: rgba(245, 245, 245, 0.9);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transition: all 0.3s;
 
     &.dark {
-        background: rgba(36, 36, 36, 1);
+        background: rgba(36, 36, 36, 0.9);
 
         .s-title {
             color: whitesmoke;

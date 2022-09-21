@@ -7,6 +7,7 @@
         :background="navigationViewBackground"
         :settingTitle="local('Setting')"
         :mobileDisplay="mobileDisplay"
+        :flyout-display="mobileDisplay"
         :expandWidth="350"
         :showNav="windowWidth < mobileDisplay"
         :style="{'z-index': windowWidth < mobileDisplay ? 2 : 1}"
@@ -20,6 +21,7 @@
                 :placeholder="` ` + local('Search Partitions')"
                 :theme="theme"
                 borderWidth="1"
+                background="rgba(255, 255, 255, 0.1)"
                 :border-radius="30"
                 :revealBorder="true"
                 style="width: 95%;"
@@ -50,8 +52,8 @@
                         v-model="treeList"
                         :theme="theme"
                         expandedIconPosition="right"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)'"
-                        :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 1)' : 'rgba(245, 245, 245, 1)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.1)' : 'rgba(245, 245, 245, 1)'}"
+                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
+                        :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
                         style="width: 100%; height: 100%;"
                         @click="SwitchPartition"
                     >
@@ -100,7 +102,10 @@
                         :title="local('Choose a source to start.')"
                     ></loading>
                 </div>
-                <div class="navigation-view-command-bar-block">
+                <div
+                    class="navigation-view-command-bar-block"
+                    :class="[{dark: theme === 'dark'}]"
+                >
                     <div
                         v-for="(item, index) in cmdList"
                         :key="`command-bar-item: ${index}`"
@@ -264,6 +269,9 @@ export default {
         },
         partitions() {
             this.refreshTreeList();
+        },
+        windowWidth() {
+            if (this.windowWidth > this.mobileDisplay) this.expand = true;
         },
     },
     computed: {
@@ -675,6 +683,22 @@ export default {
             margin: 20px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
+
+            &.dark {
+                background: rgba(0, 0, 0, 0.3);
+
+                .command-item {
+                    .command-item-icon {
+                        
+                        background: rgba(36, 36, 36, 1);
+                        
+                    }
+
+                    .command-item-content {
+                        color: rgba(245, 245, 245, 0.9);
+                    }
+                }
+            }
 
             .command-item {
                 @include Vcenter;
