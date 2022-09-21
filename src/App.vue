@@ -3,7 +3,7 @@
         id="app"
         :class="{dark: theme == 'dark'}"
     >
-        <dynamic-b-g :theme="theme" :disabled="!dynamicEffect"></dynamic-b-g>
+        <dynamic-b-g :theme="theme" :disabled="!dynamicEffect" :themeColorList="themeColorList"></dynamic-b-g>
         <navigation-view></navigation-view>
         <div class="addition-container">
             <title-bar
@@ -88,6 +88,7 @@ export default {
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
             dynamicEffect: (state) => state.config.dynamicEffect,
+            themeColorList: (state) => state.config.themeColorList,
             show_editor: (state) => state.editor.show,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,

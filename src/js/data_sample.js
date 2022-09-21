@@ -5,6 +5,7 @@ export const config = {
     language: "en",
     autoSave: false,
     dynamicEffect: true,
+    themeColorList: [],
     theme: "light"
 }
 

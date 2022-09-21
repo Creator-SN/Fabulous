@@ -16,6 +16,7 @@ export default new Vuex.Store({
             language: 'en',
             autoSave: false,
             dynamicEffect: true,
+            themeColorList: [],
             theme: 'light'
         },
         // ds //

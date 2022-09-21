@@ -6,9 +6,73 @@
         <div
             v-show="!disabled"
             class="dynamic-bg-block"
-            :style="{left: computedLeft, top: computedTop, width: computedWidth, height: computedHeight, background: `url(${img.dynamicBG}) no-repeat`, 'background-size': 'cover', opacity: theme === 'dark' ? 1 : 0.7}"
+            :style="{left: computedLeft, top: computedTop, width: computedWidth, height: computedHeight, opacity: theme === 'dark' ? 1 : 0.7}"
         >
-
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.1"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:svgjs="http://svgjs.dev/svgjs"
+                viewBox="0 0 800 450"
+                opacity="0.67"
+            >
+                <defs>
+                    <filter
+                        id="bbblurry-filter"
+                        x="-100%"
+                        y="-100%"
+                        width="400%"
+                        height="400%"
+                        filterUnits="objectBoundingBox"
+                        primitiveUnits="userSpaceOnUse"
+                        color-interpolation-filters="sRGB"
+                    >
+                        <feGaussianBlur
+                            stdDeviation="58"
+                            x="0%"
+                            y="0%"
+                            width="100%"
+                            height="100%"
+                            in="SourceGraphic"
+                            edgeMode="none"
+                            result="blur"
+                        ></feGaussianBlur>
+                    </filter>
+                </defs>
+                <g filter="url(#bbblurry-filter)">
+                    <ellipse
+                        rx="228.5"
+                        ry="233"
+                        cx="220.5862579345703"
+                        cy="36.34315490722656"
+                        :fill="computedColor(0)"
+                    >
+                    </ellipse>
+                    <ellipse
+                        rx="228.5"
+                        ry="233"
+                        cx="577.9253872958097"
+                        cy="59.557355013760656"
+                        :fill="computedColor(1)"
+                    >
+                    </ellipse>
+                    <ellipse
+                        rx="228.5"
+                        ry="233"
+                        cx="260.5261757590555"
+                        cy="352.03034834428263"
+                        :fill="computedColor(2)"
+                    >
+                    </ellipse>
+                    <ellipse
+                        rx="228.5"
+                        ry="233"
+                        cx="595.5195257013493"
+                        cy="330.0561856356534"
+                        :fill="computedColor(3)"
+                    ></ellipse>
+                </g>
+            </svg>
         </div>
     </div>
 </template>
@@ -22,6 +86,9 @@ export default {
     props: {
         disabled: {
             default: false,
+        },
+        themeColorList: {
+            default: () => [],
         },
         theme: {
             default: "light",
@@ -38,6 +105,12 @@ export default {
                 totalScreenWidth: 1,
                 totalScreenHeight: 1,
             },
+            defaultColorList: [
+                "hsla(38, 99%, 67%, 0.76)",
+                "hsla(327, 73%, 52%, 0.85)",
+                "hsla(203, 100%, 57%, 0.76)",
+                "hsl(208, 100%, 86%)",
+            ],
         };
     },
     computed: {
@@ -53,13 +126,27 @@ export default {
         computedTop() {
             return ` -${this.position.top}px`;
         },
+        computedColor() {
+            return (index) => {
+                if (this.themeColorList[index]) {
+                    return `rgba(${this.themeColorList[index].color.join(
+                        ", "
+                    )}, 1)`;
+                } else {
+                    return this.defaultColorList[index];
+                }
+            };
+        },
     },
     mounted() {
         this.positionInit();
     },
     methods: {
         positionInit() {
-            ipc.send("move");
+            this.sendMove();
+
+            window.removeEventListener("resize", this.sendMove);
+            window.addEventListener("resize", this.sendMove);
 
             ipc.on("move", (event, arg) => {
                 window.requestAnimationFrame(() => {
@@ -69,6 +156,9 @@ export default {
                     this.position.totalScreenHeight = arg.totalScreenHeight;
                 });
             });
+        },
+        sendMove() {
+            ipc.send("move");
         },
     },
 };

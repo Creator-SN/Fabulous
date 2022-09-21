@@ -4,7 +4,10 @@
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
-            <p class="s-title" style="margin-top: 20px;">{{local('Setting')}}</p>
+            <p
+                class="s-title"
+                style="margin-top: 20px;"
+            >{{local('Setting')}}</p>
         </div>
         <div class="scroll-view">
             <fv-Collapse
@@ -118,7 +121,8 @@
                 :icon="'SpecialEffectSize'"
                 :title="local('Dynamic Effect')"
                 :content="local('Dynamic Effect Background')"
-                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;">
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
                 <template v-slot:extension>
                     <fv-toggle-switch
                         :title="local('Dynamic Effect')"
@@ -129,6 +133,46 @@
                         :offForeground="theme === 'dark' ? '#fff' : '#000'"
                     >
                     </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
+                v-show="dynamic_effect"
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="'ImageExport'"
+                :title="local('Dynamic Effect Theme Color')"
+                :content="local('Dynamic Effect Background')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <input
+                        v-show="false"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                        ref="input"
+                        @change="getImgColor"
+                    />
+                    <fv-button
+                        :theme="theme"
+                        :is-box-shadow="true"
+                        style="width: 180px; margin-right: 5px;"
+                        @click="$refs.input.click()"
+                    >
+                        {{local('Pick Color from Image')}}
+                    </fv-button>
+                </template>
+                <template v-slot:content="x">
+                    <div class="collapse-info">
+                        <p v-show="themeColorList.length === 0">{{ x.content }}</p>
+                        <div v-show="themeColorList.length > 0" class="theme-color-label-block">
+                            <p
+                                v-for="(item, index) in themeColorList"
+                                :key="`color: ${index}`"
+                                class="theme-color-label-item-sample"
+                                :style="{background: `rgba(${item.color.join(', ')}, 0.8)`}"
+                            ></p>
+                        </div>
+                    </div>
                 </template>
             </fv-Collapse>
             <fv-Collapse
@@ -166,6 +210,8 @@ import dataPathItem from "@/components/settings/dataPathItem.vue";
 
 import OneDrive from "@/assets/settings/OneDrive.svg";
 
+import ThemeColor from "@/js/themeColorPicker.js";
+
 const { dialog } = require("electron").remote;
 
 export default {
@@ -181,8 +227,8 @@ export default {
                 { key: "cn", text: "简体中文" },
             ],
             thisPathList: [],
-            auto_save: this.autoSave,
-            dynamic_effect: this.dynamicEffect,
+            auto_save: false,
+            dynamic_effect: true,
             db_index: -1,
             img: {
                 OneDrive,
@@ -212,13 +258,13 @@ export default {
         auto_save() {
             this.switchAutoSave();
         },
-        autoSave () {
+        autoSave() {
             this.auto_save = this.autoSave;
         },
-        dynamic_effect () {
+        dynamic_effect() {
             this.switchDynamicEffect();
         },
-        dynamicEffect () {
+        dynamicEffect() {
             this.dynamic_effect = this.dynamicEffect;
         },
         "show.initDS"() {
@@ -234,6 +280,7 @@ export default {
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
             dynamicEffect: (state) => state.config.dynamicEffect,
+            themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -250,6 +297,8 @@ export default {
     mounted() {
         this.languageInit();
         this.refreshDBList();
+        this.auto_save = this.autoSave;
+        this.dynamic_effect = this.dynamicEffect;
     },
     methods: {
         ...mapMutations({
@@ -299,12 +348,12 @@ export default {
         },
         switchAutoSave() {
             this.reviseConfig({
-                autoSave: this.auto_save
+                autoSave: this.auto_save,
             });
         },
         switchDynamicEffect() {
             this.reviseConfig({
-                dynamicEffect: this.dynamic_effect
+                dynamicEffect: this.dynamic_effect,
             });
         },
         async addSource() {
@@ -372,6 +421,22 @@ export default {
                     cancel: () => {},
                 }
             );
+        },
+        getImgColor() {
+            if (this.$refs.input.files.length === 0) return;
+            let file = this.$refs.input.files[0];
+            ThemeColor.ThemeColorPicker(file.path, (result) => {
+                let color = [];
+                result.forEach((el) => {
+                    color.push({
+                        hot: el.hot,
+                        color: el.color,
+                    });
+                });
+                this.reviseConfig({
+                    themeColorList: color,
+                });
+            });
         },
     },
 };
@@ -479,6 +544,19 @@ export default {
                     margin-right: 5px;
                 }
             }
+        }
+    }
+
+    .theme-color-label-block {
+        @include Vcenter;
+
+        margin-top: 5px;
+
+        .theme-color-label-item-sample {
+            width: 10px;
+            height: 10px;
+            margin-right: 20px;
+            border-radius: 50%;
         }
     }
 }
