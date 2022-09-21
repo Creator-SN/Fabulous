@@ -6,7 +6,7 @@
         <div
             v-show="!disabled"
             class="dynamic-bg-block"
-            :style="{left: computedLeft, top: computedTop, width: computedWidth, height: computedHeight, opacity: theme === 'dark' ? 1 : 0.7}"
+            :style="{left: computedLeft, top: computedTop, width: computedWidth, height: computedHeight, opacity: theme === 'dark' ? 1 : 0.8}"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -76,10 +76,13 @@ export default {
     width: 200px;
     height: auto;
     padding: 8px 0px;
-    background: rgba(239, 239, 239, 1);
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    border: rgba(36, 36, 36, 0.1) solid thin;
+    border-radius: 8px;
     box-sizing: border-box;
-    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1), 0px 3px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1), 0px 3px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     z-index: 3;
 
     div {
@@ -89,7 +92,6 @@ export default {
             width: calc(100% - 10px);
             margin-left: 5px;
             padding: 8px 10px;
-            background: rgba(239, 239, 239, 1);
             font-size: 13px;
             border-radius: 3px;
             box-sizing: border-box;
@@ -127,16 +129,16 @@ export default {
     }
 
     &.dark {
-        background: rgba(36, 36, 36, 1);
+        background: rgba(36, 36, 36, 0.6);
+        border: rgba(200, 200, 200, 0.1) solid thin;
         box-shadow: 0px 0px 0px rgba(36, 36, 36, 0.1),
-            0px 3px 10px rgba(36, 36, 36, 0.3);
+            0px 3px 6px rgba(36, 36, 36, 0.3);
 
         div {
             span {
-                background: rgba(36, 36, 36, 1);
 
                 &:hover {
-                    background: rgba(49, 49, 49, 1);
+                    background: rgba(36, 36, 36, 1);
                 }
 
                 p {

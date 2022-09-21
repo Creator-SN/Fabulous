@@ -534,5 +534,33 @@ export default {
     "Folder": {
         "en": "Folder",
         "cn": "文件夹"
-    }
+    },
+    "Dynamic Effect": {
+        "en": "Dynamic Effect",
+        "cn": "灵动效果"
+    },
+    "Dynamic Effect Background": {
+        "en": "Dynamic Effect Background",
+        "cn": "启用灵动效果背景"
+    },
+    "Dynamic Effect ON": {
+        "en": "Dynamic Effect ON",
+        "cn": "开启效果"
+    },
+    "Dynamic Effect OFF": {
+        "en": "Dynamic Effect OFF",
+        "cn": "关闭效果"
+    },
+    "Dynamic Effect Theme Color": {
+        "en": "Dynamic Effect Theme Color",
+        "cn": "灵动效果主题色"
+    },
+    "Pick Theme Color from Image": {
+        "en": "Pick Theme Color from Image",
+        "cn": "从图片中提取主题色"
+    },
+    "Pick from Image": {
+        "en": "Pick from Image",
+        "cn": "选择图片"
+    },
 }

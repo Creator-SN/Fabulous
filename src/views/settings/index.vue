@@ -136,12 +136,13 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
+                v-if="themeColorList"
                 v-show="dynamic_effect"
                 :disabledCollapse="true"
                 :theme="theme"
                 :icon="'ImageExport'"
                 :title="local('Dynamic Effect Theme Color')"
-                :content="local('Dynamic Effect Background')"
+                :content="local('Pick Theme Color from Image')"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
             >
                 <template v-slot:extension>
@@ -155,22 +156,35 @@
                     <fv-button
                         :theme="theme"
                         :is-box-shadow="true"
-                        style="width: 180px; margin-right: 5px;"
+                        style="width: 120px;"
                         @click="$refs.input.click()"
                     >
-                        {{local('Pick Color from Image')}}
+                        {{local('Pick from Image')}}
                     </fv-button>
                 </template>
                 <template v-slot:content="x">
                     <div class="collapse-info">
                         <p v-show="themeColorList.length === 0">{{ x.content }}</p>
-                        <div v-show="themeColorList.length > 0" class="theme-color-label-block">
+                        <div
+                            v-show="themeColorList.length > 0"
+                            class="theme-color-label-block"
+                        >
                             <p
                                 v-for="(item, index) in themeColorList"
                                 :key="`color: ${index}`"
                                 class="theme-color-label-item-sample"
                                 :style="{background: `rgba(${item.color.join(', ')}, 0.8)`}"
                             ></p>
+                            <fv-button
+                                :theme="theme"
+                                :border-radius="50"
+                                :font-size="12"
+                                :is-box-shadow="true"
+                                style="width: 20px; height: 20px;"
+                                @click="shuffleThemeColorList"
+                            >
+                                <i class="ms-Icon ms-Icon--Shuffle"></i>
+                            </fv-button>
                         </div>
                     </div>
                 </template>
@@ -436,6 +450,16 @@ export default {
                 this.reviseConfig({
                     themeColorList: color,
                 });
+                this.$refs.input.value = "";
+            });
+        },
+        shuffleThemeColorList() {
+            let color = this.themeColorList;
+            color.sort(() => {
+                return Math.random() - 0.5;
+            });
+            this.reviseConfig({
+                themeColorList: color,
             });
         },
     },
@@ -553,8 +577,8 @@ export default {
         margin-top: 5px;
 
         .theme-color-label-item-sample {
-            width: 10px;
-            height: 10px;
+            width: 15px;
+            height: 15px;
             margin-right: 20px;
             border-radius: 50%;
         }
