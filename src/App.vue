@@ -45,7 +45,7 @@ import i18n from "@/js/i18n.js";
 import starter from "@/components/general/starter.vue";
 import titleBar from "@/components/general/titleBar.vue";
 import progressBar from "@/components/general/progressbar.vue";
-import navigationView from "@/components/general/navigationView.vue";
+import navigationView from "@/components/general/navigationView";
 import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
