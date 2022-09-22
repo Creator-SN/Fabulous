@@ -26,7 +26,7 @@
                     :src="logo"
                     style="width: 80px; height: auto;"
                 ></fv-img>
-                <p class="logo-title">IFKB</p>
+                <p class="logo-title">Fabulous</p>
                 <fv-button
                     theme="dark"
                     background="rgba(0, 130, 180, 1)"

@@ -35,80 +35,131 @@
             >
                 <div
                     v-show="expand"
-                    class="navigation-view-current-ds-block"
-                    @click="Go(`/settings`)"
+                    class="navigation-view-mode-block"
+                    @click="menuDisplayMode = 0"
                 >
-                    <img
-                        draggable="false"
-                        :src="img.dataSource"
-                        alt=""
-                        class="icon-img"
+                    <div class="navigation-view-mode-left-block">
+                        <img
+                            draggable="false"
+                            :src="img.dataSource"
+                            alt=""
+                            class="icon-img"
+                        >
+                        <p class="title">{{!name ? local('Unselected') : name}}</p>
+                    </div>
+                    <div
+                        class="navigation-view-mode-right-block"
+                        @click="$event => {$event.stopPropagation(); Go(`/settings`);}"
                     >
-                    <p class="title">{{!name ? local('Unselected') : name}}</p>
+                        <i class="ms-Icon ms-Icon--Repair more-menu-btn"></i>
+                    </div>
                 </div>
+                <transition name="expand-top-to-bottom">
+                    <div
+                        v-show="menuDisplayMode === 0"
+                        class="navigation-view-tree-view-block"
+                    >
+                        <fv-TreeView
+                            v-show="treeList.length > 0"
+                            v-model="treeList"
+                            :theme="theme"
+                            :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
+                            :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
+                            style="width: 100%; height: 100%;"
+                            @click="SwitchPartition"
+                        >
+                            <template v-slot:default="x">
+                                <div
+                                    class="tree-view-custom-item"
+                                    @contextmenu="rightClick($event, x.item)"
+                                >
+                                    <div class="tree-view-item-left-block">
+                                        <emoji-callout
+                                            :value="x.item.emoji"
+                                            :theme="theme"
+                                            @insert-emoji="reviseEmoji(x.item, $event)"
+                                        ></emoji-callout>
+                                        <!-- <p>{{x.item.emoji}}</p> -->
+                                        <p
+                                            v-show="!x.item.editable"
+                                            class="tree-view-custom-label"
+                                        >{{x.item.name}}</p>
+                                        <fv-text-box
+                                            v-model="x.item.name"
+                                            v-show="x.item.editable"
+                                            :theme="theme"
+                                            :ref="`t:${x.item.id}`"
+                                            class="tree-view-custom-text-box"
+                                            background="rgba(255, 255, 255, 0.3)"
+                                            border-color="rgba(250, 176, 70, 0.3)"
+                                            focus-border-color="rgba(250, 176, 70, 1)"
+                                            underline
+                                            @keyup.native.enter="rename(x.item)"
+                                        ></fv-text-box>
+                                        <fv-button
+                                            v-show="x.item.editable"
+                                            :theme="theme"
+                                            borderRadius="50"
+                                            class="tree-view-custom-confirm"
+                                            @click="rename(x.item)"
+                                        >
+                                            <i class="ms-Icon ms-Icon--CheckMark"></i>
+                                        </fv-button>
+                                    </div>
+                                    <div
+                                        class="tree-view-item-right-block"
+                                        @click="rightClick($event, x.item)"
+                                    >
+                                        <i class="ms-Icon ms-Icon--More more-menu-btn"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </fv-TreeView>
+                        <nav-empty v-show="treeList.length === 0"></nav-empty>
+                        <loading
+                            v-show="SourceDisabled"
+                            :title="local('Choose a source to start.')"
+                        ></loading>
+                    </div>
+                </transition>
                 <div
                     v-show="expand"
-                    class="navigation-view-tree-view-block"
+                    class="navigation-view-mode-block"
+                    @click="menuDisplayMode = 1"
                 >
-                    <fv-TreeView
-                        v-show="treeList.length > 0"
-                        v-model="treeList"
-                        :theme="theme"
-                        :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
-                        :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
-                        style="width: 100%; height: 100%;"
-                        @click="SwitchPartition"
-                    >
-                        <template v-slot:default="x">
-                            <div
-                                class="tree-view-custom-item"
-                                @contextmenu="rightClick($event, x.item)"
-                            >
-                                <div class="tree-view-item-left-block">
-                                    <emoji-callout
-                                        :value="x.item.emoji"
-                                        :theme="theme"
-                                        @insert-emoji="reviseEmoji(x.item, $event)"
-                                    ></emoji-callout>
-                                    <!-- <p>{{x.item.emoji}}</p> -->
-                                    <p
-                                        v-show="!x.item.editable"
-                                        class="tree-view-custom-label"
-                                    >{{x.item.name}}</p>
-                                    <fv-text-box
-                                        v-model="x.item.name"
-                                        v-show="x.item.editable"
-                                        :theme="theme"
-                                        :ref="`t:${x.item.id}`"
-                                        class="tree-view-custom-text-box"
-                                        background="rgba(255, 255, 255, 0.3)"
-                                        border-color="rgba(250, 176, 70, 0.3)"
-                                        focus-border-color="rgba(250, 176, 70, 1)"
-                                        underline
-                                        @keyup.native.enter="rename(x.item)"
-                                    ></fv-text-box>
-                                    <fv-button
-                                        v-show="x.item.editable"
-                                        :theme="theme"
-                                        borderRadius="50"
-                                        class="tree-view-custom-confirm"
-                                        @click="rename(x.item)"
-                                    >
-                                        <i class="ms-Icon ms-Icon--CheckMark"></i>
-                                    </fv-button>
-                                </div>
-                                <div class="tree-view-item-right-block" @click="rightClick($event, x.item)">
-                                    <i class="ms-Icon ms-Icon--More more-menu-btn"></i>
-                                </div>
-                            </div>
-                        </template>
-                    </fv-TreeView>
-                    <nav-empty v-show="treeList.length === 0"></nav-empty>
-                    <loading
-                        v-show="SourceDisabled"
-                        :title="local('Choose a source to start.')"
-                    ></loading>
+                    <div class="navigation-view-mode-left-block">
+                        <img
+                            draggable="false"
+                            :src="img.notebook"
+                            alt=""
+                            class="icon-img"
+                        >
+                        <p class="title">{{!localPath ? local('Unselected') : localPathFolderName}}</p>
+                    </div>
+                    <div class="navigation-view-mode-right-block">
+                        <i
+                            class="ms-Icon ms-Icon--SubscriptionAdd more-menu-btn"
+                            @click="() => $refs.local_view.createFile()"
+                        ></i>
+                        <i
+                            class="ms-Icon ms-Icon--NewFolder more-menu-btn"
+                            @click="() => $refs.local_view.createFolder()"
+                        ></i>
+                        <i
+                            class="ms-Icon ms-Icon--FolderOpen more-menu-btn"
+                            @click="() => $refs.local_view.chooseFolder()"
+                        ></i>
+                    </div>
                 </div>
+                <transition name="expand-top-to-bottom">
+                    <local-tree-view
+                        v-show="menuDisplayMode === 1"
+                        v-model="localPath"
+                        :theme="theme"
+                        :local="local"
+                        ref="local_view"
+                    ></local-tree-view>
+                </transition>
                 <div
                     class="navigation-view-command-bar-block"
                     :class="[{dark: theme === 'dark'}]"
@@ -198,12 +249,14 @@
 <script>
 import loading from "@/components/general/loading.vue";
 import navEmpty from "@/components/general/empty/navEmpty.vue";
+import localTreeView from "@/components/general/navigationView/localTreeView.vue";
 import rightMenu from "@/components/general/rightMenu.vue";
 import emojiCallout from "@/components/general/callout/emojiCallout.vue";
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { group, partition } from "@/js/data_sample";
 
 import dataSource from "@/assets/nav/dataSource.svg";
+import notebook from "@/assets/nav/notebook.svg";
 import groupImg from "@/assets/nav/group.svg";
 import partitionImg from "@/assets/nav/partition.svg";
 import templatesImg from "@/assets/nav/template.svg";
@@ -213,6 +266,7 @@ export default {
     components: {
         loading,
         navEmpty,
+        localTreeView,
         rightMenu,
         emojiCallout,
     },
@@ -254,6 +308,7 @@ export default {
             ],
             img: {
                 dataSource,
+                notebook,
                 group: groupImg,
                 partition: partitionImg,
                 templates: templatesImg,
@@ -261,8 +316,10 @@ export default {
             },
             treeList: [],
             FLAT: [],
+            localPath: "",
             posX: 0,
             posY: 0,
+            menuDisplayMode: 0,
             rightMenuItem: {},
             rightMenuHeight: 0,
             show: {
@@ -313,6 +370,10 @@ export default {
                 result.push(t[i]);
             }
             return result;
+        },
+        localPathFolderName() {
+            let pathList = this.localPath.split(/[\\/]/);
+            return pathList[pathList.length - 1];
         },
     },
     mounted() {
@@ -621,7 +682,7 @@ export default {
         flex-direction: column;
         overflow: hidden;
 
-        .navigation-view-current-ds-block {
+        .navigation-view-mode-block {
             position: relative;
             width: calc(100% - 40px);
             margin: 3px 20px;
@@ -639,6 +700,35 @@ export default {
 
             &:active {
                 background: rgba(200, 200, 200, 0.3);
+            }
+
+            .navigation-view-mode-left-block {
+                @include Vcenter;
+
+                flex: 1;
+            }
+
+            .navigation-view-mode-right-block {
+                @include HendVcenter;
+
+                width: 100px;
+
+                .more-menu-btn {
+                    @include HcenterVcenter;
+
+                    width: 25px;
+                    height: 25px;
+                    font-size: 12px;
+                    border-radius: 8px;
+
+                    &:hover {
+                        background: rgba(200, 200, 200, 0.2);
+                    }
+
+                    &:active {
+                        background: rgba(200, 200, 200, 0.3);
+                    }
+                }
             }
 
             .title {
@@ -757,6 +847,15 @@ export default {
 
                 &.disabled {
                     filter: grayscale(1);
+                    opacity: 0.6;
+
+                    &:hover {
+                        background: transparent;
+                    }
+
+                    &:active {
+                        background: transparent;
+                    }
                 }
 
                 .command-item-icon {
@@ -804,6 +903,38 @@ export default {
         width: 15px;
         height: auto;
         user-select: none;
+    }
+
+    .expand-top-to-bottom-enter-active,
+    .expand-top-to-bottom-leave-active {
+        transform-origin: 50% 0%;
+        transition: all 0.3s;
+    }
+
+    .expand-top-to-bottom-enter,
+    .expand-top-to-bottom-leave-to {
+        transform: scaleY(0);
+    }
+
+    .expand-top-to-bottom-enter-to,
+    .expand-top-to-bottom-leave {
+        transform: scaleY(1);
+    }
+
+    .expand-bottom-to-top-enter-active,
+    .expand-bottom-to-top-leave-active {
+        transform-origin: 50% 100%;
+        transition: all 0.3s;
+    }
+
+    .expand-bottom-to-top-enter,
+    .expand-bottom-to-top-leave-to {
+        transform: scaleY(0);
+    }
+
+    .expand-bottom-to-top-enter-to,
+    .expand-bottom-to-top-leave {
+        transform: scaleY(1);
     }
 }
 </style>

@@ -10,6 +10,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const translate = require('google-translate-cn-api');
 
 var fs = require('fs-extra');
+const path = require('path');
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -94,6 +95,46 @@ async function createWindow() {
     ipcMain.on("ensure-file", (event, dir) => {
         fs.ensureDir(dir).then(() => {
             event.reply('ensure-file-callback', 200);
+        });
+    });
+
+    ipcMain.on("list-dir", (event, { dir, target }) => {
+        fs.readdir(dir, (err, files) => {
+            if (err) {
+                event.reply('list-dir-callback', {
+                    status: err,
+                    dir: dir,
+                    files: [],
+                    target: target
+                });
+                return;
+            }
+            let fileList = [];
+            let promises = [];
+            files.forEach(filename => {
+                let fileObj = {};
+                fileObj.filePath = path.join(dir, filename);
+
+                promises.push(new Promise(resolve => {
+                    fs.stat(fileObj.filePath, (error, stats) => {
+                        if (!error) {
+                            fileObj.name = filename;
+                            fileObj.isFile = stats.isFile();
+                            fileObj.isDir = stats.isDirectory();
+                            fileList.push(fileObj);
+                            resolve(1);
+                        }
+                    });
+                }))
+            });
+            Promise.all(promises).then(() => {
+                event.reply('list-dir-callback', {
+                    status: err,
+                    dir: dir,
+                    files: fileList,
+                    target: target
+                });
+            });
         });
     });
 
