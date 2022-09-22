@@ -3,8 +3,13 @@
         <div
             v-show="show_editor"
             class="fabulous-editor-container"
-            :class="[{ dark: theme == 'dark', fullScreen: fullScreen }]"
+            :class="[{ dark: theme == 'dark' }]"
         >
+            <dynamic-b-g
+                :theme="theme"
+                :disabled="!dynamicEffect"
+                :themeColorList="themeColorList"
+            ></dynamic-b-g>
             <div class="control-banner">
                 <div class="control-left-block">
                     <fv-button
@@ -20,21 +25,6 @@
                             show.quickNav
                                 ? 'ms-Icon--RemoveFromShoppingList'
                                 : 'ms-Icon--PageList',
-                        ]"
-                        ></i>
-                    </fv-button>
-                    <fv-button
-                        :theme="theme"
-                        :borderRadius="30"
-                        class="control-btn"
-                        @click="fullScreen ^= true"
-                    >
-                        <i
-                            class="ms-Icon"
-                            :class="[
-                            fullScreen
-                                ? 'ms-Icon--BackToWindow'
-                                : 'ms-Icon--FullScreen',
                         ]"
                         ></i>
                     </fv-button>
@@ -137,13 +127,14 @@
                         :is-box-shadow="true"
                         @click="close"
                     >
-                        <i class="ms-Icon ms-Icon--Cancel"></i>
+                        <i class="ms-Icon ms-Icon--BackToWindow"></i>
                     </fv-button>
                 </div>
             </div>
             <div
                 v-if="showNav"
                 class="nav-banner"
+                :class="[{half: displayMode === 2}]"
             >
                 <fv-Breadcrumb
                     :value="`${item.name}/${target.name}`"
@@ -162,21 +153,19 @@
                     :editable="!readonly"
                     :theme="theme"
                     :language="language"
+                    :editorBackground="
+                    theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
                     :editorOutSideBackground="
-                    theme == 'dark' ? 'rgba(47, 52, 55, 1)' : 'white'
-                "
+                    theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
+                    :toolbarHeight="150"
+                    :readOnlyPaddingTop="100"
                     :contentMaxWidth="expandContent ? '99999px' : '900px'"
                     :mobileDisplayWidth="0"
                     :mentionItemAttr="editorMentionItemAttr"
                     :extensions="customExtensions"
                     ref="editor"
-                    :style="{height: `calc(100% - ${showNav ? 40 : 0}px)`, 'font-size': `${fontSize}px`}"
-                    style="
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    flex: 1;
-                "
+                    :style="{background: 'transparent', 'font-size': `${fontSize}px`}"
+                    style="position: relative; width: 100%; height: 100%; flex: 1;"
                     @save-json="saveContent"
                     @click.native="show.quickNav = false"
                 >
@@ -271,6 +260,7 @@ import { mapMutations, mapState, mapGetters } from "vuex";
 
 import addItemPage from "@/components/home/addItemPage.vue";
 import pdfViewer from "@/components/general/pdfViewer";
+import dynamicBG from "@/components/general/dynamicBG.vue";
 
 import pdfNote from "@/components/general/editorCustom/extension/pdfNote.js";
 
@@ -284,13 +274,13 @@ export default {
     components: {
         addItemPage,
         pdfViewer,
+        dynamicBG,
     },
     data() {
         return {
             content: "",
             readonly: false,
             fontSize: 16,
-            fullScreen: false,
             expandContent: false,
             unsave: false,
             auto_save: false,
@@ -383,6 +373,8 @@ export default {
             templates: (state) => state.data_structure.templates,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
+            dynamicEffect: (state) => state.config.dynamicEffect,
+            themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
             show_editor: (state) => state.editor.show,
             type: (state) => state.editor.type,
@@ -764,12 +756,11 @@ export default {
 <style lang="scss">
 .fabulous-editor-container {
     position: fixed;
-    width: calc(100% - 350px);
+    width: 100%;
     height: 100%;
     top: 0px;
     right: 0px;
-    padding-top: 32px;
-    background: white;
+    background: rgba(250, 250, 250, 1);
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     box-sizing: border-box;
@@ -782,10 +773,10 @@ export default {
 
     &.dark {
         background: rgba(47, 52, 55, 1);
-    }
 
-    &.fullScreen {
-        width: 100%;
+        .main-display-block {
+            background: rgba(47, 52, 55, 0.8);
+        }
     }
 
     .control-banner {
@@ -794,11 +785,14 @@ export default {
         position: relative;
         min-height: 40px;
         height: 40px;
+        padding-top: 32px;
+        z-index: 2;
 
         .control-left-block {
             @include Vcenter;
 
             flex: 1;
+            padding-left: 10px;
         }
 
         .control-right-block {
@@ -809,7 +803,7 @@ export default {
             }
 
             .control-btn:last-child {
-                margin-right: 15px;
+                margin-right: 10px;
             }
         }
 
@@ -824,24 +818,31 @@ export default {
         position: relative;
         width: 100%;
         height: 40px;
+        padding: 0px 5px;
 
         display: flex;
         align-items: center;
+        z-index: 2;
+
+        &.half {
+            width: 48%;
+        }
     }
 
     .main-display-block {
-        @include Vcenter;
+        @include Vend;
 
-        position: relative;
+        position: absolute;
         width: 100%;
-        height: calc(100% - 40px);
-        flex: 1;
+        height: 100%;
+        background: rgba(250, 250, 250, 0.8);
         overflow: hidden;
+        z-index: 1;
 
         .pdf-viewer {
             position: relative;
             width: 100%;
-            height: 100%;
+            height: calc(100% - 80px);
             flex: 1;
             border-left: rgba(120, 120, 120, 0.1) solid thin;
         }
@@ -869,6 +870,7 @@ export default {
         transition: all 0.3s;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        z-index: 2;
 
         &.dark {
             background: rgba(36, 36, 36, 0.6);

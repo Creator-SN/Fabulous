@@ -3,15 +3,19 @@
         id="app"
         :class="{dark: theme == 'dark'}"
     >
-        <dynamic-b-g :theme="theme" :disabled="!dynamicEffect" :themeColorList="themeColorList"></dynamic-b-g>
+        <dynamic-b-g
+            :theme="theme"
+            :disabled="!dynamicEffect"
+            :themeColorList="themeColorList"
+        ></dynamic-b-g>
         <navigation-view></navigation-view>
+        <title-bar
+            class="title-bar"
+            :theme="theme"
+            :left-offset="windowWidth <= mobileDisplay ? 80 : 350"
+            style="background: transparent;"
+        ></title-bar>
         <div class="addition-container">
-            <title-bar
-                class="title-bar"
-                :theme="theme"
-                :left-offset="windowWidth <= mobileDisplay ? 80 : 0"
-                style="background: transparent;"
-            ></title-bar>
             <div class="global-container">
                 <keep-alive>
                     <router-view></router-view>
@@ -296,6 +300,11 @@ export default {
         }
     }
 
+    .title-bar {
+        position: absolute;
+        z-index: 10;
+    }
+
     .addition-container {
         position: relative;
         width: 100%;
@@ -303,11 +312,6 @@ export default {
         display: flex;
         overflow: hidden;
         z-index: 1;
-
-        .title-bar {
-            position: absolute;
-            z-index: 10;
-        }
 
         .global-container {
             position: relative;
