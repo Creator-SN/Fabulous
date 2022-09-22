@@ -10,7 +10,7 @@
         :flyout-display="mobileDisplay"
         :expandWidth="350"
         :showNav="windowWidth < mobileDisplay"
-        :style="{'z-index': windowWidth < mobileDisplay ? 2 : 1}"
+        :style="{'z-index': windowWidth < mobileDisplay ? 2 : 2}"
         @setting-click="Go(`/settings`)"
         @back="$Back"
     >
@@ -29,7 +29,10 @@
             ></fv-search-box>
         </template>
         <template v-slot:panel>
-            <div class="navigation-view-template">
+            <div
+                class="navigation-view-template"
+                ref="view"
+            >
                 <div
                     v-show="expand"
                     class="navigation-view-current-ds-block"
@@ -51,7 +54,6 @@
                         v-show="treeList.length > 0"
                         v-model="treeList"
                         :theme="theme"
-                        expandedIconPosition="right"
                         :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
                         :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
                         style="width: 100%; height: 100%;"
@@ -62,37 +64,42 @@
                                 class="tree-view-custom-item"
                                 @contextmenu="rightClick($event, x.item)"
                             >
-                                <emoji-callout
-                                    :value="x.item.emoji"
-                                    :theme="theme"
-                                    @insert-emoji="reviseEmoji(x.item, $event)"
-                                ></emoji-callout>
-                                <!-- <p>{{x.item.emoji}}</p> -->
-                                <p
-                                    v-show="!x.item.editable"
-                                    class="tree-view-custom-label"
-                                >{{x.item.name}}</p>
-                                <fv-text-box
-                                    v-model="x.item.name"
-                                    v-show="x.item.editable"
-                                    :theme="theme"
-                                    :ref="`t:${x.item.id}`"
-                                    class="tree-view-custom-text-box"
-                                    background="rgba(255, 255, 255, 0.3)"
-                                    border-color="rgba(250, 176, 70, 0.3)"
-                                    focus-border-color="rgba(250, 176, 70, 1)"
-                                    underline
-                                    @keyup.native.enter="rename(x.item)"
-                                ></fv-text-box>
-                                <fv-button
-                                    v-show="x.item.editable"
-                                    :theme="theme"
-                                    borderRadius="50"
-                                    class="tree-view-custom-confirm"
-                                    @click="rename(x.item)"
-                                >
-                                    <i class="ms-Icon ms-Icon--CheckMark"></i>
-                                </fv-button>
+                                <div class="tree-view-item-left-block">
+                                    <emoji-callout
+                                        :value="x.item.emoji"
+                                        :theme="theme"
+                                        @insert-emoji="reviseEmoji(x.item, $event)"
+                                    ></emoji-callout>
+                                    <!-- <p>{{x.item.emoji}}</p> -->
+                                    <p
+                                        v-show="!x.item.editable"
+                                        class="tree-view-custom-label"
+                                    >{{x.item.name}}</p>
+                                    <fv-text-box
+                                        v-model="x.item.name"
+                                        v-show="x.item.editable"
+                                        :theme="theme"
+                                        :ref="`t:${x.item.id}`"
+                                        class="tree-view-custom-text-box"
+                                        background="rgba(255, 255, 255, 0.3)"
+                                        border-color="rgba(250, 176, 70, 0.3)"
+                                        focus-border-color="rgba(250, 176, 70, 1)"
+                                        underline
+                                        @keyup.native.enter="rename(x.item)"
+                                    ></fv-text-box>
+                                    <fv-button
+                                        v-show="x.item.editable"
+                                        :theme="theme"
+                                        borderRadius="50"
+                                        class="tree-view-custom-confirm"
+                                        @click="rename(x.item)"
+                                    >
+                                        <i class="ms-Icon ms-Icon--CheckMark"></i>
+                                    </fv-button>
+                                </div>
+                                <div class="tree-view-item-right-block" @click="rightClick($event, x.item)">
+                                    <i class="ms-Icon ms-Icon--More more-menu-btn"></i>
+                                </div>
                             </div>
                         </template>
                     </fv-TreeView>
@@ -566,12 +573,14 @@ export default {
             event.preventDefault();
             this.show.rightMenu = true;
             let bounding = this.$el.getBoundingClientRect();
+            let viewBounding = this.$refs.view.getBoundingClientRect();
             let targetPos = {};
+            console.log(event, event.x, event.y);
             targetPos.x = event.x;
             targetPos.y = event.y;
             if (targetPos.x < bounding.left) targetPos.x = bounding.left;
-            if (targetPos.x + this.rightMenuWidth > bounding.right)
-                targetPos.x = bounding.right - this.rightMenuWidth;
+            if (targetPos.x + this.rightMenuWidth > viewBounding.right)
+                targetPos.x = viewBounding.right - this.rightMenuWidth;
             if (targetPos.y < bounding.top) targetPos.y = bounding.top;
             if (targetPos.y + this.rightMenuHeight > bounding.bottom)
                 targetPos.y = bounding.bottom - this.rightMenuHeight;
@@ -651,26 +660,54 @@ export default {
                 display: flex;
                 align-items: center;
 
-                .tree-view-custom-label {
-                    margin-left: 5px;
+                .tree-view-item-left-block {
+                    @include Vcenter;
+
+                    flex: 1;
+
+                    .tree-view-custom-label {
+                        margin-left: 5px;
+                    }
+
+                    .tree-view-custom-text-box {
+                        margin-left: 5px;
+                    }
+
+                    .tree-view-custom-confirm {
+                        width: 30px;
+                        height: 30px;
+                        flex-shrink: 0;
+                        margin-left: 5px;
+                        margin-right: 25px;
+
+                        i.ms-Icon {
+                            margin: 0px;
+                            padding: 0px;
+                            display: flex;
+                            align-items: center;
+                        }
+                    }
                 }
 
-                .tree-view-custom-text-box {
-                    margin-left: 5px;
-                }
+                .tree-view-item-right-block {
+                    @include Vcenter;
 
-                .tree-view-custom-confirm {
-                    width: 30px;
-                    height: 30px;
-                    flex-shrink: 0;
-                    margin-left: 5px;
-                    margin-right: 25px;
+                    width: 50px;
 
-                    i.ms-Icon {
-                        margin: 0px;
-                        padding: 0px;
-                        display: flex;
-                        align-items: center;
+                    .more-menu-btn {
+                        @include HcenterVcenter;
+
+                        width: 25px;
+                        height: 25px;
+                        border-radius: 8px;
+
+                        &:hover {
+                            background: rgba(200, 200, 200, 0.2);
+                        }
+
+                        &:active {
+                            background: rgba(200, 200, 200, 0.3);
+                        }
                     }
                 }
             }
@@ -689,9 +726,7 @@ export default {
 
                 .command-item {
                     .command-item-icon {
-                        
                         background: rgba(36, 36, 36, 1);
-                        
                     }
 
                     .command-item-content {
