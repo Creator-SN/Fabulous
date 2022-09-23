@@ -11,7 +11,10 @@
             @click="treeItemClick"
         >
             <template v-slot:default="x">
-                <div class="tree-view-custom-item">
+                <div
+                    class="tree-view-custom-item"
+                    @contextmenu="rightClick($event, x.item)"
+                >
                     <div class="tree-view-item-left-block">
                         <img
                             v-if="x.item.loading == false"
@@ -42,6 +45,7 @@
                             border-color="rgba(250, 176, 70, 0.3)"
                             focus-border-color="rgba(250, 176, 70, 1)"
                             underline
+                            @click.native="$event.stopPropagation()"
                             @keyup.native.enter="rename(x.item)"
                         ></fv-text-box>
                         <fv-button
@@ -49,12 +53,16 @@
                             :theme="theme"
                             borderRadius="50"
                             class="tree-view-custom-confirm"
-                            @click="rename(x.item)"
+                            @click="$event => {$event.stopPropagation(); rename(x.item);}"
                         >
                             <i class="ms-Icon ms-Icon--CheckMark"></i>
                         </fv-button>
                     </div>
-                    <div class="tree-view-item-right-block">
+                    <div
+                        v-show="x.item.filePath"
+                        class="tree-view-item-right-block"
+                        @click="rightClick($event, x.item)"
+                    >
                         <i class="ms-Icon ms-Icon--More more-menu-btn"></i>
                     </div>
                 </div>
@@ -68,14 +76,73 @@
                 theme="dark"
                 background="rgba(255, 180, 0, 1)"
                 :is-box-shadow="true"
-                style="width: 180px;"
+                style="width: calc(100% - 50px);"
                 @click="chooseFolder"
             >{{local('Open Folder')}}</fv-button>
         </div>
+        <right-menu
+            v-model="show.rightMenu"
+            :theme="theme"
+            :posX="posX"
+            :posY="posY"
+            :rightMenuWidth="rightMenuWidth"
+            @update-height="rightMenuHeight = $event"
+        >
+            <div>
+                <span
+                    v-show="rightMenuItem.isDir"
+                    @click="createFile(rightMenuItem.filePath)"
+                >
+                    <i
+                        class="ms-Icon ms-Icon--SubscriptionAdd"
+                        style="color: rgba(0, 120, 212, 1);"
+                    ></i>
+                    <p>{{local("New Note")}}</p>
+                </span>
+                <span
+                    v-show="rightMenuItem.isDir"
+                    @click="createFolder(rightMenuItem.filePath)"
+                >
+                    <i
+                        class="ms-Icon ms-Icon--NewFolder"
+                        style="color: rgba(0, 153, 204, 1);"
+                    ></i>
+                    <p>{{local("New Folder")}}</p>
+                </span>
+                <span @click="openFile(`${rightMenuItem.filePath}`)">
+                    <img
+                        draggable="false"
+                        :src="img.folder"
+                        alt=""
+                        style="width: 13px; height: 13px; object-fit: contain;"
+                    >
+                    <p>{{local("Open Folder")}}</p>
+                </span>
+                <hr>
+                <span @click="showRename(rightMenuItem)">
+                    <i
+                        class="ms-Icon ms-Icon--Rename"
+                        style="color: rgba(0, 120, 212, 1);"
+                    ></i>
+                    <p>{{local("Rename")}}</p>
+                </span>
+                <span @click="deleteConfirm(rightMenuItem)">
+                    <i
+                        class="ms-Icon ms-Icon--Delete"
+                        style="color: rgba(173, 38, 45, 1);"
+                    ></i>
+                    <p>{{local("Delete")}}</p>
+                </span>
+            </div>
+        </right-menu>
     </div>
 </template>
 
 <script>
+import rightMenu from "@/components/general/rightMenu.vue";
+
+import { fabulous_notebook } from "@/js/data_sample.js";
+
 const { ipcRenderer: ipc } = require("electron");
 const { dialog } = require("electron").remote;
 
@@ -83,6 +150,7 @@ import folderImg from "@/assets/nav/folder.svg";
 import noteImg from "@/assets/nav/note.svg";
 
 export default {
+    components: { rightMenu },
     props: {
         value: {
             default: "",
@@ -91,6 +159,9 @@ export default {
             default: () => {
                 return {};
             },
+        },
+        rightMenuWidth: {
+            default: 200,
         },
         theme: {
             default: "light",
@@ -102,6 +173,8 @@ export default {
         },
         path(val) {
             this.$emit("input", val);
+            if (!val) return;
+            this.treeList = [];
             this.FLAT = [];
             if (val) {
                 ipc.send("list-dir", { dir: val, target: null });
@@ -117,6 +190,13 @@ export default {
                 note: noteImg,
             },
             FLAT: [],
+            posX: 0,
+            posY: 0,
+            rightMenuItem: {},
+            rightMenuHeight: 0,
+            show: {
+                rightMenu: false,
+            },
         };
     },
     computed: {
@@ -134,19 +214,21 @@ export default {
                         finished: false,
                         ...file,
                     };
-                    treeList.push(item);
                     let index = this.FLAT.findIndex(
                         (it) => it.filePath === item.filePath
                     );
                     if (index > -1) {
                         let oriItem = this.FLAT[index];
                         for (let key in oriItem) {
-                            if (key !== "children") {
-                                item[key] = oriItem[key];
+                            let skipKey = ["children", "expanded"];
+                            if (!skipKey.includes(key)) {
+                                oriItem[key] = item[key];
                             }
                         }
+                        treeList.push(oriItem);
                     } else {
                         this.FLAT.push(item);
+                        treeList.push(item);
                     }
                 });
                 return treeList;
@@ -157,6 +239,10 @@ export default {
         this.eventInit();
     },
     methods: {
+        // t() {
+        //     this.$refs.tree.$forceUpdate();
+        //     console.log(this.treeList);
+        // },
         eventInit() {
             ipc.on("list-dir-callback", (event, { status, files, target }) => {
                 if (status) {
@@ -165,6 +251,91 @@ export default {
                 }
                 if (!target) this.treeList = this.computeTreeList(files);
                 else this.expandItem(target, files);
+            });
+
+            let refreshDir = (target) => {
+                let dirItem = this.FLAT.find(
+                    (it) => it.filePath === target.dir
+                );
+                if (dirItem) {
+                    dirItem.finished = false;
+                    ipc.send("list-dir", {
+                        dir: dirItem.filePath,
+                        target: dirItem,
+                    });
+                } else ipc.send("list-dir", { dir: this.path, target: null });
+            };
+
+            ipc.on(
+                "output-file-localTree",
+                (event, { status, target, message }) => {
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Create File Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    refreshDir(target);
+                }
+            );
+            ipc.on(
+                "ensure-folder-localTree",
+                (event, { status, target, message }) => {
+                    if (!target) return;
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Create Folder Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    refreshDir(target);
+                }
+            );
+            ipc.on(
+                "remove-file-localTree",
+                (event, { status, target, message }) => {
+                    if (!target) return;
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Remove File Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    refreshDir(target);
+                }
+            );
+            ipc.on(
+                "remove-folder-localTree",
+                (event, { status, target, message }) => {
+                    if (!target) return;
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Remove Folder Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    refreshDir(target);
+                }
+            );
+            ipc.on("rename-localTree", (event, { status, target, message }) => {
+                if (!target) return;
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Rename Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+                let targetItem = this.FLAT.find(
+                    (it) => it.filePath === target.filePath
+                );
+                targetItem.filePath =
+                    targetItem.dir.replace(/\\/g, "/") + `/${targetItem.name}`;
+                this.refreshAllExpandedDir();
             });
         },
         async chooseFolder() {
@@ -189,7 +360,8 @@ export default {
         treeItemClick(item) {
             if (!item.filePath) return;
             if (!item.isDir) {
-                this.$Go(`/notebook/${encodeURI(item.filePath)}`);
+                let url = `/notebook/${encodeURI(item.filePath)}`;
+                if (this.$route.path !== url) this.$Go(url);
                 return;
             }
             if (item.finished) return;
@@ -208,8 +380,22 @@ export default {
                 isFile: true,
                 isDir: false,
             };
-            this.treeList.push(tmpItem);
+            if (!dir) {
+                this.treeList.unshift(tmpItem);
+            } else {
+                let dirItem = this.FLAT.find((it) => it.filePath === dir);
+                if (!dirItem) return;
+                this.treeItemClick(dirItem);
+                dirItem.expanded = true;
+                dirItem.children.unshift(tmpItem);
+            }
             this.FLAT.push(tmpItem);
+            setTimeout(() => {
+                let textbox = this.$refs[`t:${tmpItem.id}`];
+                textbox.focus();
+                let input = textbox.$el.querySelector("input");
+                input.setSelectionRange(0, 0);
+            }, 300);
         },
         createFolder(dir = null) {
             this.removeTmp();
@@ -225,20 +411,46 @@ export default {
                 isFile: false,
                 isDir: true,
             };
-            this.treeList.push(tmpItem);
+            if (!dir) {
+                this.treeList.unshift(tmpItem);
+            } else {
+                let dirItem = this.FLAT.find((it) => it.filePath === dir);
+                if (!dirItem) return;
+                this.treeItemClick(dirItem);
+                dirItem.expanded = true;
+                dirItem.children.unshift(tmpItem);
+            }
             this.FLAT.push(tmpItem);
+            setTimeout(() => {
+                let textbox = this.$refs[`t:${tmpItem.id}`];
+                textbox.focus();
+                let input = textbox.$el.querySelector("input");
+                input.setSelectionRange(0, 0);
+            }, 300);
         },
-        nameJudge(name, dir = null) {
+        nameJudge(target) {
             let pattern = /[<>:"/\\\\|\\?\\*]/;
-            if (pattern.test(name)) return "name";
-            dir = dir ? dir : this.path;
+            if (pattern.test(target.name)) return "name";
+            let dir = target.dir ? target.dir : this.path;
             dir = dir.replace(/\\/g, "/");
-            let matchItem = this.FLAT.find((it) =>
-                it.filePath
-                    ? it.filePath.replace(/\\/g, "/") === `${dir}/${name}`
-                    : false
-            );
-            if (matchItem) return "exists";
+            if (target.filePath) {
+                let matchItem = this.FLAT.find((it) => {
+                    let filePath = it.filePath;
+                    filePath = filePath ? filePath.replace(/\\/g, "/") : "";
+                    return (
+                        filePath === `${dir}/${target.name}` &&
+                        it.id !== target.id
+                    );
+                });
+                if (matchItem) return "exists";
+            } else {
+                let matchItem = this.FLAT.find((it) => {
+                    let filePath = it.filePath;
+                    filePath = filePath ? filePath.replace(/\\/g, "/") : "";
+                    return filePath === `${dir}/${target.name}`;
+                });
+                if (matchItem) return "exists";
+            }
             return false;
         },
         removeTmp() {
@@ -264,8 +476,19 @@ export default {
             }
             this.$refs.tree.$forceUpdate();
         },
+        showRename(item) {
+            item.editable = true;
+            setTimeout(() => {
+                let textbox = this.$refs[`t:${item.id}`];
+                textbox.focus();
+                let input = textbox.$el.querySelector("input");
+                let dotIndex = input.value.lastIndexOf(".");
+                if (dotIndex > -1) input.setSelectionRange(0, dotIndex);
+                else document.execCommand("selectAll");
+            }, 300);
+        },
         rename(target) {
-            let judge = this.nameJudge(target.name, target.dir);
+            let judge = this.nameJudge(target);
             if (judge === "name") {
                 this.$barWarning(
                     this.local("Name cannot contain special characters"),
@@ -283,6 +506,102 @@ export default {
             let item = this.FLAT.find((it) => it.id === target.id);
             item.name = target.name;
             item.editable = false;
+            if (!item.filePath) {
+                if (item.isDir) this.newFolderConfirm(item);
+                else this.newFileConfirm(item);
+            } else this.renameConfirm(item);
+        },
+        newFileConfirm(target) {
+            let fbn = JSON.parse(JSON.stringify(fabulous_notebook));
+            let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
+            fbn.id = this.$Guid();
+            fbn.title = target.name;
+            fbn.content = {
+                type: "doc",
+                content: [],
+            };
+            fbn.createDate = new Date();
+            fbn.updateDate = new Date();
+            ipc.send("output-file", {
+                id: "localTree",
+                path: url,
+                data: JSON.stringify(fbn),
+                target,
+            });
+        },
+        newFolderConfirm(target) {
+            let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
+            ipc.send("ensure-folder", {
+                id: "localTree",
+                dir: url,
+                target,
+            });
+        },
+        renameConfirm(target) {
+            ipc.send("rename", {
+                id: "localTree",
+                path: target.filePath,
+                newPath: target.dir.replace(/\\/g, "/") + `/${target.name}`,
+                target,
+            });
+        },
+        deleteConfirm(target) {
+            if (!target.filePath) return;
+            if (target.isDir) {
+                let itemsDelete = [target];
+                for (let i = 0; i < itemsDelete.length; i++) {
+                    if (itemsDelete[i].children)
+                        itemsDelete = itemsDelete.concat(
+                            itemsDelete[i].children
+                        );
+                    let flatIndex = this.FLAT.findIndex(
+                        (it) => it.filePath === itemsDelete[i].filePath
+                    );
+                    this.FLAT.splice(flatIndex, 1);
+                }
+                ipc.send("remove-folder", {
+                    id: "localTree",
+                    path: target.filePath,
+                    target,
+                });
+                return;
+            }
+            ipc.send("remove-file", {
+                id: "localTree",
+                path: target.filePath,
+                target,
+            });
+        },
+        refreshAllExpandedDir() {
+            for (let i = 0; i < this.FLAT.length; i++) {
+                if (this.FLAT[i].isDir && this.FLAT[i].expanded)
+                    ipc.send("list-dir", {
+                        dir: this.FLAT[i].filePath,
+                        target: this.FLAT[i],
+                    });
+            }
+        },
+        rightClick(event, item) {
+            event.preventDefault();
+            if (!item.filePath) return;
+            this.show.rightMenu = true;
+            let bounding = this.$el.getBoundingClientRect();
+            let targetPos = {};
+            targetPos.x = event.x;
+            targetPos.y = event.y;
+            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
+            if (targetPos.x + this.rightMenuWidth > bounding.right)
+                targetPos.x = bounding.right - this.rightMenuWidth;
+            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
+            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
+                targetPos.y = bounding.bottom - this.rightMenuHeight;
+            this.posX = targetPos.x;
+            this.posY = targetPos.y;
+
+            this.rightMenuItem = item;
+        },
+        openFile(url) {
+            ipc.send("open-file", url);
         },
     },
 };

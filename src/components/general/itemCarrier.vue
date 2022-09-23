@@ -193,7 +193,7 @@ export default {
                     "items",
                     newId
                 );
-                ipc.send("ensure-folder", targetDir);
+                ipc.send("ensure-folder", { dir: targetDir });
                 await new Promise((resolve) => {
                     ipc.on("ensure-folder-callback", () => {
                         resolve(1);

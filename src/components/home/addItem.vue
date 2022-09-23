@@ -164,7 +164,7 @@ export default {
                 this.data_path[this.data_index],
                 `root/items/${_item.id}`
             );
-            ipc.send("ensure-folder", url);
+            ipc.send("ensure-folder", { dir: url });
             await new Promise((resolve) => {
                 ipc.on("ensure-folder-callback", () => {
                     resolve(1);

@@ -94,6 +94,7 @@
                                             border-color="rgba(250, 176, 70, 0.3)"
                                             focus-border-color="rgba(250, 176, 70, 1)"
                                             underline
+                                            @click.native="$event.stopPropagation()"
                                             @keyup.native.enter="rename(x.item)"
                                         ></fv-text-box>
                                         <fv-button
@@ -101,7 +102,7 @@
                                             :theme="theme"
                                             borderRadius="50"
                                             class="tree-view-custom-confirm"
-                                            @click="rename(x.item)"
+                                            @click="$event => {$event.stopPropagation(); rename(x.item);}"
                                         >
                                             <i class="ms-Icon ms-Icon--CheckMark"></i>
                                         </fv-button>
@@ -134,9 +135,12 @@
                             alt=""
                             class="icon-img"
                         >
-                        <p class="title">{{!localPath ? local('Unselected') : localPathFolderName}}</p>
+                        <p class="title">{{!localPath ? local('Notebook') : localPathFolderName}}</p>
                     </div>
-                    <div class="navigation-view-mode-right-block">
+                    <div
+                        v-show="localPath"
+                        class="navigation-view-mode-right-block"
+                    >
                         <i
                             class="ms-Icon ms-Icon--SubscriptionAdd more-menu-btn"
                             @click="() => $refs.local_view.createFile()"
@@ -151,7 +155,7 @@
                         ></i>
                     </div>
                 </div>
-                <transition name="expand-top-to-bottom">
+                <transition name="expand-bottom-to-top">
                     <local-tree-view
                         v-show="menuDisplayMode === 1"
                         v-model="localPath"
@@ -226,7 +230,7 @@
                         <p>{{local("New Group")}}</p>
                     </span>
                     <hr>
-                    <span @click="rightMenuItem.editable = true">
+                    <span @click="showRename(rightMenuItem)">
                         <i
                             class="ms-Icon ms-Icon--Rename"
                             style="color: rgba(0, 120, 212, 1);"
@@ -524,6 +528,14 @@ export default {
             });
             this.refreshTreeList();
         },
+        showRename(item) {
+            item.editable = true;
+            setTimeout(() => {
+                let textbox = this.$refs[`t:${item.id}`];
+                textbox.focus();
+                document.execCommand("selectAll");
+            }, 300);
+        },
         rename(item) {
             let id = item.id;
             let name = item.name;
@@ -636,7 +648,6 @@ export default {
             let bounding = this.$el.getBoundingClientRect();
             let viewBounding = this.$refs.view.getBoundingClientRect();
             let targetPos = {};
-            console.log(event, event.x, event.y);
             targetPos.x = event.x;
             targetPos.y = event.y;
             if (targetPos.x < bounding.left) targetPos.x = bounding.left;
@@ -760,7 +771,9 @@ export default {
                     }
 
                     .tree-view-custom-text-box {
+                        width: 100%;
                         margin-left: 5px;
+                        flex: 1;
                     }
 
                     .tree-view-custom-confirm {
@@ -908,7 +921,7 @@ export default {
     .expand-top-to-bottom-enter-active,
     .expand-top-to-bottom-leave-active {
         transform-origin: 50% 0%;
-        transition: all 0.3s;
+        transition: all 0.3s linear;
     }
 
     .expand-top-to-bottom-enter,
@@ -924,7 +937,7 @@ export default {
     .expand-bottom-to-top-enter-active,
     .expand-bottom-to-top-leave-active {
         transform-origin: 50% 100%;
-        transition: all 0.3s;
+        transition: all 0.3s linear;
     }
 
     .expand-bottom-to-top-enter,

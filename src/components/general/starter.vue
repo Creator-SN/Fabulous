@@ -171,7 +171,7 @@ export default {
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
-            reviseData: "reviseData"
+            reviseData: "reviseData",
         }),
         languageInit() {
             this.cur_language = this.languages.find(
@@ -196,7 +196,7 @@ export default {
             if (this.path === "") return;
             if (this.name === "") return;
             let _path = path.join(this.path, this.name);
-            ipc.send("ensure-folder", _path);
+            ipc.send("ensure-folder", { dir: _path });
             await new Promise((resolve) => {
                 ipc.on("ensure-folder-callback", () => {
                     resolve(1);
@@ -225,7 +225,7 @@ export default {
             await this.reviseData({
                 ...ds,
             });
-            this.$emit('refresh-data-db');
+            this.$emit("refresh-data-db");
             this.close();
         },
         async chooseSource() {

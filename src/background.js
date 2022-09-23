@@ -86,9 +86,17 @@ async function createWindow() {
         win.close();
     });
 
-    ipcMain.on("ensure-folder", (event, dir) => {
-        fs.ensureDir(dir).then(() => {
-            event.reply('ensure-folder-callback', 200);
+    ipcMain.on("ensure-folder", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.ensureDir(obj.dir, err => {
+            if (err) event.reply(`ensure-folder-${obj.id}`, {
+                status: 500,
+                target: obj.target
+            });
+            else event.reply(`ensure-folder-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
         });
     });
 
@@ -153,22 +161,62 @@ async function createWindow() {
     });
 
     ipcMain.on("output-file", (event, obj) => {
-        fs.outputFile(obj.path, obj.data).then(() => {
-            event.reply('output-file-callback', 200);
+        if (!obj.id) obj.id = 'callback';
+        fs.outputFile(obj.path, obj.data, err => {
+            if (err) event.reply(`output-file-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            else event.reply(`output-file-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
         });
     });
 
-    ipcMain.on("remove-file", (event, path) => {
-        fs.unlink(path, (err) => {
-            if (err) return console.error(err)
-            event.reply('remove-file-callback', 200);
+    ipcMain.on("remove-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.unlink(obj.path, (err) => {
+            if (err) event.reply(`remove-file-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`remove-file-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
         });
     });
 
-    ipcMain.on("remove-folder", (event, path) => {
-        fs.rmdir(path, { recursive: true }, (err) => {
-            if (err) return console.error(err)
-            event.reply('remove-folder-callback', 200);
+    ipcMain.on("remove-folder", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.rmdir(obj.path, { recursive: true }, (err) => {
+            if (err) event.reply(`remove-folder-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`remove-folder-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
+        });
+    });
+
+    ipcMain.on("rename", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.rename(obj.path, obj.newPath, (err) => {
+            if (err) event.reply(`rename-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`rename-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
         });
     });
 

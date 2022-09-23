@@ -563,4 +563,8 @@ export default {
         "en": "Pick from Image",
         "cn": "选择图片"
     },
+    "Notebook": {
+        "en": "Notebook",
+        "cn": "笔记本"
+    }
 }

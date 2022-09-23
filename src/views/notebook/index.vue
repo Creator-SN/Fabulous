@@ -130,7 +130,7 @@ export default {
             show: {
                 bottomControl: false,
             },
-            timeout: {
+            timer: {
                 autoSave: undefined,
             },
         };
@@ -159,11 +159,45 @@ export default {
     },
     mounted() {
         console.log(ipc, path);
+        this.ShortCutInit();
+        this.timerInit();
     },
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
         }),
+        timerInit() {
+            clearInterval(this.timer.autoSave);
+            this.timer.autoSave = setInterval(this.autoSaveContent, 10000);
+        },
+        ShortCutInit() {
+            this.$el.addEventListener("keydown", (event) => {
+                if (event.keyCode === 83 && event.ctrlKey) {
+                    this.$refs.editor.save();
+                    this.unsave = false;
+                } else {
+                    let filterKey = [16, 17, 18, 20];
+                    if (filterKey.indexOf(event.keyCode) < 0) {
+                        if (!this.readonly) this.unsave = true;
+                    }
+                }
+
+                if (event.keyCode === 9) {
+                    event.preventDefault();
+                    if (
+                        this.$refs.editor.editor.isActive("bulletList") ||
+                        this.$refs.editor.editor.isActive("orderedList")
+                    )
+                        return;
+                    this.$refs.editor.editor.commands.insertContent("    ");
+                }
+            });
+        },
+        switchAutoSave() {
+            this.reviseConfig({
+                autoSave: this.auto_save,
+            });
+        },
         refreshPath() {
             let path = decodeURI(this.$route.params.path);
             path = path.replace(/\\/g, "/");
@@ -198,10 +232,16 @@ export default {
             }
             if (this.content === "") this.$refs.editor.focus();
         },
+        autoSaveContent() {
+            if (this.auto_save) {
+                this.$refs.editor.save();
+            }
+        },
         async saveContent(json) {
             let saveContent = this.rawContent;
             if (this.contentType === "fabulous_notebook") {
                 saveContent.content = json;
+                saveContent.updateDate = new Date();
             } else {
                 saveContent = json;
             }
@@ -216,16 +256,14 @@ export default {
             });
             this.unsave = false;
         },
-        switchAutoSave() {
-            this.reviseConfig({
-                autoSave: this.auto_save,
-            });
-        },
         back() {
             let last = this.history[this.history.length - 1];
             this.history.splice(this.history.length - 1, 1);
             this.$Go(`/notebook/${encodeURI(last)}`);
         },
+    },
+    beforeDestroy() {
+        clearInterval(this.timer.autoSave);
     },
 };
 </script>

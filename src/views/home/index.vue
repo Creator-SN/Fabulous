@@ -515,7 +515,7 @@ export default {
         },
         c() {
             this.refreshFilterItems();
-        }
+        },
     },
     computed: {
         ...mapState({
@@ -603,10 +603,9 @@ export default {
         itemsEnsureFolder() {
             if (!this.ds_db || this.data_index == -1) return;
             this.lock = false;
-            ipc.send(
-                "ensure-folder",
-                path.join(this.data_path[this.data_index], "root/items")
-            );
+            ipc.send("ensure-folder", {
+                dir: path.join(this.data_path[this.data_index], "root/items"),
+            });
             ipc.on("ensure-folder-callback", () => {
                 this.lock = true;
             });
@@ -628,13 +627,12 @@ export default {
                     this.reviseData({
                         items: this.items,
                     });
-                    ipc.send(
-                        "remove-folder",
-                        path.join(
+                    ipc.send("remove-folder", {
+                        path: path.join(
                             this.data_path[this.data_index],
                             `root/items/${this.currentItem.id}`
-                        )
-                    );
+                        ),
+                    });
                     this.delItemsFromPs([this.currentItem.id]);
                     this.lock = true;
                 },
@@ -662,13 +660,12 @@ export default {
                         this.reviseData({
                             items: this.items,
                         });
-                        ipc.send(
-                            "remove-folder",
-                            path.join(
+                        ipc.send("remove-folder", {
+                            path: path.join(
                                 this.data_path[this.data_index],
                                 `root/items/${el.id}`
-                            )
-                        );
+                            ),
+                        });
                         this.delItemsFromPs(ids);
                         this.currentChoosen = [];
                         this.lock = true;
@@ -928,14 +925,13 @@ export default {
                     await this.reviseData({
                         items: this.items,
                     });
-                    ipc.send(
-                        "remove-file",
-                        path.join(
+                    ipc.send("remove-file", {
+                        path: path.join(
                             this.data_path[this.data_index],
                             `root/items/${item.id}`,
                             `${pageId}.json`
-                        )
-                    );
+                        ),
+                    });
                 },
                 cancel: () => {},
             });

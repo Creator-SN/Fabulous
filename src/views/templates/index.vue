@@ -4,7 +4,10 @@
         :class="[{dark: theme === 'dark'}]"
     >
         <div class="s-row">
-            <p class="s-title" style="margin-top: 20px;">{{local('Templates')}}</p>
+            <p
+                class="s-title"
+                style="margin-top: 20px;"
+            >{{local('Templates')}}</p>
         </div>
         <div class="m-templates-block">
             <div class="row between">
@@ -144,10 +147,12 @@ export default {
         templatesEnsureFolder() {
             if (!this.ds_db || this.data_index == -1) return;
             this.lock = false;
-            ipc.send(
-                "ensure-folder",
-                path.join(this.data_path[this.data_index], "root/templates")
-            );
+            ipc.send("ensure-folder", {
+                dir: path.join(
+                    this.data_path[this.data_index],
+                    "root/templates"
+                ),
+            });
             ipc.on("ensure-folder-callback", () => {
                 this.lock = true;
             });
@@ -171,14 +176,13 @@ export default {
                     this.reviseData({
                         templates: this.templates,
                     });
-                    ipc.send(
-                        "remove-file",
-                        path.join(
+                    ipc.send("remove-file", {
+                        path: path.join(
                             this.data_path[this.data_index],
                             "root/templates",
                             `${this.currentItem.id}.json`
-                        )
-                    );
+                        ),
+                    });
                     this.lock = true;
                 },
                 cancel: () => {},
@@ -207,14 +211,13 @@ export default {
                             this.reviseData({
                                 templates: this.templates,
                             });
-                            ipc.send(
-                                "remove-file",
-                                path.join(
+                            ipc.send("remove-file", {
+                                path: path.join(
                                     this.data_path[this.data_index],
                                     "root/templates",
                                     `${el.id}.json`
-                                )
-                            );
+                                ),
+                            });
                             this.lock = true;
                         });
                     },
