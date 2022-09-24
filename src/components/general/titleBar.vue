@@ -136,7 +136,7 @@
 </style>
 
 <script>
-import { remote } from "electron";
+import * as remote from "@electron/remote"
 const { ipcRenderer: ipc } = require("electron");
 
 export default {

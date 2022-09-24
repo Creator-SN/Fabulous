@@ -130,7 +130,7 @@ import { mapMutations, mapState, mapGetters } from "vuex";
 import { data_structure } from "@/js/data_sample.js";
 
 const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("electron").remote;
+const { dialog } = require("@electron/remote");
 const path = require("path");
 
 export default {

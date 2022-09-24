@@ -6,6 +6,8 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { autoUpdater } from 'electron-updater'
 import logger from "electron-log"
 const isDevelopment = process.env.NODE_ENV !== 'production'
+import * as remote from "@electron/remote/main"
+remote.initialize()
 
 const translate = require('google-translate-cn-api');
 
@@ -70,6 +72,7 @@ async function createWindow() {
             devTools: true
         }
     })
+    remote.enable(win.webContents)
 
     ipcMain.on("min", () => {
         win.minimize();
