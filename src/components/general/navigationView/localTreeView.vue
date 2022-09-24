@@ -601,7 +601,10 @@ export default {
             this.rightMenuItem = item;
         },
         openFile(url) {
-            ipc.send("open-file", url);
+            ipc.send("open-file", {
+                id: "local",
+                path: url,
+            });
         },
     },
 };

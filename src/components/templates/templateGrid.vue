@@ -124,7 +124,7 @@ export default {
         },
         rightMenuWidth: {
             default: 200,
-        }
+        },
     },
     data() {
         return {
@@ -202,7 +202,7 @@ export default {
                 });
                 promises.push(
                     new Promise((resolve) => {
-                        ipc.on(`read-file-${el.id}`, (event, data) => {
+                        ipc.on(`read-file-${el.id}`, (event, { data }) => {
                             let content = data;
                             try {
                                 el.content = JSON.parse(content);

@@ -578,6 +578,7 @@ export default {
         },
     },
     mounted() {
+        this.eventInit();
         this.itemsEnsureFolder();
         this.refreshFilterItems();
     },
@@ -589,6 +590,20 @@ export default {
             reviseItemCarrier: "reviseItemCarrier",
             toggleEditor: "toggleEditor",
         }),
+        eventInit() {
+            ipc.on("ensure-folder-home", () => {
+                this.lock = true;
+            });
+            ipc.on("open-file-home", (event, { status, message }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Open File Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+            });
+        },
         refreshFilterItems() {
             if (this.filterItemsId === true) this.filterItems = this.items;
             else {
@@ -604,10 +619,8 @@ export default {
             if (!this.ds_db || this.data_index == -1) return;
             this.lock = false;
             ipc.send("ensure-folder", {
+                id: "home",
                 dir: path.join(this.data_path[this.data_index], "root/items"),
-            });
-            ipc.on("ensure-folder-callback", () => {
-                this.lock = true;
             });
         },
         deleteItem() {
@@ -728,9 +741,9 @@ export default {
                 "root/items",
                 fileName
             );
-            ipc.send("open-file", url);
-            ipc.on("open-file-callback", (event, data) => {
-                console.log(data);
+            ipc.send("open-file", {
+                id: "home",
+                path: url,
             });
         },
         openPDF(item, mode = "outside") {
@@ -888,20 +901,21 @@ export default {
                 `${page.id}.json`
             );
             ipc.send("read-file", {
-                id: "editor",
+                id: oriUrl,
                 path: oriUrl,
             });
             let templateContent = await new Promise((resolve) => {
-                ipc.on(`read-file-editor`, (event, data) => {
+                ipc.on(`read-file-${oriUrl}`, (event, { data }) => {
                     resolve(data);
                 });
             });
             ipc.send("output-file", {
+                id: url,
                 path: url,
                 data: templateContent,
             });
             await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
+                ipc.on(`output-file-${url}`, () => {
                     resolve(1);
                 });
             });

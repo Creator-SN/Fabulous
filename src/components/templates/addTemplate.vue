@@ -79,10 +79,18 @@ export default {
             return this;
         },
     },
+    mounted() {
+        this.eventInit();
+    },
     methods: {
         ...mapMutations({
             reviseData: "reviseData",
         }),
+        eventInit() {
+            ipc.on("output-file-callback", () => {
+                this.thisShow = false;
+            });
+        },
         async add() {
             if (!this.ds_db || this.name === "") return;
             let _page = JSON.parse(JSON.stringify(page));
@@ -103,12 +111,6 @@ export default {
                 path: url,
                 data: "",
             });
-            await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
-                    resolve(1);
-                });
-            });
-            this.thisShow = false;
         },
     },
 };

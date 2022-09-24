@@ -136,6 +136,7 @@ export default {
         },
     },
     mounted() {
+        this.eventInit();
         this.templatesEnsureFolder();
     },
     methods: {
@@ -144,17 +145,20 @@ export default {
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
+        eventInit() {
+            ipc.on("ensure-folder-templates", () => {
+                this.lock = true;
+            });
+        },
         templatesEnsureFolder() {
             if (!this.ds_db || this.data_index == -1) return;
             this.lock = false;
             ipc.send("ensure-folder", {
+                id: "templates",
                 dir: path.join(
                     this.data_path[this.data_index],
                     "root/templates"
                 ),
-            });
-            ipc.on("ensure-folder-callback", () => {
-                this.lock = true;
             });
         },
         deleteTemplate() {

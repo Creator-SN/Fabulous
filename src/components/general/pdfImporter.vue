@@ -230,11 +230,12 @@ export default {
                 `${id}/${id}.pdf`
             );
             ipc.send("copy-file", {
+                id: id,
                 src: objURL,
                 tgt: url,
             });
             await new Promise((resolve) => {
-                ipc.on("copy-file-callback", () => {
+                ipc.on(`copy-file-${id}`, () => {
                     resolve(1);
                 });
             });
@@ -247,11 +248,12 @@ export default {
                 `${id}/${id}.metadata`
             );
             ipc.send("output-file", {
+                id,
                 path: url,
                 data: JSON.stringify(_metadata),
             });
             await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
+                ipc.on(`output-file-${id}`, () => {
                     resolve(1);
                 });
             });
@@ -284,7 +286,7 @@ export default {
                 });
                 _metadata.authors = authors;
             }
-            
+
             for (let it of crefInfo) {
                 if (it.title.toLowerCase() === title.toLowerCase()) {
                     Object.assign(_metadata, it);
@@ -294,13 +296,17 @@ export default {
         },
         async getMetaInfo(title) {
             let p = [];
-            let fn = [this.metaAPI.cref_getInfoByTitle, this.metaAPI.semanticScholar_getInfoByTitle, this.metaAPI.dataCite_getInfoByTitle];
-            for(let f of fn) {
+            let fn = [
+                this.metaAPI.cref_getInfoByTitle,
+                this.metaAPI.semanticScholar_getInfoByTitle,
+                this.metaAPI.dataCite_getInfoByTitle,
+            ];
+            for (let f of fn) {
                 p.push(f(title, this.axios));
             }
             let result = [];
             await Promise.all(p).then((res) => {
-                res.forEach(it => {
+                res.forEach((it) => {
                     result = result.concat(it);
                 });
             });

@@ -571,7 +571,7 @@ export default {
             let fn = [
                 this.metaAPI.cref_getInfoByTitle,
                 this.metaAPI.semanticScholar_getInfoByTitle,
-                this.metaAPI.dataCite_getInfoByTitle
+                this.metaAPI.dataCite_getInfoByTitle,
             ];
             for (let f of fn) {
                 p.push(f(this.metadata.title, this.axios));
@@ -603,7 +603,7 @@ export default {
             this.reviseData({
                 items: this.items,
             });
-            await this.saveMetadata(this.metadata, item.id);
+            this.saveMetadata(this.metadata, item.id);
             this.thisValue = false;
         },
         async saveMetadata(_metadata, id = null) {
@@ -616,11 +616,6 @@ export default {
             ipc.send("output-file", {
                 path: url,
                 data: JSON.stringify(_metadata),
-            });
-            await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
-                    resolve(1);
-                });
             });
         },
         generateBibTex() {

@@ -137,7 +137,10 @@ export default {
     },
     watch: {
         $route() {
-            if (this.$route.name === "NoteBook") this.refreshPath();
+            if (this.$route.name === "NoteBook") {
+                this.refreshPath();
+                this.refreshContent();
+            }
         },
         path() {
             this.refreshContent();
@@ -158,7 +161,7 @@ export default {
         ...mapGetters(["local"]),
     },
     mounted() {
-        console.log(ipc, path);
+        this.eventInit();
         this.ShortCutInit();
         this.timerInit();
     },
@@ -166,6 +169,44 @@ export default {
         ...mapMutations({
             reviseConfig: "reviseConfig",
         }),
+        eventInit() {
+            ipc.on("output-file-notebook", (event, { status, message }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Save Content Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+                this.unsave = false;
+            });
+            ipc.on(`read-file-notebook`, (event, { status, message, data }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Read File Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+                let content = data;
+                try {
+                    this.rawContent = JSON.parse(content);
+                    if (this.rawContent.fabulous_notebook) {
+                        this.contentType = "fabulous_notebook";
+                        this.content = this.rawContent.content;
+                    } else {
+                        this.contentType = "json";
+                        this.content = this.rawContent;
+                    }
+                    this.lock.loading = true;
+                } catch (e) {
+                    this.contentType = "html";
+                    this.content = content;
+                    this.lock.loading = true;
+                }
+                if (this.content === "") this.$refs.editor.focus();
+            });
+        },
         timerInit() {
             clearInterval(this.timer.autoSave);
             this.timer.autoSave = setInterval(this.autoSaveContent, 10000);
@@ -204,33 +245,13 @@ export default {
             this.path = path;
         },
         async refreshContent() {
+            if (!path) return;
             if (!this.lock.loading) return;
             this.lock.loading = false;
             ipc.send("read-file", {
                 id: "notebook",
                 path: this.path,
             });
-            let content = await new Promise((resolve) => {
-                ipc.on(`read-file-notebook`, (event, data) => {
-                    resolve(data);
-                });
-            });
-            try {
-                this.rawContent = JSON.parse(content);
-                if (this.rawContent.fabulous_notebook) {
-                    this.contentType = "fabulous_notebook";
-                    this.content = this.rawContent.content;
-                } else {
-                    this.contentType = "json";
-                    this.content = this.rawContent;
-                }
-                this.lock.loading = true;
-            } catch (e) {
-                this.contentType = "html";
-                this.content = content;
-                this.lock.loading = true;
-            }
-            if (this.content === "") this.$refs.editor.focus();
         },
         autoSaveContent() {
             if (this.auto_save) {
@@ -246,15 +267,10 @@ export default {
                 saveContent = json;
             }
             ipc.send("output-file", {
+                id: "notebook",
                 path: this.path,
                 data: JSON.stringify(saveContent),
             });
-            await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
-                    resolve(1);
-                });
-            });
-            this.unsave = false;
         },
         back() {
             let last = this.history[this.history.length - 1];

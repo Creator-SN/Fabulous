@@ -139,11 +139,19 @@ export default {
             return this;
         },
     },
+    mounted() {
+        this.eventInit();
+    },
     methods: {
         ...mapMutations({
             reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
         }),
+        eventInit() {
+            ipc.on("ensure-folder-addItem", () => {
+                this.thisShow = false;
+            });
+        },
         async add() {
             if (!this.ds_db || this.name === "") return;
             let _item = JSON.parse(JSON.stringify(item));
@@ -164,13 +172,7 @@ export default {
                 this.data_path[this.data_index],
                 `root/items/${_item.id}`
             );
-            ipc.send("ensure-folder", { dir: url });
-            await new Promise((resolve) => {
-                ipc.on("ensure-folder-callback", () => {
-                    resolve(1);
-                });
-            });
-            this.thisShow = false;
+            ipc.send("ensure-folder", { id: "addItem", dir: url });
         },
         copyToPartition(item) {
             let id = this.$route.params.id;

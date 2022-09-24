@@ -193,30 +193,32 @@ export default {
                     "items",
                     newId
                 );
-                ipc.send("ensure-folder", { dir: targetDir });
+                ipc.send("ensure-folder", { id: itemX.id, dir: targetDir });
                 await new Promise((resolve) => {
-                    ipc.on("ensure-folder-callback", () => {
+                    ipc.on(`ensure-folder-${itemX.id}`, () => {
                         resolve(1);
                     });
                 });
                 if (itemX.item.pdf) {
                     ipc.send("copy-file", {
+                        id: itemX.id,
                         src: path.join(sourceDir, `${itemX.item.pdf}.pdf`),
                         tgt: path.join(targetDir, `${newId}.pdf`),
                     });
                     await new Promise((resolve) => {
-                        ipc.on("copy-file-callback", () => {
+                        ipc.on(`copy-file-${itemX.id}`, () => {
                             resolve(1);
                         });
                     });
                 }
                 if (itemX.item.metadata) {
                     ipc.send("copy-file", {
+                        id: itemX.id,
                         src: path.join(sourceDir, `${itemX.id}.metadata`),
                         tgt: path.join(targetDir, `${newId}.metadata`),
                     });
                     await new Promise((resolve) => {
-                        ipc.on("copy-file-callback", () => {
+                        ipc.on(`copy-file-${itemX.id}`, () => {
                             resolve(1);
                         });
                     });
@@ -228,11 +230,12 @@ export default {
                         let page = itemX.item.pages[j];
                         let newPageId = this.$Guid();
                         ipc.send("copy-file", {
+                            id: itemX.id,
                             src: path.join(sourceDir, `${page.id}.json`),
                             tgt: path.join(targetDir, `${newPageId}.json`),
                         });
                         await new Promise((resolve) => {
-                            ipc.on("copy-file-callback", () => {
+                            ipc.on(`copy-file-${itemX.id}`, () => {
                                 resolve(1);
                             });
                         });

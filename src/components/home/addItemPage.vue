@@ -96,12 +96,20 @@ export default {
             return this;
         },
     },
+    mounted() {
+        this.eventInit();
+    },
     methods: {
         ...mapMutations({
             reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
+        eventInit() {
+            ipc.on("output-file-addItemPage", () => {
+                this.thisShow = false;
+            });
+        },
         async add() {
             if (
                 !this.ds_db ||
@@ -132,15 +140,10 @@ export default {
                     ? JSON.stringify(this.currentChoosen[0].content)
                     : "";
             ipc.send("output-file", {
+                id: "addItemPage",
                 path: url,
                 data: templateContent,
             });
-            await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
-                    resolve(1);
-                });
-            });
-            this.thisShow = false;
         },
         openEditor(template) {
             this.reviseEditor({

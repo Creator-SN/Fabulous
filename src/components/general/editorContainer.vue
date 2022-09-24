@@ -475,6 +475,7 @@ export default {
         },
     },
     mounted() {
+        this.eventInit();
         this.ShortCutInit();
         this.TimeoutInit();
     },
@@ -485,6 +486,54 @@ export default {
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
+        eventInit() {
+            ipc.on("output-file-editor", (event, { status, message }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Save Content Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+                this.unsave = false;
+            });
+            ipc.on(`read-file-editor`, (event, { status, message, data }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Read File Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+                let content = data;
+                try {
+                    this.content = JSON.parse(content);
+                    this.reviseEditor({
+                        targetContent: this.content,
+                    });
+                    this.lock.loading = true;
+                } catch (e) {
+                    this.content = content;
+                    this.reviseEditor({
+                        targetContent: {
+                            type: "doc",
+                            content: [],
+                        },
+                    });
+                    this.lock.loading = true;
+                }
+                if (this.content === "") this.$refs.editor.focus();
+            });
+            ipc.on("open-file-editor", (event, { status, message }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Open File Failed`), {
+                        status: "warning",
+                    });
+                    return;
+                }
+            });
+        },
         TimeoutInit() {
             this.timeout.autoSave = setInterval(this.editorSave, 10000);
         },
@@ -533,28 +582,6 @@ export default {
                 id: "editor",
                 path: url,
             });
-            let content = await new Promise((resolve) => {
-                ipc.on(`read-file-editor`, (event, data) => {
-                    resolve(data);
-                });
-            });
-            try {
-                this.content = JSON.parse(content);
-                this.reviseEditor({
-                    targetContent: this.content,
-                });
-                this.lock.loading = true;
-            } catch (e) {
-                this.content = content;
-                this.reviseEditor({
-                    targetContent: {
-                        type: "doc",
-                        content: [],
-                    },
-                });
-                this.lock.loading = true;
-            }
-            if (this.content === "") this.$refs.editor.focus();
         },
         editorSave() {
             if (this.auto_save && this.show_editor) {
@@ -583,15 +610,10 @@ export default {
                 targetContent: json,
             });
             ipc.send("output-file", {
+                id: "editor",
                 path: url,
                 data: JSON.stringify(json),
             });
-            await new Promise((resolve) => {
-                ipc.on("output-file-callback", () => {
-                    resolve(1);
-                });
-            });
-            this.unsave = false;
         },
         openEditor(item, page) {
             if (!this.lock.loading) return;
@@ -618,9 +640,9 @@ export default {
                 "root/items",
                 fileName
             );
-            ipc.send("open-file", url);
-            ipc.on("open-file-callback", (event, data) => {
-                if (data.length) console.log(data.length);
+            ipc.send("open-file", {
+                id: "editor",
+                path: url,
             });
         },
         addPDFNote(event) {

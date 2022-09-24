@@ -91,7 +91,8 @@ async function createWindow() {
         fs.ensureDir(obj.dir, err => {
             if (err) event.reply(`ensure-folder-${obj.id}`, {
                 status: 500,
-                target: obj.target
+                target: obj.target,
+                message: err
             });
             else event.reply(`ensure-folder-${obj.id}`, {
                 status: 200,
@@ -100,20 +101,30 @@ async function createWindow() {
         });
     });
 
-    ipcMain.on("ensure-file", (event, dir) => {
-        fs.ensureDir(dir).then(() => {
-            event.reply('ensure-file-callback', 200);
+    ipcMain.on("ensure-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.ensureDir(obj.dir, err => {
+            if (err) event.reply(`ensure-folder-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            else event.reply(`ensure-folder-${obj.id}`, {
+                status: 200,
+                target: obj.target
+            });
         });
     });
 
-    ipcMain.on("list-dir", (event, { dir, target }) => {
-        fs.readdir(dir, (err, files) => {
+    ipcMain.on("list-dir", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.readdir(obj.dir, (err, files) => {
             if (err) {
-                event.reply('list-dir-callback', {
+                event.reply(`list-dir-${obj.id}`, {
                     status: err,
-                    dir: dir,
+                    dir: obj.dir,
                     files: [],
-                    target: target
+                    target: obj.target
                 });
                 return;
             }
@@ -121,7 +132,7 @@ async function createWindow() {
             let promises = [];
             files.forEach(filename => {
                 let fileObj = {};
-                fileObj.filePath = path.join(dir, filename);
+                fileObj.filePath = path.join(obj.dir, filename);
 
                 promises.push(new Promise(resolve => {
                     fs.stat(fileObj.filePath, (error, stats) => {
@@ -136,20 +147,29 @@ async function createWindow() {
                 }))
             });
             Promise.all(promises).then(() => {
-                event.reply('list-dir-callback', {
+                event.reply(`list-dir-${obj.id}`, {
                     status: err,
-                    dir: dir,
+                    dir: obj.dir,
                     files: fileList,
-                    target: target
+                    target: obj.target
                 });
             });
         });
     });
 
     ipcMain.on("read-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
         fs.readFile(obj.path, 'utf8', (err, data) => {
-            if (err) return console.error(err)
-            event.reply(`read-file-${obj.id}`, data);
+            if (err) event.reply(`read-file-${obj.id}`, {
+                status: 500,
+                data: "",
+                message: err
+            });
+            event.reply(`read-file-${obj.id}`, {
+                status: 200,
+                data,
+                message: err
+            });
         });
     });
 
@@ -221,17 +241,32 @@ async function createWindow() {
     });
 
     ipcMain.on("copy-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
         fs.copy(obj.src, obj.tgt, err => {
-            if (err) return console.error(err)
-            event.reply('copy-file-callback', 200);
+            if (err) return event.reply(`copy-file-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`copy-file-${obj.id}`, {
+                status: 200,
+                target: obj.target,
+            });
         });
     });
 
-    ipcMain.on("open-file", (event, path) => {
-        fs.access(path, err => {
+    ipcMain.on("open-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.access(obj.path, err => {
             // fix: 修复中文路径不能打开的问题
-            shell.openPath(path)
-            event.reply('open-file-callback', err);
+            shell.openPath(obj.path);
+            if (err) event.reply(`open-file-${obj.id}`, {
+                status: 500,
+                message: err
+            });
+            else event.reply(`open-file-${obj.id}`, {
+                status: 200
+            });
         });
     });
 
