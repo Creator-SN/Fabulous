@@ -619,4 +619,16 @@ export default {
         "en": "Choose Folder",
         "cn": "选择文件夹"
     },
+    "Upgrade to Fabulous Notebook": {
+        "en": "Upgrade to Fabulous Notebook",
+        "cn": "升级到Fabulous Notebook"
+    },
+    "Save As": {
+        "en": "Save As",
+        "cn": "另存为"
+    },
+    "All Files": {
+        "en": "All Files",
+        "cn": "所有文件"
+    },
 }

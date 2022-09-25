@@ -13,6 +13,7 @@ const translate = require('google-translate-cn-api');
 
 var fs = require('fs-extra');
 const path = require('path');
+const chokidar = require('chokidar');
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -135,7 +136,7 @@ async function createWindow() {
             let promises = [];
             files.forEach(filename => {
                 let fileObj = {};
-                fileObj.filePath = path.join(obj.dir, filename);
+                fileObj.filePath = path.join(obj.dir, filename).replace(/\\/g, '/');
 
                 promises.push(new Promise(resolve => {
                     fs.stat(fileObj.filePath, (error, stats) => {
@@ -261,15 +262,67 @@ async function createWindow() {
     ipcMain.on("open-file", (event, obj) => {
         if (!obj.id) obj.id = 'callback';
         fs.access(obj.path, err => {
-            // fix: 修复中文路径不能打开的问题
-            shell.openPath(obj.path);
             if (err) event.reply(`open-file-${obj.id}`, {
                 status: 500,
                 message: err
             });
-            else event.reply(`open-file-${obj.id}`, {
-                status: 200
+            else {
+                // fix: 修复中文路径不能打开的问题
+                if (process.platform == 'win32') {
+                    shell.openPath(obj.path.replace(/\//g, '\\'));
+                }
+                else
+                    shell.openPath(obj.path.replace(/\\/g, '/'));
+                event.reply(`open-file-${obj.id}`, {
+                    status: 200
+                });
+            }
+        });
+    });
+
+    ipcMain.on("watch-path", async (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        try {
+            await new Promise(resolve => {
+                chokidar.close().then(() => {
+                    console.log('change-path', obj.path);
+                    resolve(0);
+                });
             });
+        }
+        catch (e) {
+            console.log('not watching yet');
+        }
+        chokidar.watch(obj.path).on('all', (event, p) => {
+            if (event === 'add' || event === 'addDir') {
+                let fileObj = {};
+                fs.stat(p, (error, stats) => {
+                    if (!error) {
+                        fileObj.filePath = p.replace(/\\/g, '/');
+                        fileObj.relativePath = (path.relative(obj.path, p)).replace(/\\/g, '/');
+                        fileObj.name = path.basename(p);
+                        fileObj.isFile = stats.isFile();
+                        fileObj.isDir = stats.isDirectory();
+                        win.webContents.send(`watch-path-${obj.id}`, {
+                            status: 200,
+                            file: fileObj,
+                            event,
+                            path: p
+                        });
+                    }
+                    else
+                        win.webContents.send(`watch-path-${obj.id}`, {
+                            status: 500,
+                            message: error
+                        });
+                });
+            }
+            else
+                win.webContents.send(`watch-path-${obj.id}`, {
+                    status: 200,
+                    event,
+                    path: p
+                });
         });
     });
 

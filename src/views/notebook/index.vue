@@ -15,7 +15,7 @@
                         class="ms-Icon"
                         :class="[
                             `ms-Icon--${
-                                readonly === true ? 'PageEdit' : 'ReadingMode'
+                                readonly === true ? 'Edit' : 'ReadingMode'
                             }`,
                         ]"
                     ></i>
@@ -34,6 +34,26 @@
                             }`,
                         ]"
                     ></i>
+                </fv-button>
+                <fv-button
+                    :theme="theme"
+                    :borderRadius="30"
+                    class="control-btn"
+                    :title="local('Save As')"
+                    @click="saveAs"
+                >
+                    <i class="ms-Icon ms-Icon--SaveAs"></i>
+                </fv-button>
+                <fv-button
+                    v-show="contentType !== 'fabulous_notebook'"
+                    theme="dark"
+                    :borderRadius="30"
+                    class="control-btn"
+                    background="linear-gradient(to right, #800080, #ffc0cb)"
+                    :title="local('Upgrade to Fabulous Notebook')"
+                    @click="upgrade"
+                >
+                    <i class="ms-Icon ms-Icon--UpArrowShiftKey"></i>
                 </fv-button>
                 <fv-button
                     v-show="unsave"
@@ -104,7 +124,7 @@
         <div class="main-display-block">
             <power-editor
                 v-show="lock.loading"
-                :value="content"
+                :value="fabulousNotebook.content"
                 :placeholder="local('Write something ...')"
                 :editable="!readonly"
                 :theme="theme"
@@ -120,7 +140,7 @@
                 ref="editor"
                 :style="{background: 'transparent', 'font-size': `${fontSize}px`}"
                 style="position: relative; width: 100%; height: 100%; flex: 1;"
-                @save-json="saveContent"
+                @save-json="saveConfirm"
                 @click.native="show.quickNav = false"
             >
                 <template v-slot:front-content>
@@ -157,6 +177,7 @@ import { mapMutations, mapState, mapGetters } from "vuex";
 import { fabulous_notebook } from "@/js/data_sample.js";
 
 const { ipcRenderer: ipc } = require("electron");
+const { dialog } = require("@electron/remote");
 const path = require("path");
 
 export default {
@@ -219,6 +240,9 @@ export default {
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
+        dir() {
+            return path.dirname(this.path);
+        },
         currentBanner() {
             if (!this.fabulousNotebook.banner) return "";
             return this.fabulousNotebook.banner;
@@ -263,18 +287,18 @@ export default {
                         this.contentType = "fabulous_notebook";
                         for (let key in this.fabulousNotebook)
                             this.fabulousNotebook[key] = rawJson[key];
-                        this.content = this.fabulousNotebook.content;
                     } else {
                         this.contentType = "json";
-                        this.content = rawJson;
+                        this.fabulousNotebook.content = rawJson;
                     }
                     this.lock.loading = true;
                 } catch (e) {
                     this.contentType = "html";
-                    this.content = data;
+                    this.fabulousNotebook.content = data;
                     this.lock.loading = true;
                 }
-                if (this.content === "") this.$refs.editor.focus();
+                if (this.fabulousNotebook.content === "")
+                    this.$refs.editor.focus();
             });
         },
         timerInit() {
@@ -283,8 +307,15 @@ export default {
         },
         ShortCutInit() {
             this.$el.addEventListener("keydown", (event) => {
-                if (event.keyCode === 83 && event.ctrlKey) {
+                if (event.keyCode === 83 && event.ctrlKey && !event.shiftKey) {
                     this.$refs.editor.save();
+                    this.unsave = false;
+                } else if (
+                    event.keyCode === 83 &&
+                    event.ctrlKey &&
+                    event.shiftKey
+                ) {
+                    this.saveAs();
                     this.unsave = false;
                 } else {
                     let filterKey = [16, 17, 18, 20];
@@ -330,7 +361,7 @@ export default {
                 this.$refs.editor.save();
             }
         },
-        async saveContent(json) {
+        saveContent(json) {
             let saveContent = null;
             if (this.contentType === "fabulous_notebook") {
                 this.fabulousNotebook.content = json;
@@ -345,11 +376,19 @@ export default {
             } else {
                 saveContent = json;
             }
+            return saveContent;
+        },
+        saveConfirm(obj) {
+            let saveContent = this.saveContent(obj);
             ipc.send("output-file", {
                 id: "notebook",
                 path: this.path,
                 data: JSON.stringify(saveContent),
             });
+        },
+        upgrade() {
+            this.contentType = "fabulous_notebook";
+            this.fabulousNotebook.title = "";
         },
         chooseBanner() {
             if (this.$refs.input.files.length === 0) return;
@@ -360,6 +399,46 @@ export default {
                 this.$refs.input.value = "";
             };
             reader.readAsDataURL(file);
+        },
+        saveAs() {
+            let filters = [
+                {
+                    name: this.local("Fabulous Notebook"),
+                    extensions: ["fbn"],
+                },
+                {
+                    name: this.local("JSON"),
+                    extensions: ["json"],
+                },
+                {
+                    name: this.local("HTML"),
+                    extensions: ["html"],
+                },
+            ];
+            if (this.contentType === "json") filters = filters.slice(1);
+            if (this.contentType === "html") filters = filters.slice(2);
+            dialog
+                .showSaveDialog({
+                    title: this.local("Save As"),
+                    defaultPath: this.dir,
+                    filters: filters.concat([
+                        {
+                            name: this.local("All Files"),
+                            extensions: ["*"],
+                        },
+                    ]),
+                })
+                .then((result) => {
+                    if (result.canceled) return;
+                    let targetPath = result.filePath;
+                    let json = this.$refs.editor.editor.getJSON();
+                    let saveContent = this.saveContent(json);
+                    ipc.send("output-file", {
+                        id: "notebook",
+                        path: targetPath,
+                        data: JSON.stringify(saveContent),
+                    });
+                });
         },
         back() {
             let last = this.history[this.history.length - 1];

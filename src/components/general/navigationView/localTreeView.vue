@@ -109,7 +109,7 @@
                     ></i>
                     <p>{{local("New Folder")}}</p>
                 </span>
-                <span @click="openFile(`${rightMenuItem.filePath}`)">
+                <span @click="openFile(rightMenuItem)">
                     <img
                         draggable="false"
                         :src="img.folder"
@@ -167,20 +167,6 @@ export default {
             default: "light",
         },
     },
-    watch: {
-        value(val) {
-            this.path = val;
-        },
-        path(val) {
-            this.$emit("input", val);
-            if (!val) return;
-            this.treeList = [];
-            this.FLAT = [];
-            if (val) {
-                ipc.send("list-dir", { dir: val, target: null });
-            }
-        },
-    },
     data() {
         return {
             path: "",
@@ -199,39 +185,46 @@ export default {
             },
         };
     },
-    computed: {
-        computeTreeList() {
-            return (fileList, dir = null) => {
-                let treeList = [];
-                fileList.forEach((file) => {
-                    let item = {
-                        id: this.$Guid(),
-                        name: file.name,
-                        editable: false,
-                        children: file.isDir ? [] : null,
-                        dir: dir ? dir : this.path,
-                        loading: false,
-                        finished: false,
-                        ...file,
-                    };
-                    let index = this.FLAT.findIndex(
-                        (it) => it.filePath === item.filePath
-                    );
-                    if (index > -1) {
-                        let oriItem = this.FLAT[index];
-                        for (let key in oriItem) {
-                            let skipKey = ["children", "expanded"];
-                            if (!skipKey.includes(key)) {
-                                oriItem[key] = item[key];
-                            }
-                        }
-                        treeList.push(oriItem);
-                    } else {
-                        this.FLAT.push(item);
-                        treeList.push(item);
-                    }
+    watch: {
+        value(val) {
+            this.path = val;
+        },
+        path(val) {
+            this.$emit("input", val);
+            if (!val) return;
+            this.treeList = [];
+            this.FLAT = [];
+            if (val) {
+                ipc.send("watch-path", {
+                    id: "localTree",
+                    path: val.replace(/\\/g, "/"),
+                    target: null,
                 });
-                return treeList;
+            }
+        },
+    },
+    computed: {
+        computeTreeItem() {
+            return (fileObj) => {
+                let item = {
+                    id: this.$Guid(),
+                    name: fileObj.name,
+                    editable: false,
+                    children: fileObj.isDir ? [] : null,
+                    dir: null,
+                    loading: false,
+                    finished: false,
+                    ...fileObj,
+                };
+                let parentPath = this.findParentPath(item);
+                item.dir = parentPath;
+                return item;
+            };
+        },
+        comparePath() {
+            return (path1, path2) => {
+                if (!path1 || !path2) return false;
+                return path1.replace(/\\/g, "/") === path2.replace(/\\/g, "/");
             };
         },
     },
@@ -244,41 +237,15 @@ export default {
         //     console.log(this.treeList);
         // },
         eventInit() {
-            ipc.on("list-dir-callback", (event, { status, files, target }) => {
-                if (status) {
-                    console.error(status);
+            ipc.on("output-file-localTree", (event, { status, message }) => {
+                if (status !== 200) {
+                    console.error(message);
+                    this.$barWarning(this.local(`Create File Failed`), {
+                        status: "warning",
+                    });
                     return;
                 }
-                if (!target) this.treeList = this.computeTreeList(files);
-                else this.expandItem(target, files);
             });
-
-            let refreshDir = (target) => {
-                let dirItem = this.FLAT.find(
-                    (it) => it.filePath === target.dir
-                );
-                if (dirItem) {
-                    dirItem.finished = false;
-                    ipc.send("list-dir", {
-                        dir: dirItem.filePath,
-                        target: dirItem,
-                    });
-                } else ipc.send("list-dir", { dir: this.path, target: null });
-            };
-
-            ipc.on(
-                "output-file-localTree",
-                (event, { status, target, message }) => {
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Create File Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                    refreshDir(target);
-                }
-            );
             ipc.on(
                 "ensure-folder-localTree",
                 (event, { status, target, message }) => {
@@ -290,7 +257,6 @@ export default {
                         });
                         return;
                     }
-                    refreshDir(target);
                 }
             );
             ipc.on(
@@ -304,7 +270,6 @@ export default {
                         });
                         return;
                     }
-                    refreshDir(target);
                 }
             );
             ipc.on(
@@ -318,7 +283,6 @@ export default {
                         });
                         return;
                     }
-                    refreshDir(target);
                 }
             );
             ipc.on("rename-localTree", (event, { status, target, message }) => {
@@ -330,12 +294,68 @@ export default {
                     });
                     return;
                 }
-                let targetItem = this.FLAT.find(
-                    (it) => it.filePath === target.filePath
-                );
-                targetItem.filePath =
-                    targetItem.dir.replace(/\\/g, "/") + `/${targetItem.name}`;
-                this.refreshAllExpandedDir();
+            });
+
+            ipc.on("watch-path-localTree", (e, { event, path, file }) => {
+                // console.log(event, file);
+                if (event === "addDir" || event === "add") {
+                    let fileItem = this.computeTreeItem(file);
+                    let parentPath = this.findParentPath(fileItem);
+                    if (parentPath.isRoot) {
+                        this.treeList.push(fileItem);
+                        this.hotPushFLAT(fileItem);
+                    } else {
+                        let parentItem = this.FLAT.find((it) =>
+                            this.comparePath(it.filePath, parentPath.path)
+                        );
+                        if (parentItem) {
+                            parentItem.children.push(fileItem);
+                            this.hotPushFLAT(fileItem);
+                        }
+                    }
+                } else if (event === "unlinkDir" || event === "unlink") {
+                    let fileItem = this.FLAT.find((it) =>
+                        this.comparePath(it.filePath, path)
+                    );
+                    if (fileItem) {
+                        let parentPath = this.findParentPath(fileItem);
+                        if (parentPath.isRoot) {
+                            let treeIndex = this.treeList.findIndex((it) =>
+                                this.comparePath(it.filePath, fileItem.filePath)
+                            );
+                            let flatIndex = this.FLAT.findIndex((it) =>
+                                this.comparePath(it.filePath, fileItem.filePath)
+                            );
+                            if (treeIndex > -1)
+                                this.treeList.splice(treeIndex, 1);
+                            if (flatIndex > -1) this.FLAT.splice(flatIndex, 1);
+                        } else {
+                            let parentItem = this.FLAT.find((it) =>
+                                this.comparePath(it.filePath, parentPath.path)
+                            );
+                            if (parentItem) {
+                                let index = parentItem.children.findIndex(
+                                    (it) =>
+                                        this.comparePath(
+                                            it.filePath,
+                                            fileItem.filePath
+                                        )
+                                );
+                                let flatIndex = this.FLAT.findIndex((it) =>
+                                    this.comparePath(
+                                        it.filePath,
+                                        fileItem.filePath
+                                    )
+                                );
+                                if (index > -1)
+                                    parentItem.children.splice(index, 1);
+                                if (flatIndex > -1)
+                                    this.FLAT.splice(flatIndex, 1);
+                            }
+                        }
+                    }
+                }
+                this.$refs.tree.$forceUpdate();
             });
         },
         async chooseFolder() {
@@ -347,25 +367,42 @@ export default {
             if (!path) return;
             this.path = path;
         },
-        async expandItem(target, files) {
-            let item = this.FLAT.find((it) => it.filePath === target.filePath);
-            if (!item.isDir) return;
-            if (item.finished) return;
-            item.loading = true;
-            item.children = this.computeTreeList(files, target.filePath);
-            item.finished = true;
-            item.loading = false;
-            this.$refs.tree.$forceUpdate();
+        hotPushFLAT(item) {
+            let index = this.FLAT.findIndex((it) =>
+                this.comparePath(it.filePath, item.filePath)
+            );
+            if (index > -1) {
+                let oriItem = this.FLAT[index];
+                for (let key in oriItem) {
+                    let skipKey = ["children", "expanded"];
+                    if (!skipKey.includes(key)) {
+                        oriItem[key] = item[key];
+                    }
+                }
+            } else {
+                this.FLAT.push(item);
+            }
+        },
+        findParentPath(target) {
+            let targetPath = target.filePath.replace(/\\/g, "/");
+            let parentPath = targetPath.substring(
+                0,
+                targetPath.lastIndexOf("/")
+            );
+            return {
+                path: parentPath,
+                isRoot: parentPath === this.path.replace(/\\/g, "/"),
+            };
         },
         treeItemClick(item) {
             if (!item.filePath) return;
             if (!item.isDir) {
-                let url = `/notebook/${encodeURI(item.filePath)}`;
+                let url = `/notebook/${encodeURI(
+                    item.filePath.replace(/\//g, "\\")
+                )}`;
                 if (this.$route.path !== url) this.$Go(url);
                 return;
             }
-            if (item.finished) return;
-            ipc.send("list-dir", { dir: item.filePath, target: item });
         },
         createFile(dir = null) {
             this.removeTmp();
@@ -383,9 +420,10 @@ export default {
             if (!dir) {
                 this.treeList.unshift(tmpItem);
             } else {
-                let dirItem = this.FLAT.find((it) => it.filePath === dir);
+                let dirItem = this.FLAT.find((it) =>
+                    this.comparePath(it.filePath, dir)
+                );
                 if (!dirItem) return;
-                this.treeItemClick(dirItem);
                 dirItem.expanded = true;
                 dirItem.children.unshift(tmpItem);
             }
@@ -414,9 +452,10 @@ export default {
             if (!dir) {
                 this.treeList.unshift(tmpItem);
             } else {
-                let dirItem = this.FLAT.find((it) => it.filePath === dir);
+                let dirItem = this.FLAT.find((it) =>
+                    this.comparePath(it.filePath, dir)
+                );
                 if (!dirItem) return;
-                this.treeItemClick(dirItem);
                 dirItem.expanded = true;
                 dirItem.children.unshift(tmpItem);
             }
@@ -528,6 +567,7 @@ export default {
                 data: JSON.stringify(fbn),
                 target,
             });
+            this.removeTmp();
         },
         newFolderConfirm(target) {
             let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
@@ -536,6 +576,7 @@ export default {
                 dir: url,
                 target,
             });
+            this.removeTmp();
         },
         renameConfirm(target) {
             ipc.send("rename", {
@@ -547,42 +588,18 @@ export default {
         },
         deleteConfirm(target) {
             if (!target.filePath) return;
-            let flatIndex = this.FLAT.findIndex(
-                (it) => it.filePath === target.filePath
-            );
-            this.FLAT.splice(flatIndex, 1);
             if (target.isDir) {
-                let itemsDelete = [target];
-                for (let i = 0; i < itemsDelete.length; i++) {
-                    if (itemsDelete[i].children)
-                        itemsDelete = itemsDelete.concat(
-                            itemsDelete[i].children
-                        );
-                    let flatIndex = this.FLAT.findIndex(
-                        (it) => it.filePath === itemsDelete[i].filePath
-                    );
-                    this.FLAT.splice(flatIndex, 1);
-                }
                 ipc.send("remove-folder", {
                     id: "localTree",
                     path: target.filePath,
                     target,
                 });
-                return;
-            }
-            ipc.send("remove-file", {
-                id: "localTree",
-                path: target.filePath,
-                target,
-            });
-        },
-        refreshAllExpandedDir() {
-            for (let i = 0; i < this.FLAT.length; i++) {
-                if (this.FLAT[i].isDir && this.FLAT[i].expanded)
-                    ipc.send("list-dir", {
-                        dir: this.FLAT[i].filePath,
-                        target: this.FLAT[i],
-                    });
+            } else {
+                ipc.send("remove-file", {
+                    id: "localTree",
+                    path: target.filePath,
+                    target,
+                });
             }
         },
         rightClick(event, item) {
@@ -604,7 +621,9 @@ export default {
 
             this.rightMenuItem = item;
         },
-        openFile(url) {
+        openFile(item) {
+            let url = item.filePath;
+            if (!item.isDir) url = this.findParentPath(item).path;
             ipc.send("open-file", {
                 id: "local",
                 path: url,

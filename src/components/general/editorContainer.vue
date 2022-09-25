@@ -38,7 +38,7 @@
                             class="ms-Icon"
                             :class="[
                             `ms-Icon--${
-                                readonly === true ? 'PageEdit' : 'ReadingMode'
+                                readonly === true ? 'Edit' : 'ReadingMode'
                             }`,
                         ]"
                         ></i></fv-button>
