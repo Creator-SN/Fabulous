@@ -226,7 +226,7 @@ import OneDrive from "@/assets/settings/OneDrive.svg";
 
 import ThemeColor from "@/js/themeColorPicker.js";
 
-const { dialog } = require("electron").remote;
+const { dialog } = require("@electron/remote");
 
 export default {
     components: {

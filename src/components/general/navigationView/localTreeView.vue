@@ -144,7 +144,7 @@ import rightMenu from "@/components/general/rightMenu.vue";
 import { fabulous_notebook } from "@/js/data_sample.js";
 
 const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("electron").remote;
+const { dialog } = require("@electron/remote");
 
 import folderImg from "@/assets/nav/folder.svg";
 import noteImg from "@/assets/nav/note.svg";

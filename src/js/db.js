@@ -3,7 +3,8 @@ import FileSync from 'lowdb/adapters/FileSync'
 
 import fs from 'fs-extra'
 import path from 'path'
-import { app, remote } from 'electron' // 引入remote模块
+import { app } from 'electron' // 引入remote模块
+import * as remote from "@electron/remote"
 
 import { config } from './data_sample'
 
