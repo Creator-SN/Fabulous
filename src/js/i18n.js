@@ -566,5 +566,57 @@ export default {
     "Notebook": {
         "en": "Notebook",
         "cn": "笔记本"
-    }
+    },
+    "Save Content Failed": {
+        "en": "Save Content Failed",
+        "cn": "保存内容失败"
+    },
+    "Read File Failed": {
+        "en": "Read File Failed",
+        "cn": "读取文件失败"
+    },
+    "Input title here ...": {
+        "en": "Input title here ...",
+        "cn": "在这里输入标题..."
+    },
+    "Add Banner": {
+        "en": "Add Banner",
+        "cn": "添加头图"
+    },
+    "New Note": {
+        "en": "New Note",
+        "cn": "新建笔记"
+    },
+    "New Folder": {
+        "en": "New Folder",
+        "cn": "新建文件夹"
+    },
+    "Create File Failed": {
+        "en": "Create File Failed",
+        "cn": "创建文件失败"
+    },
+    "Create Folder Failed": {
+        "en": "Create Folder Failed",
+        "cn": "创建文件夹失败"
+    },
+    "Remove File Failed": {
+        "en": "Remove File Failed",
+        "cn": "删除文件失败"
+    },
+    "Remove Folder Failed": {
+        "en": "Remove Folder Failed",
+        "cn": "删除文件夹失败"
+    },
+    "Rename Failed": {
+        "en": "Rename Failed",
+        "cn": "重命名失败"
+    },
+    "Name already exists": {
+        "en": "Name already exists",
+        "cn": "名称已存在"
+    },
+    "Choose Folder": {
+        "en": "Choose Folder",
+        "cn": "选择文件夹"
+    },
 }

@@ -9,7 +9,7 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
-                    @click="readonly ^= true"
+                    @click="readonly = readonly ? false : true"
                 >
                     <i
                         class="ms-Icon"
@@ -24,7 +24,7 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
-                    @click="expandContent ^= true"
+                    @click="expandContent = expandContent ? false : true"
                 >
                     <i
                         class="ms-Icon"
@@ -67,6 +67,40 @@
                 @root-click="back"
             ></fv-Breadcrumb>
         </div>
+        <div
+            v-show="!readonly && contentType === 'fabulous_notebook'"
+            class="fabulous-notebook-info-block"
+            :class="[{'has-banner': fabulousNotebook.banner}]"
+        >
+            <fv-button
+                v-show="!fabulousNotebook.banner"
+                :theme="theme"
+                icon="Picture"
+                background="transparent"
+                :border-radius="6"
+                foreground="rgba(120, 120, 120, 1)"
+                style="width: 120px; margin: 15px 10px;"
+                @click="$refs.input.click()"
+            >{{local('Add Banner')}}</fv-button>
+            <input
+                v-show="false"
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                ref="input"
+                @change="chooseBanner"
+            />
+            <fv-text-Field
+                :placeholder="local('Input title here ...')"
+                v-model="fabulousNotebook.title"
+                :font-size="20"
+                :background="`transparent`"
+                :border-color="`rgba(246, 167, 197, 0.3)`"
+                :focus-border-color="`rgba(246, 167, 197, 0.8)`"
+                :readonly="readonly != false"
+                :reveal-border="true"
+                style="width: calc(100% - 20px); height: 60px; margin-left: 10px; margin-bottom: 5px;"
+            ></fv-text-Field>
+        </div>
         <div class="main-display-block">
             <power-editor
                 v-show="lock.loading"
@@ -79,7 +113,7 @@
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
                 :editorOutSideBackground="
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
-                :toolbarHeight="150"
+                :toolbarHeight="toolbarHeight"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
                 :mobileDisplayWidth="0"
@@ -89,6 +123,19 @@
                 @save-json="saveContent"
                 @click.native="show.quickNav = false"
             >
+                <template v-slot:front-content>
+                    <fv-img
+                        v-show="fabulousNotebook.banner"
+                        :src="currentBanner"
+                        class="fabulous-notebook-banner-img"
+                        @click.native="$refs.input.click()"
+                    ></fv-img>
+                    <p
+                        v-show="readonly && fabulousNotebook.title"
+                        class="fabulous-notebook-readonly-title"
+                        :class="[{dark: theme === 'dark'}]"
+                    >{{fabulousNotebook.title}}</p>
+                </template>
             </power-editor>
         </div>
         <div
@@ -107,6 +154,8 @@
 <script>
 import { mapMutations, mapState, mapGetters } from "vuex";
 
+import { fabulous_notebook } from "@/js/data_sample.js";
+
 const { ipcRenderer: ipc } = require("electron");
 const path = require("path");
 
@@ -117,13 +166,24 @@ export default {
             path: "",
             content: "",
             contentType: "", // json, html, fabulous_notebook
-            rawContent: "",
+            fabulousNotebook: {
+                title: null,
+                description: null,
+                banner: null,
+                content: null,
+                author: [],
+                createDate: null,
+                updateDate: null,
+            },
             readonly: false,
             fontSize: 16,
             expandContent: false,
             history: [],
             unsave: false,
             auto_save: false,
+            containerPos: {
+                scrollTop: 0,
+            },
             lock: {
                 loading: true,
             },
@@ -159,11 +219,20 @@ export default {
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
+        currentBanner() {
+            if (!this.fabulousNotebook.banner) return "";
+            return this.fabulousNotebook.banner;
+        },
+        toolbarHeight() {
+            if (this.contentType !== "fabulous_notebook") return 160;
+            return this.fabulousNotebook.banner ? 250 : 290;
+        },
     },
     mounted() {
         this.eventInit();
         this.ShortCutInit();
         this.timerInit();
+        this.refreshPath();
     },
     methods: {
         ...mapMutations({
@@ -188,20 +257,21 @@ export default {
                     });
                     return;
                 }
-                let content = data;
                 try {
-                    this.rawContent = JSON.parse(content);
-                    if (this.rawContent.fabulous_notebook) {
+                    let rawJson = JSON.parse(data);
+                    if (rawJson.fabulous_notebook) {
                         this.contentType = "fabulous_notebook";
-                        this.content = this.rawContent.content;
+                        for (let key in this.fabulousNotebook)
+                            this.fabulousNotebook[key] = rawJson[key];
+                        this.content = this.fabulousNotebook.content;
                     } else {
                         this.contentType = "json";
-                        this.content = this.rawContent;
+                        this.content = rawJson;
                     }
                     this.lock.loading = true;
                 } catch (e) {
                     this.contentType = "html";
-                    this.content = content;
+                    this.content = data;
                     this.lock.loading = true;
                 }
                 if (this.content === "") this.$refs.editor.focus();
@@ -241,6 +311,7 @@ export default {
         },
         refreshPath() {
             let path = decodeURI(this.$route.params.path);
+            if (!path) return;
             path = path.replace(/\\/g, "/");
             this.path = path;
         },
@@ -248,6 +319,7 @@ export default {
             if (!path) return;
             if (!this.lock.loading) return;
             this.lock.loading = false;
+            this.fabulousNotebook.banner = null;
             ipc.send("read-file", {
                 id: "notebook",
                 path: this.path,
@@ -259,10 +331,17 @@ export default {
             }
         },
         async saveContent(json) {
-            let saveContent = this.rawContent;
+            let saveContent = null;
             if (this.contentType === "fabulous_notebook") {
-                saveContent.content = json;
-                saveContent.updateDate = new Date();
+                this.fabulousNotebook.content = json;
+                this.fabulousNotebook.updateDate = new Date();
+                let _fabulous_notebook = JSON.parse(
+                    JSON.stringify(fabulous_notebook)
+                );
+                for (let key in this.fabulousNotebook) {
+                    _fabulous_notebook[key] = this.fabulousNotebook[key];
+                }
+                saveContent = _fabulous_notebook;
             } else {
                 saveContent = json;
             }
@@ -271,6 +350,16 @@ export default {
                 path: this.path,
                 data: JSON.stringify(saveContent),
             });
+        },
+        chooseBanner() {
+            if (this.$refs.input.files.length === 0) return;
+            let file = this.$refs.input.files[0];
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                this.fabulousNotebook.banner = e.target.result;
+                this.$refs.input.value = "";
+            };
+            reader.readAsDataURL(file);
         },
         back() {
             let last = this.history[this.history.length - 1];
@@ -307,7 +396,9 @@ export default {
         min-height: 40px;
         height: 40px;
         padding-top: 32px;
-        z-index: 2;
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        z-index: 3;
 
         .control-left-block {
             @include Vcenter;
@@ -343,10 +434,59 @@ export default {
 
         display: flex;
         align-items: center;
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        z-index: 3;
+    }
+
+    .fabulous-notebook-info-block {
+        position: absolute;
+        left: 0px;
+        top: 5px;
+        width: 100%;
+        height: 230px;
+        padding: 0px 5px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        overflow: hidden;
         z-index: 2;
 
-        &.half {
-            width: 48%;
+        &.has-banner {
+            height: 180px;
+        }
+    }
+
+    .fabulous-notebook-banner-img {
+        position: relative;
+        width: calc(100% - 30px);
+        height: 300px;
+        margin-left: 15px;
+        margin-top: 25px;
+        border-radius: 6px;
+        transition: all 0.3s;
+        z-index: 2;
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &:active {
+            opacity: 0.6;
+        }
+    }
+
+    .fabulous-notebook-readonly-title {
+        padding: 15px;
+        font-size: 24px;
+        font-weight: 600;
+
+        &.dark {
+            color: whitesmoke;
         }
     }
 
@@ -356,17 +496,8 @@ export default {
         position: absolute;
         width: 100%;
         height: 100%;
-        background: rgba(250, 250, 250, 0.8);
         overflow: hidden;
         z-index: 1;
-
-        .pdf-viewer {
-            position: relative;
-            width: 100%;
-            height: calc(100% - 80px);
-            flex: 1;
-            border-left: rgba(120, 120, 120, 0.1) solid thin;
-        }
     }
 
     .loading-block {
@@ -391,7 +522,7 @@ export default {
         transition: all 0.3s;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        z-index: 2;
+        z-index: 3;
 
         &.dark {
             background: rgba(36, 36, 36, 0.6);

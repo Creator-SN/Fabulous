@@ -36,6 +36,7 @@
                 <div
                     v-show="expand"
                     class="navigation-view-mode-block"
+                    :class="[{dark: theme === 'dark'}]"
                     @click="menuDisplayMode = 0"
                 >
                     <div class="navigation-view-mode-left-block">
@@ -126,6 +127,7 @@
                 <div
                     v-show="expand"
                     class="navigation-view-mode-block"
+                    :class="[{dark: theme === 'dark'}]"
                     @click="menuDisplayMode = 1"
                 >
                     <div class="navigation-view-mode-left-block">
@@ -143,14 +145,17 @@
                     >
                         <i
                             class="ms-Icon ms-Icon--SubscriptionAdd more-menu-btn"
+                            :title="local('New Note')"
                             @click="() => $refs.local_view.createFile()"
                         ></i>
                         <i
                             class="ms-Icon ms-Icon--NewFolder more-menu-btn"
+                            :title="local('New Folder')"
                             @click="() => $refs.local_view.createFolder()"
                         ></i>
                         <i
                             class="ms-Icon ms-Icon--FolderOpen more-menu-btn"
+                            :title="local('Choose Folder')"
                             @click="() => $refs.local_view.chooseFolder()"
                         ></i>
                     </div>
@@ -707,10 +712,18 @@ export default {
 
             &:hover {
                 background: rgba(200, 200, 200, 0.1);
+
+                .navigation-view-mode-right-block {
+                    opacity: 1;
+                }
             }
 
             &:active {
                 background: rgba(200, 200, 200, 0.3);
+            }
+
+            &.dark {
+                color: rgba(245, 245, 245, 0.8);
             }
 
             .navigation-view-mode-left-block {
@@ -723,6 +736,8 @@ export default {
                 @include HendVcenter;
 
                 width: 100px;
+                opacity: 0;
+                transition: all 0.3s;
 
                 .more-menu-btn {
                     @include HcenterVcenter;

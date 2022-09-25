@@ -547,6 +547,10 @@ export default {
         },
         deleteConfirm(target) {
             if (!target.filePath) return;
+            let flatIndex = this.FLAT.findIndex(
+                (it) => it.filePath === target.filePath
+            );
+            this.FLAT.splice(flatIndex, 1);
             if (target.isDir) {
                 let itemsDelete = [target];
                 for (let i = 0; i < itemsDelete.length; i++) {
