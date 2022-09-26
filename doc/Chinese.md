@@ -1,8 +1,8 @@
-# Fabulous 快卷
+# Fabulous Fab
 
-我们开发了一款集文献管理和出色笔记体验的应用-- 快卷 (Fabulous)
+我们开发了一款集文献管理和出色笔记体验的应用-- Fab (Fabulous)
 
-**快卷** 全称: 卷王快乐本（英文：InvolutionKing Fun Book，简称：Fabulous）是论文笔记和文献归纳的综合管理工具。UI 设计基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/)。
+**Fab** 全称: 卷王快乐本（英文：InvolutionKing Fun Book，简称：Fabulous）是论文笔记和文献归纳的综合管理工具。UI 设计基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/)。
 
 该应用程序支持**跨平台**，由 Electron 提供支持。
 

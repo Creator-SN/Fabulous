@@ -9,7 +9,7 @@ export default {
     },
     "Fabulous": {
         "en": "Fabulous",
-        "cn": "快卷"
+        "cn": "Fab"
     },
     "Setting": {
         "en": "Setting",

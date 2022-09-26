@@ -669,5 +669,11 @@ export default {
             }
         }
     }
+
+    .ProseMirror {
+        p {
+            line-height: 2;
+        }
+    }
 }
 </style>
