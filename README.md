@@ -11,9 +11,11 @@
     </a>
 </p>
 
-# Fabulous
+# Fabulous Notebook
 
-Involution King Fun Book (Fabulous, Chinese: 快卷, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
+Fabulous Notebook is a WYSIWYG notebook with an exciting paper and literature management system.
+
+The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
 
 The Application is **Cross Platform** and powered by Electron.
 
