@@ -30,11 +30,8 @@
             class="file-drop-mask"
             ref="drop"
         ></div>
-        <transition name="scale-up-to-up">
-            <starter
-                v-if="init_status"
-                @refresh-data-db="dataDBInit"
-            ></starter>
+        <transition :name="init_status ? `move-bottom-to-top` : `move-top-to-bottom`">
+            <starter v-if="init_status"></starter>
         </transition>
         <progress-bar></progress-bar>
     </div>

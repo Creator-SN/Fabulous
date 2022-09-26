@@ -1,7 +1,7 @@
 <template>
     <div class="fabulous-starter-container">
         <fv-button
-            v-show="step > 2"
+            v-show="step > 1"
             theme="dark"
             background="rgba(29, 85, 125, 1)"
             :border-radius="50"
@@ -10,6 +10,7 @@
             @click="step > 0 ? step-- : step"
         ><i class="ms-Icon ms-Icon--ChevronLeftMed"></i></fv-button>
         <fv-button
+            v-show="step > 2"
             theme="dark"
             background="rgba(29, 85, 125, 1)"
             :border-radius="50"
@@ -23,7 +24,7 @@
                 class="item-block"
             >
                 <fv-img
-                    :src="logo"
+                    :src="img.logo"
                     style="width: 80px; height: auto;"
                 ></fv-img>
                 <p class="logo-title">Fabulous</p>
@@ -40,6 +41,10 @@
                 v-show="step === 1"
                 class="item-block"
             >
+                <fv-img
+                    :src="img.language"
+                    style="width: 120px; height: auto;"
+                ></fv-img>
                 <p class="title">{{local(`Choose Language`)}}</p>
                 <fv-Combobox
                     v-model="cur_language"
@@ -63,23 +68,27 @@
                 v-show="step === 2"
                 class="item-block"
             >
-                <p class="title">{{local(`New Data Dource`)}}</p>
+                <fv-img
+                    :src="img.dataSource"
+                    style="width: 120px; height: auto;"
+                ></fv-img>
+                <p class="title">{{local(`New Data Source`)}}</p>
                 <fv-text-box
                     v-model="path"
-                    :placeholder="local('Click Me to Choose Data Source Path ...')"
+                    :placeholder="local('Choose Data Source Directory ...')"
                     theme="dark"
-                    background="rgba(29, 85, 125, 1)"
+                    background="rgba(0, 130, 180, 0.3)"
                     :reveal-border="true"
                     readonly
                     @click.native="choosePath"
                 ></fv-text-box>
                 <fv-text-box
                     v-model="name"
-                    :placeholder="local('Data Source Name')"
-                    theme="dark"
-                    background="rgba(63, 88, 101, 1)"
+                    :placeholder="local('New Data Source Name')"
+                    background="rgba(255, 255, 255, 0.6)"
                     :reveal-border="true"
                     style="margin-top: 5px; margin-bottom: 15px;"
+                    @keyup.enter="addSource"
                 ></fv-text-box>
                 <fv-button
                     theme="dark"
@@ -90,7 +99,8 @@
                 >{{local('Confirm')}}</fv-button>
                 <fv-button
                     theme="dark"
-                    background="rgba(29, 85, 125, 1)"
+                    icon="Attach"
+                    background="rgba(29, 85, 125, 0.3)"
                     class="starter-btn"
                     @click="step = 3"
                 >{{local('Exists Data Source')}}</fv-button>
@@ -101,12 +111,16 @@
                 v-show="step === 3"
                 class="item-block"
             >
+                <fv-img
+                    :src="img.link"
+                    style="width: 120px; height: auto;"
+                ></fv-img>
                 <p class="title">{{local(`Choose from Exists`)}}</p>
                 <fv-text-box
                     v-model="path"
-                    :placeholder="local('Click Me to Choose Data Source Path ...')"
+                    :placeholder="local('Choose Data Source Path ...')"
                     theme="dark"
-                    background="rgba(29, 85, 125, 1)"
+                    background="rgba(0, 130, 180, 0.3)"
                     :reveal-border="true"
                     readonly
                     @click.native="choosePath"
@@ -126,6 +140,10 @@
 
 <script>
 import logo from "../../assets/logo.svg";
+import languageImg from "@/assets/nav/language.svg";
+import dataSourceImg from "@/assets/nav/dataSource.svg";
+import linkImg from "@/assets/nav/link.svg";
+
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { data_structure } from "@/js/data_sample.js";
 
@@ -136,7 +154,12 @@ const path = require("path");
 export default {
     data() {
         return {
-            logo: logo,
+            img: {
+                logo: logo,
+                language: languageImg,
+                dataSource: dataSourceImg,
+                link: linkImg,
+            },
             step: 0,
             cur_language: {},
             languages: [
@@ -195,37 +218,42 @@ export default {
         async addSource() {
             if (this.path === "") return;
             if (this.name === "") return;
+            let id = this.$Guid();
             let _path = path.join(this.path, this.name);
-            ipc.send("ensure-folder", { dir: _path });
+            ipc.send("ensure-folder", { id: id, dir: _path });
             await new Promise((resolve) => {
-                ipc.on("ensure-folder-callback", () => {
+                ipc.on(`ensure-folder-${id}`, () => {
                     resolve(1);
                 });
             });
-            let pathList = this.data_path;
-            if (!pathList.find((url) => url === _path)) pathList.push(_path);
-            await this.reviseConfig({
-                data_path: pathList,
-            });
-            let index = pathList.indexOf(_path);
-            if (!this.SourceIndexDisabled(index)) {
-                if (this.data_index === index)
-                    await this.reviseConfig({
-                        data_index: -1,
-                    });
-                this.reviseConfig({
-                    data_index: index,
-                });
-            }
 
             let ds = JSON.parse(JSON.stringify(data_structure));
             ds.id = this.$Guid();
             ds.name = this.name;
             ds.createDate = this.$SDate.DateToString(new Date());
-            await this.reviseData({
-                ...ds,
+
+            ipc.send("output-file", {
+                id: ds.id,
+                path: path.join(_path, "data_structure.json"),
+                data: JSON.stringify(ds),
             });
-            this.$emit("refresh-data-db");
+            await new Promise((resolve) => {
+                ipc.on(`output-file-${ds.id}`, () => {
+                    resolve(1);
+                });
+            });
+
+            let pathList = this.data_path;
+            if (!pathList.find((url) => url === _path)) pathList.push(_path);
+            await this.reviseConfig({
+                data_path: pathList,
+            });
+
+            let index = pathList.indexOf(_path);
+            this.reviseConfig({
+                data_index: index,
+            });
+
             this.close();
         },
         async chooseSource() {
@@ -237,15 +265,9 @@ export default {
                 data_path: pathList,
             });
             let index = pathList.indexOf(_path);
-            if (!this.SourceIndexDisabled(index)) {
-                if (this.data_index === index)
-                    await this.reviseConfig({
-                        data_index: -1,
-                    });
-                this.reviseConfig({
-                    data_index: index,
-                });
-            }
+            this.reviseConfig({
+                data_index: index,
+            });
             this.close();
         },
         close() {
@@ -294,13 +316,13 @@ export default {
         line-height: 2;
 
         .logo-title {
-            margin-bottom: 25px;
+            margin: 25px;
             font-size: 20px;
             color: whitesmoke;
         }
 
         .title {
-            margin-bottom: 25px;
+            margin: 25px;
             font-size: 20px;
             color: whitesmoke;
         }

@@ -26,6 +26,13 @@
                         style="width: 150px;"
                         @click="addSource"
                     >{{local('Add New Source')}}</fv-button>
+                    <fv-button
+                        :theme="theme"
+                        icon="Link"
+                        :is-box-shadow="true"
+                        style="width: 150px; margin-left: 5px;"
+                        @click="linkSource"
+                    >{{local('Link Exists Source')}}</fv-button>
                 </template>
             </fv-Collapse>
             <div class="s-item-block">
@@ -214,12 +221,17 @@
             :theme="theme"
             :db_index="db_index"
         ></init-ds>
+        <add-ds
+            :show.sync="show.addDS"
+            :theme="theme"
+        ></add-ds>
     </div>
 </template>
 
 <script>
 import { mapMutations, mapState, mapGetters } from "vuex";
-import initDs from "@/components/settings/initDs.vue";
+import initDs from "@/components/settings/initDS.vue";
+import addDs from "@/components/settings/addDS.vue";
 import dataPathItem from "@/components/settings/dataPathItem.vue";
 
 import OneDrive from "@/assets/settings/OneDrive.svg";
@@ -231,6 +243,7 @@ const { dialog } = require("@electron/remote");
 export default {
     components: {
         initDs,
+        addDs,
         dataPathItem,
     },
     data() {
@@ -249,6 +262,7 @@ export default {
             },
             show: {
                 initDS: false,
+                addDS: false,
             },
             lock: {
                 switchDataIndex: true,
@@ -370,7 +384,10 @@ export default {
                 dynamicEffect: this.dynamic_effect,
             });
         },
-        async addSource() {
+        addSource() {
+            this.show.addDS = true;
+        },
+        async linkSource() {
             let path = (
                 await dialog.showOpenDialog({
                     properties: ["openDirectory"],

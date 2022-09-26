@@ -103,6 +103,10 @@ export default {
         "en": "Rename Page",
         "cn": "重命名笔记"
     },
+    "Init Data Source": {
+        "en": "Init Data Source",
+        "cn": "初始化数据源"
+    },
     "Init New Data Source": {
         "en": "Init New Data Source",
         "cn": "初始化新的数据源"
@@ -165,7 +169,11 @@ export default {
     },
     "Add New Source": {
         "en": "Add New Source",
-        "cn": "添加新的数据源"
+        "cn": "添加数据源"
+    },
+    "Link Exists Source": {
+        "en": "Link Exists Source",
+        "cn": "关联已有数据源"
     },
     "Theme": {
         "en": "Theme",
@@ -247,6 +255,10 @@ export default {
         "en": "Can't find data_structure.json on this source, shall we init new one ?",
         "cn": "无法在此数据源找到data_structure.json, 是否初始化新的配置?"
     },
+    "Init a source to start." : {
+        "en": "Init a source to start.",
+        "cn": "初始化数据源以开始."
+    },
     "Choose a source to start.": {
         "en": "Choose a source to start.",
         "cn": "选择数据源以开始."
@@ -279,9 +291,17 @@ export default {
         "en": "Skip",
         "cn": "跳过"
     },
-    "New Data Dource": {
-        "en": "New Data Dource",
-        "cn": "添加新的数据源"
+    "New Data Source": {
+        "en": "New Data Source",
+        "cn": "新建数据源"
+    },
+    "Choose Data Source Path ...": {
+        "en": "Choose Data Source Path ...",
+        "cn": "选择数据源位置 ..."
+    },
+    "Choose Data Source Directory ...": {
+        "en": "Choose Data Source Directory ...",
+        "cn": "选择数据源存放目录 ..."
     },
     "Click Me to Choose Data Source Path ...": {
         "en": "Click Me to Choose Data Source Path ...",
@@ -291,9 +311,13 @@ export default {
         "en": "Data Source Name'",
         "cn": "数据源名称"
     },
+    "New Data Source Name": {
+        "en": "New Data Source Name",
+        "cn": "取个响亮的名称"
+    },
     "Exists Data Source": {
         "en": "Exists Data Source",
-        "cn": "从现有数据源恢复"
+        "cn": "关联已有源"
     },
     "Choose from Exists": {
         "en": "Choose from Exists",

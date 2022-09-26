@@ -69,7 +69,7 @@
             </template>
         </fv-TreeView>
         <div
-            v-show="treeList.length === 0"
+            v-show="!path"
             class="local-empty-block"
         >
             <fv-button

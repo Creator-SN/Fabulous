@@ -1,7 +1,7 @@
 <template>
     <float-window-base
         v-model="thisShow"
-        :title="local('Init New Data Source')"
+        :title="local('Init Data Source')"
         :theme="theme"
     >
         <template v-slot:content>

@@ -10,7 +10,7 @@
         :flyout-display="mobileDisplay"
         :expandWidth="350"
         :showNav="windowWidth < mobileDisplay"
-        :style="{'z-index': windowWidth < mobileDisplay ? 2 : 2}"
+        :style="{'z-index': windowWidth < mobileDisplay ? 2 : 1}"
         @setting-click="Go(`/settings`)"
         @back="$Back"
     >
@@ -120,7 +120,7 @@
                         <nav-empty v-show="treeList.length === 0"></nav-empty>
                         <loading
                             v-show="SourceDisabled"
-                            :title="local('Choose a source to start.')"
+                            :title="treeList.length === 0 ? local('Choose a source to start.') : local('Init a source to start.')"
                         ></loading>
                     </div>
                 </transition>
