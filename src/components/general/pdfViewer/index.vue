@@ -2,6 +2,7 @@
     <div
         class="fabulous-pdf-container"
         :class="[{dark: theme === 'dark'}]"
+        @mousewheel="onMouseWheel"
     >
         <div
             class="pdf-display-scroll-view"
@@ -555,6 +556,16 @@ export default {
             if (this.currentScale + this.additionScaleRatio > 0.6) {
                 this.additionScaleRatio -= 0.3;
                 this.widthFormat();
+            }
+        },
+        onMouseWheel(event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                if (event.deltaY > 0) {
+                    this.scaleDown();
+                } else {
+                    this.scaleUp();
+                }
             }
         },
         tryFindTextLayerIndex(node) {

@@ -4,6 +4,7 @@ export const config = {
     data_index: -1,
     language: "en",
     autoSave: false,
+    lastLocalPath: "",
     dynamicEffect: true,
     themeColorList: [],
     theme: "light"

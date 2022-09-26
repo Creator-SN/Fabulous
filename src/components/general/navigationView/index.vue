@@ -346,6 +346,14 @@ export default {
         windowWidth() {
             if (this.windowWidth > this.mobileDisplay) this.expand = true;
         },
+        localPath() {
+            this.reviseConfig({
+                lastLocalPath: this.localPath,
+            });
+        },
+        lastLocalPath() {
+            this.localPath = this.lastLocalPath;
+        },
     },
     computed: {
         ...mapState({
@@ -353,6 +361,7 @@ export default {
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
             language: (state) => state.config.language,
+            lastLocalPath: (state) => state.config.lastLocalPath,
             ds_id: (state) => state.data_structure.id,
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
@@ -387,9 +396,11 @@ export default {
     },
     mounted() {
         this.refreshTreeList();
+        this.localPath = this.lastLocalPath;
     },
     methods: {
         ...mapMutations({
+            reviseConfig: "reviseConfig",
             reviseData: "reviseData",
             reviseI18N: "reviseI18N",
         }),

@@ -339,17 +339,17 @@ async function createWindow() {
     let positionInfo = () => {
         let position = win.getPosition();
         let displays = screen.getAllDisplays();
-        let maxXDisplay = displays[0];
-        let maxYDisplay = displays[0];
-        displays.sort((a, b) => b.bounds.x - a.bounds.x);
-        maxXDisplay = displays[0];
-        displays.sort((a, b) => b.bounds.y - a.bounds.y);
-        maxYDisplay = displays[0];
+        let totalScreenWidth = 0;
+        let totalScreenHeight = 0;
+        displays.forEach(display => {
+            totalScreenWidth += display.bounds.width;
+            totalScreenHeight += display.bounds.height;
+        });
         return {
             left: position[0],
             top: position[1],
-            totalScreenWidth: maxXDisplay.bounds.x + maxXDisplay.bounds.width,
-            totalScreenHeight: maxYDisplay.bounds.y + maxYDisplay.bounds.height
+            totalScreenWidth: totalScreenWidth,
+            totalScreenHeight: totalScreenHeight
         }
 
     }
