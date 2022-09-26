@@ -215,10 +215,11 @@ export default {
                 if (df.items !== undefined) {
                     for (let i = 0; i < df.items.length; i++) {
                         let item = df.items[i];
+                        let fileEntry = item.webkitGetAsEntry();
                         // 用webkitGetAsEntry禁止上传目录
                         if (
                             item.kind === "file" &&
-                            item.webkitGetAsEntry().isFile &&
+                            fileEntry.isFile &&
                             item.type === "application/pdf"
                         ) {
                             let file = item.getAsFile();

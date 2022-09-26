@@ -259,6 +259,21 @@ async function createWindow() {
         });
     });
 
+    ipcMain.on("move-file", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.move(obj.src, obj.tgt, err => {
+            if (err) return event.reply(`move-file-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`move-file-${obj.id}`, {
+                status: 200,
+                target: obj.target,
+            });
+        });
+    });
+
     ipcMain.on("open-file", (event, obj) => {
         if (!obj.id) obj.id = 'callback';
         fs.access(obj.path, err => {
@@ -280,20 +295,24 @@ async function createWindow() {
         });
     });
 
+    let chokidarWatcher = null;
     ipcMain.on("watch-path", async (event, obj) => {
         if (!obj.id) obj.id = 'callback';
         try {
-            await new Promise(resolve => {
-                chokidar.close().then(() => {
-                    console.log('change-path', obj.path);
-                    resolve(0);
+            if (!chokidarWatcher) console.log('not watching yet');
+            else {
+                await new Promise(resolve => {
+                    chokidarWatcher.close().then(() => {
+                        console.log('change-path', obj.path);
+                        resolve(0);
+                    });
                 });
-            });
+            }
         }
         catch (e) {
-            console.log('not watching yet');
+            console.log('not watching yet', e);
         }
-        chokidar.watch(obj.path).on('all', (event, p) => {
+        chokidarWatcher = chokidar.watch(obj.path).on('all', (event, p) => {
             if (event === 'add' || event === 'addDir') {
                 let fileObj = {};
                 fs.stat(p, (error, stats) => {

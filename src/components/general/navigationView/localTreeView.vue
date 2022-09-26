@@ -13,6 +13,7 @@
             <template v-slot:default="x">
                 <div
                     class="tree-view-custom-item"
+                    :style="{opacity: copyList.find(it => it.path === x.item.filePath && it.type === 'move') ? 0.6 : ''}"
                     @contextmenu="rightClick($event, x.item)"
                 >
                     <div class="tree-view-item-left-block">
@@ -109,6 +110,32 @@
                     ></i>
                     <p>{{local("New Folder")}}</p>
                 </span>
+                <hr v-show="rightMenuItem.isDir">
+                <span @click="copy(rightMenuItem)">
+                    <i
+                        class="ms-Icon ms-Icon--Copy"
+                        style="color: rgba(0, 98, 158, 1);"
+                    ></i>
+                    <p>{{local("Copy")}}</p>
+                </span>
+                <span @click="move(rightMenuItem)">
+                    <i
+                        class="ms-Icon ms-Icon--Cut"
+                        style="color: rgba(0, 98, 158, 1);"
+                    ></i>
+                    <p>{{local("Cut")}}</p>
+                </span>
+                <span
+                    v-show="rightMenuItem.isDir && copyList.length > 0"
+                    @click="paste(rightMenuItem)"
+                >
+                    <i
+                        class="ms-Icon ms-Icon--Paste"
+                        style="color: rgba(0, 98, 158, 1);"
+                    ></i>
+                    <p>{{local("Paste")}}</p>
+                </span>
+                <hr>
                 <span @click="openFile(rightMenuItem)">
                     <img
                         draggable="false"
@@ -176,6 +203,7 @@ export default {
                 note: noteImg,
             },
             FLAT: [],
+            copyList: [],
             posX: 0,
             posY: 0,
             rightMenuItem: {},
@@ -192,15 +220,7 @@ export default {
         path(val) {
             this.$emit("input", val);
             if (!val) return;
-            this.treeList = [];
-            this.FLAT = [];
-            if (val) {
-                ipc.send("watch-path", {
-                    id: "localTree",
-                    path: val.replace(/\\/g, "/"),
-                    target: null,
-                });
-            }
+            this.refreshFolder();
         },
     },
     computed: {
@@ -230,6 +250,7 @@ export default {
     },
     mounted() {
         this.eventInit();
+        this.refreshFolder();
     },
     methods: {
         // t() {
@@ -257,6 +278,42 @@ export default {
                         });
                         return;
                     }
+                }
+            );
+            ipc.on(
+                "copy-file-localTree",
+                (event, { status, target, message }) => {
+                    if (!target) return;
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Copy File Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    let targetItem = this.FLAT.find((it) =>
+                        this.comparePath(it.filePath, target.filePath)
+                    );
+                    targetItem.expanded = true;
+                    this.$refs.tree.$forceUpdate();
+                }
+            );
+            ipc.on(
+                "move-file-localTree",
+                (event, { status, target, message }) => {
+                    if (!target) return;
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Move File Failed`), {
+                            status: "warning",
+                        });
+                        return;
+                    }
+                    let targetItem = this.FLAT.find((it) =>
+                        this.comparePath(it.filePath, target.filePath)
+                    );
+                    targetItem.expanded = true;
+                    this.$refs.tree.$forceUpdate();
                 }
             );
             ipc.on(
@@ -366,6 +423,17 @@ export default {
             ).filePaths[0];
             if (!path) return;
             this.path = path;
+        },
+        refreshFolder() {
+            this.treeList = [];
+            this.FLAT = [];
+            if (this.path) {
+                ipc.send("watch-path", {
+                    id: "localTree",
+                    path: this.path.replace(/\\/g, "/"),
+                    target: null,
+                });
+            }
         },
         hotPushFLAT(item) {
             let index = this.FLAT.findIndex((it) =>
@@ -600,6 +668,50 @@ export default {
                     path: target.filePath,
                     target,
                 });
+            }
+        },
+        copy(target) {
+            this.copyList = [
+                {
+                    type: "copy",
+                    name: target.name,
+                    path: target.filePath,
+                },
+            ];
+        },
+        move(target) {
+            this.copyList = [
+                {
+                    type: "move",
+                    name: target.name,
+                    path: target.filePath,
+                },
+            ];
+        },
+        paste(target) {
+            if (!target.isDir) return;
+            for (let item of this.copyList) {
+                if (item.type === "copy") {
+                    ipc.send("copy-file", {
+                        id: "localTree",
+                        src: item.path,
+                        tgt:
+                            target.filePath.replace(/\\/g, "/") +
+                            `/${item.name}`,
+                        target,
+                    });
+                    this.copyList = [];
+                } else if (item.type === "move") {
+                    ipc.send("move-file", {
+                        id: "localTree",
+                        src: item.path,
+                        tgt:
+                            target.filePath.replace(/\\/g, "/") +
+                            `/${item.name}`,
+                        target,
+                    });
+                    this.copyList = [];
+                }
             }
         },
         rightClick(event, item) {

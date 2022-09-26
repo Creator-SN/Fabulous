@@ -2,6 +2,7 @@
     <div
         class="fabulous-home-container"
         :class="[{dark: theme === 'dark'}]"
+        @mousewheel="onMouseWheel"
     >
         <div class="control-banner">
             <div class="control-left-block">
@@ -167,6 +168,31 @@
                 r="20"
                 borderWidth="5"
             ></fv-progress-ring>
+        </div>
+        <div
+            class="bottom-control"
+            :class="[{dark: theme == 'dark'}, {close: !show.bottomControl}]"
+        >
+            <i
+                class="ms-Icon trigger"
+                :class="[`ms-Icon--${show.bottomControl ? 'ChevronRightMed' : 'ChevronLeftMed'}`]"
+                style="flex: 1;"
+                @click="show.bottomControl ^= true"
+            ></i>
+            <fv-slider
+                v-show="show.bottomControl"
+                v-model="fontSize"
+                :mininum="12"
+                :maxinum="72"
+                icon="RadioBullet"
+                color="rgba(87, 156, 193, 1)"
+                :showLabel="true"
+                style="width: 150px; margin-right: 15px;"
+            >
+                <template slot-scope="prop">
+                    <p style="margin: 5px;">{{prop.value}}px</p>
+                </template>
+            </fv-slider>
         </div>
     </div>
 </template>
@@ -386,6 +412,16 @@ export default {
                 data: JSON.stringify(saveContent),
             });
         },
+        onMouseWheel(event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                if (event.deltaY > 0 && this.fontSize > 12) {
+                    this.fontSize -= 1;
+                } else if (this.fontSize < 72) {
+                    this.fontSize += 1;
+                }
+            }
+        },
         upgrade() {
             this.contentType = "fabulous_notebook";
             this.fabulousNotebook.title = "";
@@ -543,7 +579,7 @@ export default {
     .fabulous-notebook-banner-img {
         position: relative;
         width: calc(100% - 30px);
-        height: 300px;
+        height: auto;
         margin-left: 15px;
         margin-top: 25px;
         border-radius: 6px;

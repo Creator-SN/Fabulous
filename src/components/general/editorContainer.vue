@@ -4,6 +4,7 @@
             v-show="show_editor"
             class="fabulous-editor-container"
             :class="[{ dark: theme == 'dark' }]"
+            @mousewheel="onMouseWheel"
         >
             <dynamic-b-g
                 :theme="theme"
@@ -747,6 +748,16 @@ export default {
                     editorContent.scrollTop =
                         editorContent.scrollTop + top - editorTop - 100;
                     break;
+                }
+            }
+        },
+        onMouseWheel(event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                if (event.deltaY > 0 && this.fontSize > 12) {
+                    this.fontSize -= 1;
+                } else if (this.fontSize < 72) {
+                    this.fontSize += 1;
                 }
             }
         },

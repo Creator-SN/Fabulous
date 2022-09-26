@@ -255,7 +255,7 @@ export default {
         "en": "Can't find data_structure.json on this source, shall we init new one ?",
         "cn": "无法在此数据源找到data_structure.json, 是否初始化新的配置?"
     },
-    "Init a source to start." : {
+    "Init a source to start.": {
         "en": "Init a source to start.",
         "cn": "初始化数据源以开始."
     },
@@ -655,4 +655,24 @@ export default {
         "en": "All Files",
         "cn": "所有文件"
     },
+    "Copy File Failed": {
+        "en": "Copy File Failed",
+        "cn": "复制文件失败"
+    },
+    "Move File Failed": {
+        "en": "Move File Failed",
+        "cn": "移动文件失败"
+    },
+    "Copy": {
+        "en": "Copy",
+        "cn": "复制"
+    },
+    "Cut": {
+        "en": "Cut",
+        "cn": "剪切"
+    },
+    "Paste": {
+        "en": "Paste",
+        "cn": "粘贴"
+    }
 }

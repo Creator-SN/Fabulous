@@ -154,6 +154,11 @@
                             @click="() => $refs.local_view.createFolder()"
                         ></i>
                         <i
+                            class="ms-Icon ms-Icon--Refresh more-menu-btn"
+                            :title="local('Refresh Folder')"
+                            @click="() => $refs.local_view.refreshFolder()"
+                        ></i>
+                        <i
                             class="ms-Icon ms-Icon--FolderOpen more-menu-btn"
                             :title="local('Choose Folder')"
                             @click="() => $refs.local_view.chooseFolder()"
