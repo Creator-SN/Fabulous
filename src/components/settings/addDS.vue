@@ -9,30 +9,37 @@
                 class="w-p-block"
                 @keyup.enter="addDS"
             >
-                <fv-text-box
-                    v-model="path"
-                    :placeholder="local('Choose Data Source Directory ...')"
-                    :theme="theme"
-                    :font-size="18"
-                    underline
-                    :border-radius="6"
-                    :focus-border-color="'rgba(123, 139, 209, 1)'"
-                    :is-box-shadow="true"
-                    readonly
-                    style="width: 100%; height: 50px; margin-top: 15px;"
-                    @click.native="choosePath"
-                ></fv-text-box>
+                <p class="w-title">{{local('Data Source Name')}}</p>
                 <fv-text-box
                     v-model="name"
                     :placeholder="local('New Data Source Name')"
                     :theme="theme"
-                    :font-size="18"
+                    :font-size="15"
                     underline
                     :border-radius="6"
+                    :border-color="'rgba(123, 139, 209, 0.6)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
-                    style="width: 100%; height: 50px; margin-top: 25px;"
+                    style="width: 90%; height: 45px; margin-top: 5px;"
                     @keyup.enter="addDS"
+                ></fv-text-box>
+                <p class="w-title" style="margin-top: 25px;">{{local('Choose Folder')}}</p>
+                <fv-text-box
+                    v-model="path"
+                    :placeholder="local('Choose Data Source Directory ...')"
+                    :theme="theme"
+                    :font-size="12"
+                    :border-radius="6"
+                    background="transparent"
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
+                    :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
+                    :reveal-border="true"
+                    :is-box-shadow="true"
+                    readonly
+                    style="width: 90%; height: 45px; margin-top: 5px;"
+                    @click.native="choosePath"
                 ></fv-text-box>
             </div>
         </template>

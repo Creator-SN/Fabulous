@@ -74,21 +74,21 @@
                 ></fv-img>
                 <p class="title">{{local(`New Data Source`)}}</p>
                 <fv-text-box
+                    v-model="name"
+                    :placeholder="local('New Data Source Name')"
+                    background="rgba(255, 255, 255, 0.6)"
+                    :reveal-border="true"
+                    @keyup.enter="addSource"
+                ></fv-text-box>
+                <fv-text-box
                     v-model="path"
                     :placeholder="local('Choose Data Source Directory ...')"
                     theme="dark"
                     background="rgba(0, 130, 180, 0.3)"
                     :reveal-border="true"
                     readonly
-                    @click.native="choosePath"
-                ></fv-text-box>
-                <fv-text-box
-                    v-model="name"
-                    :placeholder="local('New Data Source Name')"
-                    background="rgba(255, 255, 255, 0.6)"
-                    :reveal-border="true"
                     style="margin-top: 5px; margin-bottom: 15px;"
-                    @keyup.enter="addSource"
+                    @click.native="choosePath"
                 ></fv-text-box>
                 <fv-button
                     theme="dark"
@@ -102,7 +102,7 @@
                     icon="Attach"
                     background="rgba(29, 85, 125, 0.3)"
                     class="starter-btn"
-                    @click="step = 3"
+                    @click="() => {path = ''; step = 3;}"
                 >{{local('Exists Data Source')}}</fv-button>
             </div>
         </transition>

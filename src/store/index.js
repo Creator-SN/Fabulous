@@ -16,6 +16,8 @@ export default new Vuex.Store({
             language: 'en',
             autoSave: false,
             lastLocalPath: '',
+            editorExpandContent: false,
+            activeSystemMode: 'both', // ds, notebook, both
             dynamicEffect: true,
             themeColorList: [],
             theme: 'light'
@@ -97,7 +99,8 @@ export default new Vuex.Store({
                 if (!Object.prototype.hasOwnProperty.call(state.data_structure, key))
                     continue;
                 state.data_structure[key] = obj[key];
-                state.DataDB.set(key, state.data_structure[key]).write();
+                if (state.DataDB)
+                    state.DataDB.set(key, state.data_structure[key]).write();
             }
         },
         reviseEditor(state, obj) {

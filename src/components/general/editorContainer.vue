@@ -366,6 +366,14 @@ export default {
         "pdfNoteInfo.version"() {
             this.scrollToPDFNote();
         },
+        expandContent(val) {
+            this.reviseConfig({
+                editorExpandContent: val,
+            });
+        },
+        editorExpandContent(val) {
+            this.expandContent = val;
+        },
     },
     computed: {
         ...mapState({
@@ -375,6 +383,7 @@ export default {
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
             dynamicEffect: (state) => state.config.dynamicEffect,
+            editorExpandContent: (state) => state.config.editorExpandContent,
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
             show_editor: (state) => state.editor.show,
@@ -477,6 +486,7 @@ export default {
     },
     mounted() {
         this.eventInit();
+        this.configInit();
         this.ShortCutInit();
         this.TimeoutInit();
     },
@@ -534,6 +544,10 @@ export default {
                     return;
                 }
             });
+        },
+        configInit () {
+            this.auto_save = this.autoSave;
+            this.expandContent = this.editorExpandContent;
         },
         TimeoutInit() {
             this.timeout.autoSave = setInterval(this.editorSave, 10000);

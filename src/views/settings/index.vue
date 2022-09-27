@@ -105,6 +105,26 @@
             <fv-Collapse
                 :disabledCollapse="true"
                 :theme="theme"
+                :icon="'Manage'"
+                :title="local('System Mode')"
+                :content="local('Switch System Mode')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <fv-Combobox
+                        v-model="cur_active_system_mode"
+                        :theme="theme"
+                        :options="active_system_modes"
+                        :placeholder="local('Choose A Mode')"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        style="width: 120px;"
+                        @choose-item="chooseSystemMode"
+                    ></fv-Combobox>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
                 :icon="'Save'"
                 :title="local('Auto Save')"
                 :content="local('Auto Save')"
@@ -116,6 +136,26 @@
                         v-model="auto_save"
                         :on="local('Turn Off Auto Save')"
                         :off="local('Turn On Auto Save')"
+                        :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                        :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    >
+                    </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="editor_expand_content ? 'StaplingLandscapeTwoTop' : 'StaplingPortraitBookBinding'"
+                :title="local('Editor Content Expand')"
+                :content="local('Switch Editor Content Expand')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <fv-toggle-switch
+                        :title="local('Enable Reference Management System')"
+                        v-model="editor_expand_content"
+                        :on="local('Expand Mode')"
+                        :off="local('Collaspe Mode')"
                         :onForeground="theme === 'dark' ? '#fff' : '#000'"
                         :offForeground="theme === 'dark' ? '#fff' : '#000'"
                     >
@@ -253,9 +293,19 @@ export default {
                 { key: "en", text: "English" },
                 { key: "cn", text: "简体中文" },
             ],
+            cur_active_system_mode: {},
+            active_system_modes: [
+                {
+                    key: "ds",
+                    text: () => this.local("Reference Management System"),
+                },
+                { key: "notebook", text: () => this.local("Notebook System") },
+                { key: "both", text: () => this.local("Both Systems") },
+            ],
             thisPathList: [],
             auto_save: false,
             dynamic_effect: true,
+            editor_expand_content: false,
             db_index: -1,
             img: {
                 OneDrive,
@@ -271,7 +321,7 @@ export default {
     },
     watch: {
         $route() {
-            this.languageInit();
+            this.configInit();
             this.refreshDBList();
         },
         data_path() {
@@ -281,19 +331,29 @@ export default {
             this.refreshDBList();
         },
         language() {
-            this.languageInit();
+            this.configInit();
         },
         auto_save() {
             this.switchAutoSave();
         },
         autoSave() {
-            this.auto_save = this.autoSave;
+            this.configInit();
         },
         dynamic_effect() {
             this.switchDynamicEffect();
         },
         dynamicEffect() {
-            this.dynamic_effect = this.dynamicEffect;
+            this.configInit();
+        },
+        editor_expand_content() {
+            this.switchEditorExpandContent();
+        },
+        activeSystemMode() {
+            this.configInit();
+            this.refreshDBList();
+        },
+        editorExpandContent() {
+            this.configInit();
         },
         "show.initDS"() {
             this.refreshDBList();
@@ -307,6 +367,8 @@ export default {
             DataDB: (state) => state.DataDB,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
+            activeSystemMode: (state) => state.config.activeSystemMode,
+            editorExpandContent: (state) => state.config.editorExpandContent,
             dynamicEffect: (state) => state.config.dynamicEffect,
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
@@ -323,10 +385,8 @@ export default {
         },
     },
     mounted() {
-        this.languageInit();
+        this.configInit();
         this.refreshDBList();
-        this.auto_save = this.autoSave;
-        this.dynamic_effect = this.dynamicEffect;
     },
     methods: {
         ...mapMutations({
@@ -335,10 +395,16 @@ export default {
             toggleTheme: "toggleTheme",
             syncDS: "syncDS",
         }),
-        languageInit() {
+        configInit() {
             this.cur_language = this.languages.find(
                 (item) => item.key === this.language
             );
+            this.cur_active_system_mode = this.active_system_modes.find(
+                (item) => item.key === this.activeSystemMode
+            );
+            this.auto_save = this.autoSave;
+            this.dynamic_effect = this.dynamicEffect;
+            this.editor_expand_content = this.editorExpandContent;
         },
         chooseLanguage(item) {
             this.reviseConfig({
@@ -348,6 +414,7 @@ export default {
         refreshDBList() {
             // 此函数初始化数据源的DB //
             // 同时也会初始化ListView列表项目 //
+            if (this.activeSystemMode === "notebook") return;
             let pathList = this.data_path;
             if (pathList.length === 0) {
                 this.$barWarning(
@@ -356,9 +423,10 @@ export default {
                     ),
                     {
                         status: "warning",
-                        autoClose: -1,
+                        // autoClose: -1,
                     }
                 );
+                this.thisPathList = [];
                 return;
             }
             let thisPathList = [];
@@ -382,6 +450,16 @@ export default {
         switchDynamicEffect() {
             this.reviseConfig({
                 dynamicEffect: this.dynamic_effect,
+            });
+        },
+        chooseSystemMode(item) {
+            this.reviseConfig({
+                activeSystemMode: item.key,
+            });
+        },
+        switchEditorExpandContent() {
+            this.reviseConfig({
+                editorExpandContent: this.editor_expand_content,
             });
         },
         addSource() {

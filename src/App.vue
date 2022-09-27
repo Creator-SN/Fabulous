@@ -135,7 +135,13 @@ export default {
         dataDBInit() {
             let pathList = this.data_path;
             let dataDB = null;
-            if (!pathList || pathList.length === 0) return;
+            if (!pathList || pathList.length === 0) {
+                this.initDB({
+                    DataDB: null,
+                });
+                this.reviseData(Object.assign({}, data_structure));
+                return;
+            }
             if (this.data_index >= pathList.length || this.data_index < 0) {
                 dataDB = this.$DBM.getDataDB(pathList[0]);
             } else dataDB = this.$DBM.getDataDB(pathList[this.data_index]);
@@ -204,7 +210,18 @@ export default {
             );
 
             this.$el.addEventListener("drop", (e) => {
-                if (this.show_editor) return;
+                if (this.show_editor) {
+                    this.show.drop = false;
+                    return;
+                }
+                if (this.$route.path.startsWith("/notebook")) {
+                    this.show.drop = false;
+                    return;
+                }
+                if (!this.DataDB) {
+                    this.show.drop = false;
+                    return;
+                }
                 e.preventDefault();
                 e.stopPropagation();
 

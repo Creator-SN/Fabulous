@@ -173,7 +173,7 @@ export default {
     },
     "Link Exists Source": {
         "en": "Link Exists Source",
-        "cn": "关联已有数据源"
+        "cn": "打开已有源"
     },
     "Theme": {
         "en": "Theme",
@@ -313,7 +313,7 @@ export default {
     },
     "New Data Source Name": {
         "en": "New Data Source Name",
-        "cn": "取个响亮的名称"
+        "cn": "数据源名称"
     },
     "Exists Data Source": {
         "en": "Exists Data Source",
@@ -674,5 +674,49 @@ export default {
     "Paste": {
         "en": "Paste",
         "cn": "粘贴"
+    },
+    "Refresh Folder": {
+        "en": "Refresh Folder",
+        "cn": "刷新文件夹"
+    },
+    "Paste to Root": {
+        "en": "Paste to Root",
+        "cn": "粘贴根目录"
+    },
+    "Reference Management System": {
+        "en": "Reference Management System",
+        "cn": "文献管理系统"
+    },
+    "Notebook System": {
+        "en": "Notebook System",
+        "cn": "笔记本系统"
+    },
+    "Enable Reference Management System": {
+        "en": "Enable Reference Management System",
+        "cn": "启用文献管理系统"
+    },
+    "Enable Notebook System": {
+        "en": "Enable Notebook System",
+        "cn": "启用笔记本系统"
+    },
+    "Turn Off": {
+        "en": "Turn Off",
+        "cn": "关闭"
+    },
+    "Turn On": {
+        "en": "Turn On",
+        "cn": "开启"
+    },
+    "System Mode": {
+        "en": "System Mode",
+        "cn": "系统模式"
+    },
+    "Switch System Mode": {
+        "en": "Switch System Mode",
+        "cn": "切换系统模式"
+    },
+    "Both Systems": {
+        "en": "Both Systems",
+        "cn": "全部开启"
     }
 }

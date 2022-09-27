@@ -258,11 +258,20 @@ export default {
         autoSave() {
             this.auto_save = this.autoSave;
         },
+        expandContent(val) {
+            this.reviseConfig({
+                editorExpandContent: val,
+            });
+        },
+        editorExpandContent(val) {
+            this.expandContent = val;
+        },
     },
     computed: {
         ...mapState({
             autoSave: (state) => state.config.autoSave,
             language: (state) => state.config.language,
+            editorExpandContent: (state) => state.config.editorExpandContent,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local"]),
@@ -280,6 +289,7 @@ export default {
     },
     mounted() {
         this.eventInit();
+        this.configInit();
         this.ShortCutInit();
         this.timerInit();
         this.refreshPath();
@@ -326,6 +336,10 @@ export default {
                 if (this.fabulousNotebook.content === "")
                     this.$refs.editor.focus();
             });
+        },
+        configInit () {
+            this.auto_save = this.autoSave;
+            this.expandContent = this.editorExpandContent;
         },
         timerInit() {
             clearInterval(this.timer.autoSave);

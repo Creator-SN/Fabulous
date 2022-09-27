@@ -5,6 +5,8 @@ export const config = {
     language: "en",
     autoSave: false,
     lastLocalPath: "",
+    editorExpandContent: false,
+    activeSystemMode: 'both', // ds, notebook, both
     dynamicEffect: true,
     themeColorList: [],
     theme: "light"

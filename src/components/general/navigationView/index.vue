@@ -34,7 +34,7 @@
                 ref="view"
             >
                 <div
-                    v-show="expand"
+                    v-show="expand && activeSystemMode !== 'notebook'"
                     class="navigation-view-mode-block"
                     :class="[{dark: theme === 'dark'}]"
                     @click="menuDisplayMode = 0"
@@ -57,7 +57,7 @@
                 </div>
                 <transition name="expand-top-to-bottom">
                     <div
-                        v-show="menuDisplayMode === 0"
+                        v-show="computeDisplay('ds')"
                         class="navigation-view-tree-view-block"
                     >
                         <fv-TreeView
@@ -125,7 +125,7 @@
                     </div>
                 </transition>
                 <div
-                    v-show="expand"
+                    v-show="expand && activeSystemMode !== 'ds'"
                     class="navigation-view-mode-block"
                     :class="[{dark: theme === 'dark'}]"
                     @click="menuDisplayMode = 1"
@@ -167,7 +167,7 @@
                 </div>
                 <transition name="expand-bottom-to-top">
                     <local-tree-view
-                        v-show="menuDisplayMode === 1"
+                        v-show="computeDisplay('notebook')"
                         v-model="localPath"
                         :theme="theme"
                         :local="local"
@@ -175,11 +175,34 @@
                     ></local-tree-view>
                 </transition>
                 <div
+                    v-show="computeDisplay('ds')"
                     class="navigation-view-command-bar-block"
                     :class="[{dark: theme === 'dark'}]"
                 >
                     <div
-                        v-for="(item, index) in cmdList"
+                        v-for="(item, index) in dsCmdList"
+                        :key="`command-bar-item: ${index}`"
+                        class="command-item"
+                        :class="[{disabled: item.disabled()}]"
+                        @click="() => {item.disabled() ? null : item.func()}"
+                    >
+                        <span class="command-item-icon">
+                            <img
+                                :src="img[item.img]"
+                                alt=""
+                                class="icon-img"
+                            >
+                        </span>
+                        <p class="command-item-content">{{item.name()}}</p>
+                    </div>
+                </div>
+                <div
+                    v-show="computeDisplay('notebook')"
+                    class="navigation-view-command-bar-block"
+                    :class="[{dark: theme === 'dark'}]"
+                >
+                    <div
+                        v-for="(item, index) in notebookCmdList"
                         :key="`command-bar-item: ${index}`"
                         class="command-item"
                         :class="[{disabled: item.disabled()}]"
@@ -274,6 +297,9 @@ import notebook from "@/assets/nav/notebook.svg";
 import groupImg from "@/assets/nav/group.svg";
 import partitionImg from "@/assets/nav/partition.svg";
 import templatesImg from "@/assets/nav/template.svg";
+import folderImg from "@/assets/nav/folder.svg";
+import refreshImg from "@/assets/nav/refresh.svg";
+import pasteImg from "@/assets/nav/paste.svg";
 import allImg from "@/assets/nav/all.svg";
 
 export default {
@@ -292,7 +318,7 @@ export default {
     data() {
         return {
             expand: true,
-            cmdList: [
+            dsCmdList: [
                 {
                     name: () => this.local("Add Partition"),
                     func: this.addPartition,
@@ -320,12 +346,40 @@ export default {
                     disabled: () => this.SourceDisabled,
                 },
             ],
+            notebookCmdList: [
+                {
+                    name: () => this.local("Choose Folder"),
+                    func: () => this.$refs.local_view.chooseFolder(),
+                    img: "folder",
+                    disabled: () => false,
+                    iconColor: "rgba(213, 99, 70, 1)",
+                },
+                {
+                    name: () => this.local("Refresh Folder"),
+                    func: () => this.$refs.local_view.refreshFolder(),
+                    img: "refresh",
+                    disabled: () => !this.localPath,
+                    iconColor: "rgba(172, 84, 206, 1)",
+                },
+                {
+                    name: () => this.local("Paste to Root"),
+                    img: "paste",
+                    func: () => this.$refs.local_view.rootPaste(),
+                    disabled: () =>
+                        this.$refs.local_view
+                            ? this.$refs.local_view.rootPasteDisabled()
+                            : true,
+                },
+            ],
             img: {
                 dataSource,
                 notebook,
                 group: groupImg,
                 partition: partitionImg,
                 templates: templatesImg,
+                folder: folderImg,
+                refresh: refreshImg,
+                paste: pasteImg,
                 all: allImg,
             },
             treeList: [],
@@ -367,6 +421,7 @@ export default {
             data_index: (state) => state.config.data_index,
             language: (state) => state.config.language,
             lastLocalPath: (state) => state.config.lastLocalPath,
+            activeSystemMode: (state) => state.config.activeSystemMode,
             ds_id: (state) => state.data_structure.id,
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
@@ -397,6 +452,20 @@ export default {
         localPathFolderName() {
             let pathList = this.localPath.split(/[\\/]/);
             return pathList[pathList.length - 1];
+        },
+        computeDisplay() {
+            return (name) => {
+                if (name === "ds") {
+                    if (this.activeSystemMode === "ds") return true;
+                    if (this.activeSystemMode === "notebook") return false;
+                    return this.menuDisplayMode === 0;
+                }
+                if (name === "notebook") {
+                    if (this.activeSystemMode === "ds") return false;
+                    if (this.activeSystemMode === "notebook") return true;
+                    return this.menuDisplayMode === 1;
+                }
+            };
         },
     },
     mounted() {
@@ -850,7 +919,7 @@ export default {
         .navigation-view-command-bar-block {
             position: relative;
             width: calc(100% - 40px);
-            height: 200px;
+            height: auto;
             margin: 20px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;

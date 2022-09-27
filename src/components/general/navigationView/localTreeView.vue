@@ -294,7 +294,7 @@ export default {
                     let targetItem = this.FLAT.find((it) =>
                         this.comparePath(it.filePath, target.filePath)
                     );
-                    targetItem.expanded = true;
+                    if (targetItem) targetItem.expanded = true;
                     this.$refs.tree.$forceUpdate();
                 }
             );
@@ -312,7 +312,7 @@ export default {
                     let targetItem = this.FLAT.find((it) =>
                         this.comparePath(it.filePath, target.filePath)
                     );
-                    targetItem.expanded = true;
+                    if (targetItem) targetItem.expanded = true;
                     this.$refs.tree.$forceUpdate();
                 }
             );
@@ -690,6 +690,37 @@ export default {
         },
         paste(target) {
             if (!target.isDir) return;
+            for (let item of this.copyList) {
+                if (item.type === "copy") {
+                    ipc.send("copy-file", {
+                        id: "localTree",
+                        src: item.path,
+                        tgt:
+                            target.filePath.replace(/\\/g, "/") +
+                            `/${item.name}`,
+                        target,
+                    });
+                    this.copyList = [];
+                } else if (item.type === "move") {
+                    ipc.send("move-file", {
+                        id: "localTree",
+                        src: item.path,
+                        tgt:
+                            target.filePath.replace(/\\/g, "/") +
+                            `/${item.name}`,
+                        target,
+                    });
+                    this.copyList = [];
+                }
+            }
+        },
+        rootPasteDisabled() {
+            return this.copyList.length === 0;
+        },
+        rootPaste() {
+            let target = {
+                filePath: this.path,
+            };
             for (let item of this.copyList) {
                 if (item.type === "copy") {
                     ipc.send("copy-file", {

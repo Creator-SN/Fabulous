@@ -22,7 +22,11 @@ PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 import { DBManager } from "@/js/db.js";
 
-Vue.use(VueAxios, axios);
+const fab_axios = axios.create({
+    timeout: 5000
+});
+
+Vue.use(VueAxios, fab_axios);
 
 // Vue.use(VueFluent);
 Vue.use(PowerEditor);
@@ -33,7 +37,7 @@ new Vue({
     router,
     store,
     render: h => h(App),
-    beforeCreate () {
+    beforeCreate() {
         Vue.prototype.$PDFJS = PDFJS;
         Vue.prototype.$DBM = new DBManager();
         Vue.prototype.$Go = str => {
