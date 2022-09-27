@@ -171,7 +171,7 @@ import rightMenu from "@/components/general/rightMenu.vue";
 import { fabulous_notebook } from "@/js/data_sample.js";
 
 const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
+const { dialog, process } = require("@electron/remote");
 
 import folderImg from "@/assets/nav/folder.svg";
 import noteImg from "@/assets/nav/note.svg";
@@ -186,6 +186,9 @@ export default {
             default: () => {
                 return {};
             },
+        },
+        watchAllExtensions: {
+            default: false,
         },
         rightMenuWidth: {
             default: 200,
@@ -251,6 +254,7 @@ export default {
     mounted() {
         this.eventInit();
         this.refreshFolder();
+        this.openNotebook();
     },
     methods: {
         // t() {
@@ -428,9 +432,12 @@ export default {
             this.treeList = [];
             this.FLAT = [];
             if (this.path) {
+                // let computePath =
+                //     this.path.replace(/\\/g, "/") +
+                //     (this.watchAllExtensions ? "" : "/**/*.+(fbn|json|html)");
                 ipc.send("watch-path", {
                     id: "localTree",
-                    path: this.path.replace(/\\/g, "/"),
+                    path: this.path,
                     target: null,
                 });
             }
@@ -771,6 +778,15 @@ export default {
                 id: "local",
                 path: url,
             });
+        },
+        openNotebook() {
+            if (process.argv.length >= 2) {
+                let path = process.argv[1];
+                let url = `/notebook/${encodeURI(path.replace(/\//g, "\\"))}`;
+                setTimeout(() => {
+                    this.$Go(url);
+                }, 1000);
+            }
         },
     },
 };

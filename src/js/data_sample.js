@@ -8,6 +8,7 @@ export const config = {
     editorExpandContent: false,
     activeSystemMode: 'both', // ds, notebook, both
     dynamicEffect: true,
+    watchAllExtensions: false,
     themeColorList: [],
     theme: "light"
 }

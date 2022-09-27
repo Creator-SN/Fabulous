@@ -718,5 +718,33 @@ export default {
     "Both Systems": {
         "en": "Both Systems",
         "cn": "全部开启"
-    }
+    },
+    "Editor Content Expand": {
+        "en": "Editor Content Expand",
+        "cn": "编辑器内容展开"
+    },
+    "Switch Editor Content Expand": {
+        "en": "Switch Editor Content Expand",
+        "cn": "切换编辑器内容展开"
+    },
+    "Expand Mode": {
+        "en": "Expand Mode",
+        "cn": "展开模式"
+    },
+    "Collaspe Mode": {
+        "en": "Collaspe Mode",
+        "cn": "居中模式"
+    },
+    "Watch All Files": {
+        "en": "Watch All Files",
+        "cn": "监视所有文件"
+    },
+    "ON": {
+        "en": "ON",
+        "cn": "开启"
+    },
+    "OFF": {
+        "en": "OFF",
+        "cn": "关闭"
+    },
 }

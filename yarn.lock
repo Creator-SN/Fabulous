@@ -1015,10 +1015,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^0.9.4":
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-0.9.4.tgz#969cdbd9637a2c3eabd3a801d2955eff97d7f5c5"
-  integrity sha512-B08V3KggmAuRSLHPuYGN25612lCXCCXFNUGY3T1n49F5AuO1DShJmYfokzRy4U31W8/GLNXxlRwSCPTtaOvqGQ==
+"@creatorsn/powereditor@^0.9.5":
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-0.9.5.tgz#d8160ae1efb26c0a8b4419b10a7adce76a686229"
+  integrity sha512-op/Ry7IBbrvHQgUxIBBzbD+6xyAz7O9NPJtqGvMsiwAE4BIPZO7L6s6qdyg61ENGpqaNqB52i2ut0zbeVlzDyg==
   dependencies:
     "@tiptap/core" "^2.0.0-beta.183"
     "@tiptap/extension-bubble-menu" "^2.0.0-beta.60"

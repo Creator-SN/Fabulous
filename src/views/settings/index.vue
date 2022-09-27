@@ -152,7 +152,7 @@
             >
                 <template v-slot:extension>
                     <fv-toggle-switch
-                        :title="local('Enable Reference Management System')"
+                        :title="local('Switch Editor Content Expand')"
                         v-model="editor_expand_content"
                         :on="local('Expand Mode')"
                         :off="local('Collaspe Mode')"
@@ -237,6 +237,27 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
+                v-if="false"
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="'Diagnostic'"
+                :title="local('Watch All Files')"
+                :content="local('Switch whether to watch all extension files on Notebook system')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <fv-toggle-switch
+                        :title="local('Watch All Files')"
+                        v-model="watch_all_extensions"
+                        :on="local('ON')"
+                        :off="local('OFF')"
+                        :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                        :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    >
+                    </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
                 :disabledCollapse="true"
                 :theme="theme"
                 :icon="'DeveloperTools'"
@@ -306,6 +327,7 @@ export default {
             auto_save: false,
             dynamic_effect: true,
             editor_expand_content: false,
+            watch_all_extensions: false,
             db_index: -1,
             img: {
                 OneDrive,
@@ -355,6 +377,12 @@ export default {
         editorExpandContent() {
             this.configInit();
         },
+        watch_all_extensions() {
+            this.switchWatchAllExtensions();
+        },
+        watchAllExtensions() {
+            this.configInit();
+        },
         "show.initDS"() {
             this.refreshDBList();
         },
@@ -370,6 +398,7 @@ export default {
             activeSystemMode: (state) => state.config.activeSystemMode,
             editorExpandContent: (state) => state.config.editorExpandContent,
             dynamicEffect: (state) => state.config.dynamicEffect,
+            watchAllExtensions: (state) => state.config.watchAllExtensions,
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
         }),
@@ -405,6 +434,7 @@ export default {
             this.auto_save = this.autoSave;
             this.dynamic_effect = this.dynamicEffect;
             this.editor_expand_content = this.editorExpandContent;
+            this.watch_all_extensions = this.watchAllExtensions;
         },
         chooseLanguage(item) {
             this.reviseConfig({
@@ -460,6 +490,11 @@ export default {
         switchEditorExpandContent() {
             this.reviseConfig({
                 editorExpandContent: this.editor_expand_content,
+            });
+        },
+        switchWatchAllExtensions() {
+            this.reviseConfig({
+                watchAllExtensions: this.watch_all_extensions,
             });
         },
         addSource() {

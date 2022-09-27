@@ -36,7 +36,15 @@ module.exports = {
                     allowToChangeInstallationDirectory: true,
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true
-                }
+                },
+                fileAssociations: [
+                    {
+                        name: "Fabulous Notebook File",
+                        ext: "fbn",
+                        icon: "./logo.ico",
+                        description: "Fabulous Notebook File"
+                    }
+                ],
             }
         }
     }

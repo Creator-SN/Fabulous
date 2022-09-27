@@ -113,10 +113,12 @@
             <fv-text-Field
                 :placeholder="local('Input title here ...')"
                 v-model="fabulousNotebook.title"
+                :theme="theme"
                 :font-size="20"
                 :background="`transparent`"
                 :border-color="`rgba(246, 167, 197, 0.3)`"
                 :focus-border-color="`rgba(246, 167, 197, 0.8)`"
+                :border-width="2"
                 :readonly="readonly != false"
                 :reveal-border="true"
                 style="width: calc(100% - 20px); height: 60px; margin-left: 10px; margin-bottom: 5px;"
@@ -151,11 +153,13 @@
                         class="fabulous-notebook-banner-img"
                         @click.native="$refs.input.click()"
                     ></fv-img>
-                    <p
-                        v-show="readonly && fabulousNotebook.title"
-                        class="fabulous-notebook-readonly-title"
-                        :class="[{dark: theme === 'dark'}]"
-                    >{{fabulousNotebook.title}}</p>
+                    <div class="fabulous-notebook-readonly-title-block">
+                        <p
+                            v-show="readonly && fabulousNotebook.title"
+                            :class="[{dark: theme === 'dark'}]"
+                            :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
+                        >{{fabulousNotebook.title}}</p>
+                    </div>
                 </template>
             </power-editor>
         </div>
@@ -337,7 +341,7 @@ export default {
                     this.$refs.editor.focus();
             });
         },
-        configInit () {
+        configInit() {
             this.auto_save = this.autoSave;
             this.expandContent = this.editorExpandContent;
         },
@@ -609,7 +613,11 @@ export default {
         }
     }
 
-    .fabulous-notebook-readonly-title {
+    .fabulous-notebook-readonly-title-block {
+        @include Hcenter;
+
+        position: relative;
+        width: 100%;
         padding: 15px;
         font-size: 24px;
         font-weight: 600;

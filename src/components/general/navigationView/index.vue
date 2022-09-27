@@ -171,6 +171,7 @@
                         v-model="localPath"
                         :theme="theme"
                         :local="local"
+                        :watchAllExtensions="watchAllExtensions"
                         ref="local_view"
                     ></local-tree-view>
                 </transition>
@@ -422,6 +423,7 @@ export default {
             language: (state) => state.config.language,
             lastLocalPath: (state) => state.config.lastLocalPath,
             activeSystemMode: (state) => state.config.activeSystemMode,
+            watchAllExtensions: (state) => state.config.watchAllExtensions,
             ds_id: (state) => state.data_structure.id,
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
