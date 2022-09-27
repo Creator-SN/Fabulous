@@ -5,8 +5,8 @@ export class META_API {
     static async cref_getInfoByTitle(title, axios) {
         let baseUrl = "https://api.crossref.org/works";
         title = title.replace(/ +/g, "+");
-        try {
-            return await new Promise((resolve) => {
+        return await new Promise((resolve) => {
+            try {
                 axios
                     .get(
                         baseUrl,
@@ -26,10 +26,10 @@ export class META_API {
                         console.log(error);
                         resolve([]);
                     });
-            });
-        } catch (e) {
-            return [];
-        }
+            } catch (e) {
+                resolve([]);
+            }
+        });
     }
 
     static formatCref(data) {
@@ -74,8 +74,8 @@ export class META_API {
         let baseUrl =
             "https://api.semanticscholar.org/graph/v1/paper/search";
         title = title.replace(/ +/g, " ");
-        try {
-            return await new Promise((resolve) => {
+        return await new Promise((resolve) => {
+            try {
                 axios
                     .get(
                         baseUrl,
@@ -96,10 +96,10 @@ export class META_API {
                         console.log(error);
                         resolve([]);
                     });
-            });
-        } catch (e) {
-            return [];
-        }
+            } catch (e) {
+                resolve([]);
+            }
+        });
     }
 
     static formatSemanticScholar(data) {
@@ -133,8 +133,8 @@ export class META_API {
         let baseUrl =
             "https://api.datacite.org/dois";
         title = title.replace(/ +/g, " ");
-        try {
-            return await new Promise((resolve) => {
+        return await new Promise((resolve) => {
+            try {
                 axios
                     .get(
                         baseUrl,
@@ -154,10 +154,10 @@ export class META_API {
                         console.log(error);
                         resolve([]);
                     });
-            });
-        } catch (e) {
-            return [];
-        }
+            } catch (e) {
+                resolve([]);
+            }
+        });
     }
 
     static formatDataCite(data) {
