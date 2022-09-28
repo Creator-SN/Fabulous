@@ -90,6 +90,10 @@ jobs:
         id: tag
         uses: dawidd6/action-get-tag@v1
 
+      - name: list directory
+        run: |
+          ls ./dist_electron/
+
       - name: Rename
         run: |
           v=${{steps.tag.outputs.tag}}
