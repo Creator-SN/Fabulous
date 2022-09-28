@@ -90,6 +90,19 @@ jobs:
         id: tag
         uses: dawidd6/action-get-tag@v1
 
+      - name: Fetch action
+        id: pl
+        uses: Rishabh510/Path-lister-action@master
+        with:
+          path: './dist_electron'
+
+      - name: Output results
+        run: |
+          echo "Found ${{ steps.pl.outputs.path_count }} file(s) with this extension:"
+          for i in ${{ steps.pl.outputs.paths }}; do
+          echo $i
+          done
+
       - name: Rename
         run: |
           v=${{steps.tag.outputs.tag}}
