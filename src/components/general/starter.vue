@@ -68,6 +68,38 @@
                 v-show="step === 2"
                 class="item-block"
             >
+                <p class="title">{{local(`How you going to use Fabulous?`)}}</p>
+                <fv-img
+                    class="active-mode-img"
+                    :src="img[cur_active_system_mode.key]"
+                    style="width: 200px; height: auto;"
+                ></fv-img>
+                <fv-Combobox
+                    v-model="cur_active_system_mode"
+                    theme="dark"
+                    :options="active_system_modes"
+                    :placeholder="local('Choose A Mode')"
+                    background="rgba(36, 36, 36, 1)"
+                    style="margin-top: 35px;"
+                    @choose-item="chooseSystemMode"
+                ></fv-Combobox>
+                <fv-button
+                    theme="dark"
+                    background="rgba(0, 130, 180, 1)"
+                    class="starter-btn"
+                    style="margin-top: 25px;"
+                    @click="() => {
+                        if(activeSystemMode === 'notebook') close();
+                        else step++;
+                    }"
+                >{{local('Confirm')}}</fv-button>
+            </div>
+        </transition>
+        <transition name="scale-up-to-up">
+            <div
+                v-show="step === 3"
+                class="item-block"
+            >
                 <fv-img
                     :src="img.dataSource"
                     style="width: 120px; height: auto;"
@@ -102,13 +134,13 @@
                     icon="Attach"
                     background="rgba(29, 85, 125, 0.3)"
                     class="starter-btn"
-                    @click="() => {path = ''; step = 3;}"
+                    @click="() => {path = ''; step++;}"
                 >{{local('Exists Data Source')}}</fv-button>
             </div>
         </transition>
         <transition name="scale-up-to-up">
             <div
-                v-show="step === 3"
+                v-show="step === 4"
                 class="item-block"
             >
                 <fv-img
@@ -143,6 +175,9 @@ import logo from "../../assets/logo.svg";
 import languageImg from "@/assets/nav/language.svg";
 import dataSourceImg from "@/assets/nav/dataSource.svg";
 import linkImg from "@/assets/nav/link.svg";
+import refManagementImg from "@/assets/nav/refManagement.svg";
+import notebookImg from "@/assets/nav/notebook.svg";
+import allImg from "@/assets/nav/all.svg";
 
 import { mapMutations, mapState, mapGetters } from "vuex";
 import { data_structure } from "@/js/data_sample.js";
@@ -159,6 +194,9 @@ export default {
                 language: languageImg,
                 dataSource: dataSourceImg,
                 link: linkImg,
+                ds: refManagementImg,
+                notebook: notebookImg,
+                both: allImg,
             },
             step: 0,
             cur_language: {},
@@ -166,9 +204,26 @@ export default {
                 { key: "en", text: "English" },
                 { key: "cn", text: "简体中文" },
             ],
+            cur_active_system_mode: {},
+            active_system_modes: [
+                {
+                    key: "ds",
+                    text: () => this.local("Reference Management System"),
+                },
+                { key: "notebook", text: () => this.local("Notebook System") },
+                { key: "both", text: () => this.local("Both Systems") },
+            ],
             path: "",
             name: "",
         };
+    },
+    watch: {
+        language() {
+            this.configInit();
+        },
+        activeSystemMode() {
+            this.configInit();
+        },
     },
     computed: {
         ...mapState({
@@ -177,6 +232,7 @@ export default {
             DataDB: (state) => state.DataDB,
             dbList: (state) => state.dbList,
             language: (state) => state.config.language,
+            activeSystemMode: (state) => state.config.activeSystemMode,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -189,21 +245,29 @@ export default {
         },
     },
     mounted() {
-        this.languageInit();
+        this.configInit();
     },
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
             reviseData: "reviseData",
         }),
-        languageInit() {
+        configInit() {
             this.cur_language = this.languages.find(
                 (item) => item.key === this.language
+            );
+            this.cur_active_system_mode = this.active_system_modes.find(
+                (item) => item.key === this.activeSystemMode
             );
         },
         chooseLanguage(item) {
             this.reviseConfig({
                 language: item.key,
+            });
+        },
+        chooseSystemMode(item) {
+            this.reviseConfig({
+                activeSystemMode: item.key,
             });
         },
         async choosePath() {
@@ -331,6 +395,59 @@ export default {
             width: 150px;
             height: 40px;
             margin-bottom: 5px;
+        }
+    }
+
+    .active-mode-img {
+        animation: cute-mode 5s infinite ease-in-out;
+    }
+
+    @keyframes cute-mode {
+        0% {
+            transform: scaleY(1);
+            transform-origin: 50% 100%;
+        }
+
+        10% {
+            transform: scaleY(0.8);
+            transform-origin: 50% 100%;
+        }
+
+        20% {
+            transform: scaleY(0.9);
+            transform-origin: 50% 100%;
+        }
+
+        40% {
+            transform: scaleY(1.1);
+            transform-origin: 50% 100%;
+        }
+
+        60% {
+            transform: scaleY(0.8);
+            transform-origin: 50% 100%;
+        }
+
+        80% {
+            transform: scaleY(0.9);
+            transform-origin: 50% 100%;
+            transform: rotateY(0deg);
+        }
+
+        80% {
+            transform: scaleY(0.9);
+            transform-origin: 50% 100%;
+            transform: rotateX(30deg);
+        }
+
+        90% {
+            transform: rotateX(-30deg);
+            transform-origin: 50% 100%;
+        }
+
+        100% {
+            transform: scaleY(1);
+            transform-origin: 50% 100%;
         }
     }
 }

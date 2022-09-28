@@ -751,4 +751,8 @@ export default {
         "en": "Translator",
         "cn": "翻译"
     },
+    "How you going to use Fabulous?": {
+        "en": "How you going to use Fabulous?",
+        "cn": "你打算使用Fab做什么?"
+    }
 }
