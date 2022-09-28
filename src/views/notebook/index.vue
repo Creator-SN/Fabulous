@@ -116,11 +116,11 @@
                 :theme="theme"
                 :font-size="20"
                 :background="`transparent`"
-                :border-color="`rgba(246, 167, 197, 0.3)`"
-                :focus-border-color="`rgba(246, 167, 197, 0.8)`"
+                :border-color="`rgba(255, 180, 0, 0.3)`"
+                :focus-border-color="`rgba(255, 180, 0, 0.8)`"
                 :border-width="2"
+                :border-radius="6"
                 :readonly="readonly != false"
-                :reveal-border="true"
                 style="width: calc(100% - 20px); height: 60px; margin-left: 10px; margin-bottom: 5px;"
             ></fv-text-Field>
         </div>
@@ -303,6 +303,23 @@ export default {
             reviseConfig: "reviseConfig",
         }),
         eventInit() {
+            this.$el.addEventListener(
+                "dragenter",
+                (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                },
+                false
+            );
+            this.$el.addEventListener(
+                "dragover",
+                (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                },
+                false
+            );
+
             ipc.on("output-file-notebook", (event, { status, message }) => {
                 if (status !== 200) {
                     console.error(message);

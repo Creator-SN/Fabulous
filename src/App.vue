@@ -214,10 +214,10 @@ export default {
                     this.show.drop = false;
                     return;
                 }
-                if (this.$route.path.startsWith("/notebook")) {
-                    this.show.drop = false;
-                    return;
-                }
+                // if (this.$route.path.startsWith("/notebook")) {
+                //     this.show.drop = false;
+                //     return;
+                // }
                 if (!this.DataDB) {
                     this.show.drop = false;
                     return;
@@ -233,6 +233,8 @@ export default {
                     for (let i = 0; i < df.items.length; i++) {
                         let item = df.items[i];
                         let fileEntry = item.webkitGetAsEntry();
+                        let ext = fileEntry ? fileEntry.name.split(".") : [];
+                        ext = ext[ext.length - 1];
                         // 用webkitGetAsEntry禁止上传目录
                         if (
                             item.kind === "file" &&
@@ -241,6 +243,13 @@ export default {
                         ) {
                             let file = item.getAsFile();
                             files.push(file);
+                        } else if (ext === "fbn") {
+                            let file = item.getAsFile();
+                            let url = `/notebook/${encodeURI(
+                                file.path.replace(/\//g, "\\")
+                            )}`;
+                            if (this.$route.path === url) return;
+                            this.$Go(url);
                         }
                     }
                 }

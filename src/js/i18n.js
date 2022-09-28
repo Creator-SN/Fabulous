@@ -747,4 +747,8 @@ export default {
         "en": "OFF",
         "cn": "关闭"
     },
+    "Translator": {
+        "en": "Translator",
+        "cn": "翻译"
+    },
 }

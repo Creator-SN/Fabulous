@@ -107,15 +107,32 @@ async function createWindow() {
 
     ipcMain.on("ensure-file", (event, obj) => {
         if (!obj.id) obj.id = 'callback';
-        fs.ensureDir(obj.dir, err => {
-            if (err) event.reply(`ensure-folder-${obj.id}`, {
+        fs.ensureFile(obj.path, err => {
+            if (err) event.reply(`ensure-file-${obj.id}`, {
                 status: 500,
                 target: obj.target,
                 message: err
             });
-            else event.reply(`ensure-folder-${obj.id}`, {
+            else event.reply(`ensure-file-${obj.id}`, {
                 status: 200,
                 target: obj.target
+            });
+        });
+    });
+
+    ipcMain.on("exists-path", (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        fs.pathExists(obj.path, (err, exists) => {
+            if (err) event.reply(`exists-path-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                exists: exists,
+                message: err
+            });
+            else event.reply(`exists-path-${obj.id}`, {
+                status: 200,
+                target: obj.target,
+                exists: exists
             });
         });
     });
@@ -436,12 +453,13 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
     app.quit()
 } else {
-    app.on('second-instance', () => {
+    app.on('second-instance', (event, argv) => {
         // 当运行第二个实例时,将会聚焦到mainWindow这个窗口
         if (win) {
             if (win.isMinimized()) win.restore()
             win.focus()
             win.show()
+            win.webContents.send("open-notebook", argv)
         }
     })
     // 创建 myWindow, 加载应用的其余部分, etc...

@@ -416,6 +416,28 @@ export default {
                         }
                     }
                 }
+
+                ipc.on("open-notebook", async (event, argv) => {
+                    let id = this.$Guid();
+                    let path = argv[argv.length - 1];
+                    let url = `/notebook/${encodeURI(
+                        path.replace(/\//g, "\\")
+                    )}`;
+                    ipc.send("exists-path", {
+                        id: id,
+                        path,
+                    });
+                    await new Promise((resolve) => {
+                        ipc.on(`exists-path-${id}`, (event, { exists }) => {
+                            if (exists)
+                                setTimeout(() => {
+                                    if (this.$route.path === url) return;
+                                    this.$Go(url);
+                                }, 300);
+                            resolve(1);
+                        });
+                    });
+                });
                 this.$refs.tree.$forceUpdate();
             });
         },
@@ -629,7 +651,7 @@ export default {
             let fbn = JSON.parse(JSON.stringify(fabulous_notebook));
             let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
             fbn.id = this.$Guid();
-            fbn.title = target.name;
+            fbn.title = "";
             fbn.content = {
                 type: "doc",
                 content: [],
@@ -779,13 +801,25 @@ export default {
                 path: url,
             });
         },
-        openNotebook() {
+        async openNotebook() {
+            let id = this.$Guid();
             if (process.argv.length >= 2) {
                 let path = process.argv[1];
+                if (path === "dist_electron") return;
                 let url = `/notebook/${encodeURI(path.replace(/\//g, "\\"))}`;
-                setTimeout(() => {
-                    this.$Go(url);
-                }, 1000);
+                ipc.send("exists-path", {
+                    id: id,
+                    path,
+                });
+                await new Promise((resolve) => {
+                    ipc.on(`exists-path-${id}`, (event, { exists }) => {
+                        if (exists)
+                            setTimeout(() => {
+                                this.$Go(url);
+                            }, 300);
+                        resolve(1);
+                    });
+                });
             }
         },
     },

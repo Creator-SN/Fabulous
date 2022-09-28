@@ -122,6 +122,7 @@
         ></add-ring-button>
         <fv-web-window
             v-model="show.translate"
+            :title="local('Translator')"
             class="fabulous-pdf-translation-panel"
         >
             <fv-text-field
