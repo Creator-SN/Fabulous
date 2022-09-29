@@ -770,5 +770,21 @@ export default {
     "Continue to Cover": {
         "en": "Continue to Cover",
         "cn": "新建并覆盖"
+    },
+    "App Update": {
+        "en": "App Update",
+        "cn": "App 更新"
+    },
+    "Automatic application update": {
+        "en": "Automatic application update",
+        "cn": "自动更新应用"
+    },
+    "Checking...": {
+        "en": "Checking...",
+        "cn": "检查更新..."
+    },
+    "Latest Version": {
+        "en": "Latest Version",
+        "cn": "已经是最新版本"
     }
 }

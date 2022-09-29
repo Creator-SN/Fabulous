@@ -281,7 +281,7 @@
                 :theme="theme"
                 :icon="'DevUpdate'"
                 :title="local('App Update')"
-                :content="local('Automatic application update')"
+                :content="!updater.version ? local('Automatic application update') : updater.version"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
             >
                 <template v-slot:extension>
@@ -293,7 +293,7 @@
                         <p
                             v-show="updater.status === 'latest'"
                             class="update-content-info"
-                        >Latest Version</p>
+                        >{{local('Latest Version')}}</p>
                         <fv-progress-ring
                             v-show="updater.status === 'checking' || updater.status === 'loading'"
                             :value="updater.downloadPercent"
@@ -304,7 +304,7 @@
                         <p
                             v-show="updater.status === 'checking'"
                             class="update-content-info"
-                        >Checking...</p>
+                        >{{local('Checking...')}}</p>
                         <p
                             v-show="updater.status === 'checking' || updater.status === 'loading'"
                             class="update-content-info"
@@ -372,6 +372,7 @@ export default {
             updater: {
                 status: "init",
                 downloadPercent: 0,
+                version: false,
             },
             show: {
                 initDS: false,
@@ -481,6 +482,8 @@ export default {
         eventInit() {
             ipc.on("updater-callback", (event, { status, info }) => {
                 this.updater.status = status;
+                if (status === "latest")
+                    this.updater.version = info.releaseName;
                 if (status === "loading")
                     this.updater.downloadPercent = info.percent.toFixed(0);
                 console.log({ status, info });
