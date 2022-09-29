@@ -414,7 +414,7 @@ async function createWindow() {
 
     autoUpdater.on("download-progress", function (progressObj) {
         win.webContents.send("updater-callback", {
-            status: "downloading",
+            status: "loading",
             info: progressObj
         });
         autoUpdater.logger.log(progressObj)

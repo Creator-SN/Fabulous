@@ -306,7 +306,7 @@
                             class="update-content-info"
                         >Checking...</p>
                         <p
-                            v-show="updater.status === 'loading'"
+                            v-show="updater.status === 'checking' || updater.status === 'loading'"
                             class="update-content-info"
                         >{{updater.downloadPercent}}%</p>
                     </div>
@@ -481,9 +481,9 @@ export default {
         eventInit() {
             ipc.on("updater-callback", (event, { status, info }) => {
                 this.updater.status = status;
-                if (status === "downloading")
+                if (status === "loading")
                     this.updater.downloadPercent = info.percent;
-                console.log(info);
+                console.log({ status, info });
             });
         },
         chooseLanguage(item) {
