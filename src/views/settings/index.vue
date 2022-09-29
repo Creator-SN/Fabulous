@@ -482,7 +482,7 @@ export default {
             ipc.on("updater-callback", (event, { status, info }) => {
                 this.updater.status = status;
                 if (status === "loading")
-                    this.updater.downloadPercent = info.percent;
+                    this.updater.downloadPercent = info.percent.toFixed(0);
                 console.log({ status, info });
             });
         },
