@@ -193,6 +193,9 @@ export default {
         rightMenuWidth: {
             default: 200,
         },
+        unsave: {
+            default: false
+        },
         theme: {
             default: "light",
         },
@@ -497,7 +500,26 @@ export default {
                 let url = `/notebook/${encodeURI(
                     item.filePath.replace(/\//g, "\\")
                 )}`;
-                if (this.$route.path !== url) this.$Go(url);
+                if (this.$route.path !== url) {
+                    if (this.unsave) {
+                        this.$infoBox(
+                            this.local(
+                                `Are you sure to redirect without saved?`
+                            ),
+                            {
+                                status: "warning",
+                                title: this.local("Confirm"),
+                                confirmTitle: this.local("Confirm"),
+                                cancelTitle: this.local("Cancel"),
+                                theme: this.theme,
+                                confirm: () => {
+                                    this.$Go(url);
+                                },
+                                cancel: () => {},
+                            }
+                        );
+                    } else this.$Go(url);
+                }
                 return;
             }
         },

@@ -42,6 +42,7 @@ export default new Vuex.Store({
             target: null, // 当前绑定的page
             scrollTop: 0, // 当前编辑器滚动条位置
             displayMode: 0, // 当前编辑器显示模式 0: 笔记 1: PDF 2: 双栏
+            unsave: false, // 当前未保存
             targetContent: {
                 type: "doc",
                 content: []

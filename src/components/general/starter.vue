@@ -308,7 +308,7 @@ export default {
                         title: this.local("Data Source Exists"),
                         confirmTitle: this.local("Link to It"),
                         cancelTitle: this.local("Continue to Cover"),
-                        theme: this.theme,
+                        theme: "dark",
                         confirm: () => {
                             this.chooseSource();
                         },

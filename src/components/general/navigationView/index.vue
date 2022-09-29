@@ -171,6 +171,7 @@
                         v-model="localPath"
                         :theme="theme"
                         :local="local"
+                        :unsave="unsave"
                         :watchAllExtensions="watchAllExtensions"
                         ref="local_view"
                     ></local-tree-view>
@@ -428,6 +429,7 @@ export default {
             name: (state) => state.data_structure.name,
             groups: (state) => state.data_structure.groups,
             partitions: (state) => state.data_structure.partitions,
+            unsave: (state) => state.editor.unsave,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
             theme: (state) => state.config.theme,

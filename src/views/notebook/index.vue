@@ -230,7 +230,6 @@ export default {
             fontSize: 16,
             expandContent: false,
             history: [],
-            unsave: false,
             auto_save: false,
             containerPos: {
                 scrollTop: 0,
@@ -273,6 +272,7 @@ export default {
     },
     computed: {
         ...mapState({
+            unsave: (state) => state.editor.unsave,
             autoSave: (state) => state.config.autoSave,
             language: (state) => state.config.language,
             editorExpandContent: (state) => state.config.editorExpandContent,
@@ -301,6 +301,7 @@ export default {
     methods: {
         ...mapMutations({
             reviseConfig: "reviseConfig",
+            reviseEditor: "reviseEditor",
         }),
         eventInit() {
             this.$el.addEventListener(
@@ -328,7 +329,7 @@ export default {
                     });
                     return;
                 }
-                this.unsave = false;
+                this.toggleUnsave(false);
             });
             ipc.on(`read-file-notebook`, (event, { status, message, data }) => {
                 if (status !== 200) {
@@ -370,18 +371,18 @@ export default {
             this.$el.addEventListener("keydown", (event) => {
                 if (event.keyCode === 83 && event.ctrlKey && !event.shiftKey) {
                     this.$refs.editor.save();
-                    this.unsave = false;
+                    this.toggleUnsave(false);
                 } else if (
                     event.keyCode === 83 &&
                     event.ctrlKey &&
                     event.shiftKey
                 ) {
                     this.saveAs();
-                    this.unsave = false;
+                    this.toggleUnsave(false);
                 } else {
                     let filterKey = [16, 17, 18, 20];
                     if (filterKey.indexOf(event.keyCode) < 0) {
-                        if (!this.readonly) this.unsave = true;
+                        if (!this.readonly) this.toggleUnsave(true);
                     }
                 }
 
@@ -394,6 +395,11 @@ export default {
                         return;
                     this.$refs.editor.editor.commands.insertContent("    ");
                 }
+            });
+        },
+        toggleUnsave(status = true) {
+            this.reviseEditor({
+                unsave: status,
             });
         },
         switchAutoSave() {

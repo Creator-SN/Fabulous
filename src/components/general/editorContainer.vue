@@ -283,7 +283,6 @@ export default {
             readonly: false,
             fontSize: 16,
             expandContent: false,
-            unsave: false,
             auto_save: false,
             editorMentionItemAttr: {
                 mentionList: (val) => this.mentionList(val),
@@ -344,10 +343,10 @@ export default {
     },
     watch: {
         $route() {
-            this.unsave = false;
+            this.toggleUnsave(false);
         },
         show_editor() {
-            this.unsave = false;
+            this.toggleUnsave(false);
             this.refreshContent();
         },
         auto_save() {
@@ -357,7 +356,7 @@ export default {
             this.auto_save = this.autoSave;
         },
         target() {
-            this.unsave = false;
+            this.toggleUnsave(false);
             this.refreshContent();
             this.$nextTick(() => {
                 this.scrollToTop(this.scrollTop);
@@ -394,6 +393,7 @@ export default {
             items: (state) => state.data_structure.items,
             displayMode: (state) => state.editor.displayMode,
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
+            unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -506,7 +506,7 @@ export default {
                     });
                     return;
                 }
-                this.unsave = false;
+                this.toggleUnsave(false);
             });
             ipc.on(`read-file-editor`, (event, { status, message, data }) => {
                 if (status !== 200) {
@@ -545,7 +545,7 @@ export default {
                 }
             });
         },
-        configInit () {
+        configInit() {
             this.auto_save = this.autoSave;
             this.expandContent = this.editorExpandContent;
         },
@@ -559,11 +559,11 @@ export default {
             this.$el.addEventListener("keydown", (event) => {
                 if (event.keyCode === 83 && event.ctrlKey) {
                     this.$refs.editor.save();
-                    this.unsave = false;
+                    this.toggleUnsave(false);
                 } else {
                     let filterKey = [16, 17, 18, 20];
                     if (filterKey.indexOf(event.keyCode) < 0) {
-                        if (!this.readonly) this.unsave = true;
+                        if (!this.readonly) this.toggleUnsave(true);
                     }
                 }
 
@@ -596,6 +596,11 @@ export default {
             ipc.send("read-file", {
                 id: "editor",
                 path: url,
+            });
+        },
+        toggleUnsave(status = true) {
+            this.reviseEditor({
+                unsave: status,
             });
         },
         editorSave() {
@@ -719,7 +724,7 @@ export default {
                 displayMode: this.displayMode === 1 ? 2 : this.displayMode,
                 targetContent: this.$refs.editor.editor.getJSON(),
             });
-            this.unsave = true;
+            this.toggleUnsave(true);
         },
         back() {
             let last = this.history[this.history.length - 1];
