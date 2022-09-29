@@ -136,7 +136,8 @@
 </style>
 
 <script>
-import * as remote from "@electron/remote"
+import { mapState, mapGetters } from "vuex";
+import * as remote from "@electron/remote";
 const { ipcRenderer: ipc } = require("electron");
 
 export default {
@@ -162,6 +163,12 @@ export default {
             },
         };
     },
+    computed: {
+        ...mapState({
+            unsave: (state) => state.editor.unsave,
+        }),
+        ...mapGetters(["local"]),
+    },
     mounted() {
         this.timerInit();
     },
@@ -178,7 +185,22 @@ export default {
             ipc.send("max");
         },
         close() {
-            ipc.send("close");
+            if (this.unsave) {
+                this.$infoBox(
+                    this.local(`Are you sure to quit without saved?`),
+                    {
+                        status: "warning",
+                        title: this.local("Confirm"),
+                        confirmTitle: this.local("Confirm"),
+                        cancelTitle: this.local("Cancel"),
+                        theme: this.theme,
+                        confirm: () => {
+                            ipc.send("close");
+                        },
+                        cancel: () => {},
+                    }
+                );
+            } else ipc.send("close");
         },
     },
     beforeDestroy() {

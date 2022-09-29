@@ -276,6 +276,42 @@
                     </fv-button>
                 </template>
             </fv-Collapse>
+            <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="'DevUpdate'"
+                :title="local('App Update')"
+                :content="local('Automatic application update')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <div class="update-info-block">
+                        <i
+                            v-show="updater.status === 'latest'"
+                            class="ms-Icon ms-Icon--Accept latest-icon"
+                        ></i>
+                        <p
+                            v-show="updater.status === 'latest'"
+                            class="update-content-info"
+                        >Latest Version</p>
+                        <fv-progress-ring
+                            v-show="updater.status === 'checking' || updater.status === 'loading'"
+                            :value="updater.downloadPercent"
+                            :loading="updater.status === 'checking'"
+                            r="15"
+                            borderWidth="3"
+                        ></fv-progress-ring>
+                        <p
+                            v-show="updater.status === 'checking'"
+                            class="update-content-info"
+                        >Checking...</p>
+                        <p
+                            v-show="updater.status === 'loading'"
+                            class="update-content-info"
+                        >{{updater.downloadPercent}}%</p>
+                    </div>
+                </template>
+            </fv-Collapse>
         </div>
         <init-ds
             :show.sync="show.initDS"
@@ -299,6 +335,7 @@ import OneDrive from "@/assets/settings/OneDrive.svg";
 
 import ThemeColor from "@/js/themeColorPicker.js";
 
+const { ipcRenderer: ipc } = require("electron");
 const { dialog } = require("@electron/remote");
 
 export default {
@@ -331,6 +368,10 @@ export default {
             db_index: -1,
             img: {
                 OneDrive,
+            },
+            updater: {
+                status: "init",
+                downloadPercent: 0,
             },
             show: {
                 initDS: false,
@@ -414,6 +455,7 @@ export default {
         },
     },
     mounted() {
+        this.eventInit();
         this.configInit();
         this.refreshDBList();
     },
@@ -435,6 +477,14 @@ export default {
             this.dynamic_effect = this.dynamicEffect;
             this.editor_expand_content = this.editorExpandContent;
             this.watch_all_extensions = this.watchAllExtensions;
+        },
+        eventInit() {
+            ipc.on("updater-callback", (event, { status, info }) => {
+                this.updater.status = status;
+                if (status === "downloading")
+                    this.updater.downloadPercent = info.percent;
+                console.log(info);
+            });
         },
         chooseLanguage(item) {
             this.reviseConfig({
@@ -697,6 +747,20 @@ export default {
                     height: 35px;
                     margin-right: 5px;
                 }
+            }
+        }
+
+        .update-info-block {
+            @include Vcenter;
+
+            font-size: 12px;
+
+            .latest-icon {
+                color: rgba(0, 158, 98, 1);
+            }
+
+            .update-content-info {
+                margin-left: 15px;
             }
         }
     }
