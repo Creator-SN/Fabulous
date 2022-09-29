@@ -387,10 +387,12 @@ async function createWindow() {
         autoUpdater.logger.log(args)
     });
     autoUpdater.on("update-not-available", function (args) {
-        win.webContents.send("updater-callback", {
-            status: "latest",
-            info: args
-        });
+        setTimeout(() => {
+            win.webContents.send("updater-callback", {
+                status: "latest",
+                info: args
+            });
+        }, 1500);
         autoUpdater.logger.log(args)
     });
 
@@ -401,10 +403,12 @@ async function createWindow() {
 
 
     autoUpdater.on("checking-for-update", function (args) {
-        win.webContents.send("updater-callback", {
-            status: "checking",
-            info: args
-        });
+        setTimeout(() => {
+            win.webContents.send("updater-callback", {
+                status: "checking",
+                info: args
+            });
+        }, 1000);
         autoUpdater.logger.log(args)
     });
 
