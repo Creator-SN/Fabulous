@@ -15,10 +15,12 @@
                     v-model="currentSearch"
                     :placeholder="local('Filtering from current content')"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
+                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                     icon="Filter"
-                    borderWidth="2"
+                    borderWidth="1"
+                    :border-radius="30"
                     :revealBorder="true"
+                    :is-box-shadow="true"
                     style="box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1)"
                 ></fv-text-box>
             </div>
@@ -34,12 +36,13 @@
                 <template-grid
                     :value="templates"
                     :filter="currentSearch"
+                    :multiChoosen="true"
                     @rightclick="currentItem = $event"
                     @choose-items="currentChoosen = $event"
                     @item-click="openEditor($event)"
                 >
                     <template v-slot:menu>
-                        <div>
+                        <div v-show="!currentItem.default">
                             <span @click="show.rename = true">
                                 <i
                                     class="ms-Icon ms-Icon--Rename"
@@ -64,6 +67,10 @@
             :value="currentItem"
             :show.sync="show.rename"
         ></rename-template>
+        <template-preview
+            :value="currentItem"
+            :show.sync="show.templatePreview"
+        ></template-preview>
     </div>
 </template>
 
@@ -71,6 +78,8 @@
 import addTemplate from "@/components/templates/addTemplate.vue";
 import renameTemplate from "@/components/templates/renameTemplate.vue";
 import templateGrid from "@/components/templates/templateGrid.vue";
+import templatePreview from "@/components/templates/templatePreview.vue";
+
 import { mapMutations, mapState, mapGetters } from "vuex";
 const { ipcRenderer: ipc } = require("electron");
 const path = require("path");
@@ -80,6 +89,7 @@ export default {
         addTemplate,
         renameTemplate,
         templateGrid,
+        templatePreview,
     },
     data() {
         return {
@@ -114,6 +124,7 @@ export default {
             show: {
                 add: false,
                 rename: false,
+                templatePreview: false,
             },
             lock: true,
         };
@@ -230,6 +241,11 @@ export default {
             );
         },
         openEditor(template) {
+            if (template.default) {
+                this.currentItem = template;
+                this.show.templatePreview = true;
+                return;
+            }
             this.reviseEditor({
                 type: "template",
                 item: {},

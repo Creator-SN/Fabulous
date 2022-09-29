@@ -24,12 +24,13 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 153, 204, 1)"
+                background="rgba(0, 98, 158, 1)"
                 :disabled="!value || name === '' || !ds_db"
                 @click="rename"
             >{{local('Confirm')}}</fv-button>
             <fv-button
                 :theme="theme"
+                style="margin-left: 5px;"
                 @click="thisShow = false"
             >{{local('Cancel')}}</fv-button>
         </template>

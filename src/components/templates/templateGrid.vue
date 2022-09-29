@@ -7,12 +7,13 @@
             v-show="item.show"
             v-for="(item, index) in thisValue"
             class="template-block"
+            :class="[{choosen: item.choosen}]"
             :key="index"
             @contextmenu="rightClick($event, item)"
         >
             <div
                 class="content-preview"
-                @click="chooseCurrent(item)"
+                @click="itemClick(item)"
             >
                 <fv-shimmer
                     v-if="item.minContent == undefined"
@@ -72,18 +73,14 @@
                 </div>
             </div>
             <span
+                v-show="!item.default && multiChoosen"
                 class="icon-block icon"
                 key="multi-col"
-                @click="itemChooseClick(item)"
             >
-                <span
-                    class="icon"
-                    :class="{choose: item.choosen}"
-                >
-                    <i class="ms-Icon ms-Icon--FullCircleMask ll"></i>
-                    <i class="ms-Icon ms-Icon--CircleRing ll"></i>
-                    <i class="ms-Icon ms-Icon--Completed ll"></i>
-                </span>
+                <fv-check-box
+                    v-model="item.choosen"
+                    @click.native="chooseCurrent($event, item)"
+                ></fv-check-box>
             </span>
         </div>
         <right-menu
@@ -103,6 +100,11 @@
 <script>
 import rightMenu from "@/components/general/rightMenu.vue";
 import { mapMutations, mapState, mapGetters } from "vuex";
+
+import standardT from "@/assets/templates/Standard.json";
+import standardWithTableT from "@/assets/templates/Standard_with_Table.json";
+import ideaT from "@/assets/templates/Idea.json";
+
 const { ipcRenderer: ipc } = require("electron");
 const path = require("path");
 
@@ -122,6 +124,9 @@ export default {
                 };
             },
         },
+        multiChoosen: {
+            default: false,
+        },
         rightMenuWidth: {
             default: 200,
         },
@@ -129,6 +134,11 @@ export default {
     data() {
         return {
             thisValue: [],
+            defaults: {
+                standard: standardT,
+                standardWithTable: standardWithTableT,
+                idea: ideaT,
+            },
             posX: 0,
             posY: 0,
             rightMenuItem: {},
@@ -206,14 +216,19 @@ export default {
                             let content = data;
                             try {
                                 el.content = JSON.parse(content);
-                                el.content.content = el.content.content.slice(
-                                    0,
-                                    10
-                                );
+                                el.minContent = {
+                                    type: "doc",
+                                    content: [],
+                                };
+                                el.minContent.content =
+                                    el.content.content.slice(0, 10);
                             } catch (e) {
-                                el.content = content.slice(0, 500);
+                                el.content = {
+                                    type: "doc",
+                                    content: [],
+                                };
+                                el.minContent = el.content;
                             }
-                            el.minContent = el.content;
                             this.$set(
                                 this.thisValue,
                                 this.thisValue.indexOf(el),
@@ -224,7 +239,37 @@ export default {
                     })
                 );
             }
-            return await Promise.all(promises);
+            let result = await Promise.all(promises);
+            this.thisValue = this.thisValue.concat(this.defaultTempltes());
+
+            return result;
+        },
+        defaultTempltes() {
+            let result = [
+                { name: "Standard", ori: standardT },
+                { name: "Standard with Table", ori: standardWithTableT },
+                { name: "Idea", ori: ideaT },
+            ];
+            result.forEach((el, idx) => {
+                el.id = this.$Guid();
+                el.emoji = "⚙";
+                el.createDate = null;
+                el.updateDate = null;
+                el.default = true;
+                el.show = true;
+                el.content = el.ori.content;
+                try {
+                    el.minContent = {
+                        type: "doc",
+                        content: [],
+                    };
+                    el.minContent.content = el.content.content.slice(0, 10);
+                } catch (e) {
+                    el.minContent = el.content;
+                }
+                result[idx] = el;
+            });
+            return result;
         },
         rightClick(event, item) {
             event.preventDefault();
@@ -286,24 +331,34 @@ export default {
             }
             this.$emit("change-value", this.thisValue);
         },
-        itemChooseClick(item) {
-            let index = this.thisValue.indexOf(item);
-            let t = item;
-            t.choosen = !t.choosen;
-            this.$set(this.thisValue, index, t);
-            this.$emit("change-value", this.thisValue);
-            this.$emit("choose-items", this.currentChoosen);
-        },
-        chooseCurrent(item) {
-            for (let i = 0; i < this.thisValue.length; i++) {
-                let t = this.thisValue[i];
-                t.choosen = false;
-                this.$set(this.thisValue, i, t);
-            }
-            item.choosen = true;
-            this.$set(this.thisValue, this.thisValue.indexOf(item), item);
+        itemClick(item) {
+            if (!this.multiChoosen)
+                for (let i = 0; i < this.thisValue.length; i++) {
+                    let t = this.thisValue[i];
+                    if (t !== item) {
+                        t.choosen = false;
+                        this.$set(this.thisValue, i, t);
+                    } else {
+                        t.choosen = true;
+                        this.$set(this.thisValue, i, t);
+                    }
+                }
+
             this.$emit("change-value", this.thisValue);
             this.$emit("item-click", item);
+            this.$emit("choose-items", this.currentChoosen);
+        },
+        chooseCurrent(event, item) {
+            event.stopPropagation();
+            if (!this.multiChoosen)
+                for (let i = 0; i < this.thisValue.length; i++) {
+                    let t = this.thisValue[i];
+                    if (t !== item) {
+                        t.choosen = false;
+                        this.$set(this.thisValue, i, t);
+                    }
+                }
+            this.$emit("change-value", this.thisValue);
             this.$emit("choose-items", this.currentChoosen);
         },
     },
@@ -327,7 +382,7 @@ export default {
         .template-block {
             background: rgba(36, 36, 36, 1);
             color: whitesmoke;
-            border: rgba(90, 90, 90, 0.1) solid thin;
+            border: rgba(200, 200, 200, 0.1) solid thin;
 
             .bottom-info {
                 color: whitesmoke;
@@ -347,23 +402,27 @@ export default {
         @include FullRelative;
 
         height: 300px;
-        border: rgba(200, 200, 200, 0.1) solid thin;
+        border: rgba(90, 90, 90, 0.1) solid 2px;
         border-radius: 6px;
         display: flex;
         flex-direction: column;
         transition: all 0.2s;
-        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1),
-            -3px 3px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1);
         overflow: hidden;
 
         &:hover {
-            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2),
-                -3px 3px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2),
+                -3px -3px 8px rgba(0, 0, 0, 0.2);
         }
 
         &:active {
-            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2),
-                -3px -3px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2),
+                0px 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        &.choosen
+        {
+            border-color: rgba(255, 180, 0, 0.6);
         }
 
         .content-preview {
@@ -414,22 +473,16 @@ export default {
         }
 
         .icon-block {
+            @include HcenterVcenter;
+
             position: absolute;
             top: 15px;
-            right: 15px;
-            width: 25px;
-            height: 25px;
-            background: rgba(200, 200, 200, 0.3);
-            border-radius: 50%;
+            right: 5px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
             box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             z-index: 2;
-
-            .icon {
-                @include multi-selection;
-            }
         }
     }
 }
