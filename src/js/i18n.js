@@ -754,5 +754,21 @@ export default {
     "How you going to use Fabulous?": {
         "en": "How you going to use Fabulous?",
         "cn": "你打算使用Fab做什么?"
+    },
+    "An existing data source is detected.": {
+        "en": "An existing data source is detected",
+        "cn": "检测到已有数据源"
+    },
+    "Data Source Exists": {
+        "en": "Data Source Exists",
+        "cn": "已存在数据源"
+    },
+    "Link to It": {
+        "en": "Link to It",
+        "cn": "关联已有源"
+    },
+    "Continue to Cover": {
+        "en": "Continue to Cover",
+        "cn": "新建并覆盖"
     }
 }

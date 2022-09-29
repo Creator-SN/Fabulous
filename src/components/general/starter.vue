@@ -279,11 +279,47 @@ export default {
             if (!path) return;
             this.path = path;
         },
+        async existsSource(url) {
+            let id = this.$Guid();
+            let _path = path.join(url, "data_structure.json");
+            ipc.send("exists-path", {
+                id: id,
+                path: _path,
+            });
+            let _exists = false;
+            await new Promise((resolve) => {
+                ipc.on(`exists-path-${id}`, (event, { exists }) => {
+                    _exists = exists;
+                    resolve(1);
+                });
+            });
+            return _exists;
+        },
         async addSource() {
             if (this.path === "") return;
             if (this.name === "") return;
             let id = this.$Guid();
             let _path = path.join(this.path, this.name);
+            if (await this.existsSource(_path)) {
+                this.$infoBox(
+                    this.local(`An existing data source is detected.`),
+                    {
+                        status: "warning",
+                        title: this.local("Data Source Exists"),
+                        confirmTitle: this.local("Link to It"),
+                        cancelTitle: this.local("Continue to Cover"),
+                        theme: this.theme,
+                        confirm: () => {
+                            this.chooseSource();
+                        },
+                        cancel: () => {
+                            this.addSourceConfirm(_path, id);
+                        },
+                    }
+                );
+            } else this.addSourceConfirm(_path, id);
+        },
+        async addSourceConfirm(_path, id) {
             ipc.send("ensure-folder", { id: id, dir: _path });
             await new Promise((resolve) => {
                 ipc.on(`ensure-folder-${id}`, () => {
