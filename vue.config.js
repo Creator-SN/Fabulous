@@ -19,7 +19,8 @@ module.exports = {
                 "@": resolve("./src")
             },
             extensions: ["*", ".js", ".vue", ".json"]
-        }
+        },
+        externals: ['fsevents'],
     },
     pluginOptions: {    // necessary plugins
         electronBuilder: {
