@@ -38,6 +38,17 @@ module.exports = {
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true
                 },
+                mac:{
+                    icon:'./logo.icns',
+                    target:{
+                        target:'dmg',
+                        arch:[
+                            'x64',
+                            'arm64',
+                            'universal'
+                        ]
+                   }
+                },
                 fileAssociations: [
                     {
                         name: "Fabulous Notebook File",
