@@ -19,7 +19,8 @@ module.exports = {
                 "@": resolve("./src")
             },
             extensions: ["*", ".js", ".vue", ".json"]
-        }
+        },
+        externals: ['fsevents'],
     },
     pluginOptions: {    // necessary plugins
         electronBuilder: {
@@ -36,6 +37,17 @@ module.exports = {
                     allowToChangeInstallationDirectory: true,
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true
+                },
+                mac:{
+                    icon:'./logo.icns',
+                    target:{
+                        target:'dmg',
+                        arch:[
+                            'x64',
+                            'arm64',
+                            'universal'
+                        ]
+                   }
                 },
                 fileAssociations: [
                     {
