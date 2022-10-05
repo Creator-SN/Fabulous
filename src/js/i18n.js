@@ -425,7 +425,7 @@ export default {
     },
     "Click + to Add New Group & Partition": {
         "en": "Click + to Add New Group & Partition",
-        "cn": "点击 + 添加新的分组和分区"
+        "cn": "点击 + 添加新的区组和分区"
     },
     "Click + to Add New Item or Drag a PDF File to the Window": {
         "en": "Click + to Add New Item or Drag PDF Files to the Window",
@@ -541,7 +541,7 @@ export default {
     },
     "Add Group": {
         "en": "Add Group",
-        "cn": "添加分组"
+        "cn": "添加区组"
     },
     "Templates Page": {
         "en": "Templates Page",

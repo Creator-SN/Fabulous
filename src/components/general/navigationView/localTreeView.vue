@@ -243,7 +243,7 @@ export default {
                     ...fileObj,
                 };
                 let parentPath = this.findParentPath(item);
-                item.dir = parentPath;
+                item.dir = parentPath.path;
                 return item;
             };
         },

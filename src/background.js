@@ -46,10 +46,19 @@ async function createWindow() {
     });
 
     ipcMain.on("max", () => {
-        if (win.isMaximized())
-            win.restore();
-        else
-            win.maximize();
+        if (process.platform === "darwin") {
+            if (win.isMaximized()) {
+                win.setFullScreen(false);
+            } else {
+                win.setFullScreen(true);
+            }
+        }
+        else {
+            if (win.isMaximized())
+                win.restore();
+            else
+                win.maximize();
+        }
     });
 
     ipcMain.on("close", () => {
