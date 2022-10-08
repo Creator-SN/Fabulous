@@ -55,7 +55,7 @@ module.exports = {
                     {
                         name: "Fabulous Notebook File",
                         ext: "fbn",
-                        icon: "./notebook.ico",
+                        icon: "./assets/notebook.ico",
                         description: "Fabulous Notebook File"
                     }
                 ],
