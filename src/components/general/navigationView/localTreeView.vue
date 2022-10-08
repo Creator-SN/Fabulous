@@ -421,6 +421,7 @@ export default {
                 }
 
                 ipc.on("open-notebook", async (event, argv) => {
+                    console.log(argv)
                     let id = this.$Guid();
                     let path = argv[argv.length - 1];
                     let url = `/notebook/${encodeURI(

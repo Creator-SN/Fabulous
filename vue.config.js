@@ -20,10 +20,12 @@ module.exports = {
             },
             extensions: ["*", ".js", ".vue", ".json"]
         },
-        externals: ['fsevents'],
     },
     pluginOptions: {    // necessary plugins
         electronBuilder: {
+            externals:[
+                "fsevents"
+            ],
             nodeIntegration: true,
             // https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/881
             builderOptions: {

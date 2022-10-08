@@ -454,6 +454,11 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
+// On Mac OS open with file path.
+app.on("open-file", (event, path) => {
+    win.webContents.send("open-notebook", [path])
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -485,7 +490,9 @@ if (!gotTheLock) {
             if (win.isMinimized()) win.restore()
             win.focus()
             win.show()
-            win.webContents.send("open-notebook", argv)
+            if(process.platform !== 'darwin') {
+                win.webContents.send("open-notebook", argv)
+            }
         }
     })
     // 创建 myWindow, 加载应用的其余部分, etc...
