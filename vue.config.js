@@ -23,7 +23,7 @@ module.exports = {
     },
     pluginOptions: {    // necessary plugins
         electronBuilder: {
-            externals:[
+            externals: [
                 "fsevents"
             ],
             nodeIntegration: true,
@@ -40,16 +40,24 @@ module.exports = {
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true
                 },
-                mac:{
-                    icon:'./logo.icns',
-                    target:{
-                        target:'dmg',
-                        arch:[
+                mac: {
+                    icon: './logo.icns',
+                    target: {
+                        target: 'dmg',
+                        arch: [
                             'x64',
                             'arm64',
                             'universal'
                         ]
-                   }
+                    },
+                    fileAssociations: [
+                        {
+                            name: "Fabulous Notebook File",
+                            ext: "fbn",
+                            icon: "./src/assets/notebook.icns",
+                            description: "Fabulous Notebook File"
+                        }
+                    ],
                 },
                 fileAssociations: [
                     {

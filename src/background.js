@@ -455,8 +455,21 @@ app.on('activate', () => {
 })
 
 // On Mac OS open with file path.
-app.on("open-file", (event, path) => {
-    win.webContents.send("open-notebook", [path])
+app.on("open-file", async (event, path) => {
+    if (!win) {
+        let i = 0
+        while (i < 10) {
+            await new Promise(resolve => setTimeout(resolve, 600));
+            i += 1;
+            if (win) {
+                setTimeout(() => {
+                    win.webContents.send("open-notebook", [path]);
+                }, 600);
+                break;
+            }
+        }
+    }
+    win.webContents.send("open-notebook", [path]);
 })
 
 // This method will be called when Electron has finished
@@ -490,7 +503,7 @@ if (!gotTheLock) {
             if (win.isMinimized()) win.restore()
             win.focus()
             win.show()
-            if(process.platform !== 'darwin') {
+            if (process.platform !== 'darwin') {
                 win.webContents.send("open-notebook", argv)
             }
         }
