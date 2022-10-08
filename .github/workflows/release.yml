@@ -70,6 +70,8 @@ jobs:
 
   macos:
     runs-on: macos-latest
+    env:
+      USE_HARD_LINKS: false
     steps:
       - uses: actions/checkout@v2
 
