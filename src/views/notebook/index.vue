@@ -40,6 +40,15 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
+                    :title="local('Save')"
+                    @click="saveClick"
+                >
+                    <i class="ms-Icon ms-Icon--Save"></i>
+                </fv-button>
+                <fv-button
+                    :theme="theme"
+                    :borderRadius="30"
+                    class="control-btn"
                     :title="local('Save As')"
                     @click="saveAs"
                 >
@@ -369,12 +378,13 @@ export default {
         },
         ShortCutInit() {
             this.$el.addEventListener("keydown", (event) => {
-                if (event.keyCode === 83 && event.ctrlKey && !event.shiftKey) {
+                let ctrl = event.ctrlKey || event.metaKey;
+                if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                     this.$refs.editor.save();
                     this.toggleUnsave(false);
                 } else if (
                     event.keyCode === 83 &&
-                    event.ctrlKey &&
+                    ctrl &&
                     event.shiftKey
                 ) {
                     this.saveAs();
@@ -476,6 +486,10 @@ export default {
                 this.$refs.input.value = "";
             };
             reader.readAsDataURL(file);
+        },
+        saveClick () {
+            this.$refs.editor.save();
+            this.toggleUnsave(false);
         },
         saveAs() {
             let filters = [

@@ -557,7 +557,7 @@ export default {
         },
         ShortCutInit() {
             this.$el.addEventListener("keydown", (event) => {
-                if (event.keyCode === 83 && event.ctrlKey) {
+                if ((event.keyCode === 83 && event.ctrlKey) || (event.keyCode === 83 && event.metakey)) {
                     this.$refs.editor.save();
                     this.toggleUnsave(false);
                 } else {

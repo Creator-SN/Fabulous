@@ -786,5 +786,9 @@ export default {
     "Latest Version": {
         "en": "Latest Version",
         "cn": "已经是最新版本"
+    },
+    "Save": {
+        "en": "Save",
+        "cn": "保存"
     }
 }
