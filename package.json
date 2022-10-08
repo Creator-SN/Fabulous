@@ -1,6 +1,6 @@
 {
   "name": "@creatorsn/fabulous",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "description": "Involution King Fun Book (Fabulous, Chinese: Fab, 卷王快乐本) is an integrated management system for papers and literature. The UI design is based on the VFluent, which is inspired by the Microsft Fluent Design System.",
   "author": {
@@ -33,6 +33,7 @@
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
     "fs-extra": "^10.0.0",
+    "fsevents": "^2.3.2",
     "google-translate-cn-api": "^1.0.8",
     "gsap": "^3.10.4",
     "lowdb": "^1.0.0",
@@ -43,8 +44,7 @@
     "vue": "^2.6.11",
     "vue-axios": "^3.3.7",
     "vue-router": "^3.4.9",
-    "vuex": "^3.6.0",
-    "fsevents": "^2.3.2"
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
