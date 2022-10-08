@@ -96,8 +96,6 @@ jobs:
           v=${v:1}
           mv ./dist_electron/Fabulous-$v.dmg ./Fabulous-$v.dmg
           mv ./dist_electron/Fabulous-$v.dmg.blockmap ./Fabulous-$v.dmg.blockmap
-          mv ./dist_electron/Fabulous-$v-mac.zip ./Fabulous-$v-mac.zip
-          mv ./dist_electron/Fabulous-$v-mac.zip.blockmap ./Fabulous-$v-mac.zip.blockmap
           mv ./dist_electron/latest-mac.yml ./latest-mac.yml
 
       - name: Upload Prerelease
