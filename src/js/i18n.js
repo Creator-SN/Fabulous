@@ -423,9 +423,9 @@ export default {
         "en": "No any Content",
         "cn": "没有任何内容"
     },
-    "Click + to Add New Group & Partition": {
-        "en": "Click + to Add New Group & Partition",
-        "cn": "点击 + 添加新的区组和分区"
+    "Choose Menu Below to Add New Group & Partition": {
+        "en": "Choose Menu Below to Add New Group & Partition",
+        "cn": "在下方菜单选择以添加新的分组和分区"
     },
     "Click + to Add New Item or Drag a PDF File to the Window": {
         "en": "Click + to Add New Item or Drag PDF Files to the Window",
@@ -790,5 +790,13 @@ export default {
     "Save": {
         "en": "Save",
         "cn": "保存"
+    },
+    "Collaspe All": {
+        "en": "Collaspe All",
+        "cn": "折叠全部文件夹"
+    },
+    "Config Data Source": {
+        "en": "Config Data Source",
+        "cn": "配置数据源"
     }
 }

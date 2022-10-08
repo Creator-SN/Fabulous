@@ -50,6 +50,7 @@
                     </div>
                     <div
                         class="navigation-view-mode-right-block"
+                        :title="local('Config Data Source')"
                         @click="$event => {$event.stopPropagation(); Go(`/settings`);}"
                     >
                         <i class="ms-Icon ms-Icon--Repair more-menu-btn"></i>
@@ -124,6 +125,30 @@
                         ></loading>
                     </div>
                 </transition>
+                <transition name="expand-top-to-bottom">
+                    <div
+                        v-show="computeDisplay('ds')"
+                        class="navigation-view-command-bar-block"
+                        :class="[{dark: theme === 'dark'}]"
+                    >
+                        <div
+                            v-for="(item, index) in dsCmdList"
+                            :key="`command-bar-item: ${index}`"
+                            class="command-item"
+                            :class="[{disabled: item.disabled()}]"
+                            @click="() => {item.disabled() ? null : item.func()}"
+                        >
+                            <span class="command-item-icon">
+                                <img
+                                    :src="img[item.img]"
+                                    alt=""
+                                    class="icon-img"
+                                >
+                            </span>
+                            <p class="command-item-content">{{item.name()}}</p>
+                        </div>
+                    </div>
+                </transition>
                 <div
                     v-show="expand && activeSystemMode !== 'ds'"
                     class="navigation-view-mode-block"
@@ -159,9 +184,9 @@
                             @click="() => $refs.local_view.refreshFolder()"
                         ></i>
                         <i
-                            class="ms-Icon ms-Icon--FolderOpen more-menu-btn"
-                            :title="local('Choose Folder')"
-                            @click="() => $refs.local_view.chooseFolder()"
+                            class="ms-Icon ms-Icon--CollapseContent more-menu-btn"
+                            :title="local('Collaspe All')"
+                            @click="() => $refs.local_view.collapseAll()"
                         ></i>
                     </div>
                 </div>
@@ -173,53 +198,34 @@
                         :local="local"
                         :unsave="unsave"
                         :watchAllExtensions="watchAllExtensions"
+                        :Go="Go"
                         ref="local_view"
                     ></local-tree-view>
                 </transition>
-                <div
-                    v-show="computeDisplay('ds')"
-                    class="navigation-view-command-bar-block"
-                    :class="[{dark: theme === 'dark'}]"
-                >
+                <transition name="expand-bottom-to-top">
                     <div
-                        v-for="(item, index) in dsCmdList"
-                        :key="`command-bar-item: ${index}`"
-                        class="command-item"
-                        :class="[{disabled: item.disabled()}]"
-                        @click="() => {item.disabled() ? null : item.func()}"
+                        v-show="computeDisplay('notebook')"
+                        class="navigation-view-command-bar-block"
+                        :class="[{dark: theme === 'dark'}]"
                     >
-                        <span class="command-item-icon">
-                            <img
-                                :src="img[item.img]"
-                                alt=""
-                                class="icon-img"
-                            >
-                        </span>
-                        <p class="command-item-content">{{item.name()}}</p>
+                        <div
+                            v-for="(item, index) in notebookCmdList"
+                            :key="`command-bar-item: ${index}`"
+                            class="command-item"
+                            :class="[{disabled: item.disabled()}]"
+                            @click="() => {item.disabled() ? null : item.func()}"
+                        >
+                            <span class="command-item-icon">
+                                <img
+                                    :src="img[item.img]"
+                                    alt=""
+                                    class="icon-img"
+                                >
+                            </span>
+                            <p class="command-item-content">{{item.name()}}</p>
+                        </div>
                     </div>
-                </div>
-                <div
-                    v-show="computeDisplay('notebook')"
-                    class="navigation-view-command-bar-block"
-                    :class="[{dark: theme === 'dark'}]"
-                >
-                    <div
-                        v-for="(item, index) in notebookCmdList"
-                        :key="`command-bar-item: ${index}`"
-                        class="command-item"
-                        :class="[{disabled: item.disabled()}]"
-                        @click="() => {item.disabled() ? null : item.func()}"
-                    >
-                        <span class="command-item-icon">
-                            <img
-                                :src="img[item.img]"
-                                alt=""
-                                class="icon-img"
-                            >
-                        </span>
-                        <p class="command-item-content">{{item.name()}}</p>
-                    </div>
-                </div>
+                </transition>
             </div>
             <right-menu
                 v-model="show.rightMenu"
@@ -300,6 +306,7 @@ import groupImg from "@/assets/nav/group.svg";
 import partitionImg from "@/assets/nav/partition.svg";
 import templatesImg from "@/assets/nav/template.svg";
 import folderImg from "@/assets/nav/folder.svg";
+import newFolderImg from "@/assets/nav/newFolder.svg";
 import refreshImg from "@/assets/nav/refresh.svg";
 import pasteImg from "@/assets/nav/paste.svg";
 import allImg from "@/assets/nav/all.svg";
@@ -350,6 +357,13 @@ export default {
             ],
             notebookCmdList: [
                 {
+                    name: () => this.local("New Folder"),
+                    func: () => this.$refs.local_view.createFolder(),
+                    img: "newFolder",
+                    disabled: () => !this.localPath,
+                    iconColor: "rgba(213, 99, 70, 1)",
+                },
+                {
                     name: () => this.local("Choose Folder"),
                     func: () => this.$refs.local_view.chooseFolder(),
                     img: "folder",
@@ -380,6 +394,7 @@ export default {
                 partition: partitionImg,
                 templates: templatesImg,
                 folder: folderImg,
+                newFolder: newFolderImg,
                 refresh: refreshImg,
                 paste: pasteImg,
                 all: allImg,
@@ -697,7 +712,7 @@ export default {
         },
         delete(item) {
             let id = item.id;
-            if (this.$route.params.id === id) this.$Go("/");
+            if (this.$route.params.id === id) this.Go("/");
             for (let i = 0; i < this.groups.length; i++) {
                 if (this.groups[i].id === id) {
                     this.groups.splice(i, 1);
@@ -763,10 +778,11 @@ export default {
             if (item.type === "group") return 0;
             let id = item.id;
             if (this.$route.params.id === id) return 0;
-            this.$Go(`/partitions/${id}`);
+            this.Go(`/partitions/${id}`);
         },
         Go(path) {
             if (this.$route.path === path) return 0;
+            if (this.windowWidth < this.mobileDisplay) this.expand = false;
             this.$Go(path);
         },
     },

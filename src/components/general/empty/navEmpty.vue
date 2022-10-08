@@ -25,7 +25,7 @@
                 />
             </div>
             <p class="nec-content">{{local('No any Content')}}</p>
-            <p class="nec-content">{{local('Click + to Add New Group & Partition')}}</p>
+            <p class="nec-content">{{local('Choose Menu Below to Add New Group & Partition')}}</p>
         </div>
     </div>
 </template>

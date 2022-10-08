@@ -194,7 +194,10 @@ export default {
             default: 200,
         },
         unsave: {
-            default: false
+            default: false,
+        },
+        Go: {
+            default: () => {}
         },
         theme: {
             default: "light",
@@ -421,7 +424,7 @@ export default {
                 }
 
                 ipc.on("open-notebook", async (event, argv) => {
-                    console.log(argv)
+                    console.log(argv);
                     let id = this.$Guid();
                     let path = argv[argv.length - 1];
                     let url = `/notebook/${encodeURI(
@@ -436,7 +439,7 @@ export default {
                             if (exists)
                                 setTimeout(() => {
                                     if (this.$route.path === url) return;
-                                    this.$Go(url);
+                                    this.Go(url);
                                 }, 300);
                             resolve(1);
                         });
@@ -514,12 +517,12 @@ export default {
                                 cancelTitle: this.local("Cancel"),
                                 theme: this.theme,
                                 confirm: () => {
-                                    this.$Go(url);
+                                    this.Go(url);
                                 },
                                 cancel: () => {},
                             }
                         );
-                    } else this.$Go(url);
+                    } else this.Go(url);
                 }
                 return;
             }
@@ -797,6 +800,12 @@ export default {
                 }
             }
         },
+        collapseAll() {
+            for (let item of this.FLAT) {
+                if (item.isDir) item.expanded = false;
+            }
+            this.$refs.tree.$forceUpdate();
+        },
         rightClick(event, item) {
             event.preventDefault();
             if (!item.filePath) return;
@@ -838,13 +847,13 @@ export default {
                     ipc.on(`exists-path-${id}`, (event, { exists }) => {
                         if (exists)
                             setTimeout(() => {
-                                this.$Go(url);
+                                this.Go(url);
                             }, 300);
                         resolve(1);
                     });
                 });
             }
-        },
+        }
     },
 };
 </script>
