@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./src/assets/logo.svg" width="60" style="width: 80px;"/>
+    <img src="./src/assets/logo.png" width="60" style="width: 200px;"/>
     <p>Fabulous</p>
     <p><img src="https://img.shields.io/github/v/release/Creator-SN/Fabulous" /></p>
     <p><img src="https://img.shields.io/github/downloads/Creator-SN/Fabulous/total?color=green&style=flat-square">
@@ -13,7 +13,7 @@
 
 # Fabulous Notebook
 
-Fabulous Notebook is a WYSIWYG notebook with an exciting paper and literature management system.
+Fabulous Notebook **(FAB)** is a **WYSIWYG** notebook with an exciting paper and literature management system.
 
 The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
 
@@ -31,13 +31,13 @@ The **Fabulous** aims to provide a complete article management and well-performa
 
 - ✔ Windows 11 [Supported]
 - ✔ Windows 10 [Supported]
-- ✔ Mac(AMD64) [Supported]
+- ✔ Mac [Supported]
 
 ### 📍 Usage
 
 **Installation**
 
-From the releases page, choose the lateset stable version and download the `.zip` file. Then unzip the file and choose the file named like `fabulous_Setup_xxx.exe` to setup the **Fabulous**.
+From the releases page, choose the lateset stable version and download the installer file.
 
 **First time useage**
 
