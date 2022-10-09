@@ -31,6 +31,7 @@ module.exports = {
             builderOptions: {
                 productName: "Fabulous",
                 appId: "com.creatorsn.fabulous",
+                afterSign: "scripts/notarize.js",
                 win: {
                     icon: "./logo.ico",
                 },
@@ -58,6 +59,10 @@ module.exports = {
                             description: "Fabulous Notebook File"
                         }
                     ],
+                    hardenedRuntime: true,
+                    entitlements: "./dist_electron/bundled/entitlements.mac.plist",
+                    entitlementsInherit: "./dist_electron/bundled/entitlements.mac.plist",
+                    gatekeeperAssess: false,
                 },
                 fileAssociations: [
                     {
