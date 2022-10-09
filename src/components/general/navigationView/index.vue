@@ -68,6 +68,7 @@
                             :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
                             :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
                             style="width: 100%; height: 100%;"
+                            ref="tree"
                             @click="SwitchPartition"
                         >
                             <template v-slot:default="x">
@@ -229,6 +230,7 @@
             </div>
             <right-menu
                 v-model="show.rightMenu"
+                class="nv-right-menu"
                 :theme="theme"
                 :posX="posX"
                 :posY="posY"
@@ -490,6 +492,7 @@ export default {
     mounted() {
         this.refreshTreeList();
         this.localPath = this.lastLocalPath;
+        window.addEventListener("click", this.whiteClickClearTmp);
     },
     methods: {
         ...mapMutations({
@@ -780,11 +783,38 @@ export default {
             if (this.$route.params.id === id) return 0;
             this.Go(`/partitions/${id}`);
         },
+        whiteClickClearTmp(event) {
+            let x = event.target;
+            let _self = false;
+            while (x && x.tagName && x.tagName.toLowerCase() != "body") {
+                let classList = [...x.classList];
+                if (
+                    classList.includes("fv-TreeView__item") ||
+                    classList.includes("navigation-view-mode-block") ||
+                    classList.includes("navigation-view-command-bar-block") ||
+                    classList.includes("nv-right-menu")
+                ) {
+                    _self = true;
+                    break;
+                }
+                x = x.parentNode;
+            }
+            if (!_self) {
+                let result = this.flatPartitions;
+                for (let item of result) {
+                    item.editable = false;
+                }
+                this.$refs.tree.$forceUpdate();
+            }
+        },
         Go(path) {
             if (this.$route.path === path) return 0;
             if (this.windowWidth < this.mobileDisplay) this.expand = false;
             this.$Go(path);
         },
+    },
+    beforeDestroy() {
+        window.removeEventListener("click", this.whiteClickClearTmp);
     },
 };
 </script>
