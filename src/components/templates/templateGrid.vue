@@ -184,6 +184,7 @@ export default {
         },
     },
     mounted() {
+        this.eventInit();
         this.loadTemplates();
         this.filterValue();
     },
@@ -192,9 +193,31 @@ export default {
             reviseData: "reviseData",
             toggleEditor: "toggleEditor",
         }),
+        eventInit() {
+            ipc.on(`read-file-templateGrid`, (event, { status, data, target }) => {
+                if (status === 200) {
+                    let content = data;
+                    let el = this.thisValue.find((it) => it.id === target.id);
+                    try {
+                        el.content = JSON.parse(content);
+                        el.minContent = {
+                            type: "doc",
+                            content: [],
+                        };
+                        el.minContent.content = el.content.content.slice(0, 10);
+                    } catch (e) {
+                        el.content = {
+                            type: "doc",
+                            content: [],
+                        };
+                        el.minContent = el.content;
+                    }
+                    this.$set(this.thisValue, this.thisValue.indexOf(el), el);
+                }
+            });
+        },
         async loadTemplates() {
             this.thisValue = JSON.parse(JSON.stringify(this.value));
-            let promises = [];
             for (let el of this.thisValue) {
                 el.show = true;
                 el.choosen = false;
@@ -207,42 +230,13 @@ export default {
                     `${el.id}.json`
                 );
                 ipc.send("read-file", {
-                    id: el.id,
+                    id: "templateGrid",
                     path: url,
+                    target: el
                 });
-                promises.push(
-                    new Promise((resolve) => {
-                        ipc.on(`read-file-${el.id}`, (event, { data }) => {
-                            let content = data;
-                            try {
-                                el.content = JSON.parse(content);
-                                el.minContent = {
-                                    type: "doc",
-                                    content: [],
-                                };
-                                el.minContent.content =
-                                    el.content.content.slice(0, 10);
-                            } catch (e) {
-                                el.content = {
-                                    type: "doc",
-                                    content: [],
-                                };
-                                el.minContent = el.content;
-                            }
-                            this.$set(
-                                this.thisValue,
-                                this.thisValue.indexOf(el),
-                                el
-                            );
-                            resolve(el.id);
-                        });
-                    })
-                );
             }
-            let result = await Promise.all(promises);
             this.thisValue = this.thisValue.concat(this.defaultTempltes());
 
-            return result;
         },
         defaultTempltes() {
             let result = [
@@ -420,8 +414,7 @@ export default {
                 0px 3px 8px rgba(0, 0, 0, 0.2);
         }
 
-        &.choosen
-        {
+        &.choosen {
             border-color: rgba(255, 180, 0, 0.6);
         }
 

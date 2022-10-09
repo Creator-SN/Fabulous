@@ -159,11 +159,13 @@ async function createWindow() {
             if (err) event.reply(`read-file-${obj.id}`, {
                 status: 500,
                 data: "",
+                target: obj.target,
                 message: err
             });
             event.reply(`read-file-${obj.id}`, {
                 status: 200,
                 data,
+                target: obj.target,
                 message: err
             });
         });
