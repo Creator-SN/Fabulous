@@ -100,7 +100,6 @@
         <div
             v-show="!readonly && contentType === 'fabulous_notebook'"
             class="fabulous-notebook-info-block"
-            :class="[{'has-banner': fabulousNotebook.banner}]"
         >
             <fv-button
                 v-show="!fabulousNotebook.banner"
@@ -112,6 +111,15 @@
                 style="width: 120px; margin: 15px 10px;"
                 @click="$refs.input.click()"
             >{{local('Add Banner')}}</fv-button>
+            <fv-button
+                v-show="fabulousNotebook.banner"
+                theme="dark"
+                icon="Picture"
+                background="rgba(220, 62, 72, 0.9)"
+                :border-radius="6"
+                style="width: 120px; margin: 15px 10px;"
+                @click="fabulousNotebook.banner = ''"
+            >{{local('Delete Banner')}}</fv-button>
             <input
                 v-show="false"
                 type="file"
@@ -119,19 +127,6 @@
                 ref="input"
                 @change="chooseBanner"
             />
-            <fv-text-Field
-                :placeholder="local('Input title here ...')"
-                v-model="fabulousNotebook.title"
-                :theme="theme"
-                :font-size="20"
-                :background="`transparent`"
-                :border-color="`rgba(255, 180, 0, 0.3)`"
-                :focus-border-color="`rgba(255, 180, 0, 0.8)`"
-                :border-width="2"
-                :border-radius="6"
-                :readonly="readonly != false"
-                style="width: calc(100% - 20px); height: 60px; margin-left: 10px; margin-bottom: 5px;"
-            ></fv-text-Field>
         </div>
         <div class="main-display-block">
             <power-editor
@@ -162,7 +157,24 @@
                         class="fabulous-notebook-banner-img"
                         @click.native="$refs.input.click()"
                     ></fv-img>
-                    <div class="fabulous-notebook-readonly-title-block">
+                    <div class="fabulous-notebook-title-block">
+                        <fv-text-box
+                            v-show="!readonly && contentType == 'fabulous_notebook'"
+                            :placeholder="local('Input title here ...')"
+                            v-model="fabulousNotebook.title"
+                            :theme="theme"
+                            :font-size="28"
+                            :font-weight="600"
+                            :background="`transparent`"
+                            :border-color="`rgba(245, 78, 162, 0.3)`"
+                            :focus-border-color="`rgba(245, 78, 162, 0.8)`"
+                            :border-width="2"
+                            :border-radius="6"
+                            underline
+                            :readonly="readonly != false"
+                            style="height: 60px;"
+                            :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
+                        ></fv-text-box>
                         <p
                             v-show="readonly && fabulousNotebook.title"
                             :class="[{dark: theme === 'dark'}]"
@@ -297,7 +309,7 @@ export default {
         },
         toolbarHeight() {
             if (this.contentType !== "fabulous_notebook") return 160;
-            return this.fabulousNotebook.banner ? 250 : 290;
+            return 230;
         },
     },
     mounted() {
@@ -382,11 +394,7 @@ export default {
                 if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                     this.$refs.editor.save();
                     this.toggleUnsave(false);
-                } else if (
-                    event.keyCode === 83 &&
-                    ctrl &&
-                    event.shiftKey
-                ) {
+                } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                     this.saveAs();
                     this.toggleUnsave(false);
                 } else {
@@ -487,7 +495,7 @@ export default {
             };
             reader.readAsDataURL(file);
         },
-        saveClick () {
+        saveClick() {
             this.$refs.editor.save();
             this.toggleUnsave(false);
         },
@@ -563,8 +571,10 @@ export default {
         @include Vcenter;
 
         position: relative;
+        width: calc(100% - 12px);
         min-height: 40px;
         height: 40px;
+        margin-left: 6px;
         padding-top: 32px;
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
@@ -598,10 +608,12 @@ export default {
 
     .nav-banner {
         position: relative;
-        width: 100%;
+        width: calc(100% - 12px);
         height: 40px;
+        margin-left: 6px;
         padding: 0px 5px;
 
+        box-sizing: border-box;
         display: flex;
         align-items: center;
         backdrop-filter: blur(25px);
@@ -611,10 +623,10 @@ export default {
 
     .fabulous-notebook-info-block {
         position: absolute;
-        left: 0px;
+        left: 6px;
         top: 5px;
-        width: 100%;
-        height: 230px;
+        width: calc(100% - 12px);
+        height: 170px;
         padding: 0px 5px;
         box-sizing: border-box;
         display: flex;
@@ -625,10 +637,6 @@ export default {
         -webkit-backdrop-filter: blur(25px);
         overflow: hidden;
         z-index: 2;
-
-        &.has-banner {
-            height: 180px;
-        }
     }
 
     .fabulous-notebook-banner-img {
@@ -650,7 +658,7 @@ export default {
         }
     }
 
-    .fabulous-notebook-readonly-title-block {
+    .fabulous-notebook-title-block {
         @include Hcenter;
 
         position: relative;

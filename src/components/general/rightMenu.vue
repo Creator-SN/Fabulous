@@ -56,9 +56,20 @@ export default {
         },
     },
     mounted() {
+        this.globalAppendInit();
         this.rightMenuClearInit();
     },
     methods: {
+        globalAppendInit() {
+            this.$nextTick(() => {
+                const body = document.querySelector("body");
+                if (body.append) {
+                    body.append(this.$el);
+                } else {
+                    body.appendChild(this.$el);
+                }
+            });
+        },
         rightMenuClearInit() {
             window.addEventListener("click", (event) => {
                 let x = event.target;
@@ -136,7 +147,6 @@ export default {
 
         div {
             span {
-
                 &:hover {
                     background: rgba(36, 36, 36, 1);
                 }
@@ -150,6 +160,12 @@ export default {
                 border-bottom: rgba(50, 49, 48, 1) solid thin;
             }
         }
+    }
+
+    .icon-img {
+        width: 15px;
+        height: auto;
+        user-select: none;
     }
 }
 

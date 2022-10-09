@@ -17,7 +17,7 @@
         ></title-bar>
         <div class="addition-container">
             <div class="global-container">
-                <keep-alive>
+                <keep-alive include="Home,Templates,Settings">
                     <router-view></router-view>
                 </keep-alive>
             </div>

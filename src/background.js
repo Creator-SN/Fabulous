@@ -9,7 +9,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 import * as remote from "@electron/remote/main"
 remote.initialize()
 
-const translate = require('google-translate-cn-api');
+const { microsoft } = require('translate-platforms');
 
 var fs = require('fs-extra');
 const path = require('path');
@@ -337,14 +337,22 @@ async function createWindow() {
         });
     });
 
-    ipcMain.on("translate", (event, obj) => {
-        translate(obj.text, { from: obj.from, to: obj.to }).then(res => {
+    ipcMain.on("translate", async (event, obj) => {
+        try {
+            const result = await microsoft(obj.text, { to: microsoft.zh });
             if (obj.id) {
-                event.reply(`translate-callback:${obj.id}`, res);
+                event.reply(`translate-callback:${obj.id}`, result);
             }
             else
-                event.reply('translate-callback', res);
-        })
+                event.reply('translate-callback', result);
+        }
+        catch (e) {
+            if (obj.id) {
+                event.reply(`translate-callback:${obj.id}`, { text: '翻译失败' });
+            }
+            else
+                event.reply('translate-callback', { text: '翻译失败' });
+        }
     });
 
     let positionInfo = () => {

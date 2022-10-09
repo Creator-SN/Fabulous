@@ -63,6 +63,7 @@
                         v-show="x.item.filePath"
                         class="tree-view-item-right-block"
                         @click="rightClick($event, x.item)"
+                        @mousedown.stop
                     >
                         <i class="ms-Icon ms-Icon--More more-menu-btn"></i>
                     </div>
@@ -83,6 +84,7 @@
         </div>
         <right-menu
             v-model="show.rightMenu"
+            class="lt-right-menu"
             :theme="theme"
             :posX="posX"
             :posY="posY"
@@ -197,7 +199,7 @@ export default {
             default: false,
         },
         Go: {
-            default: () => {}
+            default: () => {},
         },
         theme: {
             default: "light",
@@ -447,6 +449,8 @@ export default {
                 });
                 this.$refs.tree.$forceUpdate();
             });
+
+            window.addEventListener("click", this.whiteClickClearTmp);
         },
         async chooseFolder() {
             let path = (
@@ -808,6 +812,7 @@ export default {
         },
         rightClick(event, item) {
             event.preventDefault();
+            event.stopPropagation();
             if (!item.filePath) return;
             this.show.rightMenu = true;
             let bounding = this.$el.getBoundingClientRect();
@@ -833,6 +838,24 @@ export default {
                 path: url,
             });
         },
+        whiteClickClearTmp(event) {
+            let x = event.target;
+            let _self = false;
+            while (x && x.tagName && x.tagName.toLowerCase() != "body") {
+                let classList = [...x.classList];
+                if (
+                    classList.includes("fv-TreeView__item") ||
+                    classList.includes("navigation-view-mode-block") ||
+                    classList.includes("navigation-view-command-bar-block") ||
+                    classList.includes("lt-right-menu")
+                ) {
+                    _self = true;
+                    break;
+                }
+                x = x.parentNode;
+            }
+            if (!_self) this.removeTmp();
+        },
         async openNotebook() {
             let id = this.$Guid();
             if (process.argv.length >= 2) {
@@ -853,7 +876,10 @@ export default {
                     });
                 });
             }
-        }
+        },
+    },
+    beforeDestroy() {
+        window.removeEventListener("click", this.whiteClickClearTmp);
     },
 };
 </script>

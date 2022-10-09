@@ -10,7 +10,7 @@ export default new Vuex.Store({
         DataDB: null,
         // config //
         config: {
-            init_status: true,
+            init_status: false,
             data_path: [],
             data_index: -1,
             language: 'en',

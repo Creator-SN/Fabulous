@@ -798,5 +798,9 @@ export default {
     "Config Data Source": {
         "en": "Config Data Source",
         "cn": "配置数据源"
+    },
+    "Delete Banner": {
+        "en": "Delete Banner",
+        "cn": "删除头图"
     }
 }
