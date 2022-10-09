@@ -337,6 +337,7 @@
         ></metadata-panel>
         <folder-window
             v-model="show.folder"
+            :title="local('Induce to Partitions')"
             @choose-partitions="copyItemsToPartitions"
         ></folder-window>
     </div>
