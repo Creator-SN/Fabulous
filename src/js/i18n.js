@@ -143,9 +143,9 @@ export default {
         "en": "View Metadata",
         "cn": "查看元数据"
     },
-    "Copy to Partitions": {
-        "en": "Copy to Partitions",
-        "cn": "拷贝到分区"
+    "Induce to Partitions": {
+        "en": "Induce to Partitions",
+        "cn": "收藏到分区"
     },
     "Remove From Partition": {
         "en": "Remove From Partition",

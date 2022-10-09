@@ -275,7 +275,7 @@
                                     class="ms-Icon ms-Icon--FabricMovetoFolder"
                                     :style="{color: theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(0, 90, 158, 1)'}"
                                 ></i>
-                                <p>{{local("Copy to Partitions")}}</p>
+                                <p>{{local("Induce to Partitions")}}</p>
                             </span>
                             <span @click="addToTransferCarrier">
                                 <i
@@ -418,7 +418,7 @@ export default {
                     },
                 },
                 {
-                    name: () => this.local("Copy to Partitions"),
+                    name: () => this.local("Induce to Partitions"),
                     icon: "FabricMovetoFolder",
                     iconColor: () =>
                         this.theme === "dark"
