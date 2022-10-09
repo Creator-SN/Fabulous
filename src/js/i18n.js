@@ -802,5 +802,9 @@ export default {
     "Delete Banner": {
         "en": "Delete Banner",
         "cn": "删除头图"
+    },
+    "Template Preview": {
+        "en": "Template Preview",
+        "cn": "模板预览"
     }
 }
