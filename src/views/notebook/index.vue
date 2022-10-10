@@ -389,31 +389,37 @@ export default {
             this.timer.autoSave = setInterval(this.autoSaveContent, 10000);
         },
         ShortCutInit() {
-            this.$el.addEventListener("keydown", (event) => {
-                let ctrl = event.ctrlKey || event.metaKey;
-                if (event.keyCode === 83 && ctrl && !event.shiftKey) {
-                    this.$refs.editor.save();
-                    this.toggleUnsave(false);
-                } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
-                    this.saveAs();
-                    this.toggleUnsave(false);
-                } else {
-                    let filterKey = [16, 17, 18, 20];
-                    if (filterKey.indexOf(event.keyCode) < 0) {
-                        if (!this.readonly) this.toggleUnsave(true);
-                    }
+            window.addEventListener("keydown", this.shortCutEvent);
+        },
+        shortCutEvent(event) {
+            if (this.$route.name !== "NoteBook") return;
+            let ctrl = event.ctrlKey || event.metaKey;
+            if (event.keyCode === 83 && ctrl && !event.shiftKey) {
+                this.getEditor().save();
+                this.toggleUnsave(false);
+            } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
+                this.saveAs();
+                this.toggleUnsave(false);
+            } else {
+                let filterKey = [16, 17, 18, 20];
+                if (filterKey.indexOf(event.keyCode) < 0) {
+                    if (!this.readonly) this.toggleUnsave(true);
                 }
+            }
 
-                if (event.keyCode === 9) {
-                    event.preventDefault();
-                    if (
-                        this.$refs.editor.editor.isActive("bulletList") ||
-                        this.$refs.editor.editor.isActive("orderedList")
-                    )
-                        return;
-                    this.$refs.editor.editor.commands.insertContent("    ");
-                }
-            });
+            if (event.keyCode === 9) {
+                event.preventDefault();
+                if (
+                    this.getEditor().editor.isActive("bulletList") ||
+                    this.getEditor().editor.isActive("orderedList")
+                )
+                    return;
+                if (this.readonly) return;
+                this.getEditor().editor.commands.insertContent("    ");
+            }
+        },
+        getEditor() {
+            return this.$refs.editor;
         },
         toggleUnsave(status = true) {
             this.reviseEditor({
@@ -547,6 +553,7 @@ export default {
     },
     beforeDestroy() {
         clearInterval(this.timer.autoSave);
+        window.removeEventListener("keydown", this.shortCutEvent);
     },
 };
 </script>

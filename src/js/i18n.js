@@ -293,7 +293,7 @@ export default {
     },
     "New Data Source": {
         "en": "New Data Source",
-        "cn": "新建数据源"
+        "cn": "新数据源"
     },
     "Choose Data Source Path ...": {
         "en": "Choose Data Source Path ...",
@@ -311,9 +311,9 @@ export default {
         "en": "Data Source Name'",
         "cn": "数据源名称"
     },
-    "New Data Source Name": {
-        "en": "New Data Source Name",
-        "cn": "数据源名称"
+    "Input Data Source Name": {
+        "en": "Input Data Source Name",
+        "cn": "输入数据源名称"
     },
     "Exists Data Source": {
         "en": "Exists Data Source",
@@ -806,5 +806,25 @@ export default {
     "Template Preview": {
         "en": "Template Preview",
         "cn": "模板预览"
+    },
+    "Will create on": {
+        "en": "Will create on",
+        "cn": "将在路径"
+    },
+    "create with new data source": {
+        "en": "with",
+        "cn": "中创建"
+    },
+    "Or": {
+        "en": "Or",
+        "cn": "或者"
+    },
+    "Please select the data source directory containing data_sturcture.json and root folder.": {
+        "en": "Please select the data source directory containing [data_sturcture.json] and [root] folder.",
+        "cn": "请选择包含 [data_sturcture.json] 和 [root] 文件夹的目录"
+    },
+    "The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.": {
+        "en": "The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.",
+        "cn": "数据源是一个用于存储文献数据的目录, 请选择适合位置存放它。创建后无需管理。"
     }
 }

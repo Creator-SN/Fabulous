@@ -105,23 +105,29 @@
                     style="width: 120px; height: auto;"
                 ></fv-img>
                 <p class="title">{{local(`New Data Source`)}}</p>
+                <p class="info" style="max-width: 600px; margin-bottom: 35px; text-align: center;">{{local('The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.')}}</p>
                 <fv-text-box
                     v-model="name"
-                    :placeholder="local('New Data Source Name')"
+                    :placeholder="local('Input Data Source Name')"
                     background="rgba(255, 255, 255, 0.6)"
                     :reveal-border="true"
                     @keyup.enter="addSource"
                 ></fv-text-box>
-                <fv-text-box
-                    v-model="path"
-                    :placeholder="local('Choose Data Source Directory ...')"
+                <fv-button
                     theme="dark"
-                    background="rgba(0, 130, 180, 0.3)"
-                    :reveal-border="true"
-                    readonly
-                    style="margin-top: 5px; margin-bottom: 15px;"
-                    @click.native="choosePath"
-                ></fv-text-box>
+                    icon="FolderOpen"
+                    background="rgba(0, 130, 180, 0.6)"
+                    :is-box-shadow="true"
+                    style="width: 300px; height: 30px; margin-top: 15px; margin-bottom: 15px;"
+                    :title="path"
+                    @click="choosePath"
+                >
+                    <p style="max-width: 80%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{path ? path : local('Choose Data Source Directory ...')}}</p>
+                </fv-button>
+                <p
+                    v-show="name && path"
+                    class="info"
+                >{{local(`Will create on`)}} [{{path}}] {{local('create with new data source')}} [{{name}}]</p>
                 <fv-button
                     theme="dark"
                     background="rgba(0, 130, 180, 1)"
@@ -129,13 +135,14 @@
                     class="starter-btn"
                     @click="addSource"
                 >{{local('Confirm')}}</fv-button>
+                <p class="info">{{local('Or')}}</p>
                 <fv-button
                     theme="dark"
                     icon="Attach"
-                    background="rgba(29, 85, 125, 0.3)"
+                    background="rgba(255, 180, 0, 0.8)"
                     class="starter-btn"
                     @click="() => {path = ''; step++;}"
-                >{{local('Exists Data Source')}}</fv-button>
+                >{{local('Exists Data Source')}} ?</fv-button>
             </div>
         </transition>
         <transition name="scale-up-to-up">
@@ -148,16 +155,18 @@
                     style="width: 120px; height: auto;"
                 ></fv-img>
                 <p class="title">{{local(`Choose from Exists`)}}</p>
-                <fv-text-box
-                    v-model="path"
-                    :placeholder="local('Choose Data Source Path ...')"
+                <p class="info" style="margin-bottom: 25px;">{{local('Please select the data source directory containing data_sturcture.json and root folder.')}}</p>
+                <fv-button
                     theme="dark"
-                    background="rgba(0, 130, 180, 0.3)"
-                    :reveal-border="true"
-                    readonly
-                    @click.native="choosePath"
-                    style="margin-bottom: 15px;"
-                ></fv-text-box>
+                    icon="FolderOpen"
+                    background="rgba(0, 130, 180, 0.6)"
+                    :is-box-shadow="true"
+                    style="width: 300px; height: 35px; margin-top: 15px; margin-bottom: 15px;"
+                    :title="path"
+                    @click="choosePath"
+                >
+                    <p style="max-width: 80%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{path ? path : local('Choose Data Source Path ...')}}</p>
+                </fv-button>
                 <fv-button
                     theme="dark"
                     background="rgba(0, 130, 180, 1)"
@@ -422,9 +431,16 @@ export default {
         }
 
         .title {
-            margin: 25px;
+            margin-top: 25px;
+            margin-bottom: 5px;
             font-size: 20px;
             color: whitesmoke;
+        }
+
+        .info {
+            margin: 8px;
+            font-size: 12px;
+            color: rgba(239, 239, 239, 0.8);
         }
 
         .starter-btn {
