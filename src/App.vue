@@ -31,7 +31,7 @@
             ref="drop"
         ></div>
         <transition :name="init_status ? `move-bottom-to-top` : `move-top-to-bottom`">
-            <starter v-if="true || init_status"></starter>
+            <starter v-if="init_status"></starter>
         </transition>
         <progress-bar></progress-bar>
     </div>
