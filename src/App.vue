@@ -289,6 +289,8 @@ export default {
     height: 100%;
     margin: 0px;
     padding: 0px;
+    font-family: Segoe UI Emoji, Segoe UI Symbol, Segoe UI,
+        Helvetica Neue, Helvetica, Arial, sans-serif;
     display: flex;
     overflow: hidden;
     transition: all 0.3s;
