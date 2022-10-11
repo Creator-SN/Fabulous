@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/logo.png";
 import languageImg from "@/assets/nav/language.svg";
 import dataSourceImg from "@/assets/nav/dataSource.svg";
 import linkImg from "@/assets/nav/link.svg";
