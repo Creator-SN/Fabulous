@@ -23,9 +23,14 @@ The Application is **Cross Platform** and powered by Electron.
 
 [中文文档(Chinese)](./doc/Chinese.md)
 
-### 🤔 Why we need Fabulous?
+### 🤔 What can Fab do?
 
-The **Fabulous** aims to provide a complete article management and well-performanced notion user experience. We provide automatic retrieval of literature metadata, and our notebook supports rich text edition and even markdown typing (like typroa).
+**Fabulous** provides complete **PDF reference management** and powerful **swift notes** experience. We offer:
+
+- PDF document metadata automatic retrieving
+- PDF document translation
+- Swift Notes with `Markdown` shortcut input supported
+- Notes interact with PDF selection
 
 ## 🎈 Platform
 
@@ -33,108 +38,76 @@ The **Fabulous** aims to provide a complete article management and well-performa
 - ✔ Windows 10 [Supported]
 - ✔ Mac [Supported]
 
-### 📍 Usage
+### 📍 Quick Start
 
-**Installation**
+**First Time Installation**
 
-From the releases page, choose the lateset stable version and download the installer file.
+From the releases page, choose the latest stable version and download the installer file.
 
-**First time useage**
+**First-time Useage**
 
-![f1](./doc/assets/f1.png)
+The first time launching the app, the guide page will be shown up. Just click the next step according to your interests. If you don't want to do reference management, you just need to open the **Notebook System**.
 
-For the first time to start up, there is a user guide page. And don't worry, just follow the guide page step by step, it's easy and quick to finish the set up. Just click the `Start` button to move on.
+![f1](./doc/assets/Chinese-f1.png)
 
-In this step, you're going to add a new data source. And you need to choose folder to create the new data source folder.
-> A data source is a physical folder to store all the files, and the database would be store in the `data_structure.json` file. Of course, you don't need to be concerned about what's in the folder, and I don't suggest you change the files in the folder, just ignore it, everything is work fine by **Fabulous**😊.
+- If you select **Reference Management System**, or **All**, you need to specify a data source.
+- The data source is a directory to store **all literature data**. It is **Management-free** after creation, just make sure that the files in it are not modified or deleted. It is also recommended not to create other content inside it.
 
-Or, if you already have a data source folder and you want to link to it, you can click the `Exists Data Source` button to switch the mode.
+Enter a nice name and select a suitable directory, and then click **Confirm** to complete the initial setup.
 
-![f2](./doc/assets/f2.png)
+![f2](./doc/assets/Chinese-f2.png)
 
-And you can select the exists data source root folder to link it. Make sure the folder is the one contains `root/` folder and `data_structure.json`.
+**Reference Management**
 
-![f3](./doc/assets/f3.png)
+Dragging one or multiple PDF references into Fab, then it will automatically retrieve the metadata.
 
-When you're ready, just click `Confirm` to finish setup.
+![f3](./doc/assets/Chinese-f3.png)
 
-**Articles Management**
+You can see that the title of the document is automatically extracted, and `PDF Reference` and `metadata` are summarized in an `item`. Click `metadata` to view more information.
 
-![f4](./doc/assets/f4.png)
+![f4](./doc/assets/Chinese-f4.png)
 
-- All your articles can be found in the `All` page, you can add new `Partition` to collect your domain specific articles. And you can also add new `Group` to collect multiple `Partitions`.
+**Add Reference**
 
-![f5](./doc/assets/f5.png)
+You can also click the `Import` button to import articles on each `partition` page. **Fabulous** will automatically create an `Item` for each article.
 
-- The root `Partition` or `Group` can be add by the below `Add` button. The group `Partitions` can be create by right click the current `Group`.
+**Reference Pages**
 
-> You should be known that the `Group` can't directly contain the articles, it is just a collection of `Partition`. You can create groups nested, however, the **Fabulous** database is constructed based on a lightwight database. Therefore nesting too deeply may cause performance decrease.
+You can add multiple notes to each project. Click **Add Page**, and you can quickly create a new beautiful note from the template.
 
-**Add Articles**
+![f5](./doc/assets/Chinese-f5.png)
 
-- You can click the `Import` button to import articles in each `Partition` page. **Fabulous** would automatically create an `Item` for each article.
+Swift Note supports rich text editing and **Markdown shortcut input**. The format supports of our editor can be displayed as follows:
 
-- You can even drag the `pdf` files into the application, the function is the same as `Import`.
-
-![f6](./doc/assets/f6.png)
-
-- Each `Item` contains the article `pdf` file, `metadata` file, and `Note Pages`.
-
-- You can manaully add a new `Item` by click `Add` button, if sometimes you don't wanna add a article but only want to write something on the `Note Page`, you can use this method.
-
-> The article title extraction is implemented by two methods, one is the `pdf` file metadata extraction. However, some journal articles may contain full metadata, but most files don't contain any information. 
-The other method is implemented by sorting the `font size` and `position` of first page to extract the title.
-The title extraction accuracy is acceptable, and if anyone has a better idea, we are welcome you to be a contributor. 😊
-
-> The article metadata extraction is powered by the **CrossRef** API, there are still many articles can't be retrieved for metadata, if you have better free sources please let us know.
-
-**Note Page**
-
-Our notebook editor is implemented with the [PowerEditor](https://github.com/Creator-SN/PowerEditor), which is powered by [tiptap](https://tiptap.dev/).
-
-It's exciting to show that our editor support rich text editing, and **Markdown Shortcuts**. The extension function of our editor can be displayed as follows:
-
-![f7](./doc/assets/f7.png)
+![f6](./doc/assets/Chinese-f6.png)
 
 - Font Style (Bold, Italic, Strike, Underline)
 - Block Quote
 - Horizontal Rule
 - Header
-- **To-do Task List**
+- To-do Task List
 - Order List
 - Text Align
 - Text Color
 - Text Highlight
-- **Drawing Block**
+- Drawing Block
 - Emoji
 - Code
-- **Inline Equation**
-- **Block Equation**
+- Inline Equation
+- Block Equation
 - Image
 - Link
 - Embed
 
-**Data Source Recover**
+**Interact with PDF**
 
-If you want to add some new data sources or recover your data source in a new device, just follow the below steps:
+Swift Note supports adding `PDF Note` to generate notes associated with the corresponding PDF document location. You only need to select the specified range in the PDF viewer, and then click the yellow button to create the corresponding notes.
 
-![f8](./doc/assets/f8.png)
+![f7](./doc/assets/Chinese-f7.png)
 
-1. Click the `Setting` button to enter the **Setting** page.
+In double-column mode, you can see that the notes on the left have created corresponding PDF Notes.
 
-2. In the **Source** block, click `Add New Source` button to link to a existing souce.
-
-3. Please make sure the data source folder is the one contains a `data_structure.json` file and a `root/` folder.
-
-![f9](./doc/assets/f9.png)
-
-4. If you choose the wrong folder without `data_structure.json`, there will appear a **yellow** button to warn you that there is no `data_structure.json`. 
-
-    > If you mistake the right folder position, just remove this source and choose the right folder again, do not click the **yellow** button !!!
-
-5. If you want to add a new empty source, please create an empty folder for the data source and choose this folder. Then click the **yellow** button to init a new data source.
-
-6. You can switch the current data source by clicking each item of the source list.
+![f8](./doc/assets/Chinese-f8.png)
 
 ### 🛠 Project setup
 
