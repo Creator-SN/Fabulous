@@ -58,6 +58,16 @@
                         ]"
                         ></i></fv-button>
                     <fv-button
+                        v-show="displayMode !== 1"
+                        :theme="theme"
+                        :borderRadius="30"
+                        class="control-btn"
+                        :title="local('Save As')"
+                        @click="saveAs"
+                    >
+                        <i class="ms-Icon ms-Icon--SaveAs"></i>
+                    </fv-button>
+                    <fv-button
                         v-show="unsave"
                         :theme="theme"
                         :borderRadius="30"
@@ -269,7 +279,10 @@ import pdf from "@/assets/home/pdf.svg";
 import note from "@/assets/home/note.svg";
 
 const { ipcRenderer: ipc } = require("electron");
+const { dialog } = require("@electron/remote");
 const path = require("path");
+
+import { fabulous_notebook } from "@/js/data_sample.js";
 
 export default {
     components: {
@@ -560,12 +573,12 @@ export default {
         },
         shortCutEvent(event) {
             if (!this.show_editor) return;
-            if (
-                (event.keyCode === 83 && event.ctrlKey) ||
-                (event.keyCode === 83 && event.metakey)
-            ) {
+            let ctrl = event.ctrlKey || event.metaKey;
+            if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                 this.getEditor().save();
                 this.toggleUnsave(false);
+            } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
+                this.saveAs();
             } else {
                 let filterKey = [16, 17, 18, 20];
                 if (filterKey.indexOf(event.keyCode) < 0) {
@@ -643,6 +656,38 @@ export default {
                 path: url,
                 data: JSON.stringify(json),
             });
+        },
+        saveAs() {
+            let filters = [
+                {
+                    name: this.local("Fabulous Notebook"),
+                    extensions: ["fbn"],
+                },
+            ];
+            dialog
+                .showSaveDialog({
+                    title: this.local("Save As"),
+                    filters: filters.concat([
+                        {
+                            name: this.local("All Files"),
+                            extensions: ["*"],
+                        },
+                    ]),
+                })
+                .then((result) => {
+                    if (result.canceled) return;
+                    let targetPath = result.filePath;
+                    let json = this.$refs.editor.editor.getJSON();
+                    let saveContent = Object.assign({}, fabulous_notebook);
+                    saveContent.title = this.target.name;
+                    saveContent.content = json;
+                    saveContent.updateDate = new Date();
+                    ipc.send("output-file", {
+                        id: "editor",
+                        path: targetPath,
+                        data: JSON.stringify(saveContent),
+                    });
+                });
         },
         openEditor(item, page) {
             if (!this.lock.loading) return;
@@ -1055,7 +1100,7 @@ export default {
     }
 
     .ProseMirror {
-        p {
+        * {
             line-height: 2;
         }
     }

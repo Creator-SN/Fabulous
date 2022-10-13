@@ -21,7 +21,7 @@
                             v-if="x.item.loading == false"
                             draggable="false"
                             class="icon-img"
-                            :src="x.item.isDir ? img.folder : img.note"
+                            :src="computeIcon(x.item)"
                             alt=""
                         >
                         <fv-progress-ring
@@ -177,6 +177,9 @@ const { dialog, process } = require("@electron/remote");
 
 import folderImg from "@/assets/nav/folder.svg";
 import noteImg from "@/assets/nav/note.svg";
+import jsonImg from "@/assets/nav/json.svg";
+import htmlImg from "@/assets/nav/html.svg";
+import fileImg from "@/assets/nav/file.svg";
 
 export default {
     components: { rightMenu },
@@ -195,6 +198,9 @@ export default {
         rightMenuWidth: {
             default: 200,
         },
+        toggleEditor: {
+            default: () => {},
+        },
         unsave: {
             default: false,
         },
@@ -212,6 +218,9 @@ export default {
             img: {
                 folder: folderImg,
                 note: noteImg,
+                json: jsonImg,
+                html: htmlImg,
+                file: fileImg,
             },
             FLAT: [],
             copyList: [],
@@ -256,6 +265,17 @@ export default {
             return (path1, path2) => {
                 if (!path1 || !path2) return false;
                 return path1.replace(/\\/g, "/") === path2.replace(/\\/g, "/");
+            };
+        },
+        computeIcon() {
+            return (item) => {
+                if (item.isDir) return this.img.folder;
+                let nameList = item.name.split(".");
+                let ext = nameList[nameList.length - 1];
+                if (ext === "fbn") return this.img.note;
+                if (ext === "json") return this.img.json;
+                if (ext === "html") return this.img.html;
+                return this.img.file;
             };
         },
     },
@@ -441,6 +461,7 @@ export default {
                             if (exists)
                                 setTimeout(() => {
                                     if (this.$route.path === url) return;
+                                    this.toggleEditor(false);
                                     this.Go(url);
                                 }, 300);
                             resolve(1);
@@ -870,6 +891,7 @@ export default {
                     ipc.on(`exists-path-${id}`, (event, { exists }) => {
                         if (exists)
                             setTimeout(() => {
+                                this.toggleEditor(false);
                                 this.Go(url);
                             }, 300);
                         resolve(1);
