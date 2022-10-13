@@ -172,32 +172,106 @@ yarn lint
 
 **Init Function**
 
-1. load_ds_file
+```javascript
+export const config = {
+    init_status: true,
+    data_path: [],
+    data_index: -1,
+    language: "en",
+    autoSave: false,
+    lastLocalPath: "",
+    editorExpandContent: false,
+    activeSystemMode: 'both', // ds, notebook, both
+    dynamicEffect: true,
+    watchAllExtensions: false,
+    themeColorList: [],
+    theme: "light"
+}
 
-    ```javascript
-    load_ds_file(data_path=[])
-    => {
-        status,
-        dbXList: [{
-            status,
-            db
-        }]
-    }
-    ```
-    - status: 
-        - `200`: success.
-        - `404`: data_path is empty.
-        - `500`: source url not found.
-        - `502`: data_structure.json not found.
-    - dbXList: A array of each source object, each object contains the current ds' db and status.
-    - db: A data_structure's lowdb DataStore.
 
-2. init_ds
+export const data_structure = {
+    id: null,
+    name: null,
+    groups: [],
+    partitions: [],
+    items: [],
+    templates: [],
+    path: null,
+    createDate: null
+}
 
-    ```javascript
-    init_ds(id, name, ds_db)
-    => default
-    ```
+export const group = {
+    id: null,
+    name: null,
+    emoji: null,
+    groups: [],
+    partitions: [],
+    createDate: null
+}
+export const partition = {
+    id: null,
+    name: null,
+    emoji: null,
+    items: [], // only item id
+    createDate: null
+}
+
+export const item = {
+    id: null,
+    name: null,
+    emoji: null,
+    pdf: null,
+    metadata: null,
+    pages: [],
+    labels: [],
+    createDate: null,
+    updateDate: null
+}
+
+export const page = {
+    id: null,
+    name: null,
+    emoji: null,
+    createDate: null,
+    updateDate: null
+}
+
+export const metadata = {
+    publisher: null,
+    DOI: null,
+    year: null,
+    createDate: null,
+    source: null,
+    title: null,
+    url: null,
+    containerTitle: null, //一般是会议名称
+    abstract: null,
+    ISSN: null,
+    language: null,
+    chapter: null,
+    pages: null,
+    school: null,
+    note: null,
+    authors: []
+}
+
+export const author = {
+    first: null,
+    last: null,
+    sequence: null
+}
+
+export const fabulous_notebook = {
+    fabulous_notebook: true,
+    title: null,
+    description: null,
+    banner: null,
+    content: null,
+    author: [],
+    createDate: null,
+    updateDate: null
+}
+```
 
 ### License
 
