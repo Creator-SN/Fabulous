@@ -42,7 +42,7 @@
 
 **首次安装**
 
-从发布(`Release`)页面，选择最新的稳定版本并下载。
+从发布([`Release`](https://github.com/Creator-SN/Fabulous/releases))页面，选择最新的稳定版本并下载。
 
 **首次使用**
 
