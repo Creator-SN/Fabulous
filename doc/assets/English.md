@@ -11,101 +11,99 @@
     </a>
 </p>
 
-# Fab
+# Fabulous Notebook
 
-[English Document](./doc/English.md)
+Fabulous Notebook **(FAB)** is a **WYSIWYG** notebook with an exciting paper and literature management system.
 
-**Fab (Fabulous)** - 集文献管理和出色笔记体验的应用
+The UI design is based on the [VFluent](https://github.com/aleversn/VFluent), which is inspired by the Microsft [Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/). 
 
-**Fab** 是`Electron`驱动的基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/) Win UI 3.0的文献管理 + 笔记管理综合应用。
+The Application is **Cross Platform** and powered by Electron.
 
-> 关于UI组件库的更多信息, 请了解[VFluent](https://github.com/aleversn/VFluent)。
+> This project is still working on, we are welcome you to be a contributor. 😄
 
-> 该项目仍在进行中，我们欢迎您成为贡献者。 😄
+### 🤔 What can Fab do?
 
-## 🤔 Fab可以做什么?
+**Fabulous** provides complete **PDF reference management** and powerful **swift notes** experience. We offer:
 
-**Fabulous**提供完整的**PDF文献管理**和出色的**妙动笔记**体验。我们提供:
+- PDF document metadata automatic retrieving
+- PDF document translation
+- Swift Notes with `Markdown` shortcut input supported
+- Notes interact with PDF selection
 
-- PDF文献元数据自动检索归纳
-- PDF文献阅读划词翻译
-- 支持`Markdown`输入的富文本妙动笔记
-- 笔记与PDF选区互动
+## 🎈 Platform
 
-## 🎈 平台
+- ✔ Windows 11 [Supported]
+- ✔ Windows 10 [Supported]
+- ✔ Mac [Supported]
 
-- ✔ Windows 11 [支持]
-- ✔ Windows 10 [支持]
-- ✔ Mac [支持]
+### 📍 Quick Start
 
-### 📍 快速上手
+**First Time Installation**
 
-**首次安装**
+From the releases page, choose the latest stable version and download the installer file.
 
-从发布([`Release`](https://github.com/Creator-SN/Fabulous/releases))页面，选择最新的稳定版本并下载。
+**First-time Useage**
 
-**首次使用**
-
-首次使用会弹出引导页, 根据自己的兴趣爱好往下走就够了, 如果你只想做笔记管理, 则只需开启**笔记本系统**。
+The first time launching the app, the guide page will be shown up. Just click the next step according to your interests. If you don't want to do reference management, you just need to open the **Notebook System**.
 
 ![f1](./doc/assets/Chinese-f1.png)
 
-- 如果你选择了**文献管理系统**, 或**全部开启**, 则需要指定一个数据源。
-- 数据源是一个用于**存储文献数据的目录**，创建后**不用管理它**, 确保里面的文件不要被修改删除即可, 也建议不要在里面自行创建其他内容。
+- If you select **Reference Management System**, or **All**, you need to specify a data source.
+- The data source is a directory to store **all literature data**. It is **Management-free** after creation, just make sure that the files in it are not modified or deleted. It is also recommended not to create other content inside it.
 
-输入好名称, 选择好目录后, 点击**确认**即可完成初次引导设置。
+Enter a nice name and select a suitable directory, and then click **Confirm** to complete the initial setup.
 
 ![f2](./doc/assets/Chinese-f2.png)
 
-**文献管理**
+**Reference Management**
 
-直接拖入一篇或多篇文献PDF文件即可将文献导入到Fab中，Fab会自动解析并检索文献的元数据。
+Dragging one or multiple PDF references into Fab, then it will automatically retrieve the metadata.
 
 ![f3](./doc/assets/Chinese-f3.png)
 
-你可以看到文献的标题被自动识别出来了,`PDF文献`和`元数据(Metadata)`被归纳在一个`项目`里 点击`Metadata`可以查看更多的数据。
+You can see that the title of the document is automatically extracted, and `PDF Reference` and `metadata` are summarized in an `item`. Click `metadata` to view more information.
 
 ![f4](./doc/assets/Chinese-f4.png)
 
-**添加文献**
+**Add Reference**
 
-您也可以单击`导入`按钮在每个`分区`页面中导入文章，**Fabulous**会自动为每篇文章创建一个`项目`。
+You can also click the `Import` button to import articles on each `partition` page. **Fabulous** will automatically create an `Item` for each article.
 
-**文献笔记**
+**Reference Pages**
 
-在每一个项目中都可以添加多个笔记, 点击**添加笔记**, 你可以从模板中快速新建一个格式优美的笔记。
+You can add multiple notes to each project. Click **Add Page**, and you can quickly create a new beautiful note from the template.
 
 ![f5](./doc/assets/Chinese-f5.png)
 
-妙动笔记支持丰富的文本编辑和**Markdown快捷编辑方式**。我们编辑器的扩展功能可以显示如下：
+Swift Note supports rich text editing and **Markdown shortcut input**. The format supports of our editor can be displayed as follows:
 
 ![f6](./doc/assets/Chinese-f6.png)
 
-- 字体样式（粗体，斜体，笔划，下划线）
-- 块引用
-- 水平线
-- 标题头
-- 任务列表 
-- 顺序列表
-- 文本对齐
-- 文本颜色
-- 文本突出显示
-- 绘图块
-- Emoji表情
-- 代码块
-- 行内公式
-- 块公式
-- 图片
-- 链接
-- 嵌入
+- Font Style (Bold, Italic, Strike, Underline)
+- Block Quote
+- Horizontal Rule
+- Header
+- To-do Task List
+- Order List
+- Text Align
+- Text Color
+- Text Highlight
+- Drawing Block
+- Emoji
+- Code
+- Inline Equation
+- Block Equation
+- Image
+- Link
+- Embed
 
-**与PDF联动**
+**Interact with PDF**
 
-Fab妙动笔记支持通过添加`PDF Note`来生成与对应PDF文献位置关联的笔记，你只需在PDF浏览器上选择指定内容，然后点击黄色小按钮即可在妙动笔记里创建对应的笔记。
+Swift Note supports adding `PDF Note` to generate notes associated with the corresponding PDF document location. You only need to select the specified range in the PDF viewer, and then click the yellow button to create the corresponding notes.
 
 ![f7](./doc/assets/Chinese-f7.png)
 
-在双栏模式下, 你可以看到左侧的笔记已经创建了对应的PDF块。
+In double-column mode, you can see that the notes on the left have created corresponding PDF Notes.
 
 ![f8](./doc/assets/Chinese-f8.png)
 

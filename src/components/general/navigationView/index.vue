@@ -199,6 +199,7 @@
                         :local="local"
                         :unsave="unsave"
                         :watchAllExtensions="watchAllExtensions"
+                        :toggleEditor="toggleEditor"
                         :Go="Go"
                         ref="local_view"
                     ></local-tree-view>
@@ -499,6 +500,7 @@ export default {
             reviseConfig: "reviseConfig",
             reviseData: "reviseData",
             reviseI18N: "reviseI18N",
+            toggleEditor: "toggleEditor"
         }),
         refreshTreeList() {
             let result = [];
