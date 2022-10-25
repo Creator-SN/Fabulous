@@ -72,6 +72,11 @@ jobs:
     runs-on: macos-latest
     env:
       USE_HARD_LINKS: false
+      CSC_LINK: ~/app.p12
+      P12: ${{ secrets.APP_P12 }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -81,6 +86,13 @@ jobs:
           node-version: 14
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
+
+      - name: create app.p12
+        run: |
+          cat > ~/app.p12.base64 << EOF
+          $P12
+          EOF
+          base64 -d ~/app.p12.base64 -o ~/app.p12
 
       - name: install dependencies
         run: yarn install --frozen-lockfile
@@ -99,13 +111,15 @@ jobs:
           mv ./dist_electron/Fabulous-$v.dmg ./Fabulous-$v.dmg
           mv ./dist_electron/Fabulous-$v.dmg.blockmap ./Fabulous-$v.dmg.blockmap
           mv ./dist_electron/latest-mac.yml ./latest-mac.yml
+          mv ./dist_electron/Fabulous-$v-mac.zip ./Fabulous-$v-mac.zip
+          mv ./dist_electron/Fabulous-$v-mac.zip.blockmap ./Fabulous-$v-mac.zip.blockmap
 
       - name: Upload Prerelease
         uses: ncipollo/release-action@v1
         if: ${{ contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.dmg,*.blockmap,*.yml"
+          artifacts: "*.dmg,*.blockmap,*.yml,*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: true
 
@@ -114,5 +128,5 @@ jobs:
         if: ${{ !contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.dmg,*.blockmap,*.yml"
+          artifacts: "*.dmg,*.blockmap,*.yml,*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}

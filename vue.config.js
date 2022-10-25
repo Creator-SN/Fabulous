@@ -43,14 +43,7 @@ module.exports = {
                 },
                 mac: {
                     icon: './logo.icns',
-                    target: {
-                        target: 'dmg',
-                        arch: [
-                            'x64',
-                            'arm64',
-                            'universal'
-                        ]
-                    },
+                   
                     fileAssociations: [
                         {
                             name: "Fabulous Notebook File",

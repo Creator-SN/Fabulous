@@ -11,8 +11,8 @@ exports.default = async function notarizing(context) {
   return await notarize({
     appBundleId: 'com.creatorsn.fabulous',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: '',
-    appleIdPassword: '',
+    appleId: process.env.APPLE_ID,
+    appleIdPassword: process.env.APPLE_PASSWORD,
   });
 }
 
