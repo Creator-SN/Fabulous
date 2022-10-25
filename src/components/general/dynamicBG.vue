@@ -13,7 +13,8 @@
                 version="1.1"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns:svgjs="http://svgjs.dev/svgjs"
-                viewBox="0 0 800 450"
+                :viewBox="`0 0 ${position.totalScreenWidth} ${position.totalScreenHeight}`"
+                style="width: 100%; height: 100%;"
                 opacity="0.67"
             >
                 <defs>
@@ -28,7 +29,7 @@
                         color-interpolation-filters="sRGB"
                     >
                         <feGaussianBlur
-                            stdDeviation="58"
+                            :stdDeviation="58 / 800 * position.totalScreenWidth"
                             x="0%"
                             y="0%"
                             width="100%"
@@ -41,34 +42,34 @@
                 </defs>
                 <g filter="url(#bbblurry-filter)">
                     <ellipse
-                        rx="228.5"
-                        ry="233"
-                        cx="220.5862579345703"
-                        cy="36.34315490722656"
+                        :rx="228.5 / 800 * position.totalScreenWidth"
+                        :ry="233 / 450 * position.totalScreenHeight"
+                        :cx="220.5862579345703 / 800 * position.totalScreenWidth"
+                        :cy="36.34315490722656 / 450 * position.totalScreenHeight"
                         :fill="computedColor(0)"
                     >
                     </ellipse>
                     <ellipse
-                        rx="228.5"
-                        ry="233"
-                        cx="577.9253872958097"
-                        cy="59.557355013760656"
+                        :rx="228.5 / 800 * position.totalScreenWidth"
+                        :ry="233 / 450 * position.totalScreenHeight"
+                        :cx="577.9253872958097 / 800 * position.totalScreenWidth"
+                        :cy="59.557355013760656 / 450 * position.totalScreenHeight"
                         :fill="computedColor(1)"
                     >
                     </ellipse>
                     <ellipse
-                        rx="228.5"
-                        ry="233"
-                        cx="260.5261757590555"
-                        cy="352.03034834428263"
+                        :rx="228.5 / 800 * position.totalScreenWidth"
+                        :ry="233 / 450 * position.totalScreenHeight"
+                        :cx="260.5261757590555 / 800 * position.totalScreenWidth"
+                        :cy="352.03034834428263 / 450 * position.totalScreenHeight"
                         :fill="computedColor(2)"
                     >
                     </ellipse>
                     <ellipse
-                        rx="228.5"
-                        ry="233"
-                        cx="595.5195257013493"
-                        cy="330.0561856356534"
+                        :rx="228.5 / 800 * position.totalScreenWidth"
+                        :ry="233 / 450 * position.totalScreenHeight"
+                        :cx="595.5195257013493 / 800 * position.totalScreenWidth"
+                        :cy="330.0561856356534 / 450 * position.totalScreenHeight"
                         :fill="computedColor(3)"
                     ></ellipse>
                 </g>
