@@ -177,6 +177,7 @@
                         ></fv-text-box>
                         <p
                             v-show="readonly && fabulousNotebook.title"
+                            class="fabulous-notebook-title"
                             :class="[{dark: theme === 'dark'}]"
                             :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
                         >{{fabulousNotebook.title}}</p>
@@ -352,33 +353,43 @@ export default {
                 }
                 this.toggleUnsave(false);
             });
-            ipc.on(`read-file-notebook`, (event, { status, message, data }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Read File Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-                try {
-                    let rawJson = JSON.parse(data);
-                    if (rawJson.fabulous_notebook) {
-                        this.contentType = "fabulous_notebook";
-                        for (let key in this.fabulousNotebook)
-                            this.fabulousNotebook[key] = rawJson[key];
-                    } else {
-                        this.contentType = "json";
-                        this.fabulousNotebook.content = rawJson;
+            ipc.on(
+                `read-file-notebook`,
+                (event, { status, message, target, data }) => {
+                    if (status !== 200) {
+                        console.error(message);
+                        this.$barWarning(this.local(`Read File Failed`), {
+                            status: "warning",
+                        });
+                        return;
                     }
-                    this.lock.loading = true;
-                } catch (e) {
-                    this.contentType = "html";
-                    this.fabulousNotebook.content = data;
-                    this.lock.loading = true;
+                    try {
+                        let rawJson = JSON.parse(data);
+                        if (rawJson.fabulous_notebook) {
+                            this.contentType = "fabulous_notebook";
+                            for (let key in this.fabulousNotebook)
+                                this.fabulousNotebook[key] = rawJson[key];
+                        } else {
+                            this.contentType = "json";
+                            this.fabulousNotebook.content = rawJson;
+                        }
+                        this.lock.loading = true;
+                    } catch (e) {
+                        let ext = path.extname(target);
+                        if (ext === ".md") {
+                            this.contentType = "md";
+                            this.fabulousNotebook.content =
+                                this.$refs.editor.insertMarkdown(data);
+                        } else {
+                            this.contentType = "html";
+                            this.fabulousNotebook.content = data;
+                        }
+                        this.lock.loading = true;
+                    }
+                    if (this.fabulousNotebook.content === "")
+                        this.$refs.editor.focus();
                 }
-                if (this.fabulousNotebook.content === "")
-                    this.$refs.editor.focus();
-            });
+            );
         },
         configInit() {
             this.auto_save = this.autoSave;
@@ -445,6 +456,7 @@ export default {
             ipc.send("read-file", {
                 id: "notebook",
                 path: this.path,
+                target: this.path,
             });
         },
         autoSaveContent() {
@@ -512,6 +524,10 @@ export default {
                     extensions: ["fbn"],
                 },
                 {
+                    name: this.local("Markdown File"),
+                    extensions: ["md"],
+                },
+                {
                     name: this.local("JSON"),
                     extensions: ["json"],
                 },
@@ -520,8 +536,8 @@ export default {
                     extensions: ["html"],
                 },
             ];
-            if (this.contentType === "json") filters = filters.slice(1);
-            if (this.contentType === "html") filters = filters.slice(2);
+            if (this.contentType === "json") filters = filters.slice(2);
+            if (this.contentType === "html") filters = filters.slice(3);
             dialog
                 .showSaveDialog({
                     title: this.local("Save As"),
@@ -536,12 +552,31 @@ export default {
                 .then((result) => {
                     if (result.canceled) return;
                     let targetPath = result.filePath;
-                    let json = this.$refs.editor.editor.getJSON();
-                    let saveContent = this.saveContent(json);
+                    let saveContent = "";
+                    if (path.extname(targetPath) === ".md") {
+                        try {
+                            saveContent = this.$refs.editor.saveMarkdown();
+                        } catch (e) {
+                            this.$barWarning(
+                                this.local(
+                                    "Export Markdown Failed, Please Check Your Content."
+                                ),
+                                {
+                                    status: "warning",
+                                }
+                            );
+                        }
+                    } else if (path.extname(targetPath) === ".html") {
+                        saveContent = this.$refs.editor.editor.getHTML();
+                    } else {
+                        let json = this.$refs.editor.editor.getJSON();
+                        saveContent = this.saveContent(json);
+                        saveContent = JSON.stringify(saveContent);
+                    }
                     ipc.send("output-file", {
                         id: "notebook",
                         path: targetPath,
-                        data: JSON.stringify(saveContent),
+                        data: saveContent,
                     });
                 });
         },
@@ -676,6 +711,12 @@ export default {
 
         &.dark {
             color: whitesmoke;
+        }
+
+        .fabulous-notebook-title {
+            &.dark {
+                color: whitesmoke;
+            }
         }
     }
 

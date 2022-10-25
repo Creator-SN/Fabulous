@@ -826,5 +826,18 @@ export default {
     "The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.": {
         "en": "The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.",
         "cn": "数据源是一个用于存储文献数据的目录, 请选择适合位置存放它。创建后无需管理。"
+    },
+    "Markdown File": {
+        "en": "Markdown File",
+        "cn": "Markdown 文件"
+    },
+    "Export Markdown": {
+        "en": "Export Markdown",
+        "cn": "导出Markdown"
+    },
+    "Export Markdown Failed, Please Check Your Content.":
+    {
+        "en": "Export Markdown Failed, Please Check Your Content.",
+        "cn": "导出Markdown失败, 请检查内容。"
     }
 }

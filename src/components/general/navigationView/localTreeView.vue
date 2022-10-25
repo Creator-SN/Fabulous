@@ -6,13 +6,17 @@
             :theme="theme"
             ref="tree"
             :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
-            :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
+            :backgroundColorHover="theme == 'dark' ? 'rgba(36, 36, 36, 0.3)' : 'rgba(245, 245, 245, 0.3)'"
+            :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
+            :leftIconForeground="'rgba(245, 78, 162, 0.8)'"
+            :expandClickMode="'normal'"
             style="width: 100%; height: 100%;"
             @click="treeItemClick"
         >
             <template v-slot:default="x">
                 <div
                     class="tree-view-custom-item"
+                    :class="[{dark: theme === 'dark'}]"
                     :style="{opacity: copyList.find(it => it.path === x.item.filePath && it.type === 'move') ? 0.6 : ''}"
                     @contextmenu="rightClick($event, x.item)"
                 >
@@ -35,6 +39,7 @@
                         <p
                             v-show="!x.item.editable"
                             class="tree-view-custom-label"
+                            :title="x.item.name"
                         >{{x.item.name}}</p>
                         <fv-text-box
                             v-model="x.item.name"
@@ -180,6 +185,7 @@ import noteImg from "@/assets/nav/note.svg";
 import jsonImg from "@/assets/nav/json.svg";
 import htmlImg from "@/assets/nav/html.svg";
 import fileImg from "@/assets/nav/file.svg";
+import markdownImg from "@/assets/nav/markdown.svg";
 
 export default {
     components: { rightMenu },
@@ -221,6 +227,7 @@ export default {
                 json: jsonImg,
                 html: htmlImg,
                 file: fileImg,
+                markdown: markdownImg
             },
             FLAT: [],
             copyList: [],
@@ -275,6 +282,7 @@ export default {
                 if (ext === "fbn") return this.img.note;
                 if (ext === "json") return this.img.json;
                 if (ext === "html") return this.img.html;
+                if (ext === "md") return this.img.markdown;
                 return this.img.file;
             };
         },
@@ -865,7 +873,7 @@ export default {
             while (x && x.tagName && x.tagName.toLowerCase() != "body") {
                 let classList = [...x.classList];
                 if (
-                    classList.includes("fv-TreeView__item") ||
+                    classList.includes("fv-TreeView--item") ||
                     classList.includes("navigation-view-mode-block") ||
                     classList.includes("navigation-view-command-bar-block") ||
                     classList.includes("lt-right-menu")
@@ -912,7 +920,7 @@ export default {
     width: 100%;
     height: 100%;
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     overflow-x: hidden;
 
     .local-empty-block {
@@ -931,13 +939,25 @@ export default {
         align-items: center;
         overflow-x: hidden;
 
+        &.dark {
+            color: whitesmoke;
+        }
+
         .tree-view-item-left-block {
             @include Vcenter;
 
+            width: 100%;
             flex: 1;
+            overflow: hidden;
 
             .tree-view-custom-label {
+                @include nowrap;
+
+                width: 90%;
                 margin-left: 5px;
+                flex: 1;
+                user-select: none;
+                cursor: default;
             }
 
             .tree-view-custom-text-box {

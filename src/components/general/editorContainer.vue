@@ -68,6 +68,22 @@
                         <i class="ms-Icon ms-Icon--SaveAs"></i>
                     </fv-button>
                     <fv-button
+                        v-show="displayMode !== 1"
+                        :theme="theme"
+                        :borderRadius="30"
+                        class="control-btn"
+                        :title="local('Export Markdown')"
+                        @click="saveMarkdown"
+                    >
+                        <img
+                            draggable="false"
+                            :src="img.markdown"
+                            alt=""
+                            style="width: 16px; height: 16px; object-fit: contain;"
+                            :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
+                        >
+                    </fv-button>
+                    <fv-button
                         v-show="unsave"
                         :theme="theme"
                         :borderRadius="30"
@@ -277,6 +293,7 @@ import pdfNote from "@/components/general/editorCustom/extension/pdfNote.js";
 
 import pdf from "@/assets/home/pdf.svg";
 import note from "@/assets/home/note.svg";
+import markdown from "@/assets/home/md.svg";
 
 const { ipcRenderer: ipc } = require("electron");
 const { dialog } = require("@electron/remote");
@@ -340,6 +357,7 @@ export default {
             img: {
                 pdf: pdf,
                 note: note,
+                markdown: markdown,
             },
             lock: {
                 loading: true,
@@ -687,6 +705,45 @@ export default {
                         path: targetPath,
                         data: JSON.stringify(saveContent),
                     });
+                });
+        },
+        saveMarkdown() {
+            let filters = [
+                {
+                    name: this.local("Markdown File"),
+                    extensions: ["md"],
+                },
+            ];
+            dialog
+                .showSaveDialog({
+                    title: this.local("Export Markdown"),
+                    filters: filters.concat([
+                        {
+                            name: this.local("All Files"),
+                            extensions: ["*"],
+                        },
+                    ]),
+                })
+                .then((result) => {
+                    if (result.canceled) return;
+                    let targetPath = result.filePath;
+                    try {
+                        let saveContent = this.$refs.editor.saveMarkdown();
+                        ipc.send("output-file", {
+                            id: "editor",
+                            path: targetPath,
+                            data: JSON.stringify(saveContent),
+                        });
+                    } catch (e) {
+                        this.$barWarning(
+                            this.local(
+                                "Export Markdown Failed, Please Check Your Content."
+                            ),
+                            {
+                                status: "warning",
+                            }
+                        );
+                    }
                 });
         },
         openEditor(item, page) {

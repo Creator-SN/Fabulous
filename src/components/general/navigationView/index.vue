@@ -65,8 +65,10 @@
                             v-show="treeList.length > 0"
                             v-model="treeList"
                             :theme="theme"
-                            :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
-                            :view-style="{backgroundColor: theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)', backgroundColorHover: theme == 'dark' ? 'rgba(200, 200, 200, 0.3)' : 'rgba(245, 245, 245, 0.3)'}"
+                            :backgroundColorHover="theme == 'dark' ? 'rgba(36, 36, 36, 0.3)' : 'rgba(245, 245, 245, 0.3)'"
+                            :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
+                            :leftIconForeground="'rgba(255, 180, 0, 0.8)'"
+                            :expandClickMode="'normal'"
                             style="width: 100%; height: 100%;"
                             ref="tree"
                             @click="SwitchPartition"
@@ -74,6 +76,7 @@
                             <template v-slot:default="x">
                                 <div
                                     class="tree-view-custom-item"
+                                    :class="[{dark: theme === 'dark'}]"
                                     @contextmenu="rightClick($event, x.item)"
                                 >
                                     <div class="tree-view-item-left-block">
@@ -500,7 +503,7 @@ export default {
             reviseConfig: "reviseConfig",
             reviseData: "reviseData",
             reviseI18N: "reviseI18N",
-            toggleEditor: "toggleEditor"
+            toggleEditor: "toggleEditor",
         }),
         refreshTreeList() {
             let result = [];
@@ -791,7 +794,7 @@ export default {
             while (x && x.tagName && x.tagName.toLowerCase() != "body") {
                 let classList = [...x.classList];
                 if (
-                    classList.includes("fv-TreeView__item") ||
+                    classList.includes("fv-TreeView--item") ||
                     classList.includes("navigation-view-mode-block") ||
                     classList.includes("navigation-view-command-bar-block") ||
                     classList.includes("nv-right-menu")
@@ -904,7 +907,7 @@ export default {
         .navigation-view-tree-view-block {
             position: relative;
             flex: 1;
-            overflow: auto;
+            overflow: hidden;
 
             .tree-view-custom-item {
                 position: relative;
@@ -913,6 +916,10 @@ export default {
                 display: flex;
                 align-items: center;
 
+                &.dark {
+                    color: whitesmoke;
+                }
+
                 .tree-view-item-left-block {
                     @include Vcenter;
 
@@ -920,6 +927,8 @@ export default {
 
                     .tree-view-custom-label {
                         margin-left: 5px;
+                        user-select: none;
+                        cursor: default;
                     }
 
                     .tree-view-custom-text-box {
