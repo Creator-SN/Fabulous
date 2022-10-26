@@ -732,7 +732,7 @@ export default {
                         ipc.send("output-file", {
                             id: "editor",
                             path: targetPath,
-                            data: JSON.stringify(saveContent),
+                            data: saveContent,
                         });
                     } catch (e) {
                         this.$barWarning(
