@@ -123,6 +123,8 @@ export default {
             obj.editable = obj.editable == undefined ? false : obj.editable;
             obj.type = "group";
             obj.icon = "Folder";
+            // fix: Fix the expandion issue of collections
+            obj.expanded = undefined;
 
             if (obj.children == undefined || obj.children.length == 0) {
                 obj.children = this.transPartitions(obj.partitions);
