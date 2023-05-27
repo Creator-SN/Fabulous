@@ -3,11 +3,6 @@
         id="app"
         :class="{dark: theme == 'dark'}"
     >
-        <dynamic-b-g
-            :theme="theme"
-            :disabled="!dynamicEffect"
-            :themeColorList="themeColorList"
-        ></dynamic-b-g>
         <navigation-view></navigation-view>
         <title-bar
             class="title-bar"
@@ -46,7 +41,6 @@ import navigationView from "@/components/general/navigationView";
 import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
-import dynamicBG from "@/components/general/dynamicBG.vue";
 import { config, data_structure } from "@/js/data_sample";
 import { mapMutations, mapState, mapGetters } from "vuex";
 
@@ -59,8 +53,7 @@ export default {
         navigationView,
         editorContainer,
         pdfImporter,
-        itemCarrier,
-        dynamicBG,
+        itemCarrier
     },
     data() {
         return {
@@ -88,8 +81,6 @@ export default {
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
-            dynamicEffect: (state) => state.config.dynamicEffect,
-            themeColorList: (state) => state.config.themeColorList,
             show_editor: (state) => state.editor.show,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
