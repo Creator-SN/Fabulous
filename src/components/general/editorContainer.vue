@@ -6,11 +6,6 @@
             :class="[{ dark: theme == 'dark' }]"
             @mousewheel="onMouseWheel"
         >
-            <dynamic-b-g
-                :theme="theme"
-                :disabled="!dynamicEffect"
-                :themeColorList="themeColorList"
-            ></dynamic-b-g>
             <div class="control-banner">
                 <div class="control-left-block">
                     <fv-button
@@ -287,7 +282,6 @@ import { mapMutations, mapState, mapGetters } from "vuex";
 
 import addItemPage from "@/components/home/addItemPage.vue";
 import pdfViewer from "@/components/general/pdfViewer";
-import dynamicBG from "@/components/general/dynamicBG.vue";
 
 import pdfNote from "@/components/general/editorCustom/extension/pdfNote.js";
 
@@ -305,7 +299,6 @@ export default {
     components: {
         addItemPage,
         pdfViewer,
-        dynamicBG,
     },
     data() {
         return {
@@ -412,9 +405,7 @@ export default {
             templates: (state) => state.data_structure.templates,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
-            dynamicEffect: (state) => state.config.dynamicEffect,
             editorExpandContent: (state) => state.config.editorExpandContent,
-            themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme,
             show_editor: (state) => state.editor.show,
             type: (state) => state.editor.type,

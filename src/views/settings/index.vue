@@ -163,6 +163,7 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
+                v-show="false"
                 :disabledCollapse="true"
                 :theme="theme"
                 :icon="'SpecialEffectSize'"
@@ -183,7 +184,7 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
-                v-if="themeColorList"
+                v-if="false && themeColorList"
                 v-show="dynamic_effect"
                 :disabledCollapse="true"
                 :theme="theme"
