@@ -1,10 +1,11 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import App from './App.vue'
 
 import router from "@/router";
 import store from "@/store";
 
-// import VueFluent from "vfluentdesign";
+import VueFluent from "vfluentdesign";
 import PowerEditor from "@creatorsn/powereditor";
 import "vfluentdesign/lib/index.css";
 import "@creatorsn/powereditor/lib/powereditor.css";
@@ -28,7 +29,7 @@ const fab_axios = axios.create({
 
 Vue.use(VueAxios, fab_axios);
 
-// Vue.use(VueFluent);
+Vue.use(VueFluent, Vuex);
 Vue.use(PowerEditor);
 
 Vue.config.productionTip = false
