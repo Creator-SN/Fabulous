@@ -839,5 +839,10 @@ export default {
     {
         "en": "Export Markdown Failed, Please Check Your Content.",
         "cn": "导出Markdown失败, 请检查内容。"
+    },
+    "When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.":
+    {
+        "en": "When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.",
+        "cn": "添加数据源时, 会在数据源路径下创建一个数据源文件夹, 并在数据源文件夹下创建一个数据源配置文件。"
     }
 }

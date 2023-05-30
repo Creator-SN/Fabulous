@@ -101,7 +101,7 @@
                     >
                     </fv-toggle-switch>
                     <fv-button
-                        v-show="pdfUrl"
+                        v-show="isPdf"
                         :theme="theme"
                         :borderRadius="8"
                         class="control-btn"
@@ -117,7 +117,7 @@
                         >
                     </fv-button>
                     <fv-button
-                        v-show="pdfUrl"
+                        v-show="isPdf"
                         :theme="theme"
                         :borderRadius="8"
                         class="control-btn"
@@ -132,7 +132,7 @@
                         >
                     </fv-button>
                     <fv-button
-                        v-show="pdfUrl"
+                        v-show="isPdf"
                         :theme="theme"
                         :borderRadius="8"
                         class="control-btn"
@@ -193,12 +193,11 @@
                 >
                 </power-editor>
                 <pdf-viewer
-                    v-if="displayMode !== 0 && pdfUrl"
-                    :url="pdfUrl"
+                    v-if="displayMode !== 0 && item.pdf"
                     :theme="theme"
                     :disabledEditor="!showNav"
                     class="pdf-viewer"
-                    @open-with-browser="openFile(`${item.id}/${item.pdf + '.pdf'}`)"
+                    @open-with-browser="openFile(item.id, item.pdf)"
                     @choose-selection="addPDFNote"
                     @click.native="show.quickNav = false"
                 ></pdf-viewer>
@@ -289,10 +288,6 @@ import pdf from "@/assets/home/pdf.svg";
 import note from "@/assets/home/note.svg";
 import markdown from "@/assets/home/md.svg";
 
-const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
-const path = require("path");
-
 import { fabulous_notebook } from "@/js/data_sample.js";
 
 export default {
@@ -308,7 +303,7 @@ export default {
             expandContent: false,
             auto_save: false,
             editorMentionItemAttr: {
-                mentionList: (val) => this.mentionList(val),
+                mentionList: this.mentionList,
                 filterFunc: () => {
                     return true;
                 },
@@ -317,9 +312,7 @@ export default {
                 },
                 mentionClickCallback: (item) => {
                     if (item.type === "item") {
-                        this.openFile(
-                            item.pdf ? `${item.id}/${item.pdf}.pdf` : item.id
-                        );
+                        this.openFile(item.id, item.pdf);
                     } else if (item.type === "page") {
                         if (this.unsave) {
                             this.$infoBox(
@@ -402,7 +395,6 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            templates: (state) => state.data_structure.templates,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
             editorExpandContent: (state) => state.config.editorExpandContent,
@@ -412,81 +404,12 @@ export default {
             scrollTop: (state) => state.editor.scrollTop,
             history: (state) => state.editor.history,
             item: (state) => state.editor.item,
-            items: (state) => state.data_structure.items,
             displayMode: (state) => state.editor.displayMode,
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        mentionList() {
-            return (value) => {
-                let result = [];
-                let rList = [];
-                // let rPage = [];
-                result.push({
-                    key: -1,
-                    name: this.local("Item"),
-                    type: "header",
-                });
-
-                let queryPage =
-                    value.split("/").length > 1 ? value.split("/")[1] : "";
-
-                this.items.forEach((el, idx) => {
-                    if (
-                        el.name.toLowerCase().indexOf(value.toLowerCase()) >
-                            -1 ||
-                        el.name
-                            .toLowerCase()
-                            .indexOf(value.split("/")[0].toLowerCase()) > -1
-                    ) {
-                        rList.push({
-                            key: idx,
-                            id: el.id,
-                            name: `${el.emoji} ${el.name}`,
-                            emoji: el.emoji,
-                            pdf: el.pdf,
-                            type: "item",
-                        });
-
-                        if (value.indexOf("/") > -1) {
-                            el.pages.forEach((page, pidx) => {
-                                if (
-                                    page.name
-                                        .toLowerCase()
-                                        .indexOf(queryPage.toLowerCase()) > -1
-                                ) {
-                                    rList.push({
-                                        key: idx + "-" + pidx,
-                                        id: page.id,
-                                        name: `${page.emoji}  ${page.name}`,
-                                        emoji: page.emoji,
-                                        icon: "Go",
-                                        iconColor:
-                                            this.theme === "light"
-                                                ? "rgba(36, 36, 36, 1)"
-                                                : "rgba(220, 220, 220, 1)",
-                                        parent: el,
-                                        _page: page,
-                                        type: "page",
-                                    });
-                                }
-                            });
-                            rList.push({
-                                key: idx + "-divider",
-                                name: `-`,
-                                type: "divider",
-                            });
-                        }
-                    }
-                });
-                rList = rList.slice(0, 20);
-                result = result.concat(rList);
-
-                return result;
-            };
-        },
+        ...mapGetters(["local"]),
         showNav() {
             return (
                 this.type === "item" &&
@@ -495,84 +418,30 @@ export default {
                 this.target.name
             );
         },
-        pdfUrl() {
+        isPdf() {
             if (this.type !== "item") return false;
             if (!this.item) return false;
             if (!this.item.pdf) return false;
-            return path.join(
-                `${this.data_path[this.data_index]}`,
-                "root/items",
-                `${this.item.id}/${this.item.pdf}.pdf`
-            );
+            return true;
         },
     },
     mounted() {
-        this.eventInit();
         this.configInit();
         this.ShortCutInit();
         this.TimeoutInit();
     },
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
             reviseConfig: "reviseConfig",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
-        eventInit() {
-            ipc.on("output-file-editor", (event, { status, message }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Save Content Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-                this.toggleUnsave(false);
-            });
-            ipc.on(`read-file-editor`, (event, { status, message, data }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Read File Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-                let content = data;
-                try {
-                    this.content = JSON.parse(content);
-                    this.reviseEditor({
-                        targetContent: this.content,
-                    });
-                    this.lock.loading = true;
-                } catch (e) {
-                    this.content = content;
-                    this.reviseEditor({
-                        targetContent: {
-                            type: "doc",
-                            content: [],
-                        },
-                    });
-                    this.lock.loading = true;
-                }
-                if (this.content === "") this.$refs.editor.focus();
-            });
-            ipc.on("open-file-editor", (event, { status, message }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Open File Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-            });
-        },
         configInit() {
             this.auto_save = this.autoSave;
             this.expandContent = this.editorExpandContent;
         },
         TimeoutInit() {
-            this.timeout.autoSave = setInterval(this.editorSave, 10000);
+            this.timeout.autoSave = setInterval(this.editorAutoSave, 10000);
         },
         TimeoutDestroy() {
             clearInterval(this.timeout.autoSave);
@@ -584,7 +453,8 @@ export default {
             if (!this.show_editor) return;
             let ctrl = event.ctrlKey || event.metaKey;
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
-                this.getEditor().save();
+                let editor = this.getEditor();
+                editor.save();
                 this.toggleUnsave(false);
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                 this.saveAs();
@@ -613,30 +483,53 @@ export default {
             if (!this.type || !this.target || !this.target.id) return;
             if (!this.lock.loading) return;
             this.lock.loading = false;
-            let folder =
-                this.type === "template" ? "root/templates" : "root/items";
+            let res = null;
             if (this.type === "item") {
-                if (!this.item) return;
-                folder = path.join(folder, this.item.id);
+                res = await this.$local_api.Academic.getItemPageContent(
+                    this.data_path[this.data_index],
+                    this.item.id,
+                    this.target.id
+                );
+            } else {
+                res = await this.$local_api.Academic.getTemplateContent(
+                    this.data_path[this.data_index],
+                    this.target.id
+                );
             }
-            let url = path.join(
-                this.data_path[this.data_index],
-                folder,
-                `${this.target.id}.json`
-            );
-            ipc.send("read-file", {
-                id: "editor",
-                path: url,
-            });
+            if (res.code === 200) {
+                let content = res.data;
+                try {
+                    this.content = JSON.parse(content);
+                    this.reviseEditor({
+                        targetContent: this.content,
+                    });
+                } catch (e) {
+                    this.content = content;
+                    this.reviseEditor({
+                        targetContent: {
+                            type: "doc",
+                            content: [],
+                        },
+                    });
+                }
+                if (this.content === "") this.$refs.editor.focus();
+                this.lock.loading = true;
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+                this.lock.loading = true;
+            }
         },
         toggleUnsave(status = true) {
             this.reviseEditor({
                 unsave: status,
             });
         },
-        editorSave() {
+        editorAutoSave() {
             if (this.auto_save && this.show_editor) {
-                this.$refs.editor.save();
+                let editor = this.getEditor();
+                editor.save();
             }
         },
         switchAutoSave() {
@@ -646,96 +539,58 @@ export default {
         },
         async saveContent(json) {
             if (!this.type || !this.target.id || this.displayMode === 1) return;
-            let folder =
-                this.type === "template" ? "root/templates" : "root/items";
+            let res = null;
             if (this.type === "item") {
-                if (!this.item) return;
-                folder = path.join(folder, this.item.id);
+                res = await this.$local_api.Academic.saveItemPageContent(
+                    this.data_path[this.data_index],
+                    this.item.id,
+                    this.target.id,
+                    JSON.stringify(json)
+                );
+            } else {
+                res = await this.$local_api.Academic.saveTemplateContent(
+                    this.data_path[this.data_index],
+                    this.target.id,
+                    JSON.stringify(json)
+                );
             }
-            let url = path.join(
-                this.data_path[this.data_index],
-                folder,
-                `${this.target.id}.json`
-            );
+            if (res.code !== 200) {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
             this.reviseEditor({
                 targetContent: json,
             });
-            ipc.send("output-file", {
-                id: "editor",
-                path: url,
-                data: JSON.stringify(json),
-            });
+        },
+        downloadTxtFile(text, filename) {
+            // 创建一个新的 Blob 对象，用于存储文本内容
+            const blob = new Blob([text], { type: "text/plain" });
+
+            // 创建一个 <a> 元素
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+
+            // 设置文件名
+            a.download = filename;
+
+            // 模拟点击下载链接
+            a.click();
+
+            // 释放 URL 对象
+            URL.revokeObjectURL(a.href);
         },
         saveAs() {
-            let filters = [
-                {
-                    name: this.local("Fabulous Notebook"),
-                    extensions: ["fbn"],
-                },
-            ];
-            dialog
-                .showSaveDialog({
-                    title: this.local("Save As"),
-                    filters: filters.concat([
-                        {
-                            name: this.local("All Files"),
-                            extensions: ["*"],
-                        },
-                    ]),
-                })
-                .then((result) => {
-                    if (result.canceled) return;
-                    let targetPath = result.filePath;
-                    let json = this.$refs.editor.editor.getJSON();
-                    let saveContent = Object.assign({}, fabulous_notebook);
-                    saveContent.title = this.target.name;
-                    saveContent.content = json;
-                    saveContent.updateDate = new Date();
-                    ipc.send("output-file", {
-                        id: "editor",
-                        path: targetPath,
-                        data: JSON.stringify(saveContent),
-                    });
-                });
+            let json = this.$refs.editor.editor.getJSON();
+            let saveContent = Object.assign({}, fabulous_notebook);
+            saveContent.title = this.target.name;
+            saveContent.content = json;
+            saveContent.updateDate = new Date();
+            this.downloadTxtFile(JSON.stringify(saveContent), "note.fbn");
         },
         saveMarkdown() {
-            let filters = [
-                {
-                    name: this.local("Markdown File"),
-                    extensions: ["md"],
-                },
-            ];
-            dialog
-                .showSaveDialog({
-                    title: this.local("Export Markdown"),
-                    filters: filters.concat([
-                        {
-                            name: this.local("All Files"),
-                            extensions: ["*"],
-                        },
-                    ]),
-                })
-                .then((result) => {
-                    if (result.canceled) return;
-                    let targetPath = result.filePath;
-                    try {
-                        let saveContent = this.$refs.editor.saveMarkdown();
-                        ipc.send("output-file", {
-                            id: "editor",
-                            path: targetPath,
-                            data: saveContent,
-                        });
-                    } catch (e) {
-                        this.$barWarning(
-                            this.local(
-                                "Export Markdown Failed, Please Check Your Content."
-                            ),
-                            {
-                                status: "warning",
-                            }
-                        );
-                    }
-                });
+            let saveContent = this.$refs.editor.saveMarkdown();
+            this.downloadTxtFile(saveContent, "note.md");
         },
         openEditor(item, page) {
             if (!this.lock.loading) return;
@@ -756,16 +611,90 @@ export default {
                 history: this.history,
             });
         },
-        openFile(fileName) {
-            let url = path.join(
+        openFile(itemid, fileid, type = "pdf") {
+            this.$local_api.Academic.openItemFile(
                 this.data_path[this.data_index],
-                "root/items",
-                fileName
+                itemid,
+                fileid,
+                type
             );
-            ipc.send("open-file", {
-                id: "editor",
-                path: url,
+        },
+        async mentionList(value) {
+            let result = [];
+            let rList = [];
+            // let rPage = [];
+            result.push({
+                key: -1,
+                name: this.local("Item"),
+                type: "header",
             });
+
+            let queryPage =
+                value.split("/").length > 1 ? value.split("/")[1] : "";
+
+            let res = null;
+            res = await this.$local_api.Academic.getSearchItems(
+                this.data_path[this.data_index],
+                null,
+                value.split("/")[0],
+                20,
+                0
+            );
+
+            if (res.status !== "success") return [];
+            let items = res.data;
+
+            items.forEach((el, idx) => {
+                if (
+                    el.name.toLowerCase().indexOf(value.toLowerCase()) > -1 ||
+                    el.name
+                        .toLowerCase()
+                        .indexOf(value.split("/")[0].toLowerCase()) > -1
+                ) {
+                    rList.push({
+                        key: idx,
+                        id: el.id,
+                        name: `${el.emoji} ${el.name}`,
+                        emoji: el.emoji,
+                        pdf: el.pdf,
+                        type: "item",
+                    });
+
+                    if (value.indexOf("/") > -1) {
+                        el.pages.forEach((page, pidx) => {
+                            if (
+                                page.name
+                                    .toLowerCase()
+                                    .indexOf(queryPage.toLowerCase()) > -1
+                            ) {
+                                rList.push({
+                                    key: idx + "-" + pidx,
+                                    id: page.id,
+                                    name: `${page.emoji}  ${page.name}`,
+                                    emoji: page.emoji,
+                                    icon: "Go",
+                                    iconColor:
+                                        this.theme === "light"
+                                            ? "rgba(36, 36, 36, 1)"
+                                            : "rgba(220, 220, 220, 1)",
+                                    parent: el,
+                                    _page: page,
+                                    type: "page",
+                                });
+                            }
+                        });
+                        rList.push({
+                            key: idx + "-divider",
+                            name: `-`,
+                            type: "divider",
+                        });
+                    }
+                }
+            });
+            rList = rList.slice(0, 20);
+            result = result.concat(rList);
+
+            return result;
         },
         addPDFNote(event) {
             let { pos, rangeNodes, content } = event;

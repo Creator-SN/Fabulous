@@ -41,7 +41,7 @@ import navigationView from "@/components/general/navigationView";
 import editorContainer from "@/components/general/editorContainer.vue";
 import pdfImporter from "@/components/general/pdfImporter.vue";
 import itemCarrier from "@/components/general/itemCarrier.vue";
-import { config, data_structure } from "@/js/data_sample";
+import { config } from "@/js/data_sample";
 import { mapMutations, mapState, mapGetters } from "vuex";
 
 export default {
@@ -53,7 +53,7 @@ export default {
         navigationView,
         editorContainer,
         pdfImporter,
-        itemCarrier
+        itemCarrier,
     },
     data() {
         return {
@@ -66,17 +66,10 @@ export default {
         $route() {
             this.pdfImporterInit();
         },
-        currentPath() {
-            this.dataDBInit();
-        },
-        DataDB() {
-            this.syncDataStructure();
-        },
     },
     computed: {
         ...mapState({
             ConfigDB: (state) => state.ConfigDB,
-            DataDB: (state) => state.DataDB,
             init_status: (state) => state.config.init_status,
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
@@ -92,9 +85,12 @@ export default {
                 return this.data_path[this.data_index];
             else return null;
         },
+        SourceDisabled() {
+            return !this.data_path[this.data_index];
+        },
     },
     mounted() {
-        this.configDBInit();
+        this.configInit();
         this.pdfImporterInit();
         this.dropFilesInit();
         this.i18nInit();
@@ -105,7 +101,6 @@ export default {
         ...mapMutations({
             initDB: "initDB",
             reviseConfig: "reviseConfig",
-            reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
             reviseProgress: "reviseProgress",
             setWindowSize: "setWindowSize",
@@ -114,42 +109,21 @@ export default {
         i18nInit() {
             this.reviseI18N(i18n);
         },
-        configDBInit() {
-            let configDB = this.$DBM.getConfigDB();
-            this.initDB({ ConfigDB: configDB });
+        async configInit() {
             let _config = JSON.parse(JSON.stringify(config));
-            for (let key in _config) {
-                _config[key] = this.ConfigDB.get(key).write();
-            }
-            this.reviseConfig(_config);
-        },
-        dataDBInit() {
-            let pathList = this.data_path;
-            let dataDB = null;
-            if (!pathList || pathList.length === 0) {
-                this.initDB({
-                    DataDB: null,
-                });
-                this.reviseData(Object.assign({}, data_structure));
-                return;
-            }
-            if (this.data_index >= pathList.length || this.data_index < 0) {
-                dataDB = this.$DBM.getDataDB(pathList[0]);
-            } else dataDB = this.$DBM.getDataDB(pathList[this.data_index]);
-            this.initDB({
-                DataDB: dataDB,
+            this.$local_api.Config.getConfig().then((res) => {
+                if (res.status === "success") {
+                    let target = res.data;
+                    for (let key in _config) {
+                        _config[key] = target[key];
+                    }
+                    this.reviseConfig(_config);
+                } else {
+                    this.$barWarning(res.message, {
+                        status: "error",
+                    });
+                }
             });
-        },
-        syncDataStructure() {
-            if (!this.DataDB) return;
-            let _data_structure = JSON.parse(JSON.stringify(data_structure));
-            for (let key in _data_structure) {
-                let keyValue = this.DataDB.get(key).write();
-                if (!keyValue && Array.isArray(_data_structure[key])) {
-                    _data_structure[key] = [];
-                } else _data_structure[key] = this.DataDB.get(key).write();
-            }
-            this.reviseData(_data_structure);
         },
         pdfImporterInit() {
             this.revisePdfImporter({
@@ -201,18 +175,6 @@ export default {
             );
 
             this.$el.addEventListener("drop", (e) => {
-                if (this.show_editor) {
-                    this.show.drop = false;
-                    return;
-                }
-                // if (this.$route.path.startsWith("/notebook")) {
-                //     this.show.drop = false;
-                //     return;
-                // }
-                if (!this.DataDB) {
-                    this.show.drop = false;
-                    return;
-                }
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -244,6 +206,9 @@ export default {
                         }
                     }
                 }
+
+                if (this.show_editor) return;
+                if (this.SourceDisabled) return;
 
                 this.revisePdfImporter({
                     df: files,
@@ -280,8 +245,8 @@ export default {
     height: 100%;
     margin: 0px;
     padding: 0px;
-    font-family: Segoe UI Emoji, Segoe UI Symbol, Segoe UI,
-        Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-family: Segoe UI Emoji, Segoe UI Symbol, Segoe UI, Helvetica Neue,
+        Helvetica, Arial, sans-serif;
     display: flex;
     overflow: hidden;
     transition: all 0.3s;

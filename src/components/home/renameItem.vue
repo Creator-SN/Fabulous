@@ -65,7 +65,7 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="!value || name === '' || !ds_db"
+                :disabled="!value || name === ''"
                 @click="confirm"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -79,7 +79,7 @@
 
 <script>
 import floatWindowBase from "../window/floatWindowBase.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -131,28 +131,26 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            items: (state) => state.data_structure.items,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
         async confirm() {
-            if (!this.ds_db || !this.value || this.name === "") return;
-            let _item = this.items.find((it) => it.id === this.value.id);
-            _item.name = this.name;
-            _item.labels = this.labels;
+            if (!this.value || this.name === "") return;
             this.value.name = this.name;
             this.value.labels = this.labels;
-            this.reviseData({
-                items: this.items,
-            });
+            let res = await this.$local_api.Academic.updateItem(
+                this.data_path[this.data_index],
+                this.value
+            );
+            if (res.code !== 200) {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+                return;
+            }
+            this.$emit("finished");
             this.thisShow = false;
         },
         addLabel(item) {

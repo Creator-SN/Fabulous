@@ -62,7 +62,7 @@ async function createWindow() {
     });
 
     ipcMain.on("close", () => {
-        if(process.platform === "darwin") {
+        if (process.platform === "darwin") {
             app.hide();
         }
         else {
@@ -178,8 +178,18 @@ async function createWindow() {
 
     ipcMain.on("read-binary", (event, obj) => {
         fs.readFile(obj.path, (err, data) => {
-            if (err) return console.error(err)
-            event.reply(`read-binary-${obj.id}`, data);
+            if (err) event.reply(`read-binary-${obj.id}`, {
+                status: 500,
+                data: "",
+                target: obj.target,
+                message: err
+            });
+            event.reply(`read-binary-${obj.id}`, {
+                status: 200,
+                data,
+                target: obj.target,
+                message: err
+            });
         });
     });
 
@@ -273,6 +283,22 @@ async function createWindow() {
         });
     });
 
+    ipcMain.on('save-buffer', (event, obj) => {
+        if (!obj.id) obj.id = 'callback';
+        let buffer = obj.data;
+        fs.writeFile(obj.path, buffer, err => {
+            if (err) return event.reply(`save-blob-${obj.id}`, {
+                status: 500,
+                target: obj.target,
+                message: err
+            });
+            event.reply(`save-blob-${obj.id}`, {
+                status: 200,
+                target: obj.target,
+            });
+        });
+    });
+
     ipcMain.on("open-file", (event, obj) => {
         if (!obj.id) obj.id = 'callback';
         fs.access(obj.path, err => {
@@ -347,18 +373,37 @@ async function createWindow() {
     ipcMain.on("translate", async (event, obj) => {
         try {
             const result = await microsoft(obj.text, { to: microsoft.zh });
+            console.log(result)
             if (obj.id) {
-                event.reply(`translate-callback:${obj.id}`, result);
+                event.reply(`translate-callback-${obj.id}`, {
+                    data: result,
+                    status: 200,
+                });
             }
             else
-                event.reply('translate-callback', result);
+                event.reply('translate-callback', {
+                    data: result,
+                    status: 200,
+                });
         }
         catch (e) {
             if (obj.id) {
-                event.reply(`translate-callback:${obj.id}`, { text: '翻译失败' });
+                event.reply(`translate-callback-${obj.id}`, {
+                    status: 200,
+                    data: {
+                        text: '翻译失败'
+                    },
+                    message: e
+                });
             }
             else
-                event.reply('translate-callback', { text: '翻译失败' });
+                event.reply('translate-callback', {
+                    status: 200,
+                    data: {
+                        text: '翻译失败'
+                    },
+                    message: e
+                });
         }
     });
 

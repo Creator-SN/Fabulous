@@ -25,7 +25,7 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="!value || name === '' || !ds_db"
+                :disabled="!value || name === ''"
                 @click="rename"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -39,7 +39,7 @@
 
 <script>
 import floatWindowBase from "../window/floatWindowBase.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -76,29 +76,27 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            items: (state) => state.data_structure.items,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
         async rename() {
-            if (!this.ds_db || !this.value || !this.item || this.name === "")
-                return;
-            let item = this.items.find((it) => it.id === this.item.id);
-            let _page = item.pages.find((it) => it.id === this.value.id);
-            _page.name = this.name;
+            if (!this.value || !this.item || this.name === "") return;
             this.value.name = this.name;
-            this.reviseData({
-                items: this.items,
-            });
-            this.thisShow = false;
+            let res = await this.$local_api.Academic.updateItemPage(
+                this.data_path[this.data_index],
+                this.item.id,
+                this.value
+            );
+            if (res.status === "success") {
+                this.thisShow = false;
+                this.$emit("finished");
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
         },
     },
 };

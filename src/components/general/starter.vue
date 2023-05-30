@@ -105,7 +105,10 @@
                     style="width: 120px; height: auto;"
                 ></fv-img>
                 <p class="title">{{local(`New Data Source`)}}</p>
-                <p class="info" style="max-width: 600px; margin-bottom: 35px; text-align: center;">{{local('The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.')}}</p>
+                <p
+                    class="info"
+                    style="max-width: 600px; margin-bottom: 35px; text-align: center;"
+                >{{local('The data source is a directory for storing literature data. Please choose a suitable location to store it. No management is required after creation.')}}</p>
                 <fv-text-box
                     v-model="name"
                     :placeholder="local('Input Data Source Name')"
@@ -155,7 +158,10 @@
                     style="width: 120px; height: auto;"
                 ></fv-img>
                 <p class="title">{{local(`Choose from Exists`)}}</p>
-                <p class="info" style="margin-bottom: 25px;">{{local('Please select the data source directory containing data_sturcture.json and root folder.')}}</p>
+                <p
+                    class="info"
+                    style="margin-bottom: 25px;"
+                >{{local('Please select the data source directory containing data_sturcture.json and root folder.')}}</p>
                 <fv-button
                     theme="dark"
                     icon="FolderOpen"
@@ -180,20 +186,18 @@
 </template>
 
 <script>
-import logo from "../../assets/logo.png";
-import languageImg from "@/assets/nav/language.svg";
-import dataSourceImg from "@/assets/nav/dataSource.svg";
-import linkImg from "@/assets/nav/link.svg";
-import refManagementImg from "@/assets/nav/refManagement.svg";
-import notebookImg from "@/assets/nav/notebook.svg";
-import allImg from "@/assets/nav/all.svg";
+import logo from '../../assets/logo.png';
+import languageImg from '@/assets/nav/language.svg';
+import dataSourceImg from '@/assets/nav/dataSource.svg';
+import linkImg from '@/assets/nav/link.svg';
+import refManagementImg from '@/assets/nav/refManagement.svg';
+import notebookImg from '@/assets/nav/notebook.svg';
+import allImg from '@/assets/nav/all.svg';
 
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { data_structure } from "@/js/data_sample.js";
+import { mapMutations, mapState, mapGetters } from 'vuex';
+import { data_structure, config } from '@/js/data_sample.js';
 
-const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
-const path = require("path");
+const path = require('path');
 
 export default {
     data() {
@@ -205,63 +209,70 @@ export default {
                 link: linkImg,
                 ds: refManagementImg,
                 notebook: notebookImg,
-                both: allImg,
+                both: allImg
             },
             step: 0,
             cur_language: {},
             languages: [
-                { key: "en", text: "English" },
-                { key: "cn", text: "简体中文" },
+                { key: 'en', text: 'English' },
+                { key: 'cn', text: '简体中文' }
             ],
             cur_active_system_mode: {},
             active_system_modes: [
                 {
-                    key: "ds",
-                    text: () => this.local("Reference Management System"),
+                    key: 'ds',
+                    text: () => this.local('Reference Management System')
                 },
-                { key: "notebook", text: () => this.local("Notebook System") },
-                { key: "both", text: () => this.local("Both Systems") },
+                { key: 'notebook', text: () => this.local('Notebook System') },
+                { key: 'both', text: () => this.local('Both Systems') }
             ],
-            path: "",
-            name: "",
+            path: '',
+            name: ''
         };
     },
     watch: {
         language() {
-            this.configInit();
+            this.thisConfigSync();
         },
         activeSystemMode() {
-            this.configInit();
-        },
+            this.thisConfigSync();
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            DataDB: (state) => state.DataDB,
-            dbList: (state) => state.dbList,
             language: (state) => state.config.language,
             activeSystemMode: (state) => state.config.activeSystemMode,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local", "ds_db"]),
-        SourceIndexDisabled() {
-            return (index) => {
-                if (!this.dbList[index]) return true;
-                let id = this.dbList[index].get("id").write();
-                return id === null;
-            };
-        },
+        ...mapGetters(['local'])
     },
     mounted() {
         this.configInit();
     },
     methods: {
         ...mapMutations({
-            reviseConfig: "reviseConfig",
-            reviseData: "reviseData",
+            reviseConfig: 'reviseConfig'
         }),
-        configInit() {
+        async configInit() {
+            let _config = JSON.parse(JSON.stringify(config));
+            await this.$local_api.Config.getConfig().then((res) => {
+                if (res.status === 'success') {
+                    let target = res.data;
+                    for (let key in _config) {
+                        _config[key] = target[key];
+                    }
+                    this.reviseConfig(_config);
+                    this.thisConfigSync();
+                } else {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                }
+            });
+        },
+        thisConfigSync() {
             this.cur_language = this.languages.find(
                 (item) => item.key === this.language
             );
@@ -271,120 +282,91 @@ export default {
         },
         chooseLanguage(item) {
             this.reviseConfig({
-                language: item.key,
+                language: item.key
             });
         },
         chooseSystemMode(item) {
             this.reviseConfig({
-                activeSystemMode: item.key,
+                activeSystemMode: item.key
             });
         },
         async choosePath() {
-            let path = (
-                await dialog.showOpenDialog({
-                    properties: ["openDirectory"],
-                })
-            ).filePaths[0];
-            if (!path) return;
-            this.path = path;
+            await this.$local_api.Config.selectLocalDataSourcePath().then(
+                (res) => {
+                    if (res.status === 'success') {
+                        this.path = res.data;
+                    }
+                }
+            );
         },
         async existsSource(url) {
-            let id = this.$Guid();
-            let _path = path.join(url, "data_structure.json");
-            ipc.send("exists-path", {
-                id: id,
-                path: _path,
-            });
-            let _exists = false;
-            await new Promise((resolve) => {
-                ipc.on(`exists-path-${id}`, (event, { exists }) => {
-                    _exists = exists;
-                    resolve(1);
-                });
-            });
-            return _exists;
+            let res = null;
+            res = await this.$local_api.Config.existsDataSource(url);
+            return res.data;
         },
         async addSource() {
-            if (this.path === "") return;
-            if (this.name === "") return;
+            if (this.path === '') return;
+            if (this.name === '') return;
             let id = this.$Guid();
             let _path = path.join(this.path, this.name);
             if (await this.existsSource(_path)) {
                 this.$infoBox(
                     this.local(`An existing data source is detected.`),
                     {
-                        status: "warning",
-                        title: this.local("Data Source Exists"),
-                        confirmTitle: this.local("Link to It"),
-                        cancelTitle: this.local("Continue to Cover"),
-                        theme: "dark",
+                        status: 'warning',
+                        title: this.local('Data Source Exists'),
+                        confirmTitle: this.local('Link to It'),
+                        cancelTitle: this.local('Continue to Cover'),
+                        theme: 'dark',
                         confirm: () => {
                             this.chooseSource();
                         },
                         cancel: () => {
                             this.addSourceConfirm(_path, id);
-                        },
+                        }
                     }
                 );
             } else this.addSourceConfirm(_path, id);
         },
-        async addSourceConfirm(_path, id) {
-            ipc.send("ensure-folder", { id: id, dir: _path });
-            await new Promise((resolve) => {
-                ipc.on(`ensure-folder-${id}`, () => {
-                    resolve(1);
-                });
-            });
-
+        async addSourceConfirm(_path) {
             let ds = JSON.parse(JSON.stringify(data_structure));
             ds.id = this.$Guid();
             ds.name = this.name;
             ds.createDate = this.$SDate.DateToString(new Date());
 
-            ipc.send("output-file", {
-                id: ds.id,
-                path: path.join(_path, "data_structure.json"),
-                data: JSON.stringify(ds),
-            });
-            await new Promise((resolve) => {
-                ipc.on(`output-file-${ds.id}`, () => {
-                    resolve(1);
+            let res = await this.$local_api.Config.createDataSource(_path);
+            if (res.status !== 'success') {
+                this.$barWarning(res.message, {
+                    status: 'warning'
                 });
-            });
-
-            let pathList = this.data_path;
-            if (!pathList.find((url) => url === _path)) pathList.push(_path);
-            await this.reviseConfig({
-                data_path: pathList,
-            });
-
-            let index = pathList.indexOf(_path);
-            this.reviseConfig({
-                data_index: index,
-            });
-
-            this.close();
+            } else {
+                await this.configInit();
+                let index = this.data_path.indexOf(_path);
+                this.reviseConfig({
+                    data_index: index
+                });
+                this.close();
+            }
         },
         async chooseSource() {
-            if (this.path === "") return;
+            if (this.path === '') return;
             let _path = this.path;
-            let pathList = this.data_path;
-            if (!pathList.find((url) => url === _path)) pathList.push(_path);
-            await this.reviseConfig({
-                data_path: pathList,
-            });
-            let index = pathList.indexOf(_path);
-            this.reviseConfig({
-                data_index: index,
-            });
-            this.close();
+            let res = await this.$local_api.Config.linkLocalDataSource(_path);
+            if (res.status == 'success') {
+                await this.configInit();
+                let index = this.data_path.indexOf(_path);
+                this.reviseConfig({
+                    data_index: index
+                });
+                this.close();
+            }
         },
         close() {
             this.reviseConfig({
-                init_status: false,
+                init_status: false
             });
-        },
-    },
+        }
+    }
 };
 </script>
 

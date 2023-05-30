@@ -24,7 +24,10 @@
                     style="width: 90%; height: 45px; margin-top: 5px;"
                     @keyup.enter="addDS"
                 ></fv-text-box>
-                <p class="w-title" style="margin-top: 25px;">{{local('Choose Folder')}}</p>
+                <p
+                    class="w-title"
+                    style="margin-top: 25px;"
+                >{{local('Choose Folder')}}</p>
                 <fv-text-box
                     v-model="path"
                     :placeholder="local('Choose Data Source Directory ...')"
@@ -41,6 +44,7 @@
                     style="width: 90%; height: 45px; margin-top: 5px;"
                     @click.native="choosePath"
                 ></fv-text-box>
+                <p class="w-info">{{local('When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.')}}</p>
             </div>
         </template>
         <template v-slot:control>
@@ -60,28 +64,23 @@
 </template>
 
 <script>
-import floatWindowBase from "../window/floatWindowBase.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { data_structure } from "@/js/data_sample.js";
-
-const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
-const path = require("path");
+import floatWindowBase from '../window/floatWindowBase.vue';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     components: {
-        floatWindowBase,
+        floatWindowBase
     },
     props: {
         show: {
-            default: false,
-        },
+            default: false
+        }
     },
     data() {
         return {
             thisShow: this.show,
-            name: "",
-            path: "",
+            name: '',
+            path: ''
         };
     },
     watch: {
@@ -89,77 +88,50 @@ export default {
             this.thisShow = val;
         },
         thisShow(val) {
-            this.$emit("update:show", val);
-            this.name = "";
-            this.path = "";
-        },
+            this.$emit('update:show', val);
+            this.name = '';
+            this.path = '';
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(['local'])
     },
     methods: {
-        ...mapMutations({
-            reviseConfig: "reviseConfig",
-        }),
         async choosePath() {
-            let path = (
-                await dialog.showOpenDialog({
-                    properties: ["openDirectory"],
-                })
-            ).filePaths[0];
-            if (!path) return;
-            this.path = path;
+            await this.$local_api.Config.selectLocalDataSourcePath().then(
+                (res) => {
+                    if (res.status === 'success') {
+                        this.path = res.data;
+                    }
+                }
+            );
         },
         async addDS() {
-            if (this.path === "") return;
-            if (this.name === "") return;
-            let id = this.$Guid();
-            let _path = path.join(this.path, this.name);
-            ipc.send("ensure-folder", { id: id, dir: _path });
-            await new Promise((resolve) => {
-                ipc.on(`ensure-folder-${id}`, () => {
-                    resolve(1);
+            if (this.path === '') return;
+            if (this.name === '') return;
+            this.$local_api.Config.createDataSource(this.path, this.name)
+                .then((res) => {
+                    if (res.status !== 'success') {
+                        this.$barWarning(res.message, {
+                            status: 'warning'
+                        });
+                    } else {
+                        this.$emit('finished');
+                        this.thisShow = false;
+                    }
+                })
+                .catch((res) => {
+                    this.$barWarning(res.message, {
+                        status: 'warning'
+                    });
                 });
-            });
-
-            let ds = JSON.parse(JSON.stringify(data_structure));
-            ds.id = this.$Guid();
-            ds.name = this.name;
-            ds.createDate = this.$SDate.DateToString(new Date());
-
-            ipc.send("output-file", {
-                id: ds.id,
-                path: path.join(_path, "data_structure.json"),
-                data: JSON.stringify(ds),
-            });
-            await new Promise((resolve) => {
-                ipc.on(`output-file-${ds.id}`, () => {
-                    resolve(1);
-                });
-            });
-
-            let pathList = this.data_path;
-            if (!pathList.find((url) => url === _path)) pathList.push(_path);
-            await this.reviseConfig({
-                data_path: pathList,
-            });
-
-            let index = pathList.indexOf(_path);
-            this.reviseConfig({
-                data_index: index,
-            });
-
-            this.thisShow = false;
-        },
-    },
+        }
+    }
 };
 </script>
 

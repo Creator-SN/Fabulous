@@ -25,7 +25,7 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="name === '' || !ds_db"
+                :disabled="name === ''"
                 @click="add"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -40,9 +40,7 @@
 <script>
 import floatWindowBase from "../window/floatWindowBase.vue";
 import { page } from "@/js/data_sample.js";
-import { mapMutations, mapState, mapGetters } from "vuex";
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -72,46 +70,31 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            templates: (state) => state.data_structure.templates,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
     },
-    mounted() {
-        this.eventInit();
-    },
+    mounted() {},
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
-        eventInit() {
-            ipc.on("output-file-callback", () => {
-                this.thisShow = false;
-            });
-        },
         async add() {
-            if (!this.ds_db || this.name === "") return;
+            if (this.name === "") return;
             let _page = JSON.parse(JSON.stringify(page));
             _page.id = this.$Guid();
             _page.name = this.name;
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
-            this.templates.push(_page);
-            this.reviseData({
-                templates: this.templates,
-            });
-            let url = path.join(
+            let res = await this.$local_api.Academic.createTemplate(
                 this.data_path[this.data_index],
-                "root/templates",
-                `${_page.id}.json`
+                _page
             );
-            ipc.send("output-file", {
-                path: url,
-                data: "",
-            });
+            if (res.status === "success") {
+                this.thisShow = false;
+                this.$emit("finished");
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
         },
     },
 };

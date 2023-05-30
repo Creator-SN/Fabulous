@@ -141,8 +141,6 @@ import translatorBox from "@/components/general/pdfViewer/translatorBox.vue";
 
 import "pdfjs-dist/web/pdf_viewer.css";
 
-const { ipcRenderer: ipc } = require("electron");
-
 export default {
     components: {
         pdfItem,
@@ -150,10 +148,6 @@ export default {
         translatorBox,
     },
     props: {
-        url: {
-            default:
-                "C:/Users/Alever/OneDrive/Documents/Papers/Fabulous/root/items/c8732a00/c8732a00.pdf",
-        },
         disabledEditor: {
             default: false,
         },
@@ -220,7 +214,7 @@ export default {
         };
     },
     watch: {
-        url() {
+        item() {
             this.$nextTick(() => {
                 this.totalPages = 0;
                 this.currentPage - 1;
@@ -251,6 +245,9 @@ export default {
     },
     computed: {
         ...mapState({
+            data_path: (state) => state.config.data_path,
+            data_index: (state) => state.config.data_index,
+            item: (state) => state.editor.item,
             targetContent: (state) => state.editor.targetContent,
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
             displayMode: (state) => state.editor.displayMode,
@@ -432,26 +429,19 @@ export default {
             };
             this.$refs.scroller_view.addEventListener("click", translateEvent);
             this.$refs.scroller_view.addEventListener("click", addPDFNoteEvent);
-            ipc.on("translate-callback", (event, res) => {
-                this.translateObj.text = res.text;
-                this.translateObj.pronunciation = res.pronunciation;
-            });
         },
         async initPDF() {
             if (!this.lock.init) return;
             this.lock.init = false;
-            let guid = this.$Guid();
-            ipc.send("read-binary", {
-                id: guid,
-                path: this.url,
-            });
-            let url = await new Promise((resolve) => {
-                ipc.on(`read-binary-${guid}`, (event, arg) => {
-                    let blob = new Blob([arg], { type: "application/pdf" });
-                    let url = URL.createObjectURL(blob);
-                    resolve(url);
-                });
-            });
+            let res = null;
+            res = await this.$local_api.Academic.getItemPDF(
+                this.data_path[this.data_index],
+                this.item.id,
+                this.item.pdf
+            );
+            if (res.code !== 200) return;
+            let blob = res.data;
+            let url = URL.createObjectURL(blob);
             this.$PDFJS.getDocument(url).promise.then((pdf) => {
                 // 文档对象
                 this.pdfDoc = pdf;
@@ -613,10 +603,15 @@ export default {
             clearTimeout(this.timer.translate);
             this.timer.translate = setTimeout(() => {
                 if (this.translateObj.selection !== "") {
-                    ipc.send("translate", {
-                        text: this.translateObj.selection,
-                        from: "en",
-                        to: "zh-CN",
+                    this.$local_api.Academic.getTranslation(
+                        this.translateObj.selection,
+                        "en",
+                        "zh-CN"
+                    ).then((res) => {
+                        if (res.code !== 200) console.log(res.message);
+                        this.translateObj.text = res.data.text;
+                        this.translateObj.pronunciation =
+                            res.data.pronunciation;
                     });
                 }
             }, period);

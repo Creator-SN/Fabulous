@@ -2,6 +2,7 @@
     <div
         class="data-path-item"
         :class="[{choosen: choosen, missing: scanValue.status === 'missing', disabled: disabled}]"
+        @click="switchDataIndex"
     >
         <div class="left-block">
             <img
@@ -54,25 +55,27 @@
 </template>
 
 <script>
-import OneDrive from "@/assets/settings/OneDrive.svg";
+import { mapMutations, mapState } from 'vuex';
+
+import OneDrive from '@/assets/settings/OneDrive.svg';
 
 export default {
     props: {
         value: {
-            default: () => ({}),
+            default: () => ({})
         },
         choosen: {
-            default: false,
+            default: false
         },
         disabled: {
-            default: false,
+            default: false
         },
         local: {
-            default: () => {},
+            default: () => {}
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
@@ -85,54 +88,71 @@ export default {
                 createDate: null,
                 templatesLength: 0,
                 partitionsLength: 0,
-                status: "ready", // ready, missing, normal
+                status: 'ready' // ready, missing, normal
             },
             img: {
-                OneDrive,
-            },
+                OneDrive
+            }
         };
     },
     watch: {
         value: {
             handler: function (val) {
                 this.thisValue = val;
-                this.scanValue.status = "ready";
+                this.scanValue.status = 'ready';
                 this.scanDS();
             },
-            deep: true,
+            deep: true
         },
+        $route() {
+            this.scanDS();
+        }
+    },
+    computed: {
+        ...mapState({
+            data_path: (state) => state.config.data_path
+        })
     },
     mounted() {
         this.scanDS();
     },
     methods: {
+        ...mapMutations({
+            reviseConfig: 'reviseConfig'
+        }),
         scanDS() {
             if (!this.thisValue.path) return;
             let path = this.thisValue.path;
-            let dataDB = this.$DBM.getDataDB(path);
-            if (dataDB.has("id").value()) {
-                this.scanValue.id = dataDB.get("id").write();
-                this.scanValue.name = dataDB.get("name").write();
-                this.scanValue.groupLength = dataDB
-                    .get("groups")
-                    .size()
-                    .write();
-                this.scanValue.itemLength = dataDB.get("items").size().write();
-                this.scanValue.createDate = dataDB.get("createDate").write();
-                this.scanValue.templatesLength = dataDB
-                    .get("templates")
-                    .size()
-                    .write();
-                this.scanValue.partitionsLength = dataDB
-                    .get("partitions")
-                    .size()
-                    .write();
-                this.scanValue.status = "normal";
-            } else {
-                this.scanValue.status = "missing";
-            }
+            this.$local_api.Academic.getDataSourceInfo(path)
+                .then((res) => {
+                    if (res.status === 'success') {
+                        let data = res.data;
+                        this.scanValue.id = data.id;
+                        if (!this.scanValue.id) {
+                            this.scanValue.status = 'missing';
+                            return;
+                        }
+                        this.scanValue.name = data.name;
+                        this.scanValue.groupLength = data.groupLength;
+                        this.scanValue.itemLength = data.itemLength;
+                        this.scanValue.createDate = data.createDate;
+                        this.scanValue.templatesLength = data.templatesLength;
+                        this.scanValue.partitionsLength = data.partitionsLength;
+                        this.scanValue.status = 'normal';
+                    } else this.scanValue.status = 'missing';
+                })
+                .catch(() => {
+                    this.scanValue.status = 'missing';
+                });
         },
-    },
+        switchDataIndex() {
+            if (this.scanValue.status !== 'normal') return;
+            let index = this.data_path.indexOf(this.thisValue.path);
+            this.reviseConfig({
+                data_index: index
+            });
+        }
+    }
 };
 </script>
 
@@ -168,8 +188,7 @@ export default {
             background: rgba(255, 200, 0, 0);
         }
 
-        to
-        {
+        to {
             background: rgba(255, 200, 0, 0.3);
         }
     }

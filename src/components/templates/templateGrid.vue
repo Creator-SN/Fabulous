@@ -1,14 +1,16 @@
 <template>
     <div
+        v-if="templates.length > 0"
         class="fabulous-templates-grid"
         :class="[{dark: theme === 'dark'}]"
     >
         <div
             v-show="item.show"
-            v-for="(item, index) in thisValue"
+            v-for="(item, index) in templates"
             class="template-block"
             :class="[{choosen: item.choosen}]"
             :key="index"
+            ref="list"
             @contextmenu="rightClick($event, item)"
         >
             <div
@@ -16,7 +18,7 @@
                 @click="itemClick(item)"
             >
                 <fv-shimmer
-                    v-if="item.minContent == undefined"
+                    v-if="!item.minContent"
                     :theme="theme"
                     style="position: relative; width: 100%; height: 100%;"
                 >
@@ -49,8 +51,8 @@
                     </div>
                 </fv-shimmer>
                 <power-editor
-                    v-if="item.minContent != undefined"
-                    :value="item.minContent"
+                    v-else
+                    :value="computeContent(item.minContent)"
                     :placeholder="local('No content here ...')"
                     :editable="false"
                     :theme="theme"
@@ -99,14 +101,11 @@
 
 <script>
 import rightMenu from "@/components/general/rightMenu.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import standardT from "@/assets/templates/Standard.json";
 import standardWithTableT from "@/assets/templates/Standard_with_Table.json";
 import ideaT from "@/assets/templates/Idea.json";
-
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
 
 export default {
     components: {
@@ -114,7 +113,7 @@ export default {
     },
     props: {
         value: {
-            default: () => [],
+            default: [],
         },
         filter: {
             default: () => {
@@ -133,7 +132,7 @@ export default {
     },
     data() {
         return {
-            thisValue: [],
+            templates: [],
             defaults: {
                 standard: standardT,
                 standardWithTable: standardWithTableT,
@@ -166,102 +165,110 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            templates: (state) => state.data_structure.templates,
             show_editor: (state) => state.editor.show,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
         currentChoosen() {
             let result = [];
-            for (let i = 0; i < this.thisValue.length; i++) {
-                if (this.thisValue[i].choosen && this.thisValue[i].show)
-                    result.push(this.thisValue[i]);
+            for (let i = 0; i < this.templates.length; i++) {
+                if (this.templates[i].choosen && this.templates[i].show)
+                    result.push(this.templates[i]);
             }
             return result;
         },
+        computeContent() {
+            return (content) => {
+                try {
+                    return JSON.parse(content);
+                } catch (e) {
+                    return {
+                        type: "doc",
+                        content: [],
+                    };
+                }
+            };
+        },
     },
     mounted() {
-        this.eventInit();
         this.loadTemplates();
         this.filterValue();
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-            toggleEditor: "toggleEditor",
-        }),
-        eventInit() {
-            ipc.on(`read-file-templateGrid`, (event, { status, data, target }) => {
-                if (status === 200) {
-                    let content = data;
-                    let el = this.thisValue.find((it) => it.id === target.id);
-                    try {
-                        el.content = JSON.parse(content);
-                        el.minContent = {
-                            type: "doc",
-                            content: [],
-                        };
-                        el.minContent.content = el.content.content.slice(0, 10);
-                    } catch (e) {
-                        el.content = {
-                            type: "doc",
-                            content: [],
-                        };
-                        el.minContent = el.content;
-                    }
-                    this.$set(this.thisValue, this.thisValue.indexOf(el), el);
-                }
-            });
-        },
         async loadTemplates() {
-            this.thisValue = JSON.parse(JSON.stringify(this.value));
-            for (let el of this.thisValue) {
-                el.show = true;
-                el.choosen = false;
-                this.$set(this.thisValue, this.thisValue.indexOf(el), el);
-            }
-            for (let el of this.thisValue) {
-                let url = path.join(
+            this.templates = [];
+            let templates = [];
+            for (let el of this.value) {
+                let template = {};
+                template.id = el.id;
+                template.name = el.name;
+                template.emoji = el.emoji;
+                template.default = false;
+                template.createDate = el.createDate;
+                template.updateDate = el.updateDate;
+                template.choosen = false;
+                template.show = true;
+                let res = await this.$local_api.Academic.getTemplateContent(
                     this.data_path[this.data_index],
-                    "root/templates",
-                    `${el.id}.json`
+                    el.id
                 );
-                ipc.send("read-file", {
-                    id: "templateGrid",
-                    path: url,
-                    target: el
-                });
+                if (res.code !== 200) {
+                    this.$barWarning(res.message, {
+                        status: "error",
+                    });
+                    return;
+                }
+                try {
+                    template.content = res.data;
+                    let contentObj = JSON.parse(template.content);
+                    let minContent = {
+                        type: "doc",
+                        content: [],
+                    };
+                    minContent.content = contentObj.content.slice(0, 10);
+                    template.minContent = JSON.stringify(minContent);
+                } catch (e) {
+                    template.minContent = template.content;
+                }
+                templates.push(template);
             }
-            this.thisValue = this.thisValue.concat(this.defaultTempltes());
-
+            let defaults = this.defaultTemplates();
+            for (let el of defaults) {
+                templates.push(el);
+            }
+            this.templates.splice(0, this.templates.length);
+            this.templates = templates;
         },
-        defaultTempltes() {
-            let result = [
+        defaultTemplates() {
+            let ori = [
                 { name: "Standard", ori: standardT },
                 { name: "Standard with Table", ori: standardWithTableT },
                 { name: "Idea", ori: ideaT },
             ];
-            result.forEach((el, idx) => {
-                el.id = this.$Guid();
-                el.emoji = "⚙";
-                el.createDate = null;
-                el.updateDate = null;
-                el.default = true;
-                el.show = true;
-                el.content = el.ori.content;
+            let result = [];
+            ori.forEach((el) => {
+                let template = {};
+                template.id = this.$Guid();
+                template.name = el.name;
+                template.emoji = "⚙";
+                template.default = true;
+                template.createDate = null;
+                template.updateDate = null;
+                template.choosen = false;
+                template.show = true;
+                template.content = JSON.stringify(el.ori.content);
                 try {
-                    el.minContent = {
+                    let contentObj = el.ori.content;
+                    let minContent = {
                         type: "doc",
                         content: [],
                     };
-                    el.minContent.content = el.content.content.slice(0, 10);
+                    minContent.content = contentObj.content.slice(0, 10);
+                    template.minContent = JSON.stringify(minContent);
                 } catch (e) {
-                    el.minContent = el.content;
+                    template.minContent = JSON.stringify(el.ori.content);
                 }
-                result[idx] = el;
+                result.push(template);
             });
             return result;
         },
@@ -295,10 +302,10 @@ export default {
                 return 0;
             }
             if (filter.key == "any") {
-                for (let i = 0; i < this.thisValue.length; i++) {
+                for (let i = 0; i < this.templates.length; i++) {
                     let status = false;
-                    let item = this.thisValue[i];
-                    for (let it in this.thisValue[i]) {
+                    let item = this.templates[i];
+                    for (let it in this.templates[i]) {
                         if (typeof item[it] != "string") continue;
                         if (
                             item[it]
@@ -310,49 +317,49 @@ export default {
                         }
                     }
                     item.show = status;
-                    this.$set(this.thisValue, i, item);
+                    this.$set(this.templates, i, item);
                 }
             } else {
-                for (let i = 0; i < this.thisValue.length; i++) {
-                    let item = this.thisValue[i];
+                for (let i = 0; i < this.templates.length; i++) {
+                    let item = this.templates[i];
                     let status =
-                        this.thisValue[i][this.filter.key]
+                        this.templates[i][this.filter.key]
                             .toLowerCase()
                             .indexOf(filter.value.toLowerCase()) > -1;
                     item.show = status;
-                    this.$set(this.thisValue, i, item);
+                    this.$set(this.templates, i, item);
                 }
             }
-            this.$emit("change-value", this.thisValue);
+            this.$emit("change-value", this.templates);
         },
         itemClick(item) {
             if (!this.multiChoosen)
-                for (let i = 0; i < this.thisValue.length; i++) {
-                    let t = this.thisValue[i];
+                for (let i = 0; i < this.templates.length; i++) {
+                    let t = this.templates[i];
                     if (t !== item) {
                         t.choosen = false;
-                        this.$set(this.thisValue, i, t);
+                        this.$set(this.templates, i, t);
                     } else {
                         t.choosen = true;
-                        this.$set(this.thisValue, i, t);
+                        this.$set(this.templates, i, t);
                     }
                 }
 
-            this.$emit("change-value", this.thisValue);
+            this.$emit("change-value", this.templates);
             this.$emit("item-click", item);
             this.$emit("choose-items", this.currentChoosen);
         },
         chooseCurrent(event, item) {
             event.stopPropagation();
             if (!this.multiChoosen)
-                for (let i = 0; i < this.thisValue.length; i++) {
-                    let t = this.thisValue[i];
+                for (let i = 0; i < this.templates.length; i++) {
+                    let t = this.templates[i];
                     if (t !== item) {
                         t.choosen = false;
-                        this.$set(this.thisValue, i, t);
+                        this.$set(this.templates, i, t);
                     }
                 }
-            this.$emit("change-value", this.thisValue);
+            this.$emit("change-value", this.templates);
             this.$emit("choose-items", this.currentChoosen);
         },
     },

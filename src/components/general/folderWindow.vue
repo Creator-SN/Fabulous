@@ -1,6 +1,5 @@
 <template>
     <float-window-base
-        v-if="ds_db"
         v-model="thisValue"
         :title="title"
         :theme="theme"
@@ -11,10 +10,13 @@
                     v-model="treeList"
                     :checkable="true"
                     :theme="theme"
+                    :item-height="35"
+                    expand-click-mode="normal"
                     expandedIconPosition="right"
                     background="transparent"
-                    :viewStyle="{backgroundColor:'transparent'}"
-                    style="width: 100%; height: 100%;"
+                    ref="tree"
+                    style="width: 100%; height: 100%; box-sizing: border-box;"
+                    @click="treeItemClick"
                 >
                     <template v-slot:default="x">
                         <div class="tree-view-custom-item">
@@ -29,7 +31,6 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="!ds_db || !confirmDisable"
                 @click="confirm"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -43,7 +44,7 @@
 
 <script>
 import floatWindowBase from "../window/floatWindowBase.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -61,6 +62,7 @@ export default {
         return {
             thisValue: this.value,
             treeList: [],
+            FLAT: []
         };
     },
     watch: {
@@ -76,93 +78,201 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
-        confirmDisable() {
-            let t = [].concat(this.treeList);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                if (t[i].type === "partition") partitions.push(t[i]);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            for (let i = 0; i < partitions.length; i++)
-                if (partitions[i].selected) return true;
-            return false;
-        },
+        ...mapGetters(["local"])
     },
     mounted() {
         this.refreshTreeList();
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
-        refreshTreeList() {
+        async refreshTreeList() {
+            if (!this.data_path[this.data_index]) return;
+            this.treeList = [];
+            this.FLAT = [];
             let result = [];
-            let groups = JSON.parse(JSON.stringify(this.groups));
+            let groups = await this.$local_api.Academic.getRootGroups(
+                this.data_path[this.data_index]
+            );
+            let partitions = await this.$local_api.Academic.getRootPartitions(
+                this.data_path[this.data_index]
+            );
+            groups = groups.data;
+            partitions = partitions.data;
             groups.forEach((el) => {
-                let treeItem = this.dfsTree(el);
-                result.push(treeItem);
+                result.push(this.itemFormat(el));
             });
-            result = result.concat(this.transPartitions(this.partitions));
+            partitions.forEach((el) => {
+                result.push(this.itemFormat(el, "partition"));
+            });
+            let arr = [].concat(result);
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i].children) arr = arr.concat(arr[i].children);
+                this.hotPushFLAT(arr[i]);
+            }
             this.treeList = result;
         },
-        dfsTree(groupItem) {
-            let obj = JSON.parse(JSON.stringify(groupItem));
-
-            obj.selected = false;
-            obj.children = obj.groups;
-            obj.editable = obj.editable == undefined ? false : obj.editable;
-            obj.type = "group";
-            obj.icon = "Folder";
-            // fix: Fix the expandion issue of collections
-            obj.expanded = undefined;
-
-            if (obj.children == undefined || obj.children.length == 0) {
-                obj.children = this.transPartitions(obj.partitions);
-                return obj;
-            }
-            for (let i = 0; i < obj.children.length; i++) {
-                obj.children[i] = this.dfsTree(obj.children[i]);
-            }
-            obj.children = obj.children.concat(
-                this.transPartitions(obj.partitions)
-            );
+        itemFormat(item, type = "group") {
+            let obj = {
+                ...item,
+                editable: false,
+                children:
+                    type === "group"
+                        ? item.children
+                            ? item.children
+                            : []
+                        : null,
+                loading: false,
+                finished: false,
+                selected: false,
+                type,
+            };
             return obj;
         },
-        transPartitions(partitions) {
-            let result = JSON.parse(JSON.stringify(partitions));
-            result.forEach((el, idx) => {
-                el.selected = false;
-                el.editable = el.editable == undefined ? false : el.editable;
-                el.type = "partition";
-                el.icon = "FileCode";
-                result[idx] = el;
+        listFormat(arr, type = "group") {
+            let list = [];
+            arr.forEach((item) => {
+                let obj = this.itemFormat(item, type);
+                list.push(obj);
             });
+            return list;
+        },
+        hotPushFLAT(item) {
+            let index = this.FLAT.findIndex((it) => it.id === item.id);
+            if (index > -1) {
+                let oriItem = this.FLAT[index];
+                for (let key in oriItem) {
+                    let skipKey = ["children", "expanded"];
+                    if (!skipKey.includes(key)) {
+                        oriItem[key] = item[key];
+                    }
+                }
+            } else {
+                this.FLAT.push(item);
+            }
+        },
+        async loadChildren(item) {
+            item.loading = true;
+            let groupList = [];
+            let partitionList = [];
+            await this.$local_api.Academic.getGroups(
+                this.data_path[this.data_index],
+                item.id
+            )
+                .then((res) => {
+                    if (res.code === 200) {
+                        let children = res.data;
+                        let formatChildren = this.listFormat(children);
+                        for (let item of formatChildren) {
+                            this.hotPushFLAT(item);
+                        }
+                        groupList = formatChildren;
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: "warning",
+                        });
+                    }
+                })
+                .catch((e) => {
+                    this.$barWarning(e, {
+                        status: "error",
+                    });
+                    item.loading = false;
+                });
+            await this.$local_api.Academic.getPartitions(
+                this.data_path[this.data_index],
+                item.id
+            )
+                .then((res) => {
+                    if (res.code === 200) {
+                        let children = res.data;
+                        let formatChildren = this.listFormat(
+                            children,
+                            "partition"
+                        );
+                        for (let child of formatChildren) {
+                            child.parent = item.id;
+                            this.hotPushFLAT(child);
+                        }
+                        partitionList = formatChildren;
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: "warning",
+                        });
+                    }
+                })
+                .catch((e) => {
+                    this.$barWarning(e, {
+                        status: "error",
+                    });
+                    item.loading = false;
+                });
+            let final_list = groupList.concat(partitionList);
+            this.hotReplace(item.children, final_list);
+            item.expanded = true;
+            item.finished = true;
+            item.loading = false;
+            this.$refs.tree.$forceUpdate();
+        },
+        hotReplace(arr, tgt) {
+            for (let i = arr.length - 1; i >= 0; i--) {
+                let index = tgt.findIndex((it) => it.id === arr[i].id);
+                if (index === -1) {
+                    arr.splice(i, 1);
+                    i--;
+                }
+            }
+            tgt.forEach((item) => {
+                let index = arr.findIndex((it) => it.id === item.id);
+                if (index === -1) {
+                    arr.push(item);
+                } else {
+                    let oriItem = arr[index];
+                    for (let key in oriItem) {
+                        let skipKey = ["children", "expanded"];
+                        if (!skipKey.includes(key)) {
+                            oriItem[key] = item[key];
+                        }
+                    }
+                }
+            });
+        },
+        treeItemClick(item) {
+            if (item.loading) return;
+            item = this.FLAT.find((it) => it.id === item.id);
+            if (item.type === "group") {
+                if (!item.finished) this.loadChildren(item);
+            }
+        },
+        getSelected() {
+            let result = [];
+            for (let i = this.treeList.length - 1; i >= 0; i--) {
+                if (this.treeList[i].selected) {
+                    result.push(this.treeList[i]);
+                }
+            }
+            for (let item of this.FLAT) {
+                if (item.children) {
+                    for (let i = item.children.length - 1; i >= 0; i--) {
+                        if (item.children[i].selected) {
+                            result.push(item.children[i]);
+                        }
+                    }
+                }
+            }
             return result;
         },
         confirm() {
-            let t = [].concat(this.treeList);
-            let partitions = [];
-            let result = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                if (t[i].type === "partition") partitions.push(t[i]);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].selected) result.push(partitions[i].id);
-            }
-            this.$emit("choose-partitions", result);
+            let result = this.getSelected();
+            this.$emit("choose-all", result);
+            this.$emit(
+                "choose-groups",
+                result.filter((it) => it.type === "group")
+            );
+            this.$emit(
+                "choose-partitions",
+                result.filter((it) => it.type === "partition")
+            );
             this.thisValue = false;
         },
     },
@@ -184,6 +294,7 @@ export default {
         box-sizing: border-box;
         display: flex;
         align-items: center;
+        user-select: none;
 
         .tree-view-custom-label {
             margin-left: 5px;

@@ -5,10 +5,12 @@
         :theme="theme"
     >
         <template v-slot:content>
-            <div class="w-p-block" style="overflow: auto;">
+            <div
+                class="w-p-block"
+                style="overflow: auto;"
+            >
                 <power-editor
-                    v-if="value && value.content"
-                    :value="value.content"
+                    :value="computeContent(value.content)"
                     :placeholder="local('No content here ...')"
                     :editable="false"
                     :theme="theme"
@@ -42,7 +44,7 @@ export default {
         },
         show: {
             default: false,
-        }
+        },
     },
     data() {
         return {
@@ -61,7 +63,19 @@ export default {
         ...mapState({
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
+        ...mapGetters(["local"]),
+        computeContent() {
+            return (content) => {
+                try {
+                    return JSON.parse(content);
+                } catch (e) {
+                    return {
+                        type: "doc",
+                        content: [],
+                    };
+                }
+            };
+        },
     },
     mounted() {},
     methods: {},

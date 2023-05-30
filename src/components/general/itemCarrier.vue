@@ -138,7 +138,7 @@ export default {
             groups: (state) => state.data_structure.groups,
             partitions: (state) => state.data_structure.partitions,
             itemCarrier: (state) => state.itemCarrier,
-            c: (state) => state.pdfImporter.c,
+            counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -252,7 +252,7 @@ export default {
                 });
                 this.copyToPartition(_item);
                 this.revisePdfImporter({
-                    c: this.c + 1,
+                    counter: this.counter + 1,
                 });
 
                 this.$emit(

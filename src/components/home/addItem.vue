@@ -65,7 +65,7 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="name === '' || !ds_db"
+                :disabled="name === ''"
                 @click="add"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -80,15 +80,16 @@
 <script>
 import floatWindowBase from "../window/floatWindowBase.vue";
 import { item } from "@/js/data_sample.js";
-import { mapMutations, mapState, mapGetters } from "vuex";
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
+import { mapState, mapGetters } from "vuex";
 
 export default {
     components: {
         floatWindowBase,
     },
     props: {
+        partitionId: {
+            default: "",
+        },
         show: {
             default: false,
         },
@@ -128,72 +129,47 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            items: (state) => state.data_structure.items,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
-            c: (state) => state.pdfImporter.c,
+            counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
     },
-    mounted() {
-        this.eventInit();
-    },
+    mounted() {},
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-            revisePdfImporter: "revisePdfImporter",
-        }),
-        eventInit() {
-            ipc.on("ensure-folder-addItem", () => {
-                this.thisShow = false;
-            });
-        },
         async add() {
-            if (!this.ds_db || this.name === "") return;
+            if (this.name === "") return;
             let _item = JSON.parse(JSON.stringify(item));
             _item.id = this.$Guid();
             _item.name = this.name;
             _item.emoji = "📦";
             _item.labels = this.labels;
             _item.createDate = this.$SDate.DateToString(new Date());
-            this.items.push(_item);
-            this.reviseData({
-                items: this.items,
-            });
-            this.copyToPartition(_item);
-            this.revisePdfImporter({
-                c: this.c + 1,
-            });
-            let url = path.join(
+            let res = await this.$local_api.Academic.createItem(
                 this.data_path[this.data_index],
-                `root/items/${_item.id}`
+                _item
             );
-            ipc.send("ensure-folder", { id: "addItem", dir: url });
-        },
-        copyToPartition(item) {
-            let id = this.$route.params.id;
-            if (id === undefined) return;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
+            if (res.code !== 200) {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+                return;
             }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === id) {
-                    partitions[i].items.push(item.id);
-                }
+            if (this.partitionId) {
+                let itemid = res.data.id;
+                res = await this.$local_api.Academic.addItemsToPartition(
+                    this.data_path[this.data_index],
+                    this.partitionId,
+                    [itemid]
+                );
             }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
+            if (res.code !== 200) {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+                return;
+            }
+            this.$emit("finished");
+            this.thisShow = false;
         },
         addLabel(item) {
             if (item.content === "") return;

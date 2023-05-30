@@ -45,9 +45,6 @@ import { META_API } from "@/js/meta_api.js";
 import { metadata, author, item } from "@/js/data_sample.js";
 import Extractor from "@/js/extractTitle.js";
 
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
-
 export default {
     data() {
         return {
@@ -68,21 +65,20 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            items: (state) => state.data_structure.items,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
             value: (state) => state.pdfImporter.value,
             item: (state) => state.pdfImporter.item,
             mode: (state) => state.pdfImporter.mode,
             df: (state) => state.pdfImporter.df,
-            c: (state) => state.pdfImporter.c,
+            counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
+        ...mapGetters(["local"]),
+    },
+    mounted () {
+
     },
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
             revisePdfImporter: "revisePdfImporter",
         }),
         inputInspectClick() {
@@ -93,17 +89,13 @@ export default {
             if (!this.lock) return;
             this.lock = false;
             if (this.$refs.input.files.length === 0) return;
+            // 为数据项替换PDF文件 (Replace PDF file for data item)
             if (this.mode === "item") {
                 if (!this.item) return;
                 for (let i = 0; i < this.$refs.input.files.length; i++) {
                     let file = this.$refs.input.files[i];
                     let _metadata = await this.getTitleMetadata(file);
-                    let item = this.items.find((it) => it.id === this.item.id);
-                    item.pdf = `${item.id}`;
-                    item.metadata = _metadata;
-                    this.reviseData({
-                        items: this.items,
-                    });
+                    this.item.metadata = _metadata;
                     await this.copyPdf(file.path);
                     await this.saveMetadata(_metadata);
                 }
@@ -112,6 +104,7 @@ export default {
                     status: "correct",
                 });
                 return;
+            // 在当前数据源导入PDF文件 (Import PDF file in current data source)
             } else if (this.mode === "import") {
                 this.revisePdfImporter({
                     value: true,
@@ -138,19 +131,31 @@ export default {
                     _item.createDate = this.$SDate.DateToString(new Date());
                     _item.pdf = `${_item.id}`;
                     _item.metadata = _metadata;
-                    this.items.push(_item);
-                    this.reviseData({
-                        items: this.items,
-                    });
-                    this.copyToPartition(_item);
-                    await this.copyPdf(file.path, _item.id);
-                    await this.saveMetadata(_metadata, _item.id);
+                    console.log('metadata:', _metadata);
+                    let res = await this.$local_api.Academic.createItem(
+                        this.data_path[this.data_index],
+                        _item
+                    );
+                    if (res.code !== 200) {
+                        this.$barWarning(res.message, {
+                            status: "error",
+                        });
+                        this.stop = false;
+                        this.lock = true;
+                        this.revisePdfImporter({
+                            value: false,
+                        });
+                        return;
+                    }
+                    await this.copyPdf(file.path, res.data.id);
+                    await this.saveMetadata(_metadata, res.data.id);
+                    await this.copyToPartition(res.data.id);
                 }
                 this.stop = false;
                 this.lock = true;
                 this.revisePdfImporter({
                     value: false,
-                    c: this.c + 1,
+                    counter: this.counter + 1,
                 });
                 this.progress = 0;
                 this.path_title = "";
@@ -183,80 +188,73 @@ export default {
                 _item.createDate = this.$SDate.DateToString(new Date());
                 _item.pdf = `${_item.id}`;
                 _item.metadata = _metadata;
-                this.items.push(_item);
-                this.reviseData({
-                    items: this.items,
-                });
-                this.copyToPartition(_item);
-                await this.copyPdf(file.path, _item.id);
-                await this.saveMetadata(_metadata, _item.id);
+                let res = await this.$local_api.Academic.createItem(
+                    this.data_path[this.data_index],
+                    _item
+                );
+                if (res.code !== 200) {
+                    this.$barWarning(res.message, {
+                        status: "error",
+                    });
+                    this.stop = false;
+                    this.lock = true;
+                    return;
+                }
+                await this.copyPdf(file.path, res.data.id);
+                await this.saveMetadata(_metadata, res.data.id);
+                await this.copyToPartition(res.data.id);
             }
             this.stop = false;
             this.lock = true;
             this.revisePdfImporter({
                 value: false,
                 df: [],
-                c: this.c + 1,
+                counter: this.counter + 1,
             });
             this.progress = 0;
             this.path_title = "";
         },
-        copyToPartition(item) {
+        async copyToPartition(itemid) {
             let id = this.$route.params.id;
-            if (id === undefined) return;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
+            if (!id) return;
+            let res = null;
+            res = await this.$local_api.Academic.addItemsToPartition(
+                this.data_path[this.data_index],
+                id,
+                [itemid]
+            );
+            if (res.code !== 200) {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+                return;
             }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === id) {
-                    partitions[i].items.push(item.id);
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
         },
         async copyPdf(objURL, id = null) {
             if (!id) id = this.item.id;
-            let url = path.join(
+            let blob = await fetch(objURL).then((r) => r.blob());
+            this.$local_api.Academic.updateItemPDF(
                 this.data_path[this.data_index],
-                "root/items",
-                `${id}/${id}.pdf`
-            );
-            ipc.send("copy-file", {
-                id: id,
-                src: objURL,
-                tgt: url,
-            });
-            await new Promise((resolve) => {
-                ipc.on(`copy-file-${id}`, () => {
-                    resolve(1);
+                id,
+                id,
+                blob
+            ).catch((res) => {
+                this.$barWarning(res.message, {
+                    status: "warning",
                 });
             });
         },
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
-            let url = path.join(
+            let res = await this.$local_api.Academic.updateItemMetadata(
                 this.data_path[this.data_index],
-                "root/items",
-                `${id}/${id}.metadata`
-            );
-            ipc.send("output-file", {
                 id,
-                path: url,
-                data: JSON.stringify(_metadata),
-            });
-            await new Promise((resolve) => {
-                ipc.on(`output-file-${id}`, () => {
-                    resolve(1);
+                _metadata
+            );
+            if (res.status !== "success")
+                this.$barWarning(res.message, {
+                    status: "warning",
                 });
-            });
         },
         async getTitleMetadata(file) {
             this.extractor.PDFJS = this.$PDFJS;

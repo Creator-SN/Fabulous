@@ -5,7 +5,10 @@
         :theme="theme"
     >
         <template v-slot:content>
-            <div class="w-p-block" @keyup.enter="initDs">
+            <div
+                class="w-p-block"
+                @keyup.enter="initDs"
+            >
                 <p class="w-title">{{local('Data Source Name')}}</p>
                 <p class="w-info">{{local('Path')}}: {{data_path[db_index]}}</p>
                 <fv-text-box
@@ -39,26 +42,25 @@
 </template>
 
 <script>
-import floatWindowBase from "../window/floatWindowBase.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { data_structure } from "@/js/data_sample.js";
+import floatWindowBase from '../window/floatWindowBase.vue';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     components: {
-        floatWindowBase,
+        floatWindowBase
     },
     props: {
         show: {
-            default: false,
+            default: false
         },
         db_index: {
-            default: null,
-        },
+            default: null
+        }
     },
     data() {
         return {
             thisShow: this.show,
-            name: "",
+            name: ''
         };
     },
     watch: {
@@ -66,41 +68,40 @@ export default {
             this.thisShow = val;
         },
         thisShow(val) {
-            this.$emit("update:show", val);
-            this.name = "";
-        },
+            this.$emit('update:show', val);
+            this.name = '';
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         v() {
             return this;
-        },
+        }
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
         initDs() {
-            if (this.db_index < 0 || this.name === "") return;
+            if (this.db_index < 0 || this.name === '') return;
             if (!this.data_path[this.db_index]) return;
-            this.init_ds(this.$Guid(), this.name);
-            this.thisShow = false;
-        },
-        init_ds(id, name) {
-            let ds = JSON.parse(JSON.stringify(data_structure));
-            ds.id = id;
-            ds.name = name;
-            ds.createDate = this.$SDate.DateToString(new Date());
-            this.reviseData({
-                ...ds,
+            this.$local_api.Config.initDataSource(
+                this.data_path[this.db_index],
+                this.name
+            ).then((res) => {
+                if (res.status !== 'success') {
+                    this.$barWarning(res.message, {
+                        status: 'warning'
+                    });
+                } else {
+                    this.$emit('finished');
+                    this.thisShow = false;
+                }
             });
-        },
-    },
+        }
+    }
 };
 </script>
 

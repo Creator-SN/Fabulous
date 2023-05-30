@@ -60,7 +60,7 @@ export default new Vuex.Store({
             mode: "item",
             pdf_importer: null,
             df: [],
-            c: 0
+            counter: 0
         },
         //
         itemCarrier: {
@@ -88,13 +88,12 @@ export default new Vuex.Store({
             state.window.height = obj.height;
         },
         async reviseConfig(state, obj) {
-            if (!state.ConfigDB) return;
             for (let key in obj) {
                 if (!Object.prototype.hasOwnProperty.call(state.config, key)) // 要用undefined比较好, 因为其他情况也有可能false.
                     continue;
                 state.config[key] = obj[key];
-                await state.ConfigDB.set(key, state.config[key]).write();
             }
+            await Vue.prototype.$local_api.Config.updateConfig(state.config);
         },
         reviseData(state, obj) {
             for (let key in obj) {
@@ -133,13 +132,12 @@ export default new Vuex.Store({
             state.i18n = i18n
         },
         async toggleTheme(state) {
-            if (!state.ConfigDB) return;
             if (state.config.theme == 'light') {
                 state.config.theme = 'dark'
             } else {
                 state.config.theme = 'light'
             }
-            await state.ConfigDB.set('theme', state.config.theme).write();
+            await Vue.prototype.$local_api.Config.updateConfig(state.config);
         },
         toggleEditor(state, status) {
             state.editor.show = status;

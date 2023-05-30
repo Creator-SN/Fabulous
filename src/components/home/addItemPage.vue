@@ -35,7 +35,7 @@
             <fv-button
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
-                :disabled="name === '' || !ds_db || currentChoosen.length > 1"
+                :disabled="name === '' || currentChoosen.length > 1"
                 @click="add"
             >{{local('Confirm')}}</fv-button>
             <fv-button
@@ -52,8 +52,6 @@ import floatWindowBase from "../window/floatWindowBase.vue";
 import templateGrid from "@/components/templates/templateGrid.vue";
 import { page } from "@/js/data_sample.js";
 import { mapMutations, mapState, mapGetters } from "vuex";
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
 
 export default {
     components: {
@@ -73,11 +71,15 @@ export default {
             thisShow: this.show,
             name: "",
             currentChoosen: [],
+            templates: [],
         };
     },
     watch: {
         show(val) {
             this.thisShow = val;
+            if (val) {
+                this.getTemplates();
+            }
         },
         thisShow(val) {
             this.$emit("update:show", val);
@@ -88,32 +90,18 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            templates: (state) => state.data_structure.templates,
-            items: (state) => state.data_structure.items,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
     },
-    mounted() {
-        this.eventInit();
-    },
+    mounted() {},
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
-        eventInit() {
-            ipc.on("output-file-addItemPage", () => {
-                this.thisShow = false;
-            });
-        },
         async add() {
             if (
-                !this.ds_db ||
                 !this.item ||
                 this.name === "" ||
                 this.currentChoosen.length > 1
@@ -124,27 +112,32 @@ export default {
             _page.name = this.name;
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
-            let item = this.items.find((it) => it.id === this.item.id);
-            item.pages.push(_page);
-            this.item.pages = item.pages;
-            this.reviseData({
-                items: this.items,
-            });
-            let url = path.join(
+            let res = await this.$local_api.Academic.createItemPage(
                 this.data_path[this.data_index],
-                "root/items",
-                `${item.id}`,
-                `${_page.id}.json`
+                this.item.id,
+                _page,
+                this.currentChoosen[0].content
             );
-            let templateContent =
-                this.currentChoosen.length == 1
-                    ? JSON.stringify(this.currentChoosen[0].content)
-                    : "";
-            ipc.send("output-file", {
-                id: "addItemPage",
-                path: url,
-                data: templateContent,
-            });
+            if (res.status === "success") {
+                this.item.pages.push(_page);
+                this.thisShow = false;
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
+        },
+        async getTemplates() {
+            let res = await this.$local_api.Academic.getTemplatesInfo(
+                this.data_path[this.data_index]
+            );
+            if (res.status === "success") {
+                this.templates = res.data;
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
         },
         openEditor(template) {
             this.reviseEditor({

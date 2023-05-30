@@ -15,6 +15,8 @@ import "@/style/global.scss";
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+import local_api from "./api/local";
+
 
 let PDFJS = require("pdfjs-dist");
 // fix pdf workerSrc
@@ -31,6 +33,7 @@ Vue.use(VueAxios, fab_axios);
 
 Vue.use(VueFluent, Vuex);
 Vue.use(PowerEditor);
+Vue.use(local_api);
 
 Vue.config.productionTip = false
 

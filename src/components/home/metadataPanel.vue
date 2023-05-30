@@ -326,13 +326,9 @@
 </template>
 
 <script>
-import { clipboard } from "electron";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { META_API } from "@/js/meta_api.js";
 import { author } from "@/js/data_sample.js";
-
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
 
 export default {
     props: {
@@ -527,7 +523,6 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            items: (state) => state.data_structure.items,
             theme: (state) => state.config.theme,
         }),
         ...mapGetters(["local", "ds_db"]),
@@ -536,14 +531,15 @@ export default {
         this.metadataInit();
     },
     methods: {
-        ...mapMutations({
-            reviseData: "reviseData",
-        }),
         metadataInit() {
             if (!this.item.metadata) return;
             for (let key in this.metadata) {
                 if (this.item.metadata[key]) {
-                    if (typeof this.item.metadata[key] === "object")
+                    if (
+                        Object.prototype.toString.call(
+                            this.item.metadata[key]
+                        ) === "[object Object]"
+                    )
                         this.metadata[key] = this.item.metadata[key];
                     else
                         this.metadata[key] = this.item.metadata[key].toString();
@@ -597,26 +593,21 @@ export default {
             Object.assign(this.metadata, item);
         },
         async save() {
-            let item = this.items.find((it) => it.id === this.item.id);
-            item.metadata = JSON.parse(JSON.stringify(this.metadata));
             this.item.metadata = JSON.parse(JSON.stringify(this.metadata));
-            this.reviseData({
-                items: this.items,
-            });
-            this.saveMetadata(this.metadata, item.id);
+            this.saveMetadata(this.metadata, this.item.id);
             this.thisValue = false;
         },
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
-            let url = path.join(
+            let res = await this.$local_api.Academic.updateItemMetadata(
                 this.data_path[this.data_index],
-                "root/items",
-                `${id}/${id}.metadata`
+                id,
+                _metadata
             );
-            ipc.send("output-file", {
-                path: url,
-                data: JSON.stringify(_metadata),
-            });
+            if (res.status !== "success")
+                this.$barWarning(res.message, {
+                    status: "warning",
+                });
         },
         generateBibTex() {
             let required = this.bibTexValue.required;
@@ -664,7 +655,7 @@ export default {
 
             this.bibTexContent = bib;
 
-            clipboard.writeText(bib);
+            navigator.clipboard.writeText(bib);
             this.$barWarning(this.local("Successfully copied to clipboard"), {
                 status: "correct",
             });

@@ -16,7 +16,7 @@
     >
         <template v-slot:searchBlock>
             <fv-search-box
-                :options="flatPartitions"
+                :options="FLAT"
                 icon="Search"
                 :placeholder="` ` + local('Search Partitions')"
                 :theme="theme"
@@ -25,7 +25,7 @@
                 :border-radius="30"
                 :revealBorder="true"
                 style="width: 95%;"
-                @choose-result="SwitchPartition"
+                @choose-result="treeItemClick"
             ></fv-search-box>
         </template>
         <template v-slot:panel>
@@ -46,7 +46,7 @@
                             alt=""
                             class="icon-img"
                         >
-                        <p class="title">{{!name ? local('Unselected') : name}}</p>
+                        <p class="title">{{!dsInfo.name ? local('Unselected') : dsInfo.name}}</p>
                     </div>
                     <div
                         class="navigation-view-mode-right-block"
@@ -71,7 +71,7 @@
                             :expandClickMode="'normal'"
                             style="width: 100%; height: 100%;"
                             ref="tree"
-                            @click="SwitchPartition"
+                            @click="treeItemClick"
                         >
                             <template v-slot:default="x">
                                 <div
@@ -81,11 +81,19 @@
                                 >
                                     <div class="tree-view-item-left-block">
                                         <emoji-callout
+                                            v-if="x.item.loading === false"
                                             :value="x.item.emoji"
                                             :theme="theme"
                                             @insert-emoji="reviseEmoji(x.item, $event)"
                                         ></emoji-callout>
-                                        <!-- <p>{{x.item.emoji}}</p> -->
+                                        <fv-progress-ring
+                                            v-else
+                                            loading="true"
+                                            r="10"
+                                            borderWidth="2"
+                                            background="rgba(200, 200, 200, 0.1)"
+                                            style="display: flex; align-item: center;"
+                                        ></fv-progress-ring>
                                         <p
                                             v-show="!x.item.editable"
                                             class="tree-view-custom-label"
@@ -254,7 +262,7 @@
                     </span>
                     <span
                         v-show="rightMenuItem.type === 'group'"
-                        @click="addPartitionAt(rightMenuItem)"
+                        @click="addNewOne(rightMenuItem, 'partition')"
                     >
                         <img
                             draggable="false"
@@ -266,7 +274,7 @@
                     </span>
                     <span
                         v-show="rightMenuItem.type === 'group'"
-                        @click="addGroupAt(rightMenuItem)"
+                        @click="addNewOne(rightMenuItem)"
                     >
                         <img
                             draggable="false"
@@ -298,101 +306,106 @@
 </template>
 
 <script>
-import loading from "@/components/general/loading.vue";
-import navEmpty from "@/components/general/empty/navEmpty.vue";
-import localTreeView from "@/components/general/navigationView/localTreeView.vue";
-import rightMenu from "@/components/general/rightMenu.vue";
-import emojiCallout from "@/components/general/callout/emojiCallout.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { group, partition } from "@/js/data_sample";
+import loading from '@/components/general/loading.vue';
+import navEmpty from '@/components/general/empty/navEmpty.vue';
+import localTreeView from '@/components/general/navigationView/localTreeView.vue';
+import rightMenu from '@/components/general/rightMenu.vue';
+import emojiCallout from '@/components/general/callout/emojiCallout.vue';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
-import dataSource from "@/assets/nav/dataSource.svg";
-import notebook from "@/assets/nav/notebook.svg";
-import groupImg from "@/assets/nav/group.svg";
-import partitionImg from "@/assets/nav/partition.svg";
-import templatesImg from "@/assets/nav/template.svg";
-import folderImg from "@/assets/nav/folder.svg";
-import newFolderImg from "@/assets/nav/newFolder.svg";
-import refreshImg from "@/assets/nav/refresh.svg";
-import pasteImg from "@/assets/nav/paste.svg";
-import allImg from "@/assets/nav/all.svg";
+import dataSource from '@/assets/nav/dataSource.svg';
+import notebook from '@/assets/nav/notebook.svg';
+import groupImg from '@/assets/nav/group.svg';
+import partitionImg from '@/assets/nav/partition.svg';
+import templatesImg from '@/assets/nav/template.svg';
+import folderImg from '@/assets/nav/folder.svg';
+import newFolderImg from '@/assets/nav/newFolder.svg';
+import refreshImg from '@/assets/nav/refresh.svg';
+import pasteImg from '@/assets/nav/paste.svg';
+import allImg from '@/assets/nav/all.svg';
 
 export default {
+    name: 'fab-navigation-view',
     components: {
         loading,
         navEmpty,
         localTreeView,
         rightMenu,
-        emojiCallout,
+        emojiCallout
     },
     props: {
         rightMenuWidth: {
-            default: 200,
-        },
+            default: 200
+        }
     },
     data() {
         return {
             expand: true,
             dsCmdList: [
                 {
-                    name: () => this.local("Add Partition"),
-                    func: this.addPartition,
-                    img: "partition",
+                    name: () => this.local('Add Partition'),
+                    func: () => this.addNewOne(null, 'partition'),
+                    img: 'partition',
                     disabled: () => this.SourceDisabled,
-                    iconColor: "rgba(213, 99, 70, 1)",
+                    iconColor: 'rgba(213, 99, 70, 1)'
                 },
                 {
-                    name: () => this.local("Add Group"),
-                    func: this.addGroup,
-                    img: "group",
+                    name: () => this.local('Add Group'),
+                    func: () => this.addNewOne(),
+                    img: 'group',
                     disabled: () => this.SourceDisabled,
-                    iconColor: "rgba(172, 84, 206, 1)",
+                    iconColor: 'rgba(172, 84, 206, 1)'
                 },
                 {
-                    name: () => this.local("Templates Page"),
-                    img: "templates",
-                    func: () => this.Go("/templates"),
-                    disabled: () => this.SourceDisabled,
+                    name: () => this.local('Templates Page'),
+                    img: 'templates',
+                    func: () => this.Go('/templates'),
+                    disabled: () => this.SourceDisabled
                 },
                 {
-                    name: () => this.local("All Content"),
-                    img: "all",
-                    func: () => this.Go("/"),
-                    disabled: () => this.SourceDisabled,
-                },
+                    name: () => this.local('All Content'),
+                    img: 'all',
+                    func: () => this.Go('/'),
+                    disabled: () => this.SourceDisabled
+                }
             ],
             notebookCmdList: [
                 {
-                    name: () => this.local("New Folder"),
+                    name: () => this.local('New Folder'),
                     func: () => this.$refs.local_view.createFolder(),
-                    img: "newFolder",
+                    img: 'newFolder',
                     disabled: () => !this.localPath,
-                    iconColor: "rgba(213, 99, 70, 1)",
+                    iconColor: 'rgba(213, 99, 70, 1)'
                 },
                 {
-                    name: () => this.local("Choose Folder"),
+                    name: () => this.local('Choose Folder'),
                     func: () => this.$refs.local_view.chooseFolder(),
-                    img: "folder",
+                    img: 'folder',
                     disabled: () => false,
-                    iconColor: "rgba(213, 99, 70, 1)",
+                    iconColor: 'rgba(213, 99, 70, 1)'
                 },
                 {
-                    name: () => this.local("Refresh Folder"),
+                    name: () => this.local('Refresh Folder'),
                     func: () => this.$refs.local_view.refreshFolder(),
-                    img: "refresh",
+                    img: 'refresh',
                     disabled: () => !this.localPath,
-                    iconColor: "rgba(172, 84, 206, 1)",
+                    iconColor: 'rgba(172, 84, 206, 1)'
                 },
                 {
-                    name: () => this.local("Paste to Root"),
-                    img: "paste",
+                    name: () => this.local('Paste to Root'),
+                    img: 'paste',
                     func: () => this.$refs.local_view.rootPaste(),
                     disabled: () =>
                         this.$refs.local_view
                             ? this.$refs.local_view.rootPasteDisabled()
-                            : true,
-                },
+                            : true
+                }
             ],
+            dsInfo: {
+                id: '',
+                name: '',
+                createDate: ''
+            },
             img: {
                 dataSource,
                 notebook,
@@ -403,26 +416,28 @@ export default {
                 newFolder: newFolderImg,
                 refresh: refreshImg,
                 paste: pasteImg,
-                all: allImg,
+                all: allImg
             },
             treeList: [],
             FLAT: [],
-            localPath: "",
+            localPath: '',
             posX: 0,
             posY: 0,
             menuDisplayMode: 0,
             rightMenuItem: {},
             rightMenuHeight: 0,
             show: {
-                rightMenu: false,
-            },
+                rightMenu: false
+            }
         };
     },
     watch: {
-        groups() {
+        data_path() {
+            this.getDSInfo();
             this.refreshTreeList();
         },
-        partitions() {
+        data_index() {
+            this.getDSInfo();
             this.refreshTreeList();
         },
         windowWidth() {
@@ -430,49 +445,33 @@ export default {
         },
         localPath() {
             this.reviseConfig({
-                lastLocalPath: this.localPath,
+                lastLocalPath: this.localPath
             });
         },
         lastLocalPath() {
             this.localPath = this.lastLocalPath;
-        },
+        }
     },
     computed: {
         ...mapState({
-            DataDB: (state) => state.DataDB,
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
             language: (state) => state.config.language,
             lastLocalPath: (state) => state.config.lastLocalPath,
             activeSystemMode: (state) => state.config.activeSystemMode,
             watchAllExtensions: (state) => state.config.watchAllExtensions,
-            ds_id: (state) => state.data_structure.id,
-            name: (state) => state.data_structure.name,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
             unsave: (state) => state.editor.unsave,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         navigationViewBackground() {
-            if (this.theme == "light") return "rgba(242, 242, 242, 0.8)";
-            return "rgba(0, 0, 0, 0.8)";
+            if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
+            return 'rgba(0, 0, 0, 0.8)';
         },
         SourceDisabled() {
-            if (!this.DataDB) return true;
-            if (!this.ds_id) return true;
-            return false;
-        },
-        flatPartitions() {
-            let result = [];
-            let t = [].concat(this.treeList);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                result.push(t[i]);
-            }
-            return result;
+            return !this.data_path[this.data_index];
         },
         localPathFolderName() {
             let pathList = this.localPath.split(/[\\/]/);
@@ -480,284 +479,376 @@ export default {
         },
         computeDisplay() {
             return (name) => {
-                if (name === "ds") {
-                    if (this.activeSystemMode === "ds") return true;
-                    if (this.activeSystemMode === "notebook") return false;
+                if (name === 'ds') {
+                    if (this.activeSystemMode === 'ds') return true;
+                    if (this.activeSystemMode === 'notebook') return false;
                     return this.menuDisplayMode === 0;
                 }
-                if (name === "notebook") {
-                    if (this.activeSystemMode === "ds") return false;
-                    if (this.activeSystemMode === "notebook") return true;
+                if (name === 'notebook') {
+                    if (this.activeSystemMode === 'ds') return false;
+                    if (this.activeSystemMode === 'notebook') return true;
                     return this.menuDisplayMode === 1;
                 }
             };
-        },
+        }
     },
     mounted() {
+        this.getDSInfo();
         this.refreshTreeList();
         this.localPath = this.lastLocalPath;
-        window.addEventListener("click", this.whiteClickClearTmp);
+        window.addEventListener('click', this.whiteClickClearTmp);
     },
     methods: {
         ...mapMutations({
-            reviseConfig: "reviseConfig",
-            reviseData: "reviseData",
-            reviseI18N: "reviseI18N",
-            toggleEditor: "toggleEditor",
+            reviseConfig: 'reviseConfig',
+            toggleEditor: 'toggleEditor'
         }),
-        refreshTreeList() {
+        getDSInfo() {
+            if (this.SourceDisabled) return;
+            this.$local_api.Academic.getDataSourceInfo(
+                this.data_path[this.data_index]
+            )
+                .then((res) => {
+                    if (res.status === 'success') {
+                        this.dsInfo = res.data;
+                    } else
+                        this.$barWarning(res.message, {
+                            status: 'warning'
+                        });
+                })
+                .catch((err) => {
+                    this.$barWarning(err, {
+                        status: 'error'
+                    });
+                });
+        },
+        async refreshTreeList() {
+            if (!this.data_path[this.data_index]) return;
+            this.treeList = [];
+            this.FLAT = [];
             let result = [];
-            this.saveExpandedStatus();
-            this.groups.forEach((el) => {
-                let treeItem = this.dfsTree(el);
-                result.push(treeItem);
+            let groups = await this.$local_api.Academic.getRootGroups(
+                this.data_path[this.data_index]
+            );
+            let partitions = await this.$local_api.Academic.getRootPartitions(
+                this.data_path[this.data_index]
+            );
+            groups = groups.data;
+            partitions = partitions.data;
+            groups.forEach((el) => {
+                result.push(this.itemFormat(el));
             });
-            result = result.concat(this.transPartitions(this.partitions));
+            partitions.forEach((el) => {
+                result.push(this.itemFormat(el, 'partition'));
+            });
+            let arr = [].concat(result);
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i].children) arr = arr.concat(arr[i].children);
+                this.hotPushFLAT(arr[i]);
+            }
             this.treeList = result;
         },
-        dfsTree(groupItem) {
-            let obj = JSON.parse(JSON.stringify(groupItem));
-
-            obj.children = obj.groups;
-            obj.editable = obj.editable == undefined ? false : obj.editable;
-            obj.type = "group";
-            obj.icon = "Folder";
-
-            // 从存储状态里获取expand而不是从数据库中获取 //
-            let restore_status = this.FLAT.find((it) => it.id === obj.id);
-            if (restore_status) obj.expanded = restore_status.expanded;
-
-            if (obj.children == undefined || obj.children.length == 0) {
-                obj.children = this.transPartitions(obj.partitions);
-                return obj;
-            }
-            for (let i = 0; i < obj.children.length; i++) {
-                obj.children[i] = this.dfsTree(obj.children[i]);
-            }
-            obj.children = obj.children.concat(
-                this.transPartitions(obj.partitions)
-            );
+        itemFormat(item, type = 'group') {
+            let obj = {
+                ...item,
+                editable: false,
+                children:
+                    type === 'group'
+                        ? item.children
+                            ? item.children
+                            : []
+                        : null,
+                loading: false,
+                finished: false,
+                type
+            };
             return obj;
         },
-        transPartitions(partitions) {
-            let result = JSON.parse(JSON.stringify(partitions));
-            result.forEach((el, idx) => {
-                el.editable = el.editable == undefined ? false : el.editable;
-                el.type = "partition";
-                el.icon = "FileCode";
-                result[idx] = el;
+        listFormat(arr, type = 'group') {
+            let list = [];
+            arr.forEach((item) => {
+                let obj = this.itemFormat(item, type);
+                list.push(obj);
             });
-            return result;
+            return list;
         },
-        saveExpandedStatus() {
-            this.FLAT = [];
-            let t = [].concat(this.treeList);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                this.FLAT.push(t[i]);
+        hotPushFLAT(item) {
+            let index = this.FLAT.findIndex((it) => it.id === item.id);
+            if (index > -1) {
+                let oriItem = this.FLAT[index];
+                for (let key in oriItem) {
+                    let skipKey = ['children', 'expanded'];
+                    if (!skipKey.includes(key)) {
+                        oriItem[key] = item[key];
+                    }
+                }
+            } else {
+                this.FLAT.push(item);
             }
         },
-        addGroup(target = null) {
-            let _group = JSON.parse(JSON.stringify(group));
-            _group.id = this.$Guid();
-            _group.name = this.local("New Group Name");
-            _group.emoji = "📁";
-            _group.createDate = this.$SDate.DateToString(new Date());
-            _group.editable = true;
-            if (target) target.groups.push(_group);
-            else this.groups.push(_group);
-            this.reviseData({
-                groups: this.groups,
+        async loadChildren(item) {
+            item.loading = true;
+            let groupList = [];
+            let partitionList = [];
+            await this.$local_api.Academic.getGroups(
+                this.data_path[this.data_index],
+                item.id
+            )
+                .then((res) => {
+                    if (res.code === 200) {
+                        let children = res.data;
+                        let formatChildren = this.listFormat(children);
+                        for (let item of formatChildren) {
+                            this.hotPushFLAT(item);
+                        }
+                        groupList = formatChildren;
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: 'warning'
+                        });
+                    }
+                })
+                .catch((e) => {
+                    this.$barWarning(e, {
+                        status: 'error'
+                    });
+                    item.loading = false;
+                });
+            await this.$local_api.Academic.getPartitions(
+                this.data_path[this.data_index],
+                item.id
+            )
+                .then((res) => {
+                    if (res.code === 200) {
+                        let children = res.data;
+                        let formatChildren = this.listFormat(
+                            children,
+                            'partition'
+                        );
+                        for (let child of formatChildren) {
+                            child.parent = item.id;
+                            this.hotPushFLAT(child);
+                        }
+                        partitionList = formatChildren;
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: 'warning'
+                        });
+                    }
+                })
+                .catch((e) => {
+                    this.$barWarning(e, {
+                        status: 'error'
+                    });
+                    item.loading = false;
+                });
+            let final_list = groupList.concat(partitionList);
+            this.hotReplace(item.children, final_list);
+            item.expanded = true;
+            item.finished = true;
+            item.loading = false;
+            this.$refs.tree.$forceUpdate();
+        },
+        hotReplace(arr, tgt) {
+            for (let i = arr.length - 1; i >= 0; i--) {
+                let index = tgt.findIndex((it) => it.id === arr[i].id);
+                if (index === -1) {
+                    arr.splice(i, 1);
+                    i--;
+                }
+            }
+            tgt.forEach((item) => {
+                let index = arr.findIndex((it) => it.id === item.id);
+                if (index === -1) {
+                    arr.push(item);
+                } else {
+                    let oriItem = arr[index];
+                    for (let key in oriItem) {
+                        let skipKey = ['children', 'expanded'];
+                        if (!skipKey.includes(key)) {
+                            oriItem[key] = item[key];
+                        }
+                    }
+                }
             });
+        },
+        removeTmp() {
+            for (let i = this.treeList.length - 1; i >= 0; i--) {
+                if (this.treeList[i].isTmp) {
+                    this.treeList.splice(i, 1);
+                }
+            }
+            for (let item of this.FLAT) {
+                if (item.children) {
+                    for (let i = item.children.length - 1; i >= 0; i--) {
+                        if (item.children[i].isTmp) {
+                            item.children.splice(i, 1);
+                        }
+                    }
+                }
+            }
+            for (let i = this.FLAT.length - 1; i >= 0; i--) {
+                if (this.FLAT[i].isTmp) {
+                    this.FLAT.splice(i, 1);
+                    i--;
+                }
+            }
+            this.$refs.tree.$forceUpdate();
+        },
+        async addNewOne(parent = null, type = 'group') {
+            this.removeTmp();
+            let tmpItem = {};
+            tmpItem.id = this.$Guid();
+            tmpItem.name =
+                type === 'group'
+                    ? this.local('New Group Name')
+                    : this.local('New Partition Name');
+            tmpItem.emoji = type === 'group' ? '📁' : '📔';
+            tmpItem.parent = parent ? parent.id : null;
+            tmpItem.createDate = this.$SDate.DateToString(new Date());
+            tmpItem.isTmp = true;
+            tmpItem.editable = true;
+            tmpItem.type = type;
+            tmpItem.children = type === 'group' ? [] : null;
+            tmpItem.loading = false;
+            tmpItem.finished = true;
+
+            if (parent) {
+                if (parent.finished) parent.expanded = true;
+                else await this.loadChildren(parent);
+                parent.children.unshift(tmpItem);
+            } else this.treeList.push(tmpItem);
+            this.FLAT.push(tmpItem);
             setTimeout(() => {
-                let textbox = this.$refs[`t:${_group.id}`];
+                let textbox = this.$refs[`t:${tmpItem.id}`];
                 textbox.focus();
-                document.execCommand("selectAll");
+                document.execCommand('selectAll');
             }, 300);
-        },
-        addPartition(target = null) {
-            let _partition = JSON.parse(JSON.stringify(partition));
-            _partition.id = this.$Guid();
-            _partition.name = this.local("New Partition Name");
-            _partition.emoji = "📔";
-            _partition.createDate = this.$SDate.DateToString(new Date());
-            _partition.editable = true;
-            if (target) target.partitions.push(_partition);
-            else this.partitions.push(_partition);
-            this.reviseData({
-                partitions: this.partitions,
-            });
-            setTimeout(() => {
-                let textbox = this.$refs[`t:${_partition.id}`];
-                textbox.focus();
-                document.execCommand("selectAll");
-            }, 300);
-        },
-        addGroupAt(item) {
-            if (item.type !== "group") return;
-            let id = item.id;
-            let t = [].concat(this.groups);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].id === id) {
-                    this.addGroup(t[i]);
-                    break;
-                }
-            }
-            // treeList expand //
-            t = [].concat(this.treeList);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                if (t[i].id === id) {
-                    t[i].expanded = true;
-                    break;
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshTreeList();
-        },
-        addPartitionAt(item) {
-            if (item.type !== "group") return;
-            let id = item.id;
-            let t = [].concat(this.groups);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].id === id) {
-                    this.addPartition(t[i]);
-                    break;
-                }
-            }
-            // treeList expand //
-            t = [].concat(this.treeList);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].children) t = t.concat(t[i].children);
-                if (t[i].id === id) {
-                    t[i].expanded = true;
-                    break;
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshTreeList();
         },
         showRename(item) {
+            if (item.loading) return;
             item.editable = true;
             setTimeout(() => {
                 let textbox = this.$refs[`t:${item.id}`];
                 textbox.focus();
-                document.execCommand("selectAll");
+                document.execCommand('selectAll');
             }, 300);
         },
-        rename(item) {
-            let id = item.id;
-            let name = item.name;
-            let t = [].concat(this.groups);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions) t = t.concat(t[i].partitions);
-                if (t[i].id === id) {
-                    t[i].name = name;
-                    t[i].editable = false;
-                    break;
-                }
+        async rename(item) {
+            item = this.FLAT.find((it) => it.id === item.id);
+            let res = null;
+            let mode = null;
+            if (item.isTmp) {
+                if (item.type === 'group') {
+                    res = await this.$local_api.Academic.createGroup(
+                        this.data_path[this.data_index],
+                        item.parent,
+                        item
+                    );
+                } else
+                    res = await this.$local_api.Academic.createPartition(
+                        this.data_path[this.data_index],
+                        item.parent,
+                        item
+                    );
+                mode = 'add';
+            } else {
+                if (item.type === 'group') {
+                    res = await this.$local_api.Academic.updateGroup(
+                        this.data_path[this.data_index],
+                        item
+                    );
+                } else
+                    res = await this.$local_api.Academic.updatePartition(
+                        this.data_path[this.data_index],
+                        item.parent,
+                        item
+                    );
+                mode = 'update';
             }
-            for (let i = 0; i < this.partitions.length; i++) {
-                if (this.partitions[i].id === id) {
-                    this.partitions[i].name = name;
-                    this.partitions[i].editable = false;
-                    break;
-                }
+            if (res.status !== 'success') {
+                this.$barWarning(res.message, {
+                    status: 'error'
+                });
+                return;
             }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshTreeList();
+            if (mode === 'add') {
+                let data = res.data;
+                for (let key in data) {
+                    item[key] = data[key];
+                }
+                item.children = item.type === 'group' ? [] : null;
+                item.isTmp = false;
+            }
+            item.editable = false;
         },
-        reviseEmoji(item, emoji) {
-            let id = item.id;
-            let t = [].concat(this.groups);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions) t = t.concat(t[i].partitions);
-                if (t[i].id === id) {
-                    t[i].emoji = emoji;
-                    break;
-                }
+        async reviseEmoji(item, emoji) {
+            if (item.loading) return;
+            item = this.FLAT.find((it) => it.id === item.id);
+            item.emoji = emoji;
+            item.loading = true;
+            let res = null;
+            if (item.type === 'group') {
+                res = await this.$local_api.Academic.updateGroup(
+                    this.data_path[this.data_index],
+                    item
+                );
+            } else
+                res = await this.$local_api.Academic.updatePartition(
+                    this.data_path[this.data_index],
+                    item.parent,
+                    item
+                );
+            item.loading = false;
+            if (res.status !== 'success') {
+                this.$barWarning(res.message, {
+                    status: 'error'
+                });
+                return;
             }
-            for (let i = 0; i < this.partitions.length; i++) {
-                if (this.partitions[i].id === id) {
-                    this.partitions[i].emoji = emoji;
-                    break;
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshTreeList();
         },
         deleteConfirm(item) {
             this.$infoBox(
                 this.local(`Are you sure to delete this ${item.type}?`),
                 {
-                    status: "error",
-                    title: this.local("Delete"),
-                    confirmTitle: this.local("Confirm"),
-                    cancelTitle: this.local("Cancel"),
+                    status: 'error',
+                    title: this.local('Delete'),
+                    confirmTitle: this.local('Confirm'),
+                    cancelTitle: this.local('Cancel'),
                     theme: this.theme,
                     confirm: () => {
                         this.delete(item);
                     },
-                    cancel: () => {},
+                    cancel: () => {}
                 }
             );
         },
-        delete(item) {
-            let id = item.id;
-            if (this.$route.params.id === id) this.Go("/");
-            for (let i = 0; i < this.groups.length; i++) {
-                if (this.groups[i].id === id) {
-                    this.groups.splice(i, 1);
-                    break;
-                }
+        async delete(item) {
+            if (item.isTmp) return;
+            if (item.loading) return;
+            item = this.FLAT.find((it) => it.id === item.id);
+            item.loading = true;
+            let res = null;
+            if (item.type === 'group') {
+                res = await this.$local_api.Academic.deleteGroup(
+                    this.data_path[this.data_index],
+                    item.id
+                );
+            } else
+                res = await this.$local_api.Academic.deletePartition(
+                    this.data_path[this.data_index],
+                    item.parent,
+                    item.id
+                );
+            item.loading = false;
+            if (res.status !== 'success') {
+                this.$barWarning(res.message, {
+                    status: 'error'
+                });
+                return;
             }
-            for (let i = 0; i < this.partitions.length; i++) {
-                if (this.partitions[i].id === id) {
-                    this.partitions.splice(i, 1);
-                    break;
-                }
-            }
-            let t = [].concat(this.groups);
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].groups && t[i].groups.length > 0) {
-                    let d = t[i].groups.find((it) => it.id === id);
-                    let idx = t[i].groups.indexOf(d);
-                    if (idx > -1) {
-                        t[i].groups.splice(idx, 1);
-                        break;
-                    }
-                }
-                if (t[i].partitions && t[i].partitions.length > 0) {
-                    let d = t[i].partitions.find((it) => it.id === id);
-                    let idx = t[i].partitions.indexOf(d);
-                    if (idx > -1) {
-                        t[i].partitions.splice(idx, 1);
-                        break;
-                    }
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshTreeList();
+            item.isTmp = true;
+            this.removeTmp();
         },
         rightClick(event, item) {
             event.preventDefault();
@@ -782,22 +873,29 @@ export default {
             this.expand = true;
             func();
         },
-        SwitchPartition(item) {
-            if (item.type === "group") return 0;
-            let id = item.id;
-            if (this.$route.params.id === id) return 0;
-            this.Go(`/partitions/${id}`);
+        treeItemClick(item) {
+            if (item.isTmp) return;
+            if (item.loading) return;
+            item = this.FLAT.find((it) => it.id === item.id);
+            if (item.type === 'group') {
+                console.log('loadChildren', !item.finished, item.children)
+                if (!item.finished) this.loadChildren(item);
+            } else {
+                let id = item.id;
+                if (this.$route.params.id === id) return 0;
+                this.Go(`/partitions/${id}`);
+            }
         },
         whiteClickClearTmp(event) {
             let x = event.target;
             let _self = false;
-            while (x && x.tagName && x.tagName.toLowerCase() != "body") {
+            while (x && x.tagName && x.tagName.toLowerCase() != 'body') {
                 let classList = [...x.classList];
                 if (
-                    classList.includes("fv-TreeView--item") ||
-                    classList.includes("navigation-view-mode-block") ||
-                    classList.includes("navigation-view-command-bar-block") ||
-                    classList.includes("nv-right-menu")
+                    classList.includes('fv-TreeView--item') ||
+                    classList.includes('navigation-view-mode-block') ||
+                    classList.includes('navigation-view-command-bar-block') ||
+                    classList.includes('nv-right-menu')
                 ) {
                     _self = true;
                     break;
@@ -805,8 +903,8 @@ export default {
                 x = x.parentNode;
             }
             if (!_self) {
-                let result = this.flatPartitions;
-                for (let item of result) {
+                this.removeTmp();
+                for (let item of this.FLAT) {
                     item.editable = false;
                 }
                 this.$refs.tree.$forceUpdate();
@@ -816,11 +914,11 @@ export default {
             if (this.$route.path === path) return 0;
             if (this.windowWidth < this.mobileDisplay) this.expand = false;
             this.$Go(path);
-        },
+        }
     },
     beforeDestroy() {
-        window.removeEventListener("click", this.whiteClickClearTmp);
-    },
+        window.removeEventListener('click', this.whiteClickClearTmp);
+    }
 };
 </script>
 

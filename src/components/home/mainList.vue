@@ -144,23 +144,8 @@ export default {
             type: Array,
             default: () => [],
         },
-        filter: {
-            default: () => {
-                return {
-                    key: "any",
-                    value: "",
-                };
-            },
-        },
         edit: {
             default: false,
-        },
-        desc: {
-            default: 1,
-        },
-        sortKey: {
-            // name, title, publisher, createDate, year
-            default: "",
         },
         rightMenuWidth: {
             default: 200,
@@ -187,17 +172,10 @@ export default {
             handler() {
                 this.thisValue = this.value;
                 this.valueInit();
-                this.sort();
             },
         },
         thisValue() {
             this.$emit("input", this.thisValue);
-        },
-        sortKey() {
-            this.sort();
-        },
-        desc() {
-            this.sort();
         },
         edit() {
             for (let i = 0; i < this.thisValue.length; i++) {
@@ -205,13 +183,7 @@ export default {
                 t.choosen = false;
                 this.$set(this.thisValue, i, t);
             }
-        },
-        filter() {
-            this.filterValue();
-        },
-        "filter.value"() {
-            this.filterValue();
-        },
+        }
     },
     computed: {
         ...mapGetters(["local"]),
@@ -258,62 +230,6 @@ export default {
                 val[i].show = true;
             }
             this.thisValue = val;
-            this.filterValue();
-        },
-        filterValue() {
-            let filter = this.filter;
-            if (typeof this.filter == "string")
-                filter = {
-                    key: "any",
-                    value: this.filter,
-                };
-            if (filter.key == undefined || filter.value == undefined) {
-                console.warn(this.filter, "Invalid filter.");
-                return 0;
-            }
-            if (filter.key == "any") {
-                for (let i = 0; i < this.thisValue.length; i++) {
-                    let status = false;
-                    let item = this.thisValue[i];
-                    for (let it in this.thisValue[i]) {
-                        if (it === "labels") {
-                            for (let l = 0; l < item[it].length; l++) {
-                                if (
-                                    item[it][l].text
-                                        .toLowerCase()
-                                        .includes(filter.value.toLowerCase())
-                                ) {
-                                    status = true;
-                                    break;
-                                }
-                            }
-                            if (status) break;
-                        }
-                        if (typeof item[it] != "string") continue;
-                        if (
-                            item[it]
-                                .toLowerCase()
-                                .indexOf(filter.value.toLowerCase()) > -1
-                        ) {
-                            status = true;
-                            break;
-                        }
-                    }
-                    item.show = status;
-                    this.$set(this.thisValue, i, item);
-                }
-            } else {
-                for (let i = 0; i < this.thisValue.length; i++) {
-                    let item = this.thisValue[i];
-                    let status =
-                        this.thisValue[i][this.filter.key]
-                            .toLowerCase()
-                            .indexOf(filter.value.toLowerCase()) > -1;
-                    item.show = status;
-                    this.$set(this.thisValue, i, item);
-                }
-            }
-            this.$emit("change-value", this.thisValue);
         },
         rightClick(event, item) {
             event.preventDefault();
@@ -340,73 +256,7 @@ export default {
             this.$set(this.thisValue, index, t);
             this.$emit("change-value", this.thisValue);
             this.$emit("choose-items", this.currentChoosen);
-        },
-        sort() {
-            let numKey = ["year"];
-            let strKey1 = ["name"];
-            let strKey2 = ["title", "publisher"];
-            let timeKey1 = ["createDate"];
-            if (numKey.find((it) => it == this.sortKey))
-                this.thisValue.sort((a, b) => {
-                    if (!a.metadata || !a.metadata[this.sortKey])
-                        return this.desc * -1;
-                    if (!b.metadata || !b.metadata[this.sortKey])
-                        return this.desc * 1;
-                    return (
-                        this.desc *
-                        this.sortNum(
-                            a.metadata[this.sortKey],
-                            b.metadata[this.sortKey]
-                        )
-                    );
-                });
-            else if (strKey1.find((it) => it == this.sortKey))
-                this.thisValue.sort((a, b) => {
-                    if (!a[this.sortKey]) return this.desc * -1;
-                    if (!b[this.sortKey]) return this.desc * 1;
-                    return (
-                        this.desc *
-                        this.sortName(a[this.sortKey], b[this.sortKey])
-                    );
-                });
-            else if (strKey2.find((it) => it == this.sortKey))
-                this.thisValue.sort((a, b) => {
-                    if (!a.metadata || !a.metadata[this.sortKey])
-                        return this.desc * -1;
-                    if (!b.metadata || !b.metadata[this.sortKey])
-                        return this.desc * 1;
-                    return (
-                        this.desc *
-                        this.sortName(
-                            a.metadata[this.sortKey],
-                            b.metadata[this.sortKey]
-                        )
-                    );
-                });
-            else if (timeKey1.find((it) => it == this.sortKey))
-                this.thisValue.sort((a, b) => {
-                    if (!a[this.sortKey]) return this.desc * -1;
-                    if (!b[this.sortKey]) return this.desc * 1;
-                    return (
-                        this.desc *
-                        this.sortTime(a[this.sortKey], b[this.sortKey])
-                    );
-                });
-        },
-        sortNum(item1, item2) {
-            return parseFloat(item1) < parseFloat(item2) ? 1 : -1;
-        },
-        sortName(item1, item2) {
-            if (!item1) return -1;
-            if (!item2) return 1;
-            return item1.localeCompare(item2);
-        },
-        sortTime(item1, item2) {
-            return this.$SDate.Compare(
-                this.$SDate.Parse(item1),
-                this.$SDate.Parse(item2)
-            );
-        },
+        }
     },
 };
 </script>

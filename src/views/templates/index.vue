@@ -81,8 +81,6 @@ import templateGrid from "@/components/templates/templateGrid.vue";
 import templatePreview from "@/components/templates/templatePreview.vue";
 
 import { mapMutations, mapState, mapGetters } from "vuex";
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
 
 export default {
     components: {
@@ -98,7 +96,7 @@ export default {
                     name: () => this.local("Add"),
                     icon: "Add",
                     iconColor: "rgba(0, 90, 158, 1)",
-                    disabled: () => this.ds_db === null || !this.lock,
+                    disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.show.add = true;
                     },
@@ -118,6 +116,7 @@ export default {
                 { content: "Name", sortName: "name", width: 300 },
                 { content: "Create Date", sortName: "createDate", width: 120 },
             ],
+            templates: [],
             currentItem: {},
             currentChoosen: [],
             currentSearch: "",
@@ -131,46 +130,39 @@ export default {
     },
     watch: {
         $route() {
-            this.templatesEnsureFolder();
+            this.getTemplates();
         },
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            templates: (state) => state.data_structure.templates,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
+        SourceDisabled() {
+            return !this.data_path[this.data_index];
+        }
     },
     mounted() {
-        this.eventInit();
-        this.templatesEnsureFolder();
+        this.getTemplates();
     },
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             toggleEditor: "toggleEditor",
         }),
-        eventInit() {
-            ipc.on("ensure-folder-templates", () => {
-                this.lock = true;
-            });
-        },
-        templatesEnsureFolder() {
-            if (!this.ds_db || this.data_index == -1) return;
-            this.lock = false;
-            ipc.send("ensure-folder", {
-                id: "templates",
-                dir: path.join(
-                    this.data_path[this.data_index],
-                    "root/templates"
-                ),
-            });
+        async getTemplates() {
+            let res = await this.$local_api.Academic.getTemplatesInfo(
+                this.data_path[this.data_index]
+            );
+            if (res.status === "success") {
+                this.templates = res.data;
+            } else {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
         },
         deleteTemplate() {
             if (!this.currentItem.id || !this.lock) return;
@@ -180,24 +172,19 @@ export default {
                 confirmTitle: this.local("Confirm"),
                 cancelTitle: this.local("Cancel"),
                 theme: this.theme,
-                confirm: () => {
+                confirm: async () => {
                     this.lock = false;
-                    let index = this.templates.indexOf(
-                        this.templates.find(
-                            (it) => it.id === this.currentItem.id
-                        )
+                    let res = await this.$local_api.Academic.deleteTemplate(
+                        this.data_path[this.data_index],
+                        this.currentItem.id
                     );
-                    this.templates.splice(index, 1);
-                    this.reviseData({
-                        templates: this.templates,
-                    });
-                    ipc.send("remove-file", {
-                        path: path.join(
-                            this.data_path[this.data_index],
-                            "root/templates",
-                            `${this.currentItem.id}.json`
-                        ),
-                    });
+                    if (res.status !== "success") {
+                        this.$barWarning(res.message, {
+                            status: "error",
+                        });
+                        this.lock = true;
+                        return;
+                    }
                     this.lock = true;
                 },
                 cancel: () => {},
@@ -213,28 +200,23 @@ export default {
                     confirmTitle: this.local("Confirm"),
                     cancelTitle: this.local("Cancel"),
                     theme: this.theme,
-                    confirm: () => {
+                    confirm: async () => {
                         this.lock = false;
-                        let copy = JSON.parse(
-                            JSON.stringify(this.currentChoosen)
-                        );
-                        copy.forEach((el) => {
-                            let index = this.templates.indexOf(
-                                this.templates.find((it) => it.id === el.id)
-                            );
-                            this.templates.splice(index, 1);
-                            this.reviseData({
-                                templates: this.templates,
-                            });
-                            ipc.send("remove-file", {
-                                path: path.join(
+                        for (let i = 0; i < this.currentChoosen.length; i++) {
+                            let res =
+                                await this.$local_api.Academic.deleteTemplate(
                                     this.data_path[this.data_index],
-                                    "root/templates",
-                                    `${el.id}.json`
-                                ),
-                            });
-                            this.lock = true;
-                        });
+                                    this.currentChoosen[i].id
+                                );
+                            if (res.status !== "success") {
+                                this.$barWarning(res.message, {
+                                    status: "error",
+                                });
+                                this.lock = true;
+                                return;
+                            }
+                        }
+                        this.lock = true;
                     },
                     cancel: () => {},
                 }

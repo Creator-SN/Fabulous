@@ -7,7 +7,7 @@
             class="s-row"
             style="margin-top: 45px;"
         >
-            <p class="s-title">{{pid === false ? local('All') : pname}}</p>
+            <p class="s-title">{{partitionInfo.name}}</p>
         </div>
         <div class="m-home-block">
             <div class="row between">
@@ -58,12 +58,9 @@
             </div>
             <div class="row main-table">
                 <main-list
-                    :value="filterItems"
+                    :value="itemList"
                     :edit="editable"
-                    :sortKey="sortKey.key"
-                    :desc="sortDesc"
                     :theme="theme"
-                    :filter="currentSearch.debounce"
                     @open-file="openFile"
                     @label-click="($event) => {currentItem = $event; show.rename = true}"
                     @rightclick="currentItem = $event"
@@ -95,7 +92,7 @@
                             <div
                                 v-show="x.item.pdf"
                                 class="item"
-                                @dblclick="openFile(`${x.item.id}/${x.item.pdf}.pdf`)"
+                                @dblclick="openFile(x.item.id, x.item.pdf, `.pdf`)"
                             >
                                 <img
                                     draggable="false"
@@ -109,7 +106,7 @@
                                 >PDF</p>
                                 <p
                                     class="sec highlight"
-                                    @click="openFile(`${x.item.id}/${x.item.pdf}.pdf`)"
+                                    @click="openFile(x.item.id, x.item.pdf, `.pdf`)"
                                 >{{x.item.pdf}}.pdf</p>
                                 <p></p>
                                 <fv-button
@@ -165,7 +162,7 @@
                                     style="width: 35px; height: 35px;"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
-                                    @click="openFile(`${x.item.id}`)"
+                                    @click="openFile(x.item.id)"
                                 >
                                     <img
                                         draggable="false"
@@ -260,7 +257,7 @@
                                 >
                                 <p>{{local("Revise Metadata")}}</p>
                             </span>
-                            <span @click="openFile(`${currentItem.id}`)">
+                            <span @click="openFile(currentItem.id)">
                                 <img
                                     draggable="false"
                                     :src="img.folder"
@@ -292,8 +289,8 @@
                                 <p>{{local("Rename Item")}}</p>
                             </span>
                             <span
-                                v-show="pid !== false"
-                                @click="deleteItemsFromPartition"
+                                v-show="pid"
+                                @click="removeItemsFromPartition"
                             >
                                 <i
                                     class="ms-Icon ms-Icon--RemoveFrom"
@@ -302,7 +299,7 @@
                                 <p>{{local("Remove From Partition")}}</p>
                             </span>
                             <span
-                                v-show="pid === false"
+                                v-show="!pid"
                                 @click="deleteItem"
                             >
                                 <i
@@ -314,10 +311,14 @@
                         </div>
                     </template>
                 </main-list>
-                <item-list-empty v-if="filterItems.length === 0"></item-list-empty>
+                <item-list-empty v-if="itemList.length === 0"></item-list-empty>
             </div>
         </div>
-        <add-item :show.sync="show.add"></add-item>
+        <add-item
+            :show.sync="show.add"
+            :partitionId="pid"
+            @finished="getItems"
+        ></add-item>
         <rename-item
             :value="currentItem"
             :show.sync="show.rename"
@@ -361,9 +362,6 @@ import folder from "@/assets/home/folder.svg";
 import viewer from "@/assets/home/viewer.svg";
 import fabulous from "@/assets/logo.svg";
 
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
-
 export default {
     components: {
         addItem,
@@ -386,7 +384,7 @@ export default {
                         this.theme === "dark"
                             ? "rgba(118, 185, 237, 1)"
                             : "rgba(0, 90, 158, 1)",
-                    disabled: () => this.ds_db === null || !this.lock,
+                    disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.show.add = true;
                     },
@@ -398,7 +396,7 @@ export default {
                         this.theme === "dark"
                             ? "rgba(118, 185, 237, 1)"
                             : "rgba(0, 90, 158, 1)",
-                    disabled: () => this.ds_db === null || !this.lock,
+                    disabled: () => this.SourceDisabled || !this.lock,
                     func: this.importPdf,
                 },
                 {
@@ -412,7 +410,7 @@ export default {
                         this.theme === "dark"
                             ? "rgba(118, 185, 237, 1)"
                             : "rgba(0, 90, 158, 1)",
-                    disabled: () => this.ds_db === null || !this.lock,
+                    disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.editable ^= true;
                         if (!this.editable) this.currentChoosen = [];
@@ -451,7 +449,7 @@ export default {
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
                         this.pid === false,
-                    func: this.deleteItemsFromPartition,
+                    func: this.removeItemsFromPartition,
                 },
                 {
                     name: () => this.local("Delete"),
@@ -461,26 +459,36 @@ export default {
                         !(
                             this.currentChoosen.length === 0 ||
                             !this.lock ||
-                            this.pid !== false
+                            this.pid
                         ),
                     disabled: () =>
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
-                        this.pid !== false,
+                        this.pid,
                     func: this.deleteItems,
                 },
             ],
-            sortKey: {},
+            sortKey: {
+                key: "createDate",
+                text: () => this.local("Create Date"),
+            },
             sortOptions: [
                 { key: "name", text: () => this.local("Name") },
-                { key: "title", text: () => this.local("Title") },
-                { key: "publisher", text: () => this.local("Publisher") },
+                { key: "metadata.title", text: () => this.local("Title") },
+                {
+                    key: "metadata.publisher",
+                    text: () => this.local("Publisher"),
+                },
                 { key: "createDate", text: () => this.local("Create Date") },
-                { key: "year", text: () => this.local("Year") },
+                { key: "metadata.year", text: () => this.local("Year") },
             ],
             sortDesc: 1,
             editable: false,
-            filterItems: [],
+            partitionInfo: {
+                id: "",
+                name: "",
+            },
+            itemList: [],
             currentItem: {},
             currentChoosen: [],
             currentItemPage: {},
@@ -511,118 +519,135 @@ export default {
     watch: {
         $route() {
             this.editable = false;
-            this.itemsEnsureFolder();
-            this.refreshFilterItems();
+            this.getPartitionInfo();
+            this.getItems();
         },
-        c() {
-            this.refreshFilterItems();
+        sortKey() {
+            this.getItems();
+        },
+        sortDesc() {
+            this.getItems();
+        },
+        "currentSearch.debounce"() {
+            this.getItems();
+        },
+        counter() {
+            this.getItems();
         },
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            items: (state) => state.data_structure.items,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
             value: (state) => state.pdfImporter.value,
             item: (state) => state.pdfImporter.item,
             pdf_importer: (state) => state.pdfImporter.pdf_importer,
+            counter: (state) => state.pdfImporter.counter,
             itemCarrier: (state) => state.itemCarrier,
             mode: (state) => state.pdfImporter.mode,
-            c: (state) => state.pdfImporter.c,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(["local"]),
         pid() {
-            if (this.$route.params.id === undefined) return false;
+            if (!this.$route.params.id) return null;
             return this.$route.params.id;
         },
-        pname() {
-            if (this.pid === false) return "Unknown";
-            let t = [].concat(this.groups);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === this.pid) {
-                    return partitions[i].name;
-                }
-            }
-            return "Unknown";
-        },
-        filterItemsId() {
-            if (this.pid === false) return true;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            let result = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === this.pid) {
-                    result = JSON.parse(JSON.stringify(partitions[i].items));
-                    break;
-                }
-            }
-            return result;
+        SourceDisabled() {
+            return !this.data_path[this.data_index];
         },
     },
     mounted() {
-        this.eventInit();
-        this.itemsEnsureFolder();
-        this.refreshFilterItems();
+        this.getPartitionInfo();
+        this.getItems();
     },
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
             reviseEditor: "reviseEditor",
             revisePdfImporter: "revisePdfImporter",
             reviseItemCarrier: "reviseItemCarrier",
             toggleEditor: "toggleEditor",
         }),
-        eventInit() {
-            ipc.on("ensure-folder-home", () => {
-                this.lock = true;
-            });
-            ipc.on("open-file-home", (event, { status, message }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Open File Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-            });
-        },
-        refreshFilterItems() {
-            if (this.filterItemsId === true) this.filterItems = this.items;
-            else {
-                let result = [];
-                this.items.forEach((el, idx) => {
-                    if (this.filterItemsId.indexOf(el.id) > -1)
-                        result.push(this.items[idx]);
-                });
-                this.filterItems = result;
+        getPartitionInfo() {
+            if (!this.pid) {
+                this.partitionInfo = {
+                    id: "all",
+                    name: this.local("All"),
+                };
+                return;
             }
+            this.$local_api.Academic.getPartition(
+                this.data_path[this.data_index],
+                this.pid
+            )
+                .then((res) => {
+                    if (res.status === "success") {
+                        this.partitionInfo = res.data;
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: "warning",
+                        });
+                    }
+                })
+                .catch((res) => {
+                    this.$barWarning(res.message, {
+                        status: "error",
+                    });
+                });
         },
-        itemsEnsureFolder() {
-            if (!this.ds_db || this.data_index == -1) return;
-            this.lock = false;
-            ipc.send("ensure-folder", {
-                id: "home",
-                dir: path.join(this.data_path[this.data_index], "root/items"),
-            });
+        getItems() {
+            if (!this.currentSearch.debounce) {
+                this.$local_api.Academic.getItems(
+                    this.data_path[this.data_index],
+                    this.pid,
+                    -1,
+                    0,
+                    this.sortKey.key,
+                    this.sortDesc
+                )
+                    .then((res) => {
+                        if (res.status === "success") {
+                            res.data.forEach((el) => {
+                                el.choosen = false;
+                            });
+                            this.itemList = res.data;
+                        } else {
+                            this.$barWarning(res.message, {
+                                status: "warning",
+                            });
+                        }
+                    })
+                    .catch((res) => {
+                        this.$barWarning(res.message, {
+                            status: "error",
+                        });
+                    });
+            } else
+                this.$local_api.Academic.getSearchItems(
+                    this.data_path[this.data_index],
+                    this.pid,
+                    this.currentSearch.debounce,
+                    50,
+                    0,
+                    this.sortKey.key,
+                    this.sortDesc
+                )
+                    .then((res) => {
+                        if (res.status === "success") {
+                            res.data.forEach((el) => {
+                                el.choosen = false;
+                            });
+                            this.itemList = res.data;
+                        } else {
+                            this.$barWarning(res.message, {
+                                status: "warning",
+                            });
+                        }
+                    })
+                    .catch((res) => {
+                        this.$barWarning(res.message, {
+                            status: "error",
+                        });
+                    });
         },
         deleteItem() {
             if (!this.currentItem.id || !this.lock) return;
@@ -632,22 +657,17 @@ export default {
                 confirmTitle: this.local("Confirm"),
                 cancelTitle: this.local("Cancel"),
                 theme: this.theme,
-                confirm: () => {
+                confirm: async () => {
                     this.lock = false;
-                    let index = this.items.indexOf(
-                        this.items.find((it) => it.id === this.currentItem.id)
-                    );
-                    this.items.splice(index, 1);
-                    this.reviseData({
-                        items: this.items,
+                    await this.$local_api.Academic.deleteItem(
+                        this.data_path[this.data_index],
+                        this.currentItem.id
+                    ).then((res) => {
+                        if (res.code !== 200)
+                            this.$barWarning(res.message, {
+                                status: "warning",
+                            });
                     });
-                    ipc.send("remove-folder", {
-                        path: path.join(
-                            this.data_path[this.data_index],
-                            `root/items/${this.currentItem.id}`
-                        ),
-                    });
-                    this.delItemsFromPs([this.currentItem.id]);
                     this.lock = true;
                 },
                 cancel: () => {},
@@ -661,51 +681,22 @@ export default {
                 confirmTitle: this.local("Confirm"),
                 cancelTitle: this.local("Cancel"),
                 theme: this.theme,
-                confirm: () => {
+                confirm: async () => {
                     this.lock = false;
-                    let ids = [];
-                    let copy = JSON.parse(JSON.stringify(this.currentChoosen));
-                    copy.forEach((el) => {
-                        ids.push(el.id);
-                        let index = this.items.indexOf(
-                            this.items.find((it) => it.id === el.id)
-                        );
-                        this.items.splice(index, 1);
-                        this.reviseData({
-                            items: this.items,
+                    let ids = this.currentChoosen.map((el) => el.id);
+                    let res = await this.$local_api.Academic.deleteItems(
+                        this.data_path[this.data_index],
+                        ids
+                    );
+                    if (res.code !== 200)
+                        this.$barWarning(res.message, {
+                            status: "warning",
                         });
-                        ipc.send("remove-folder", {
-                            path: path.join(
-                                this.data_path[this.data_index],
-                                `root/items/${el.id}`
-                            ),
-                        });
-                        this.delItemsFromPs(ids);
-                        this.currentChoosen = [];
-                        this.lock = true;
-                    });
+                    this.getItems();
+                    this.currentChoosen = [];
+                    this.lock = true;
                 },
                 cancel: () => {},
-            });
-        },
-        delItemsFromPs(ids) {
-            if (ids.length === 0) return;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            partitions.forEach((p, idx) => {
-                for (let i = 0; i < ids.length; i++) {
-                    let index = p.items.indexOf(ids[i]);
-                    if (index > -1) {
-                        p.items.splice(index, 1);
-                    }
-                }
-                partitions[idx].items = p.items;
             });
         },
         reviseItemPdf() {
@@ -736,16 +727,13 @@ export default {
             });
             this.toggleEditor(true);
         },
-        openFile(fileName) {
-            let url = path.join(
+        openFile(itemid, fileid, type = "pdf") {
+            this.$local_api.Academic.openItemFile(
                 this.data_path[this.data_index],
-                "root/items",
-                fileName
+                itemid,
+                fileid,
+                type
             );
-            ipc.send("open-file", {
-                id: "home",
-                path: url,
-            });
         },
         openPDF(item, mode = "outside") {
             if (mode === "inside") {
@@ -758,22 +746,11 @@ export default {
                     history: [],
                 });
                 this.toggleEditor(true);
-            } else this.openFile(`${item.id}/${item.pdf}.pdf`);
+            } else {
+                this.openFile(item.id, item.pdf, "pdf");
+            }
         },
-        copyItemsToPartitions(partitions_id) {
-            let t = [].concat(this.groups);
-            let partitions = [];
-            let result = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions_id.indexOf(partitions[i].id) > -1)
-                    result.push(partitions[i]);
-            }
+        async copyItemsToPartitions(partitions) {
             let choosen = this.currentChoosen;
             if (
                 this.currentChoosen.find(
@@ -782,21 +759,28 @@ export default {
             )
                 choosen.push(this.currentItem);
             if (choosen.length === 0) return;
-            result.forEach((p, idx) => {
-                for (let i = 0; i < choosen.length; i++) {
-                    if (
-                        p.items.find((it) => it === choosen[i].id) !== undefined
-                    )
-                        continue;
-                    p.items.push(choosen[i].id);
+            let ids = choosen.map((el) => el.id);
+            for (let partition of partitions) {
+                let partitionid = partition.id;
+                let res = await this.$local_api.Academic.addItemsToPartition(
+                    this.data_path[this.data_index],
+                    partitionid,
+                    ids
+                );
+                if (res.status !== "success") {
+                    this.$barWarning(res.message, {
+                        status: "warning",
+                    });
+                    break;
                 }
-                result[idx].items = p.items;
-            });
+            }
+            for (let item of this.itemList) {
+                item.choosen = false;
+                let index = this.itemList.indexOf(item);
+                this.$set(this.itemList, index, item);
+            }
             this.currentChoosen = [];
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
+            this.editable = false;
         },
         addToTransferCarrier() {
             let items = this.currentChoosen;
@@ -815,23 +799,8 @@ export default {
             });
             this.reviseItemCarrier({ itemsX: this.itemCarrier.itemsX });
         },
-        deleteItemsFromPartition() {
+        removeItemsFromPartition() {
             if (this.pid === false) return;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            let target = {};
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === this.pid) {
-                    target = partitions[i];
-                    break;
-                }
-            }
             let choosen = this.currentChoosen;
             if (
                 this.currentChoosen.find(
@@ -840,18 +809,28 @@ export default {
             )
                 choosen.push(this.currentItem);
             if (choosen.length === 0) return;
-            for (let i = 0; i < choosen.length; i++) {
-                let index = target.items.indexOf(choosen[i].id);
-                if (index > -1) {
-                    target.items.splice(index, 1);
-                }
-            }
-            this.currentChoosen = [];
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-            this.refreshFilterItems();
+            let ids = choosen.map((el) => el.id);
+            this.$local_api.Academic.removeItemsFromPartition(
+                this.data_path[this.data_index],
+                this.pid,
+                ids
+            )
+                .then((res) => {
+                    if (res.status === "success") {
+                        this.currentChoosen = [];
+                        this.editable = false;
+                        this.getItems();
+                    } else {
+                        this.$barWarning(res.message, {
+                            status: "warning",
+                        });
+                    }
+                })
+                .catch((res) => {
+                    this.$barWarning(res.message, {
+                        status: "error",
+                    });
+                });
         },
         showRenameItemPage(item, page) {
             this.currentItem = item;
@@ -862,67 +841,46 @@ export default {
             this.currentItem = item;
             this.show.metadata = true;
         },
-        reviseItemEmoji(item, emoji) {
-            if (!this.ds_db || !this.items) return;
-            let _item = this.items.find((it) => it.id === item.id);
-            _item.emoji = emoji;
+        async reviseItemEmoji(item, emoji) {
             item.emoji = emoji;
-            this.reviseData({
-                items: this.items,
-            });
+            let res = await this.$local_api.Academic.updateItem(
+                this.data_path[this.data_index],
+                item
+            );
+            if (res.status !== "success") {
+                this.$barWarning(res.message, {
+                    status: "warning",
+                });
+            }
         },
-        revisePageEmoji(item, page, emoji) {
-            if (!this.ds_db || !this.items) return;
-            let _item = this.items.find((it) => it.id === item.id);
-            let _page = _item.pages.find((it) => it.id === page.id);
-            _page.emoji = emoji;
+        async revisePageEmoji(item, page, emoji) {
+            if (!this.items) return;
             page.emoji = emoji;
-            this.reviseData({
-                items: this.items,
-            });
-            this.thisShow = false;
+            let res = await this.$local_api.Academic.updateItemPage(
+                this.data_path[this.data_index],
+                item.id,
+                page
+            );
+            if (res.status !== "success") {
+                this.$barWarning(res.message, {
+                    status: "error",
+                });
+            }
         },
         async duplicateItemPage(item, page) {
-            if (!this.ds_db || !this.items) return;
-            let _page = JSON.parse(JSON.stringify(page));
-            _page.id = this.$Guid();
-            _page.createDate = this.$SDate.DateToString(new Date());
-            item = this.items.find((it) => it.id === item.id);
-            item.pages.push(_page);
-            let url = path.join(
+            if (!this.items) return;
+            let res = await this.$local_api.Academic.duplicateItemPage(
                 this.data_path[this.data_index],
-                "root/items",
-                `${item.id}`,
-                `${_page.id}.json`
+                item.id,
+                page.id
             );
-            let oriUrl = path.join(
-                this.data_path[this.data_index],
-                "root/items",
-                `${item.id}`,
-                `${page.id}.json`
-            );
-            ipc.send("read-file", {
-                id: oriUrl,
-                path: oriUrl,
-            });
-            let templateContent = await new Promise((resolve) => {
-                ipc.on(`read-file-${oriUrl}`, (event, { data }) => {
-                    resolve(data);
+            if (res.status !== "success") {
+                this.$barWarning(res.message, {
+                    status: "error",
                 });
-            });
-            ipc.send("output-file", {
-                id: url,
-                path: url,
-                data: templateContent,
-            });
-            await new Promise((resolve) => {
-                ipc.on(`output-file-${url}`, () => {
-                    resolve(1);
-                });
-            });
-            this.reviseData({
-                items: this.items,
-            });
+            } else {
+                item.pages.push(res.data);
+            }
         },
         async deleteItemPage(itemId, pageId) {
             this.$infoBox(this.local(`Are you sure to delete this page?`), {
@@ -932,21 +890,16 @@ export default {
                 cancelTitle: this.local("Cancel"),
                 theme: this.theme,
                 confirm: async () => {
-                    let item = this.items.find((it) => it.id === itemId);
-                    let index = item.pages.indexOf(
-                        item.pages.find((page) => page.id === pageId)
+                    let res = await this.$local_api.Academic.deleteItemPage(
+                        this.data_path[this.data_index],
+                        itemId,
+                        pageId
                     );
-                    item.pages.splice(index, 1);
-                    await this.reviseData({
-                        items: this.items,
-                    });
-                    ipc.send("remove-file", {
-                        path: path.join(
-                            this.data_path[this.data_index],
-                            `root/items/${item.id}`,
-                            `${pageId}.json`
-                        ),
-                    });
+                    if (res.status !== "success") {
+                        this.$barWarning(res.message, {
+                            status: "error",
+                        });
+                    }
                 },
                 cancel: () => {},
             });

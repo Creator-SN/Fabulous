@@ -42,7 +42,6 @@
                     :rowHeight="60"
                     :choosen-background="'rgba(255, 255, 255, 0.1)'"
                     style="width: 100%; height: auto; margin-top: 15px;"
-                    @chooseItem="switchDataIndex($event.item)"
                 >
                     <template v-slot:listItem="x">
                         <data-path-item
@@ -318,48 +317,51 @@
             :show.sync="show.initDS"
             :theme="theme"
             :db_index="db_index"
+            @finished="configInit"
         ></init-ds>
         <add-ds
             :show.sync="show.addDS"
             :theme="theme"
+            @finished="configInit"
         ></add-ds>
     </div>
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
-import initDs from "@/components/settings/initDS.vue";
-import addDs from "@/components/settings/addDS.vue";
-import dataPathItem from "@/components/settings/dataPathItem.vue";
+import { mapMutations, mapState, mapGetters } from 'vuex';
+import initDs from '@/components/settings/initDS.vue';
+import addDs from '@/components/settings/addDS.vue';
+import dataPathItem from '@/components/settings/dataPathItem.vue';
 
-import OneDrive from "@/assets/settings/OneDrive.svg";
+import { config } from '@/js/data_sample';
 
-import ThemeColor from "@/js/themeColorPicker.js";
+import OneDrive from '@/assets/settings/OneDrive.svg';
 
-const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
+import ThemeColor from '@/js/themeColorPicker.js';
+
+const { ipcRenderer: ipc } = require('electron');
 
 export default {
     components: {
         initDs,
         addDs,
-        dataPathItem,
+        dataPathItem
     },
     data() {
         return {
             cur_language: {},
             languages: [
-                { key: "en", text: "English" },
-                { key: "cn", text: "简体中文" },
+                { key: 'en', text: 'English' },
+                { key: 'cn', text: '简体中文' }
             ],
             cur_active_system_mode: {},
             active_system_modes: [
                 {
-                    key: "ds",
-                    text: () => this.local("Reference Management System"),
+                    key: 'ds',
+                    text: () => this.local('Reference Management System')
                 },
-                { key: "notebook", text: () => this.local("Notebook System") },
-                { key: "both", text: () => this.local("Both Systems") },
+                { key: 'notebook', text: () => this.local('Notebook System') },
+                { key: 'both', text: () => this.local('Both Systems') }
             ],
             thisPathList: [],
             auto_save: false,
@@ -368,74 +370,59 @@ export default {
             watch_all_extensions: false,
             db_index: -1,
             img: {
-                OneDrive,
+                OneDrive
             },
             updater: {
-                status: "init",
+                status: 'init',
                 downloadPercent: 0,
-                version: false,
+                version: false
             },
             show: {
                 initDS: false,
-                addDS: false,
-            },
-            lock: {
-                switchDataIndex: true,
-            },
+                addDS: false
+            }
         };
     },
     watch: {
         $route() {
             this.configInit();
-            this.refreshDBList();
-        },
-        data_path() {
-            this.refreshDBList();
-        },
-        data_index() {
-            this.refreshDBList();
         },
         language() {
-            this.configInit();
+            this.thisConfigSync();
         },
         auto_save() {
             this.switchAutoSave();
         },
         autoSave() {
-            this.configInit();
+            this.thisConfigSync();
         },
         dynamic_effect() {
             this.switchDynamicEffect();
         },
         dynamicEffect() {
-            this.configInit();
+            this.thisConfigSync();
         },
         editor_expand_content() {
             this.switchEditorExpandContent();
         },
         activeSystemMode() {
-            this.configInit();
-            this.refreshDBList();
+            this.thisConfigSync();
         },
         editorExpandContent() {
-            this.configInit();
+            this.thisConfigSync();
         },
         watch_all_extensions() {
             this.switchWatchAllExtensions();
         },
         watchAllExtensions() {
-            this.configInit();
-        },
-        "show.initDS"() {
-            this.refreshDBList();
-        },
+            this.thisConfigSync();
+        }
     },
     computed: {
         ...mapState({
             init_status: (state) => state.config.init_status,
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            DataDB: (state) => state.DataDB,
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
             activeSystemMode: (state) => state.config.activeSystemMode,
@@ -443,32 +430,44 @@ export default {
             dynamicEffect: (state) => state.config.dynamicEffect,
             watchAllExtensions: (state) => state.config.watchAllExtensions,
             themeColorList: (state) => state.config.themeColorList,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local", "ds_db"]),
-        v() {
-            return this;
-        },
+        ...mapGetters(['local']),
         SourceIndexDisabled() {
             return (index) => {
                 if (!this.data_path[index]) return true;
                 return false;
             };
-        },
+        }
     },
     mounted() {
         this.eventInit();
         this.configInit();
-        this.refreshDBList();
     },
     methods: {
         ...mapMutations({
-            reviseConfig: "reviseConfig",
-            reviseData: "reviseData",
-            toggleTheme: "toggleTheme",
-            syncDS: "syncDS",
+            reviseConfig: 'reviseConfig',
+            toggleTheme: 'toggleTheme'
         }),
         configInit() {
+            let _config = JSON.parse(JSON.stringify(config));
+            this.$local_api.Config.getConfig().then((res) => {
+                if (res.status === 'success') {
+                    let target = res.data;
+                    for (let key in _config) {
+                        _config[key] = target[key];
+                    }
+                    this.reviseConfig(_config);
+                    this.thisConfigSync();
+                    this.refreshDSList();
+                } else {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                }
+            });
+        },
+        thisConfigSync() {
             this.cur_language = this.languages.find(
                 (item) => item.key === this.language
             );
@@ -481,32 +480,32 @@ export default {
             this.watch_all_extensions = this.watchAllExtensions;
         },
         eventInit() {
-            ipc.on("updater-callback", (event, { status, info }) => {
+            ipc.on('updater-callback', (event, { status, info }) => {
                 this.updater.status = status;
-                if (status === "latest")
+                if (status === 'latest')
                     this.updater.version = info.releaseName;
-                if (status === "loading")
+                if (status === 'loading')
                     this.updater.downloadPercent = info.percent.toFixed(0);
                 console.log({ status, info });
             });
         },
         chooseLanguage(item) {
             this.reviseConfig({
-                language: item.key,
+                language: item.key
             });
         },
-        refreshDBList() {
+        refreshDSList() {
             // 此函数初始化数据源的DB //
             // 同时也会初始化ListView列表项目 //
-            if (this.activeSystemMode === "notebook") return;
+            if (this.activeSystemMode === 'notebook') return;
             let pathList = this.data_path;
             if (pathList.length === 0) {
                 this.$barWarning(
                     this.local(
-                        "There is no source, please add a data source to getting started."
+                        'There is no source, please add a data source to getting started.'
                     ),
                     {
-                        status: "warning",
+                        status: 'warning'
                         // autoClose: -1,
                     }
                 );
@@ -520,7 +519,7 @@ export default {
                     name: pathList[idx],
                     path: pathList[idx],
                     choosen: idx === this.data_index,
-                    disabled: () => false,
+                    disabled: () => false
                 });
             });
             this.thisPathList.splice(0, this.thisPathList.length);
@@ -528,62 +527,38 @@ export default {
         },
         switchAutoSave() {
             this.reviseConfig({
-                autoSave: this.auto_save,
+                autoSave: this.auto_save
             });
         },
         switchDynamicEffect() {
             this.reviseConfig({
-                dynamicEffect: this.dynamic_effect,
+                dynamicEffect: this.dynamic_effect
             });
         },
         chooseSystemMode(item) {
             this.reviseConfig({
-                activeSystemMode: item.key,
+                activeSystemMode: item.key
             });
         },
         switchEditorExpandContent() {
             this.reviseConfig({
-                editorExpandContent: this.editor_expand_content,
+                editorExpandContent: this.editor_expand_content
             });
         },
         switchWatchAllExtensions() {
             this.reviseConfig({
-                watchAllExtensions: this.watch_all_extensions,
+                watchAllExtensions: this.watch_all_extensions
             });
         },
         addSource() {
             this.show.addDS = true;
         },
         async linkSource() {
-            let path = (
-                await dialog.showOpenDialog({
-                    properties: ["openDirectory"],
-                })
-            ).filePaths[0];
-            if (!path) return;
-            let pathList = this.data_path;
-            if (!pathList.find((url) => url === path)) pathList.push(path);
-            await this.reviseConfig({
-                data_path: pathList,
+            this.$local_api.Config.linkLocalDataSource().then((res) => {
+                if (res.status == 'success') {
+                    this.configInit();
+                }
             });
-            let index = pathList.indexOf(path);
-            if (!this.SourceIndexDisabled(index)) {
-                if (this.data_index === index)
-                    await this.reviseConfig({
-                        data_index: -1,
-                    });
-                this.reviseConfig({
-                    data_index: index,
-                });
-            }
-        },
-        switchDataIndex(item) {
-            this.lock.switchDataIndex = false;
-            let index = this.data_path.indexOf(item.path);
-            this.reviseConfig({
-                data_index: index,
-            });
-            this.lock.switchDataIndex = true;
         },
         showInitDS(item) {
             let index = this.data_path.indexOf(item.path);
@@ -592,31 +567,32 @@ export default {
         },
         removeDS(db_item) {
             this.$infoBox(
-                this.local("Are you sure to remove this data source?"),
+                this.local('Are you sure to remove this data source?'),
                 {
-                    status: "error",
-                    title: this.local("Remove Data Source"),
-                    confirmTitle: this.local("Confirm"),
-                    cancelTitle: this.local("Cancel"),
+                    status: 'error',
+                    title: this.local('Remove Data Source'),
+                    confirmTitle: this.local('Confirm'),
+                    cancelTitle: this.local('Cancel'),
                     theme: this.theme,
-                    confirm: () => {
+                    confirm: async () => {
                         let url = db_item.path;
                         let index = this.data_path.indexOf(url);
                         this.data_path.splice(index, 1);
                         if (index - 1 > 0 && this.data_path.length > 0)
-                            this.reviseConfig({
-                                data_index: index - 1,
+                            await this.reviseConfig({
+                                data_index: index - 1
                             });
                         else if (this.data_path.length > 0)
-                            this.reviseConfig({
-                                data_index: 0,
+                            await this.reviseConfig({
+                                data_index: 0
                             });
                         else
-                            this.reviseConfig({
-                                data_index: -1,
+                            await this.reviseConfig({
+                                data_index: -1
                             });
+                        this.refreshDSList();
                     },
-                    cancel: () => {},
+                    cancel: () => {}
                 }
             );
         },
@@ -628,13 +604,13 @@ export default {
                 result.forEach((el) => {
                     color.push({
                         hot: el.hot,
-                        color: el.color,
+                        color: el.color
                     });
                 });
                 this.reviseConfig({
-                    themeColorList: color,
+                    themeColorList: color
                 });
-                this.$refs.input.value = "";
+                this.$refs.input.value = '';
             });
         },
         shuffleThemeColorList() {
@@ -643,10 +619,10 @@ export default {
                 return Math.random() - 0.5;
             });
             this.reviseConfig({
-                themeColorList: color,
+                themeColorList: color
             });
-        },
-    },
+        }
+    }
 };
 </script>
 

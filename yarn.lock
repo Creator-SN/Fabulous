@@ -1183,10 +1183,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.0.4.tgz#1f41d2c904bd92b0e9e29d0fcd1540fcdf0a0ac7"
-  integrity sha512-UJTqH4TV603U7pSTMuLoC2Mlj0WoRCrtzoZpkOpeEC6PKT91btZStEFmRCgX7w1SOG5rb+V6RDaORcOwEJPZLg==
+"@creatorsn/powereditor@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.0.5.tgz#307ffc2daa6dc251f48ef3792f496a7e53412dd9"
+  integrity sha512-qxg0irmQCPbyW7drJHphrw4aW0rw/KyzmD41T7x3uSQf/YXoGiA4mFvb4fXXXGnRr7Ia/6+QmoCUHumSJUBPww==
   dependencies:
     "@tiptap/core" "2.0.3"
     "@tiptap/extension-bubble-menu" "2.0.3"
