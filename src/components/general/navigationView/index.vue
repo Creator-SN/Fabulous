@@ -428,6 +428,9 @@ export default {
             rightMenuHeight: 0,
             show: {
                 rightMenu: false
+            },
+            lock: {
+                treeList: true
             }
         };
     },
@@ -524,6 +527,8 @@ export default {
         },
         async refreshTreeList() {
             if (!this.data_path[this.data_index]) return;
+            if (!this.lock.treeList) return;
+            this.lock.treeList = false;
             this.treeList = [];
             this.FLAT = [];
             let result = [];
@@ -547,6 +552,7 @@ export default {
                 this.hotPushFLAT(arr[i]);
             }
             this.treeList = result;
+            this.lock.treeList = true;
         },
         itemFormat(item, type = 'group') {
             let obj = {
@@ -558,6 +564,7 @@ export default {
                             ? item.children
                             : []
                         : null,
+                expanded: false,
                 loading: false,
                 finished: false,
                 type
@@ -878,7 +885,6 @@ export default {
             if (item.loading) return;
             item = this.FLAT.find((it) => it.id === item.id);
             if (item.type === 'group') {
-                console.log('loadChildren', !item.finished, item.children)
                 if (!item.finished) this.loadChildren(item);
             } else {
                 let id = item.id;

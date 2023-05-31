@@ -171,7 +171,7 @@ export class Config {
             try {
                 let _config = JSON.parse(JSON.stringify(config));
                 for (let key in _config) {
-                    if (target[key])
+                    if (Object.prototype.hasOwnProperty.call(target, key))
                         configDB.set(key, target[key]).write();
                 }
                 resolve({
@@ -854,7 +854,7 @@ export class Academic {
             try {
                 let _partition = JSON.parse(JSON.stringify(Partition));
                 for (let key in _partition) {
-                    if (partition[key])
+                    if (Object.prototype.hasOwnProperty.call(partition, key))
                         _partition[key] = partition[key];
                 }
                 _partition.id = Tools.$Guid();
@@ -1261,7 +1261,7 @@ export class Academic {
             try {
                 let _item = JSON.parse(JSON.stringify(Item));
                 for (let key in _item) {
-                    if (item[key])
+                    if (Object.prototype.hasOwnProperty.call(item, key))
                         _item[key] = item[key];
                 }
                 _item.id = Tools.$Guid();
@@ -1330,7 +1330,7 @@ export class Academic {
                 }
                 let ignoreKeys = ['id', 'createDate'];
                 for (let key in _item) {
-                    if (item[key] && ignoreKeys.indexOf(key) == -1)
+                    if (Object.prototype.hasOwnProperty.call(item, key) && ignoreKeys.indexOf(key) == -1)
                         _item[key] = item[key];
                 }
                 _item.updateDate = Tools.$DateFormat('YYYY-mm-dd HH:MM:SS', new Date());
@@ -1674,7 +1674,7 @@ export class Academic {
                 }
                 let _page = JSON.parse(JSON.stringify(Page));
                 for (let key in _page) {
-                    if (page[key])
+                    if (Object.prototype.hasOwnProperty.call(page, key))
                         _page[key] = page[key];
                 }
                 _page.id = Tools.$Guid();
@@ -1860,7 +1860,7 @@ export class Academic {
                 }
                 let ignoreKeys = ['id', 'createDate'];
                 for (let key in _page) {
-                    if (page[key] && ignoreKeys.indexOf(key) == -1)
+                    if (Object.prototype.hasOwnProperty.call(page, key) && ignoreKeys.indexOf(key) == -1)
                         _page[key] = page[key];
                 }
                 _page.updateDate = Tools.$DateFormat('YYYY-mm-dd HH:MM:SS', new Date());
@@ -1981,7 +1981,7 @@ export class Academic {
                 }
                 let _metadata = item.metadata;
                 for (let key in _metadata) {
-                    if (metadata[key])
+                    if (Object.prototype.hasOwnProperty.call(metadata, key))
                         _metadata[key] = metadata[key];
                 }
                 dataDB.set('items', dataDB.get('items').value()).write();
@@ -2146,7 +2146,7 @@ export class Academic {
             try {
                 let _template = JSON.parse(JSON.stringify(Page));
                 for (let key in _template) {
-                    if (template[key])
+                    if (Object.prototype.hasOwnProperty.call(template, key))
                         _template[key] = template[key];
                 }
                 _template.id = Tools.$Guid();
@@ -2220,7 +2220,7 @@ export class Academic {
                 }
                 let ignoreKeys = ['id', 'createDate'];
                 for (let key in _template) {
-                    if (template[key] && ignoreKeys.indexOf(key) == -1)
+                    if (Object.prototype.hasOwnProperty.call(template, key) && ignoreKeys.indexOf(key) == -1)
                         _template[key] = template[key];
                 }
                 _template.updateDate = Tools.$DateFormat('YYYY-mm-dd HH:MM:SS', new Date());
