@@ -522,6 +522,11 @@ export default {
             this.getPartitionInfo();
             this.getItems();
         },
+        data_index () {
+            this.editable = false;
+            this.getPartitionInfo();
+            this.getItems();
+        },
         sortKey() {
             this.getItems();
         },
@@ -595,6 +600,7 @@ export default {
                 });
         },
         getItems() {
+            if(this.SourceDisabled) return;
             if (!this.currentSearch.debounce) {
                 this.$local_api.Academic.getItems(
                     this.data_path[this.data_index],

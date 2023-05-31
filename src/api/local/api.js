@@ -283,7 +283,7 @@ export class Config {
                     configDB.set('data_path', _config.data_path).write();
                     resolve({
                         status: 'success',
-                        data: null,
+                        data: _path,
                         code: 200,
                         message: '添加数据源成功 (Add data source successfully)'
                     });
@@ -303,14 +303,15 @@ export class Config {
     /**
      * @summary 已存在该数据源 (Data source already exists)
      * @param {string} uri 数据源路径 (Data source path)
+     * @param {string} name 数据源名称 (Data source name)
      * @returns {Promise} 检查结果 (Check result)
      * @description 检查数据源是否已存在 (Check if the data source already exists)
     */
-    static async existsDataSource(uri) {
+    static async existsDataSource(uri, name = null) {
         return await new Promise((resolve, reject) => {
             try {
                 let id = Tools.$Guid();
-                let _path = path.join(uri, "data_structure.json");
+                let _path = name ? path.join(uri, name, "data_structure.json") : path.join(uri, "data_structure.json");
                 ipc.send("exists-path", {
                     id: id,
                     path: _path,

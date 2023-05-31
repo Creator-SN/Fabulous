@@ -525,7 +525,7 @@ export default {
             data_index: (state) => state.config.data_index,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "ds_db"]),
+        ...mapGetters(["local"]),
     },
     mounted() {
         this.metadataInit();

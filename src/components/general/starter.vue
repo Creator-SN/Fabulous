@@ -178,7 +178,7 @@
                     background="rgba(0, 130, 180, 1)"
                     :disabled="path === ''"
                     class="starter-btn"
-                    @click="chooseSource"
+                    @click="chooseSource()"
                 >{{local('Confirm')}}</fv-button>
             </div>
         </transition>
@@ -195,9 +195,7 @@ import notebookImg from '@/assets/nav/notebook.svg';
 import allImg from '@/assets/nav/all.svg';
 
 import { mapMutations, mapState, mapGetters } from 'vuex';
-import { data_structure, config } from '@/js/data_sample.js';
-
-const path = require('path');
+import { config } from '@/js/data_sample.js';
 
 export default {
     data() {
@@ -299,17 +297,15 @@ export default {
                 }
             );
         },
-        async existsSource(url) {
+        async existsSource(url, name) {
             let res = null;
-            res = await this.$local_api.Config.existsDataSource(url);
+            res = await this.$local_api.Config.existsDataSource(url, name);
             return res.data;
         },
         async addSource() {
             if (this.path === '') return;
             if (this.name === '') return;
-            let id = this.$Guid();
-            let _path = path.join(this.path, this.name);
-            if (await this.existsSource(_path)) {
+            if (await this.existsSource(this.path, this.name)) {
                 this.$infoBox(
                     this.local(`An existing data source is detected.`),
                     {
@@ -319,42 +315,39 @@ export default {
                         cancelTitle: this.local('Continue to Cover'),
                         theme: 'dark',
                         confirm: () => {
-                            this.chooseSource();
+                            this.chooseSource(this.name);
                         },
                         cancel: () => {
-                            this.addSourceConfirm(_path, id);
+                            this.addSourceConfirm(this.path, this.name);
                         }
                     }
                 );
-            } else this.addSourceConfirm(_path, id);
+            } else this.addSourceConfirm(this.path, this.name);
         },
-        async addSourceConfirm(_path) {
-            let ds = JSON.parse(JSON.stringify(data_structure));
-            ds.id = this.$Guid();
-            ds.name = this.name;
-            ds.createDate = this.$SDate.DateToString(new Date());
-
-            let res = await this.$local_api.Config.createDataSource(_path);
+        async addSourceConfirm(path, name) {
+            let res = await this.$local_api.Config.createDataSource(path, name);
             if (res.status !== 'success') {
                 this.$barWarning(res.message, {
                     status: 'warning'
                 });
             } else {
                 await this.configInit();
-                let index = this.data_path.indexOf(_path);
+                let index = this.data_path.indexOf(res.data);
                 this.reviseConfig({
                     data_index: index
                 });
                 this.close();
             }
         },
-        async chooseSource() {
+        async chooseSource(name = null) {
             if (this.path === '') return;
-            let _path = this.path;
-            let res = await this.$local_api.Config.linkLocalDataSource(_path);
+            let path = name
+                ? this.path.replace(/\\/g, '/') + '/' + name
+                : this.path;
+            let res = await this.$local_api.Config.linkLocalDataSource(path);
             if (res.status == 'success') {
                 await this.configInit();
-                let index = this.data_path.indexOf(_path);
+                let index = this.data_path.indexOf(path);
                 this.reviseConfig({
                     data_index: index
                 });
