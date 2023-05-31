@@ -2535,3 +2535,353 @@ export class Academic {
         });
     }
 }
+
+export class Notebook {
+
+    /**
+     * @summary 读取文件 (Read file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 文件路径 (File path)
+     * @returns {Promise} 文件内容 (File content)
+     * @description 文件内容为PowerEditor json格式
+    */
+    static async getDocumentAsync(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("read-file", {
+                id: uri + filePath,
+                path: filePath,
+                target: filePath,
+            });
+            ipc.on(`read-file-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '读取文件成功 (Read file successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 创建笔记文件 (Create note file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 文件路径 (File path)
+     * @param {string} content 文件内容 (File content)
+     * @description 文件内容为PowerEditor json格式
+    */
+    static async createDocumentAsync(uri, filePath, content) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("output-file", {
+                id: uri + filePath,
+                path: filePath,
+                data: content,
+            });
+            ipc.on(`output-file-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '创建文件成功 (Create file successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 删除笔记文件 (Delete note file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 文件路径 (File path)
+     * @description 文件内容为PowerEditor json格式
+    */
+    static async removeDocumentAsync(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("remove-file", {
+                id: uri + filePath,
+                path: filePath,
+            });
+            ipc.on(`remove-file-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '删除文件成功 (Delete file successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * @summary 判断路径存在 (Determine if the path exists)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 文件路径, 既能判断目录是否存在, 也能判断目录下的文件是否存在 (File path, can determine whether the directory exists, and can also determine whether the file under the directory exists)
+     * @returns {Promise} 是否存在 (Whether it exists)
+    */
+    static async existsPathAsync(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("exists-path", {
+                id: uri + filePath,
+                path: filePath,
+            });
+            ipc.on(`exists-path-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.exists,
+                        code: 200,
+                        message: '判断路径存在成功 (Determine if the path exists successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 创建目录 (Create directory)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 目录路径 (Directory path)
+     * @returns {Promise} 是否创建成功 (Whether it is created successfully)
+    */
+    static async createDirectoryAsync(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("ensure-folder", {
+                id: uri + filePath,
+                dir: filePath,
+            });
+            ipc.on(`ensure-folder-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '创建目录成功 (Create directory successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 更新目录信息 (Update directory information)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 目录路径 (Directory path)
+     * @param {object} info 目录信息 (Directory information)
+     * @returns {Promise} 是否更新成功 (Whether it is updated successfully)
+    */
+    static async updateDirectoryInfoAsync(uri, filePath, info) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("rename", {
+                id: uri + filePath,
+                path: filePath,
+                newPath: path.join(path.dirname(filePath), info.name),
+            });
+            ipc.on(`update-folder-info-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '更新目录信息成功 (Update directory information successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 删除目录 (Delete directory)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 目录路径 (Directory path)
+     * @returns {Promise} 是否删除成功 (Whether it is deleted successfully)
+     * @description 本地删除目录时, 会将目录下的所有文件一并删除 (When deleting a directory locally, all files under the directory will be deleted together)
+    */
+    static async removeDirectoryAsync(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("remove-folder", {
+                id: uri + filePath,
+                path: filePath,
+            });
+            ipc.on(`remove-folder-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '删除目录成功 (Delete directory successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: '删除目录失败 (Failed to delete directory)'
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
+     * @summary 复制目录或文件 (Copy directory or file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 源路径 (Source path)
+     * @param {string} newPath 新目录路径 (New directory path)
+     * @returns {Promise} 是否复制成功 (Whether it is copied successfully)
+     * @description 本地复制目录或文件时, 会将目录下的所有文件一并复制 (When copying a directory or file locally, all files under the directory will be copied together)
+    */
+    static async copyDirectoryAsync(uri, filePath, newPath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("copy-file", {
+                id: uri + filePath + '@' + newPath,
+                src: filePath,
+                tgt: newPath,
+            });
+            ipc.on(`copy-file-${uri + filePath + '@' + newPath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        code: 200,
+                        message: '复制目录成功 (Copy directory successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        code: 500,
+                        message: '复制目录失败 (Failed to copy directory)'
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * @summary 移动目录或文件 (Move directory or file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 目录路径 (Directory path)
+     * @param {string} newPath 新目录路径 (New directory path)
+     * @returns {Promise} 是否移动成功 (Whether it is moved successfully)
+     * @description 本地移动目录时, 会将目录下的所有文件一并移动 (When moving a directory locally, all files under the directory will be moved together)
+    */
+    static async moveDirectoryAsync(uri, filePath, newPath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("move-file", {
+                id: uri + filePath + '@' + newPath,
+                src: filePath,
+                tgt: newPath,
+            });
+            ipc.on(`move-file-${uri + filePath + '@' + newPath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        code: 200,
+                        message: '移动目录成功 (Move directory successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        code: 500,
+                        message: '移动目录失败 (Failed to move directory)'
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * @summary 打开目录或文件 (Open directory or file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 目录或文件路径 (Directory or file path)
+     * @returns {Promise} 是否打开成功 (Whether it is opened successfully)
+     * @description 本地打开目录或文件时, 会调用系统默认的打开方式 (When opening a directory or file locally, the system's default opening method will be called)
+    */
+    static async openFile(uri, filePath) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("open-file", {
+                id: uri,
+                path: filePath,
+            });
+            ipc.on(`open-file-${uri}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '打开文件成功 (Open file successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            });
+
+        });
+    }
+}

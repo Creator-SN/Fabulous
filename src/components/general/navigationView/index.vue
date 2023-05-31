@@ -69,7 +69,7 @@
                             :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
                             :leftIconForeground="'rgba(255, 180, 0, 0.8)'"
                             :expandClickMode="'normal'"
-                            style="width: 100%; height: 100%;"
+                            style="width: 100%; height: 100%; overflow: auto;"
                             ref="tree"
                             @click="treeItemClick"
                         >
@@ -209,6 +209,7 @@
                         :theme="theme"
                         :local="local"
                         :unsave="unsave"
+                        :uri="SourceDisabled ? 'localTree' : data_path[data_index]"
                         :watchAllExtensions="watchAllExtensions"
                         :toggleEditor="toggleEditor"
                         :Go="Go"

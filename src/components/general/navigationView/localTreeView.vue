@@ -10,7 +10,7 @@
             :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
             :leftIconForeground="'rgba(245, 78, 162, 0.8)'"
             :expandClickMode="'normal'"
-            style="width: 100%; height: 100%;"
+            style="width: 100%; height: 100%; overflow: auto;"
             @click="treeItemClick"
         >
             <template v-slot:default="x">
@@ -173,53 +173,56 @@
 </template>
 
 <script>
-import rightMenu from "@/components/general/rightMenu.vue";
+import rightMenu from '@/components/general/rightMenu.vue';
 
-import { fabulous_notebook } from "@/js/data_sample.js";
+import { fabulous_notebook } from '@/js/data_sample.js';
 
-const { ipcRenderer: ipc } = require("electron");
-const { dialog, process } = require("@electron/remote");
+const { ipcRenderer: ipc } = require('electron');
+const { dialog, process } = require('@electron/remote');
 
-import folderImg from "@/assets/nav/folder.svg";
-import noteImg from "@/assets/nav/note.svg";
-import jsonImg from "@/assets/nav/json.svg";
-import htmlImg from "@/assets/nav/html.svg";
-import fileImg from "@/assets/nav/file.svg";
-import markdownImg from "@/assets/nav/markdown.svg";
+import folderImg from '@/assets/nav/folder.svg';
+import noteImg from '@/assets/nav/note.svg';
+import jsonImg from '@/assets/nav/json.svg';
+import htmlImg from '@/assets/nav/html.svg';
+import fileImg from '@/assets/nav/file.svg';
+import markdownImg from '@/assets/nav/markdown.svg';
 
 export default {
     components: { rightMenu },
     props: {
         value: {
-            default: "",
+            default: ''
         },
         local: {
             default: () => {
                 return {};
-            },
+            }
         },
         watchAllExtensions: {
-            default: false,
+            default: false
         },
         rightMenuWidth: {
-            default: 200,
+            default: 200
         },
         toggleEditor: {
-            default: () => {},
+            default: () => {}
         },
         unsave: {
-            default: false,
+            default: false
+        },
+        uri: {
+            default: 'localTree'
         },
         Go: {
-            default: () => {},
+            default: () => {}
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
-            path: "",
+            path: '',
             treeList: [],
             img: {
                 folder: folderImg,
@@ -236,8 +239,8 @@ export default {
             rightMenuItem: {},
             rightMenuHeight: 0,
             show: {
-                rightMenu: false,
-            },
+                rightMenu: false
+            }
         };
     },
     watch: {
@@ -245,10 +248,10 @@ export default {
             this.path = val;
         },
         path(val) {
-            this.$emit("input", val);
+            this.$emit('input', val);
             if (!val) return;
             this.refreshFolder();
-        },
+        }
     },
     computed: {
         computeTreeItem() {
@@ -261,7 +264,7 @@ export default {
                     dir: null,
                     loading: false,
                     finished: false,
-                    ...fileObj,
+                    ...fileObj
                 };
                 let parentPath = this.findParentPath(item);
                 item.dir = parentPath.path;
@@ -271,21 +274,21 @@ export default {
         comparePath() {
             return (path1, path2) => {
                 if (!path1 || !path2) return false;
-                return path1.replace(/\\/g, "/") === path2.replace(/\\/g, "/");
+                return path1.replace(/\\/g, '/') === path2.replace(/\\/g, '/');
             };
         },
         computeIcon() {
             return (item) => {
                 if (item.isDir) return this.img.folder;
-                let nameList = item.name.split(".");
+                let nameList = item.name.split('.');
                 let ext = nameList[nameList.length - 1];
-                if (ext === "fbn") return this.img.note;
-                if (ext === "json") return this.img.json;
-                if (ext === "html") return this.img.html;
-                if (ext === "md") return this.img.markdown;
+                if (ext === 'fbn') return this.img.note;
+                if (ext === 'json') return this.img.json;
+                if (ext === 'html') return this.img.html;
+                if (ext === 'md') return this.img.markdown;
                 return this.img.file;
             };
-        },
+        }
     },
     mounted() {
         this.eventInit();
@@ -298,104 +301,9 @@ export default {
         //     console.log(this.treeList);
         // },
         eventInit() {
-            ipc.on("output-file-localTree", (event, { status, message }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Create File Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-            });
-            ipc.on(
-                "ensure-folder-localTree",
-                (event, { status, target, message }) => {
-                    if (!target) return;
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Create Folder Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                }
-            );
-            ipc.on(
-                "copy-file-localTree",
-                (event, { status, target, message }) => {
-                    if (!target) return;
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Copy File Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                    let targetItem = this.FLAT.find((it) =>
-                        this.comparePath(it.filePath, target.filePath)
-                    );
-                    if (targetItem) targetItem.expanded = true;
-                    this.$refs.tree.$forceUpdate();
-                }
-            );
-            ipc.on(
-                "move-file-localTree",
-                (event, { status, target, message }) => {
-                    if (!target) return;
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Move File Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                    let targetItem = this.FLAT.find((it) =>
-                        this.comparePath(it.filePath, target.filePath)
-                    );
-                    if (targetItem) targetItem.expanded = true;
-                    this.$refs.tree.$forceUpdate();
-                }
-            );
-            ipc.on(
-                "remove-file-localTree",
-                (event, { status, target, message }) => {
-                    if (!target) return;
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Remove File Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                }
-            );
-            ipc.on(
-                "remove-folder-localTree",
-                (event, { status, target, message }) => {
-                    if (!target) return;
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Remove Folder Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                }
-            );
-            ipc.on("rename-localTree", (event, { status, target, message }) => {
-                if (!target) return;
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Rename Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-            });
-
-            ipc.on("watch-path-localTree", (e, { event, path, file }) => {
+            ipc.on('watch-path-localTree', (e, { event, path, file }) => {
                 // console.log(event, file);
-                if (event === "addDir" || event === "add") {
+                if (event === 'addDir' || event === 'add') {
                     let fileItem = this.computeTreeItem(file);
                     let parentPath = this.findParentPath(fileItem);
                     if (parentPath.isRoot) {
@@ -410,7 +318,7 @@ export default {
                             this.hotPushFLAT(fileItem);
                         }
                     }
-                } else if (event === "unlinkDir" || event === "unlink") {
+                } else if (event === 'unlinkDir' || event === 'unlink') {
                     let fileItem = this.FLAT.find((it) =>
                         this.comparePath(it.filePath, path)
                     );
@@ -453,38 +361,40 @@ export default {
                     }
                 }
 
-                ipc.on("open-notebook", async (event, argv) => {
+                ipc.on('open-notebook', async (event, argv) => {
                     console.log(argv);
                     let id = this.$Guid();
                     let path = argv[argv.length - 1];
                     let url = `/notebook/${encodeURI(
-                        path.replace(/\//g, "\\")
+                        path.replace(/\//g, '\\')
                     )}`;
-                    ipc.send("exists-path", {
-                        id: id,
-                        path,
-                    });
-                    await new Promise((resolve) => {
-                        ipc.on(`exists-path-${id}`, (event, { exists }) => {
-                            if (exists)
-                                setTimeout(() => {
-                                    if (this.$route.path === url) return;
-                                    this.toggleEditor(false);
-                                    this.Go(url);
-                                }, 300);
-                            resolve(1);
+                    this.$local_api.Notebook.existsPathAsync(id, path)
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                if (res.data)
+                                    setTimeout(() => {
+                                        if (this.$route.path === url) return;
+                                        this.toggleEditor(false);
+                                        this.Go(url);
+                                    }, 300);
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(res, {
+                                status: 'error'
+                            });
                         });
-                    });
                 });
                 this.$refs.tree.$forceUpdate();
             });
 
-            window.addEventListener("click", this.whiteClickClearTmp);
+            window.addEventListener('click', this.whiteClickClearTmp);
         },
         async chooseFolder() {
             let path = (
                 await dialog.showOpenDialog({
-                    properties: ["openDirectory"],
+                    properties: ['openDirectory']
                 })
             ).filePaths[0];
             if (!path) return;
@@ -497,10 +407,10 @@ export default {
                 // let computePath =
                 //     this.path.replace(/\\/g, "/") +
                 //     (this.watchAllExtensions ? "" : "/**/*.+(fbn|json|html)");
-                ipc.send("watch-path", {
-                    id: "localTree",
+                ipc.send('watch-path', {
+                    id: 'localTree',
                     path: this.path,
-                    target: null,
+                    target: null
                 });
             }
         },
@@ -511,7 +421,7 @@ export default {
             if (index > -1) {
                 let oriItem = this.FLAT[index];
                 for (let key in oriItem) {
-                    let skipKey = ["children", "expanded"];
+                    let skipKey = ['children', 'expanded'];
                     if (!skipKey.includes(key)) {
                         oriItem[key] = item[key];
                     }
@@ -521,21 +431,21 @@ export default {
             }
         },
         findParentPath(target) {
-            let targetPath = target.filePath.replace(/\\/g, "/");
+            let targetPath = target.filePath.replace(/\\/g, '/');
             let parentPath = targetPath.substring(
                 0,
-                targetPath.lastIndexOf("/")
+                targetPath.lastIndexOf('/')
             );
             return {
                 path: parentPath,
-                isRoot: parentPath === this.path.replace(/\\/g, "/"),
+                isRoot: parentPath === this.path.replace(/\\/g, '/')
             };
         },
         treeItemClick(item) {
             if (!item.filePath) return;
             if (!item.isDir) {
                 let url = `/notebook/${encodeURI(
-                    item.filePath.replace(/\//g, "\\")
+                    item.filePath.replace(/\//g, '\\')
                 )}`;
                 if (this.$route.path !== url) {
                     if (this.unsave) {
@@ -544,15 +454,15 @@ export default {
                                 `Are you sure to redirect without saved?`
                             ),
                             {
-                                status: "warning",
-                                title: this.local("Confirm"),
-                                confirmTitle: this.local("Confirm"),
-                                cancelTitle: this.local("Cancel"),
+                                status: 'warning',
+                                title: this.local('Confirm'),
+                                confirmTitle: this.local('Confirm'),
+                                cancelTitle: this.local('Cancel'),
                                 theme: this.theme,
                                 confirm: () => {
                                     this.Go(url);
                                 },
-                                cancel: () => {},
+                                cancel: () => {}
                             }
                         );
                     } else this.Go(url);
@@ -564,14 +474,14 @@ export default {
             this.removeTmp();
             let tmpItem = {
                 id: this.$Guid(),
-                name: ".fbn",
+                name: '.fbn',
                 editable: true,
                 loading: false,
                 finished: false,
                 filePath: null,
                 dir: dir ? dir : this.path,
                 isFile: true,
-                isDir: false,
+                isDir: false
             };
             if (!dir) {
                 this.treeList.unshift(tmpItem);
@@ -587,7 +497,7 @@ export default {
             setTimeout(() => {
                 let textbox = this.$refs[`t:${tmpItem.id}`];
                 textbox.focus();
-                let input = textbox.$el.querySelector("input");
+                let input = textbox.$el.querySelector('input');
                 input.setSelectionRange(0, 0);
             }, 300);
         },
@@ -595,7 +505,7 @@ export default {
             this.removeTmp();
             let tmpItem = {
                 id: this.$Guid(),
-                name: "",
+                name: '',
                 editable: true,
                 children: [],
                 loading: false,
@@ -603,7 +513,7 @@ export default {
                 filePath: null,
                 dir: dir ? dir : this.path,
                 isFile: false,
-                isDir: true,
+                isDir: true
             };
             if (!dir) {
                 this.treeList.unshift(tmpItem);
@@ -619,32 +529,32 @@ export default {
             setTimeout(() => {
                 let textbox = this.$refs[`t:${tmpItem.id}`];
                 textbox.focus();
-                let input = textbox.$el.querySelector("input");
+                let input = textbox.$el.querySelector('input');
                 input.setSelectionRange(0, 0);
             }, 300);
         },
         nameJudge(target) {
             let pattern = /[<>:"/\\\\|\\?\\*]/;
-            if (pattern.test(target.name)) return "name";
+            if (pattern.test(target.name)) return 'name';
             let dir = target.dir ? target.dir : this.path;
-            dir = dir.replace(/\\/g, "/");
+            dir = dir.replace(/\\/g, '/');
             if (target.filePath) {
                 let matchItem = this.FLAT.find((it) => {
                     let filePath = it.filePath;
-                    filePath = filePath ? filePath.replace(/\\/g, "/") : "";
+                    filePath = filePath ? filePath.replace(/\\/g, '/') : '';
                     return (
                         filePath === `${dir}/${target.name}` &&
                         it.id !== target.id
                     );
                 });
-                if (matchItem) return "exists";
+                if (matchItem) return 'exists';
             } else {
                 let matchItem = this.FLAT.find((it) => {
                     let filePath = it.filePath;
-                    filePath = filePath ? filePath.replace(/\\/g, "/") : "";
+                    filePath = filePath ? filePath.replace(/\\/g, '/') : '';
                     return filePath === `${dir}/${target.name}`;
                 });
-                if (matchItem) return "exists";
+                if (matchItem) return 'exists';
             }
             return false;
         },
@@ -676,25 +586,25 @@ export default {
             setTimeout(() => {
                 let textbox = this.$refs[`t:${item.id}`];
                 textbox.focus();
-                let input = textbox.$el.querySelector("input");
-                let dotIndex = input.value.lastIndexOf(".");
+                let input = textbox.$el.querySelector('input');
+                let dotIndex = input.value.lastIndexOf('.');
                 if (dotIndex > -1) input.setSelectionRange(0, dotIndex);
-                else document.execCommand("selectAll");
+                else document.execCommand('selectAll');
             }, 300);
         },
         rename(target) {
             let judge = this.nameJudge(target);
-            if (judge === "name") {
+            if (judge === 'name') {
                 this.$barWarning(
-                    this.local("Name cannot contain special characters"),
+                    this.local('Name cannot contain special characters'),
                     {
-                        status: "warning",
+                        status: 'warning'
                     }
                 );
                 return;
-            } else if (judge === "exists") {
-                this.$barWarning(this.local("Name already exists"), {
-                    status: "warning",
+            } else if (judge === 'exists') {
+                this.$barWarning(this.local('Name already exists'), {
+                    status: 'warning'
                 });
                 return;
             }
@@ -708,96 +618,206 @@ export default {
         },
         newFileConfirm(target) {
             let fbn = JSON.parse(JSON.stringify(fabulous_notebook));
-            let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
+            let url = target.dir.replace(/\\/g, '/') + `/${target.name}`;
             fbn.id = this.$Guid();
-            fbn.title = "";
+            fbn.title = '';
             fbn.content = {
-                type: "doc",
-                content: [],
+                type: 'doc',
+                content: []
             };
             fbn.createDate = new Date();
             fbn.updateDate = new Date();
-            ipc.send("output-file", {
-                id: "localTree",
-                path: url,
-                data: JSON.stringify(fbn),
-                target,
-            });
-            this.removeTmp();
+            this.$local_api.Notebook.createDocumentAsync(
+                this.uri,
+                url,
+                JSON.stringify(fbn)
+            )
+                .then((res) => {
+                    if (res.status === 'success') {
+                        this.removeTmp();
+                    } else
+                        this.$barWarning(this.local(`Create File Failed`), {
+                            status: 'warning'
+                        });
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Create File Failed`), {
+                        status: 'warning'
+                    });
+                });
         },
         newFolderConfirm(target) {
-            let url = target.dir.replace(/\\/g, "/") + `/${target.name}`;
-            ipc.send("ensure-folder", {
-                id: "localTree",
-                dir: url,
-                target,
-            });
-            this.removeTmp();
+            let url = target.dir.replace(/\\/g, '/') + `/${target.name}`;
+            this.$local_api.Notebook.createDirectoryAsync(this.uri, url)
+                .then((res) => {
+                    if (res.status === 'success') {
+                        this.removeTmp();
+                    } else
+                        this.$barWarning(this.local(`Create Folder Failed`), {
+                            status: 'warning'
+                        });
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Create Folder Failed`), {
+                        status: 'warning'
+                    });
+                });
         },
         renameConfirm(target) {
-            ipc.send("rename", {
-                id: "localTree",
-                path: target.filePath,
-                newPath: target.dir.replace(/\\/g, "/") + `/${target.name}`,
-                target,
-            });
+            this.$local_api.Notebook.updateDirectoryAsync(
+                this.uri,
+                target.filePath,
+                {
+                    name: target.name
+                }
+            )
+                .then((res) => {
+                    if (res.status !== 'success') {
+                        this.$barWarning(this.local(`Rename Failed`), {
+                            status: 'warning'
+                        });
+                    }
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Rename Failed`), {
+                        status: 'warning'
+                    });
+                });
         },
         deleteConfirm(target) {
             if (!target.filePath) return;
             if (target.isDir) {
-                ipc.send("remove-folder", {
-                    id: "localTree",
-                    path: target.filePath,
-                    target,
-                });
+                this.$local_api.Notebook.removeDirectoryAsync(
+                    this.uri,
+                    target.filePath
+                )
+                    .then((res) => {
+                        if (res.status !== 'success') {
+                            console.error(res);
+                            this.$barWarning(
+                                this.local(`Remove Folder Failed`),
+                                {
+                                    status: 'warning'
+                                }
+                            );
+                        }
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(this.local(`Remove Folder Failed`), {
+                            status: 'warning'
+                        });
+                    });
             } else {
-                ipc.send("remove-file", {
-                    id: "localTree",
-                    path: target.filePath,
-                    target,
-                });
+                this.$local_api.Notebook.removeDocumentAsync(
+                    this.uri,
+                    target.filePath
+                )
+                    .then((res) => {
+                        if (res.status !== 'success') {
+                            console.error(res);
+                            this.$barWarning(this.local(`Remove File Failed`), {
+                                status: 'warning'
+                            });
+                        }
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(this.local(`Remove File Failed`), {
+                            status: 'warning'
+                        });
+                    });
             }
         },
         copy(target) {
             this.copyList = [
                 {
-                    type: "copy",
+                    type: 'copy',
                     name: target.name,
-                    path: target.filePath,
-                },
+                    path: target.filePath
+                }
             ];
         },
         move(target) {
             this.copyList = [
                 {
-                    type: "move",
+                    type: 'move',
                     name: target.name,
-                    path: target.filePath,
-                },
+                    path: target.filePath
+                }
             ];
         },
         paste(target) {
             if (!target.isDir) return;
             for (let item of this.copyList) {
-                if (item.type === "copy") {
-                    ipc.send("copy-file", {
-                        id: "localTree",
-                        src: item.path,
-                        tgt:
-                            target.filePath.replace(/\\/g, "/") +
-                            `/${item.name}`,
-                        target,
-                    });
+                if (item.type === 'copy') {
+                    this.$local_api.Notebook.copyDirectoryAsync(
+                        this.uri,
+                        item.path,
+                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                let targetItem = this.FLAT.find((it) =>
+                                    this.comparePath(
+                                        it.filePath,
+                                        target.filePath
+                                    )
+                                );
+                                if (targetItem) targetItem.expanded = true;
+                                this.$refs.tree.$forceUpdate();
+                            } else {
+                                console.error(res);
+                                this.$barWarning(
+                                    this.local(`Copy File Failed`),
+                                    {
+                                        status: 'warning'
+                                    }
+                                );
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(this.local(`Copy File Failed`), {
+                                status: 'warning'
+                            });
+                        });
                     this.copyList = [];
-                } else if (item.type === "move") {
-                    ipc.send("move-file", {
-                        id: "localTree",
-                        src: item.path,
-                        tgt:
-                            target.filePath.replace(/\\/g, "/") +
-                            `/${item.name}`,
-                        target,
-                    });
+                } else if (item.type === 'move') {
+                    this.$local_api.Notebook.moveDirectoryAsync(
+                        this.uri,
+                        item.path,
+                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                let targetItem = this.FLAT.find((it) =>
+                                    this.comparePath(
+                                        it.filePath,
+                                        target.filePath
+                                    )
+                                );
+                                if (targetItem) targetItem.expanded = true;
+                                this.$refs.tree.$forceUpdate();
+                            } else {
+                                console.error(res);
+                                this.$barWarning(
+                                    this.local(`Move File Failed`),
+                                    {
+                                        status: 'warning'
+                                    }
+                                );
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(this.local(`Move File Failed`), {
+                                status: 'warning'
+                            });
+                        });
                     this.copyList = [];
                 }
             }
@@ -807,28 +827,74 @@ export default {
         },
         rootPaste() {
             let target = {
-                filePath: this.path,
+                filePath: this.path
             };
             for (let item of this.copyList) {
-                if (item.type === "copy") {
-                    ipc.send("copy-file", {
-                        id: "localTree",
-                        src: item.path,
-                        tgt:
-                            target.filePath.replace(/\\/g, "/") +
-                            `/${item.name}`,
-                        target,
-                    });
+                if (item.type === 'copy') {
+                    this.$local_api.Notebook.copyDirectoryAsync(
+                        this.uri,
+                        item.path,
+                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                let targetItem = this.FLAT.find((it) =>
+                                    this.comparePath(
+                                        it.filePath,
+                                        target.filePath
+                                    )
+                                );
+                                if (targetItem) targetItem.expanded = true;
+                                this.$refs.tree.$forceUpdate();
+                            } else {
+                                console.error(res);
+                                this.$barWarning(
+                                    this.local(`Copy File Failed`),
+                                    {
+                                        status: 'warning'
+                                    }
+                                );
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(this.local(`Copy File Failed`), {
+                                status: 'warning'
+                            });
+                        });
                     this.copyList = [];
-                } else if (item.type === "move") {
-                    ipc.send("move-file", {
-                        id: "localTree",
-                        src: item.path,
-                        tgt:
-                            target.filePath.replace(/\\/g, "/") +
-                            `/${item.name}`,
-                        target,
-                    });
+                } else if (item.type === 'move') {
+                    this.$local_api.Notebook.moveDirectoryAsync(
+                        this.uri,
+                        item.path,
+                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                let targetItem = this.FLAT.find((it) =>
+                                    this.comparePath(
+                                        it.filePath,
+                                        target.filePath
+                                    )
+                                );
+                                if (targetItem) targetItem.expanded = true;
+                                this.$refs.tree.$forceUpdate();
+                            } else {
+                                console.error(res);
+                                this.$barWarning(
+                                    this.local(`Move File Failed`),
+                                    {
+                                        status: 'warning'
+                                    }
+                                );
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(this.local(`Move File Failed`), {
+                                status: 'warning'
+                            });
+                        });
                     this.copyList = [];
                 }
             }
@@ -862,21 +928,18 @@ export default {
         openFile(item) {
             let url = item.filePath;
             if (!item.isDir) url = this.findParentPath(item).path;
-            ipc.send("open-file", {
-                id: "local",
-                path: url,
-            });
+            this.$local_api.Academic.openFile(this.uri, url);
         },
         whiteClickClearTmp(event) {
             let x = event.target;
             let _self = false;
-            while (x && x.tagName && x.tagName.toLowerCase() != "body") {
+            while (x && x.tagName && x.tagName.toLowerCase() != 'body') {
                 let classList = [...x.classList];
                 if (
-                    classList.includes("fv-TreeView--item") ||
-                    classList.includes("navigation-view-mode-block") ||
-                    classList.includes("navigation-view-command-bar-block") ||
-                    classList.includes("lt-right-menu")
+                    classList.includes('fv-TreeView--item') ||
+                    classList.includes('navigation-view-mode-block') ||
+                    classList.includes('navigation-view-command-bar-block') ||
+                    classList.includes('lt-right-menu')
                 ) {
                     _self = true;
                     break;
@@ -889,28 +952,30 @@ export default {
             let id = this.$Guid();
             if (process.argv.length >= 2) {
                 let path = process.argv[1];
-                if (path === "dist_electron") return;
-                let url = `/notebook/${encodeURI(path.replace(/\//g, "\\"))}`;
-                ipc.send("exists-path", {
-                    id: id,
-                    path,
-                });
-                await new Promise((resolve) => {
-                    ipc.on(`exists-path-${id}`, (event, { exists }) => {
-                        if (exists)
-                            setTimeout(() => {
-                                this.toggleEditor(false);
-                                this.Go(url);
-                            }, 300);
-                        resolve(1);
+                if (path === 'dist_electron') return;
+                let url = `/notebook/${encodeURI(path.replace(/\//g, '\\'))}`;
+                this.$local_api.Notebook.existsPathAsync(id, url)
+                    .then((res) => {
+                        if (res.status === 'success') {
+                            if (res.data)
+                                setTimeout(() => {
+                                    this.toggleEditor(false);
+                                    this.Go(url);
+                                }, 300);
+                        }
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(res, {
+                            status: 'error'
+                        });
                     });
-                });
             }
-        },
+        }
     },
     beforeDestroy() {
-        window.removeEventListener("click", this.whiteClickClearTmp);
-    },
+        window.removeEventListener('click', this.whiteClickClearTmp);
+    }
 };
 </script>
 
