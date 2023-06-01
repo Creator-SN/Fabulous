@@ -88,13 +88,10 @@
             >{{local('Open Folder')}}</fv-button>
         </div>
         <right-menu
-            v-model="show.rightMenu"
             class="lt-right-menu"
+            ref="rightMenu"
             :theme="theme"
-            :posX="posX"
-            :posY="posY"
             :rightMenuWidth="rightMenuWidth"
-            @update-height="rightMenuHeight = $event"
         >
             <div>
                 <span
@@ -233,11 +230,8 @@ export default {
             },
             FLAT: [],
             copyList: [],
-            posX: 0,
-            posY: 0,
             nw: new NotebookWatcher(),
             rightMenuItem: {},
-            rightMenuHeight: 0,
             show: {
                 rightMenu: false
             }
@@ -905,25 +899,12 @@ export default {
             }
             this.$refs.tree.$forceUpdate();
         },
-        rightClick(event, item) {
-            event.preventDefault();
-            event.stopPropagation();
+        rightClick($event, item) {
+            $event.preventDefault();
+            $event.stopPropagation();
             if (!item.filePath) return;
-            this.show.rightMenu = true;
-            let bounding = this.$el.getBoundingClientRect();
-            let targetPos = {};
-            targetPos.x = event.x;
-            targetPos.y = event.y;
-            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
-            if (targetPos.x + this.rightMenuWidth > bounding.right)
-                targetPos.x = bounding.right - this.rightMenuWidth;
-            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
-            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
-                targetPos.y = bounding.bottom - this.rightMenuHeight;
-            this.posX = targetPos.x;
-            this.posY = targetPos.y;
-
             this.rightMenuItem = item;
+            this.$refs.rightMenu.rightClick($event, this.$el);
         },
         openFile(item) {
             let url = item.filePath;

@@ -19,28 +19,24 @@
 
 <script>
 export default {
-    name: "rightMenu",
+    name: 'rightMenu',
     props: {
         value: {
-            default: false,
-        },
-        posX: {
-            default: 0,
-        },
-        posY: {
-            default: 0,
+            default: false
         },
         rightMenuWidth: {
-            default: 200,
+            default: 200
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
             thisValue: this.value,
-            rightMenuHeight: 0,
+            posX: 0,
+            posY: 0,
+            rightMenuHeight: 0
         };
     },
     watch: {
@@ -48,12 +44,12 @@ export default {
             this.thisValue = val;
         },
         thisValue(val) {
-            this.$emit("input", val);
+            this.$emit('input', val);
             if (this.rightMenuHeight == 0) {
                 this.rightMenuHeight = this.$el.clientHeight;
-                this.$emit("update-height", this.rightMenuHeight);
+                this.$emit('update-height', this.rightMenuHeight);
             }
-        },
+        }
     },
     mounted() {
         this.globalAppendInit();
@@ -62,7 +58,7 @@ export default {
     methods: {
         globalAppendInit() {
             this.$nextTick(() => {
-                const body = document.querySelector("body");
+                const body = document.querySelector('body');
                 if (body.append) {
                     body.append(this.$el);
                 } else {
@@ -71,12 +67,28 @@ export default {
             });
         },
         rightMenuClearInit() {
-            window.addEventListener("click", (event) => {
+            window.addEventListener('click', (event) => {
                 let x = event.target;
                 if (x && x !== this.$el) this.thisValue = false;
             });
         },
-    },
+        rightClick(event, el) {
+            event.preventDefault();
+            this.thisValue = true;
+            let bounding = el.getBoundingClientRect();
+            let targetPos = {};
+            targetPos.x = event.x;
+            targetPos.y = event.y;
+            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
+            if (targetPos.x + this.rightMenuWidth > bounding.right)
+                targetPos.x = bounding.right - this.rightMenuWidth;
+            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
+            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
+                targetPos.y = bounding.bottom - this.rightMenuHeight;
+            this.posX = targetPos.x;
+            this.posY = targetPos.y;
+        }
+    }
 };
 </script>
 

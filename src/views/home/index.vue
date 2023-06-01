@@ -4,6 +4,7 @@
         :class="[{dark: theme === 'dark'}]"
     >
         <div
+            :draggable="false"
             class="s-row"
             style="margin-top: 45px;"
         >
@@ -795,7 +796,11 @@ export default {
             }
             for (let i = 0; i < items.length; i++) {
                 let item = JSON.parse(JSON.stringify(items[i]));
-                if (!this.itemCarrier.itemsX.find((it) => it.item.id === item.id)) {
+                if (
+                    !this.itemCarrier.itemsX.find(
+                        (it) => it.item.id === item.id
+                    )
+                ) {
                     this.itemCarrier.itemsX.push({
                         uri: this.data_path[this.data_index],
                         item,

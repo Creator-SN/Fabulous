@@ -86,12 +86,9 @@
             </span>
         </div>
         <right-menu
-            v-model="show.rightMenu"
+            ref="rightMenu"
             :theme="theme"
-            :posX="posX"
-            :posY="posY"
             :rightMenuWidth="rightMenuWidth"
-            @update-height="rightMenuHeight = $event"
         >
             <slot name="menu">
             </slot>
@@ -100,35 +97,35 @@
 </template>
 
 <script>
-import rightMenu from "@/components/general/rightMenu.vue";
-import { mapState, mapGetters } from "vuex";
+import rightMenu from '@/components/general/rightMenu.vue';
+import { mapState, mapGetters } from 'vuex';
 
-import standardT from "@/assets/templates/Standard.json";
-import standardWithTableT from "@/assets/templates/Standard_with_Table.json";
-import ideaT from "@/assets/templates/Idea.json";
+import standardT from '@/assets/templates/Standard.json';
+import standardWithTableT from '@/assets/templates/Standard_with_Table.json';
+import ideaT from '@/assets/templates/Idea.json';
 
 export default {
     components: {
-        rightMenu,
+        rightMenu
     },
     props: {
         value: {
-            default: [],
+            default: []
         },
         filter: {
             default: () => {
                 return {
-                    key: "any",
-                    value: "",
+                    key: 'any',
+                    value: ''
                 };
-            },
+            }
         },
         multiChoosen: {
-            default: false,
+            default: false
         },
         rightMenuWidth: {
-            default: 200,
-        },
+            default: 200
+        }
     },
     data() {
         return {
@@ -136,15 +133,11 @@ export default {
             defaults: {
                 standard: standardT,
                 standardWithTable: standardWithTableT,
-                idea: ideaT,
+                idea: ideaT
             },
-            posX: 0,
-            posY: 0,
-            rightMenuItem: {},
-            rightMenuHeight: 0,
             show: {
-                rightMenu: false,
-            },
+                rightMenu: false
+            }
         };
     },
     watch: {
@@ -157,18 +150,18 @@ export default {
         filter() {
             this.filterValue();
         },
-        "filter.value"() {
+        'filter.value'() {
             this.filterValue();
-        },
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
             show_editor: (state) => state.editor.show,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.templates.length; i++) {
@@ -183,12 +176,12 @@ export default {
                     return JSON.parse(content);
                 } catch (e) {
                     return {
-                        type: "doc",
-                        content: [],
+                        type: 'doc',
+                        content: []
                     };
                 }
             };
-        },
+        }
     },
     mounted() {
         this.loadTemplates();
@@ -214,7 +207,7 @@ export default {
                 );
                 if (res.code !== 200) {
                     this.$barWarning(res.message, {
-                        status: "error",
+                        status: 'error'
                     });
                     return;
                 }
@@ -222,8 +215,8 @@ export default {
                     template.content = res.data;
                     let contentObj = JSON.parse(template.content);
                     let minContent = {
-                        type: "doc",
-                        content: [],
+                        type: 'doc',
+                        content: []
                     };
                     minContent.content = contentObj.content.slice(0, 10);
                     template.minContent = JSON.stringify(minContent);
@@ -241,16 +234,16 @@ export default {
         },
         defaultTemplates() {
             let ori = [
-                { name: "Standard", ori: standardT },
-                { name: "Standard with Table", ori: standardWithTableT },
-                { name: "Idea", ori: ideaT },
+                { name: 'Standard', ori: standardT },
+                { name: 'Standard with Table', ori: standardWithTableT },
+                { name: 'Idea', ori: ideaT }
             ];
             let result = [];
             ori.forEach((el) => {
                 let template = {};
                 template.id = this.$Guid();
                 template.name = el.name;
-                template.emoji = "⚙";
+                template.emoji = '⚙';
                 template.default = true;
                 template.createDate = null;
                 template.updateDate = null;
@@ -260,8 +253,8 @@ export default {
                 try {
                     let contentObj = el.ori.content;
                     let minContent = {
-                        type: "doc",
-                        content: [],
+                        type: 'doc',
+                        content: []
                     };
                     minContent.content = contentObj.content.slice(0, 10);
                     template.minContent = JSON.stringify(minContent);
@@ -272,41 +265,28 @@ export default {
             });
             return result;
         },
-        rightClick(event, item) {
-            event.preventDefault();
-            this.show.rightMenu = true;
-            let bounding = this.$el.getBoundingClientRect();
-            let targetPos = {};
-            targetPos.x = event.x;
-            targetPos.y = event.y;
-            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
-            if (targetPos.x + this.rightMenuWidth > bounding.right)
-                targetPos.x = bounding.right - this.rightMenuWidth;
-            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
-            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
-                targetPos.y = bounding.bottom - this.rightMenuHeight;
-            this.posX = targetPos.x;
-            this.posY = targetPos.y;
-
-            this.$emit("rightclick", item);
+        rightClick($event, item) {
+            $event.preventDefault();
+            this.$emit('rightclick', item);
+            this.$refs.rightMenu.rightClick($event, this.$el);
         },
         filterValue() {
             let filter = this.filter;
-            if (typeof this.filter == "string")
+            if (typeof this.filter == 'string')
                 filter = {
-                    key: "any",
-                    value: this.filter,
+                    key: 'any',
+                    value: this.filter
                 };
             if (filter.key == undefined || filter.value == undefined) {
-                console.warn(this.filter, "Invalid filter.");
+                console.warn(this.filter, 'Invalid filter.');
                 return 0;
             }
-            if (filter.key == "any") {
+            if (filter.key == 'any') {
                 for (let i = 0; i < this.templates.length; i++) {
                     let status = false;
                     let item = this.templates[i];
                     for (let it in this.templates[i]) {
-                        if (typeof item[it] != "string") continue;
+                        if (typeof item[it] != 'string') continue;
                         if (
                             item[it]
                                 .toLowerCase()
@@ -330,7 +310,7 @@ export default {
                     this.$set(this.templates, i, item);
                 }
             }
-            this.$emit("change-value", this.templates);
+            this.$emit('change-value', this.templates);
         },
         itemClick(item) {
             if (!this.multiChoosen)
@@ -345,9 +325,9 @@ export default {
                     }
                 }
 
-            this.$emit("change-value", this.templates);
-            this.$emit("item-click", item);
-            this.$emit("choose-items", this.currentChoosen);
+            this.$emit('change-value', this.templates);
+            this.$emit('item-click', item);
+            this.$emit('choose-items', this.currentChoosen);
         },
         chooseCurrent(event, item) {
             event.stopPropagation();
@@ -359,10 +339,10 @@ export default {
                         this.$set(this.templates, i, t);
                     }
                 }
-            this.$emit("change-value", this.templates);
-            this.$emit("choose-items", this.currentChoosen);
-        },
-    },
+            this.$emit('change-value', this.templates);
+            this.$emit('choose-items', this.currentChoosen);
+        }
+    }
 };
 </script>
 

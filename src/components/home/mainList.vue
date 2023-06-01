@@ -114,12 +114,9 @@
                 </div>
             </fv-shimmer>
             <right-menu
-                v-model="show.rightMenu"
-                :theme="theme"
-                :posX="posX"
-                :posY="posY"
+                ref="rightMenu"
                 :rightMenuWidth="rightMenuWidth"
-                @update-height="rightMenuHeight = $event"
+                :theme="theme"
             >
                 <slot name="menu">
                 </slot>
@@ -129,41 +126,35 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import emojiCallout from "@/components/general/callout/emojiCallout.vue";
-import rightMenu from "@/components/general/rightMenu.vue";
+import { mapGetters } from 'vuex';
+import emojiCallout from '@/components/general/callout/emojiCallout.vue';
+import rightMenu from '@/components/general/rightMenu.vue';
 
 export default {
-    name: "mainList",
+    name: 'mainList',
     components: {
         emojiCallout,
-        rightMenu,
+        rightMenu
     },
     props: {
         value: {
             type: Array,
-            default: () => [],
+            default: () => []
         },
         edit: {
-            default: false,
+            default: false
         },
         rightMenuWidth: {
-            default: 200,
+            default: 200
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
             thisValue: this.value,
-            posX: 0,
-            posY: 0,
-            rightMenuHeight: 0,
-            loading: false,
-            show: {
-                rightMenu: false,
-            },
+            loading: false
         };
     },
     watch: {
@@ -172,10 +163,10 @@ export default {
             handler() {
                 this.thisValue = this.value;
                 this.valueInit();
-            },
+            }
         },
         thisValue() {
-            this.$emit("input", this.thisValue);
+            this.$emit('input', this.thisValue);
         },
         edit() {
             for (let i = 0; i < this.thisValue.length; i++) {
@@ -186,7 +177,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.thisValue.length; i++) {
@@ -216,7 +207,7 @@ export default {
                 if (this.thisValue[i].show) result.push(this.thisValue[i]);
             }
             return result;
-        },
+        }
     },
     mounted() {
         this.valueInit();
@@ -231,33 +222,20 @@ export default {
             }
             this.thisValue = val;
         },
-        rightClick(event, item) {
-            event.preventDefault();
-            this.show.rightMenu = true;
-            let bounding = this.$el.getBoundingClientRect();
-            let targetPos = {};
-            targetPos.x = event.x;
-            targetPos.y = event.y;
-            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
-            if (targetPos.x + this.rightMenuWidth > bounding.right)
-                targetPos.x = bounding.right - this.rightMenuWidth;
-            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
-            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
-                targetPos.y = bounding.bottom - this.rightMenuHeight;
-            this.posX = targetPos.x;
-            this.posY = targetPos.y;
-
-            this.$emit("rightclick", item);
+        rightClick($event, item) {
+            $event.preventDefault();
+            this.$emit('rightclick', item);
+            this.$refs.rightMenu.rightClick($event, this.$el);
         },
         itemChooseClick(item) {
             let index = this.thisValue.indexOf(item);
             let t = item;
             t.choosen = !t.choosen;
             this.$set(this.thisValue, index, t);
-            this.$emit("change-value", this.thisValue);
-            this.$emit("choose-items", this.currentChoosen);
+            this.$emit('change-value', this.thisValue);
+            this.$emit('choose-items', this.currentChoosen);
         }
-    },
+    }
 };
 </script>
 

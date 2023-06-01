@@ -242,13 +242,10 @@
                 </transition>
             </div>
             <right-menu
-                v-model="show.rightMenu"
+                ref="rightMenu"
                 class="nv-right-menu"
-                :theme="theme"
-                :posX="posX"
-                :posY="posY"
                 :rightMenuWidth="rightMenuWidth"
-                @update-height="rightMenuHeight = $event"
+                :theme="theme"
             >
                 <div>
                     <span
@@ -422,14 +419,8 @@ export default {
             treeList: [],
             FLAT: [],
             localPath: '',
-            posX: 0,
-            posY: 0,
-            menuDisplayMode: 0,
             rightMenuItem: {},
-            rightMenuHeight: 0,
-            show: {
-                rightMenu: false
-            },
+            menuDisplayMode: 0,
             lock: {
                 treeList: true
             }
@@ -858,24 +849,11 @@ export default {
             item.isTmp = true;
             this.removeTmp();
         },
-        rightClick(event, item) {
-            event.preventDefault();
-            this.show.rightMenu = true;
-            let bounding = this.$el.getBoundingClientRect();
-            let viewBounding = this.$refs.view.getBoundingClientRect();
-            let targetPos = {};
-            targetPos.x = event.x;
-            targetPos.y = event.y;
-            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
-            if (targetPos.x + this.rightMenuWidth > viewBounding.right)
-                targetPos.x = viewBounding.right - this.rightMenuWidth;
-            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
-            if (targetPos.y + this.rightMenuHeight > bounding.bottom)
-                targetPos.y = bounding.bottom - this.rightMenuHeight;
-            this.posX = targetPos.x;
-            this.posY = targetPos.y;
-
+        rightClick($event, item) {
+            $event.preventDefault();
+            $event.stopPropagation();
             this.rightMenuItem = item;
+            this.$refs.rightMenu.rightClick($event, this.$el);
         },
         collapseFunc(func) {
             this.expand = true;
