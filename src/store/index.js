@@ -5,9 +5,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        // DBClass //
-        ConfigDB: null,
-        DataDB: null,
         // config //
         config: {
             init_status: false,
@@ -22,17 +19,6 @@ export default new Vuex.Store({
             watchAllExtensions: false,
             themeColorList: [],
             theme: 'light'
-        },
-        // ds //
-        data_structure: {
-            id: null,
-            name: null,
-            groups: [],
-            partitions: [],
-            items: [],
-            templates: [],
-            path: null,
-            createDate: null,
         },
         //
         editor: {
@@ -76,13 +62,6 @@ export default new Vuex.Store({
         i18n: {}
     },
     mutations: {
-        initDB(state, obj) {
-            for (let key in obj) {
-                if (key === 'ConfigDB' || key === 'DataDB') {
-                    state[key] = obj[key];
-                }
-            }
-        },
         setWindowSize(state, obj) {
             state.window.width = obj.width;
             state.window.height = obj.height;
@@ -94,15 +73,6 @@ export default new Vuex.Store({
                 state.config[key] = obj[key];
             }
             await Vue.prototype.$local_api.Config.updateConfig(state.config);
-        },
-        reviseData(state, obj) {
-            for (let key in obj) {
-                if (!Object.prototype.hasOwnProperty.call(state.data_structure, key))
-                    continue;
-                state.data_structure[key] = obj[key];
-                if (state.DataDB)
-                    state.DataDB.set(key, state.data_structure[key]).write();
-            }
         },
         reviseEditor(state, obj) {
             for (let key in obj) {
@@ -150,9 +120,6 @@ export default new Vuex.Store({
             if (!result)
                 return text;
             return result[state.config.language];
-        },
-        ds_db: state => {
-            return state.DataDB;
         }
     },
     modules: {

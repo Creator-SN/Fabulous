@@ -852,5 +852,9 @@ export default {
     "Save Options": {
         "en": "Save Options",
         "cn": "保存选项"
+    },
+    "From Path": {
+        "en": "From",
+        "cn": "来自"
     }
 }

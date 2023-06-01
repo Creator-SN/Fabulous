@@ -287,12 +287,12 @@ async function createWindow() {
         if (!obj.id) obj.id = 'callback';
         let buffer = obj.data;
         fs.writeFile(obj.path, buffer, err => {
-            if (err) return event.reply(`save-blob-${obj.id}`, {
+            if (err) return event.reply(`save-buffer-${obj.id}`, {
                 status: 500,
                 target: obj.target,
                 message: err
             });
-            event.reply(`save-blob-${obj.id}`, {
+            event.reply(`save-buffer-${obj.id}`, {
                 status: 200,
                 target: obj.target,
             });

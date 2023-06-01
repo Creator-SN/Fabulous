@@ -69,7 +69,6 @@ export default {
     },
     computed: {
         ...mapState({
-            ConfigDB: (state) => state.ConfigDB,
             init_status: (state) => state.config.init_status,
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
@@ -99,7 +98,6 @@ export default {
     },
     methods: {
         ...mapMutations({
-            initDB: "initDB",
             reviseConfig: "reviseConfig",
             revisePdfImporter: "revisePdfImporter",
             reviseProgress: "reviseProgress",

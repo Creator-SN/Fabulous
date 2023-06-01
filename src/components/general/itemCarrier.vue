@@ -30,7 +30,7 @@
                             :theme="theme"
                             :key="index"
                             :title="itemX.item.name"
-                            :content="`${local('From')}: ${itemX.path}`"
+                            :content="`${local('From Path')}: ${itemX.uri}`"
                             :disabled-collapse="true"
                             style="margin: 5px;"
                             @contextmenu.native="rightClick($event, itemX.item)"
@@ -115,19 +115,17 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
-const { ipcRenderer: ipc } = require("electron");
-const path = require("path");
+import { metadata as Metadata } from '@/js/data_sample.js';
 
 export default {
     data() {
         return {
-            edit: false,
             lock: true,
             show: {
-                panel: false,
-            },
+                panel: false
+            }
         };
     },
     watch: {},
@@ -135,14 +133,11 @@ export default {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            items: (state) => state.data_structure.items,
-            groups: (state) => state.data_structure.groups,
-            partitions: (state) => state.data_structure.partitions,
             itemCarrier: (state) => state.itemCarrier,
             counter: (state) => state.pdfImporter.counter,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local", "ds_db"]),
+        ...mapGetters(['local']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.itemCarrier.itemsX.length; i++) {
@@ -150,21 +145,20 @@ export default {
                     result.push(this.itemCarrier.itemsX[i]);
             }
             return result;
-        },
+        }
     },
     methods: {
         ...mapMutations({
-            reviseData: "reviseData",
-            revisePdfImporter: "revisePdfImporter",
-            reviseItemCarrier: "reviseItemCarrier",
+            revisePdfImporter: 'revisePdfImporter',
+            reviseItemCarrier: 'reviseItemCarrier'
         }),
         itemChooseClick(itemX) {
             let index = this.itemCarrier.itemsX.indexOf(itemX);
             let t = itemX;
             t.choosen = !t.choosen;
             this.$set(this.itemCarrier.itemsX, index, t);
-            this.$emit("change-value", this.itemCarrier.itemsX);
-            this.$emit("choose-items", this.currentChoosen);
+            this.$emit('change-value', this.itemCarrier.itemsX);
+            this.$emit('choose-items', this.currentChoosen);
         },
         remove() {
             this.currentChoosen.forEach((itemX) => {
@@ -172,127 +166,180 @@ export default {
                 this.itemCarrier.itemsX.splice(index, 1);
             });
             this.reviseItemCarrier({
-                itemsX: this.itemCarrier.itemsX,
+                itemsX: this.itemCarrier.itemsX
             });
         },
         async confirm() {
             if (!this.lock) return;
             this.lock = false;
 
-            for (let i = 0; i < this.itemCarrier.itemsX.length; i++) {
-                let itemX = this.itemCarrier.itemsX[i];
-                let sourceDir = path.join(
-                    itemX.path,
-                    "root",
-                    "items",
-                    itemX.id
-                );
-                let newId = this.$Guid();
-                let targetDir = path.join(
-                    this.data_path[this.data_index],
-                    "root",
-                    "items",
-                    newId
-                );
-                ipc.send("ensure-folder", { id: itemX.id, dir: targetDir });
-                await new Promise((resolve) => {
-                    ipc.on(`ensure-folder-${itemX.id}`, () => {
-                        resolve(1);
-                    });
-                });
-                if (itemX.item.pdf) {
-                    ipc.send("copy-file", {
-                        id: itemX.id,
-                        src: path.join(sourceDir, `${itemX.item.pdf}.pdf`),
-                        tgt: path.join(targetDir, `${newId}.pdf`),
-                    });
-                    await new Promise((resolve) => {
-                        ipc.on(`copy-file-${itemX.id}`, () => {
-                            resolve(1);
+            let dataList = [];
+            for (let i = 0; i < this.currentChoosen.length; i++) {
+                let itemX = this.currentChoosen[i];
+                let { item, uri } = itemX;
+
+                // 迁移Pages (Migrate Pages)
+                if (!Array.isArray(item.pages)) item.pages = [];
+
+                for (let page of item.pages) {
+                    await this.$local_api.Academic.getItemPageContent(
+                        uri,
+                        item.id,
+                        page.id
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                page.content = res.data;
+                            }
+                        })
+                        .catch((res) => {
+                            console.warn(res.message);
+                            page.content = '';
                         });
-                    });
                 }
-                if (itemX.item.metadata) {
-                    ipc.send("copy-file", {
-                        id: itemX.id,
-                        src: path.join(sourceDir, `${itemX.id}.metadata`),
-                        tgt: path.join(targetDir, `${newId}.metadata`),
-                    });
-                    await new Promise((resolve) => {
-                        ipc.on(`copy-file-${itemX.id}`, () => {
-                            resolve(1);
+
+                // 迁移PDF (Migrate PDF)
+                if (item.pdf) {
+                    await this.$local_api.Academic.getItemPDF(
+                        uri,
+                        item.id,
+                        item.pdf
+                    )
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                item.pdfFile = res.data;
+                            }
+                        })
+                        .catch((res) => {
+                            console.warn(res.message);
                         });
-                    });
                 }
-                itemX.item.id = newId;
-                itemX.item.pdf = newId;
-                if (itemX.item.pages.length > 0) {
-                    for (let j = 0; j < itemX.item.pages.length; j++) {
-                        let page = itemX.item.pages[j];
-                        let newPageId = this.$Guid();
-                        ipc.send("copy-file", {
-                            id: itemX.id,
-                            src: path.join(sourceDir, `${page.id}.json`),
-                            tgt: path.join(targetDir, `${newPageId}.json`),
+
+                dataList.push(itemX);
+
+                this.$emit(
+                    'update-progess',
+                    (((i + 1) / this.currentChoosen.length) * 50).toFixed(2)
+                );
+            }
+
+            let newItemsCollection = [];
+            for (let i = 0; i < dataList.length; i++) {
+                let { item } = dataList[i];
+
+                let targetUri = this.data_path[this.data_index];
+
+                let pureItem = JSON.parse(JSON.stringify(item));
+                pureItem.pdf = null;
+                pureItem.pdfFile = null;
+                pureItem.pages = [];
+
+                // 创建新数据项 (Create New Item)
+                let res = await this.$local_api.Academic.createItem(
+                    targetUri,
+                    pureItem
+                );
+
+                if (res.status !== 'success') {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                    return;
+                }
+
+                let newItem = res.data;
+                newItemsCollection.push(newItem);
+
+                // 创建新PDF (Create New PDF)
+                if (item.pdfFile) {
+                    let res = await this.$local_api.Academic.updateItemPDF(
+                        targetUri,
+                        newItem.id,
+                        newItem.id,
+                        item.pdfFile
+                    ).catch((res) => {
+                        console.warn('aaa', res.message);
+                    });
+
+                    if (res.status !== 'success') {
+                        this.$barWarning(res.message, {
+                            status: 'error'
                         });
-                        await new Promise((resolve) => {
-                            ipc.on(`copy-file-${itemX.id}`, () => {
-                                resolve(1);
-                            });
-                        });
-                        itemX.item.pages[j].id = newPageId;
+                        return;
                     }
                 }
 
-                if (!this.ds_db) return;
-                let _item = JSON.parse(JSON.stringify(itemX.item));
-                _item.createDate = this.$SDate.DateToString(new Date());
-                this.items.push(_item);
-                this.reviseData({
-                    items: this.items,
+                // 更新元数据 (Update Metadata)
+                let _metadata = JSON.parse(JSON.stringify(Metadata));
+                for (let key in _metadata) {
+                    if (item.metadata !== undefined && item.metadata !== null)
+                        _metadata[key] = item.metadata[key];
+                }
+
+                res = await this.$local_api.Academic.updateItemMetadata(
+                    targetUri,
+                    newItem.id,
+                    _metadata
+                ).catch((res) => {
+                    console.warn(res.message);
                 });
-                this.copyToPartition(_item);
+
+                if (res.status !== 'success') {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                    return;
+                }
+
+                // 创建新Pages (Create New Pages)
+                for (let page of item.pages) {
+                    let res = await this.$local_api.Academic.createItemPage(
+                        targetUri,
+                        newItem.id,
+                        page,
+                        page.content
+                    ).catch((res) => {
+                        console.warn(res.message);
+                    });
+
+                    if (res.status !== 'success') {
+                        this.$barWarning(res.message, {
+                            status: 'error'
+                        });
+                        return;
+                    }
+                }
+
                 this.revisePdfImporter({
-                    counter: this.counter + 1,
+                    counter: this.counter + 1
                 });
 
                 this.$emit(
-                    "update-progess",
-                    (((i + 1) / this.itemCarrier.itemsX.length) * 100).toFixed(
-                        2
-                    )
+                    'update-progess',
+                    (50 + ((i + 1) / dataList.length) * 50).toFixed(2)
                 );
             }
 
-            this.$emit("update-progess", 110);
+            if (this.$route.params.id) {
+                let partitionid = this.$route.params.id;
+                let ids = newItemsCollection.map((item) => item.id);
+                await this.$local_api.Academic.addItemsToPartition(
+                    this.data_path[this.data_index],
+                    partitionid,
+                    ids
+                ).catch((res) => {
+                    console.warn(res.message);
+                });
+            }
+
+            this.$emit('update-progess', 110);
             this.reviseItemCarrier({
-                itemsX: [],
+                itemsX: []
             });
             this.show.panel = false;
             this.lock = true;
-        },
-        copyToPartition(item) {
-            let id = this.$route.params.id;
-            if (id === undefined) return;
-            let t = [].concat(this.groups);
-            let partitions = [];
-            for (let i = 0; i < t.length; i++) {
-                if (t[i].groups) t = t.concat(t[i].groups);
-                if (t[i].partitions)
-                    partitions = partitions.concat(t[i].partitions);
-            }
-            partitions = partitions.concat(this.partitions);
-            for (let i = 0; i < partitions.length; i++) {
-                if (partitions[i].id === id) {
-                    partitions[i].items.push(item.id);
-                }
-            }
-            this.reviseData({
-                groups: this.groups,
-                partitions: this.partitions,
-            });
-        },
-    },
+        }
+    }
 };
 </script>
 

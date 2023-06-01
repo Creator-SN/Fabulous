@@ -345,22 +345,22 @@
 </template>
 
 <script>
-import addItem from "@/components/home/addItem.vue";
-import renameItem from "@/components/home/renameItem.vue";
-import mainList from "@/components/home/mainList.vue";
-import itemListEmpty from "@/components/general/empty/itemListEmpty.vue";
-import addItemPage from "@/components/home/addItemPage.vue";
-import renameItemPage from "@/components/home/renameItemPage.vue";
-import metadataPanel from "@/components/home/metadataPanel.vue";
-import folderWindow from "@/components/general/folderWindow.vue";
-import emojiCallout from "@/components/general/callout/emojiCallout.vue";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import addItem from '@/components/home/addItem.vue';
+import renameItem from '@/components/home/renameItem.vue';
+import mainList from '@/components/home/mainList.vue';
+import itemListEmpty from '@/components/general/empty/itemListEmpty.vue';
+import addItemPage from '@/components/home/addItemPage.vue';
+import renameItemPage from '@/components/home/renameItemPage.vue';
+import metadataPanel from '@/components/home/metadataPanel.vue';
+import folderWindow from '@/components/general/folderWindow.vue';
+import emojiCallout from '@/components/general/callout/emojiCallout.vue';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
-import pdf from "@/assets/home/pdf.svg";
-import metadata from "@/assets/home/metadata.svg";
-import folder from "@/assets/home/folder.svg";
-import viewer from "@/assets/home/viewer.svg";
-import fabulous from "@/assets/logo.svg";
+import pdf from '@/assets/home/pdf.svg';
+import metadata from '@/assets/home/metadata.svg';
+import folder from '@/assets/home/folder.svg';
+import viewer from '@/assets/home/viewer.svg';
+import fabulous from '@/assets/logo.svg';
 
 export default {
     components: {
@@ -372,89 +372,89 @@ export default {
         renameItemPage,
         metadataPanel,
         folderWindow,
-        emojiCallout,
+        emojiCallout
     },
     data() {
         return {
             cmd: [
                 {
-                    name: () => this.local("Add"),
-                    icon: "Add",
+                    name: () => this.local('Add'),
+                    icon: 'Add',
                     iconColor: () =>
-                        this.theme === "dark"
-                            ? "rgba(118, 185, 237, 1)"
-                            : "rgba(0, 90, 158, 1)",
+                        this.theme === 'dark'
+                            ? 'rgba(118, 185, 237, 1)'
+                            : 'rgba(0, 90, 158, 1)',
                     disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.show.add = true;
-                    },
+                    }
                 },
                 {
-                    name: () => this.local("Import"),
-                    icon: "Upload",
+                    name: () => this.local('Import'),
+                    icon: 'Upload',
                     iconColor: () =>
-                        this.theme === "dark"
-                            ? "rgba(118, 185, 237, 1)"
-                            : "rgba(0, 90, 158, 1)",
+                        this.theme === 'dark'
+                            ? 'rgba(118, 185, 237, 1)'
+                            : 'rgba(0, 90, 158, 1)',
                     disabled: () => this.SourceDisabled || !this.lock,
-                    func: this.importPdf,
+                    func: this.importPdf
                 },
                 {
                     name: () => {
                         if (this.editable)
-                            return this.local("Cancel Multi-Selection");
-                        return this.local("Multi-Selection");
+                            return this.local('Cancel Multi-Selection');
+                        return this.local('Multi-Selection');
                     },
-                    icon: "MultiSelect",
+                    icon: 'MultiSelect',
                     iconColor: () =>
-                        this.theme === "dark"
-                            ? "rgba(118, 185, 237, 1)"
-                            : "rgba(0, 90, 158, 1)",
+                        this.theme === 'dark'
+                            ? 'rgba(118, 185, 237, 1)'
+                            : 'rgba(0, 90, 158, 1)',
                     disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.editable ^= true;
                         if (!this.editable) this.currentChoosen = [];
-                    },
+                    }
                 },
                 {
-                    name: () => this.local("Induce to Partitions"),
-                    icon: "FabricMovetoFolder",
+                    name: () => this.local('Induce to Partitions'),
+                    icon: 'FabricMovetoFolder',
                     iconColor: () =>
-                        this.theme === "dark"
-                            ? "rgba(118, 185, 237, 1)"
-                            : "rgba(0, 90, 158, 1)",
+                        this.theme === 'dark'
+                            ? 'rgba(118, 185, 237, 1)'
+                            : 'rgba(0, 90, 158, 1)',
                     disabled: () =>
                         this.currentChoosen.length === 0 || !this.lock,
                     func: () => {
                         this.show.folder = true;
-                    },
+                    }
                 },
                 {
-                    name: () => this.local("Add to Transfer Carrier"),
-                    icon: "Send",
-                    iconColor: "rgba(229, 173, 70, 1)",
+                    name: () => this.local('Add to Transfer Carrier'),
+                    icon: 'Send',
+                    iconColor: 'rgba(229, 173, 70, 1)',
                     disabled: () =>
                         this.currentChoosen.length === 0 || !this.lock,
                     func: () => {
                         this.addToTransferCarrier();
-                    },
+                    }
                 },
                 {
-                    name: () => this.local("Remove From Partition"),
-                    icon: "RemoveFrom",
-                    iconColor: "rgba(220, 62, 72, 1)",
+                    name: () => this.local('Remove From Partition'),
+                    icon: 'RemoveFrom',
+                    iconColor: 'rgba(220, 62, 72, 1)',
                     show: () =>
                         this.currentChoosen.length > 0 && this.lock && this.pid,
                     disabled: () =>
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
                         this.pid === false,
-                    func: this.removeItemsFromPartition,
+                    func: this.removeItemsFromPartition
                 },
                 {
-                    name: () => this.local("Delete"),
-                    icon: "Delete",
-                    iconColor: "rgba(220, 62, 72, 1)",
+                    name: () => this.local('Delete'),
+                    icon: 'Delete',
+                    iconColor: 'rgba(220, 62, 72, 1)',
                     show: () =>
                         !(
                             this.currentChoosen.length === 0 ||
@@ -465,43 +465,43 @@ export default {
                         this.currentChoosen.length === 0 ||
                         !this.lock ||
                         this.pid,
-                    func: this.deleteItems,
-                },
+                    func: this.deleteItems
+                }
             ],
             sortKey: {
-                key: "createDate",
-                text: () => this.local("Create Date"),
+                key: 'createDate',
+                text: () => this.local('Create Date')
             },
             sortOptions: [
-                { key: "name", text: () => this.local("Name") },
-                { key: "metadata.title", text: () => this.local("Title") },
+                { key: 'name', text: () => this.local('Name') },
+                { key: 'metadata.title', text: () => this.local('Title') },
                 {
-                    key: "metadata.publisher",
-                    text: () => this.local("Publisher"),
+                    key: 'metadata.publisher',
+                    text: () => this.local('Publisher')
                 },
-                { key: "createDate", text: () => this.local("Create Date") },
-                { key: "metadata.year", text: () => this.local("Year") },
+                { key: 'createDate', text: () => this.local('Create Date') },
+                { key: 'metadata.year', text: () => this.local('Year') }
             ],
             sortDesc: 1,
             editable: false,
             partitionInfo: {
-                id: "",
-                name: "",
+                id: '',
+                name: ''
             },
             itemList: [],
             currentItem: {},
             currentChoosen: [],
             currentItemPage: {},
             currentSearch: {
-                debounce: "",
-                value: "",
+                debounce: '',
+                value: ''
             },
             img: {
                 pdf: pdf,
                 metadata: metadata,
                 folder: folder,
                 viewer: viewer,
-                fabulous: fabulous,
+                fabulous: fabulous
             },
             show: {
                 add: false,
@@ -511,9 +511,9 @@ export default {
                 metadata: false,
                 folder: false,
                 pdfImporter: false,
-                chooseViewer: true,
+                chooseViewer: true
             },
-            lock: true,
+            lock: true
         };
     },
     watch: {
@@ -522,7 +522,7 @@ export default {
             this.getPartitionInfo();
             this.getItems();
         },
-        data_index () {
+        data_index() {
             this.editable = false;
             this.getPartitionInfo();
             this.getItems();
@@ -533,12 +533,12 @@ export default {
         sortDesc() {
             this.getItems();
         },
-        "currentSearch.debounce"() {
+        'currentSearch.debounce'() {
             this.getItems();
         },
         counter() {
             this.getItems();
-        },
+        }
     },
     computed: {
         ...mapState({
@@ -550,16 +550,16 @@ export default {
             counter: (state) => state.pdfImporter.counter,
             itemCarrier: (state) => state.itemCarrier,
             mode: (state) => state.pdfImporter.mode,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         pid() {
             if (!this.$route.params.id) return null;
             return this.$route.params.id;
         },
         SourceDisabled() {
             return !this.data_path[this.data_index];
-        },
+        }
     },
     mounted() {
         this.getPartitionInfo();
@@ -567,16 +567,16 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseEditor: "reviseEditor",
-            revisePdfImporter: "revisePdfImporter",
-            reviseItemCarrier: "reviseItemCarrier",
-            toggleEditor: "toggleEditor",
+            reviseEditor: 'reviseEditor',
+            revisePdfImporter: 'revisePdfImporter',
+            reviseItemCarrier: 'reviseItemCarrier',
+            toggleEditor: 'toggleEditor'
         }),
         getPartitionInfo() {
             if (!this.pid) {
                 this.partitionInfo = {
-                    id: "all",
-                    name: this.local("All"),
+                    id: 'all',
+                    name: this.local('All')
                 };
                 return;
             }
@@ -585,22 +585,22 @@ export default {
                 this.pid
             )
                 .then((res) => {
-                    if (res.status === "success") {
+                    if (res.status === 'success') {
                         this.partitionInfo = res.data;
                     } else {
                         this.$barWarning(res.message, {
-                            status: "warning",
+                            status: 'warning'
                         });
                     }
                 })
                 .catch((res) => {
                     this.$barWarning(res.message, {
-                        status: "error",
+                        status: 'error'
                     });
                 });
         },
         getItems() {
-            if(this.SourceDisabled) return;
+            if (this.SourceDisabled) return;
             if (!this.currentSearch.debounce) {
                 this.$local_api.Academic.getItems(
                     this.data_path[this.data_index],
@@ -611,20 +611,20 @@ export default {
                     this.sortDesc
                 )
                     .then((res) => {
-                        if (res.status === "success") {
+                        if (res.status === 'success') {
                             res.data.forEach((el) => {
                                 el.choosen = false;
                             });
                             this.itemList = res.data;
                         } else {
                             this.$barWarning(res.message, {
-                                status: "warning",
+                                status: 'warning'
                             });
                         }
                     })
                     .catch((res) => {
                         this.$barWarning(res.message, {
-                            status: "error",
+                            status: 'error'
                         });
                     });
             } else
@@ -638,30 +638,30 @@ export default {
                     this.sortDesc
                 )
                     .then((res) => {
-                        if (res.status === "success") {
+                        if (res.status === 'success') {
                             res.data.forEach((el) => {
                                 el.choosen = false;
                             });
                             this.itemList = res.data;
                         } else {
                             this.$barWarning(res.message, {
-                                status: "warning",
+                                status: 'warning'
                             });
                         }
                     })
                     .catch((res) => {
                         this.$barWarning(res.message, {
-                            status: "error",
+                            status: 'error'
                         });
                     });
         },
         deleteItem() {
             if (!this.currentItem.id || !this.lock) return;
             this.$infoBox(this.local(`Are you sure to delete this item?`), {
-                status: "error",
-                title: this.local("Delete Item"),
-                confirmTitle: this.local("Confirm"),
-                cancelTitle: this.local("Cancel"),
+                status: 'error',
+                title: this.local('Delete Item'),
+                confirmTitle: this.local('Confirm'),
+                cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
@@ -671,21 +671,21 @@ export default {
                     ).then((res) => {
                         if (res.code !== 200)
                             this.$barWarning(res.message, {
-                                status: "warning",
+                                status: 'warning'
                             });
                     });
                     this.lock = true;
                 },
-                cancel: () => {},
+                cancel: () => {}
             });
         },
         deleteItems() {
             if (!this.currentChoosen || !this.lock) return;
             this.$infoBox(this.local(`Are you sure to delete these items?`), {
-                status: "error",
-                title: this.local("Delete Items"),
-                confirmTitle: this.local("Confirm"),
-                cancelTitle: this.local("Cancel"),
+                status: 'error',
+                title: this.local('Delete Items'),
+                confirmTitle: this.local('Confirm'),
+                cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
@@ -696,19 +696,19 @@ export default {
                     );
                     if (res.code !== 200)
                         this.$barWarning(res.message, {
-                            status: "warning",
+                            status: 'warning'
                         });
                     this.getItems();
                     this.currentChoosen = [];
                     this.lock = true;
                 },
-                cancel: () => {},
+                cancel: () => {}
             });
         },
         reviseItemPdf() {
             this.revisePdfImporter({
-                mode: "item",
-                item: this.currentItem,
+                mode: 'item',
+                item: this.currentItem
             });
             setTimeout(() => {
                 this.pdf_importer.inputInspectClick();
@@ -716,7 +716,7 @@ export default {
         },
         importPdf() {
             this.revisePdfImporter({
-                mode: "import",
+                mode: 'import'
             });
             setTimeout(() => {
                 this.pdf_importer.inputInspectClick();
@@ -724,16 +724,16 @@ export default {
         },
         openEditor(item, page) {
             this.reviseEditor({
-                type: "item",
+                type: 'item',
                 item: item,
                 target: page,
                 scrollTop: 0,
                 displayMode: 0,
-                history: [],
+                history: []
             });
             this.toggleEditor(true);
         },
-        openFile(itemid, fileid, type = "pdf") {
+        openFile(itemid, fileid, type = 'pdf') {
             this.$local_api.Academic.openItemFile(
                 this.data_path[this.data_index],
                 itemid,
@@ -741,19 +741,19 @@ export default {
                 type
             );
         },
-        openPDF(item, mode = "outside") {
-            if (mode === "inside") {
+        openPDF(item, mode = 'outside') {
+            if (mode === 'inside') {
                 this.reviseEditor({
-                    type: "item",
+                    type: 'item',
                     item: item,
                     target: item.pages.length > 0 ? item.pages[0] : null,
                     scrollTop: 0,
                     displayMode: 1,
-                    history: [],
+                    history: []
                 });
                 this.toggleEditor(true);
             } else {
-                this.openFile(item.id, item.pdf, "pdf");
+                this.openFile(item.id, item.pdf, 'pdf');
             }
         },
         async copyItemsToPartitions(partitions) {
@@ -773,9 +773,9 @@ export default {
                     partitionid,
                     ids
                 );
-                if (res.status !== "success") {
+                if (res.status !== 'success') {
                     this.$barWarning(res.message, {
-                        status: "warning",
+                        status: 'warning'
                     });
                     break;
                 }
@@ -793,16 +793,16 @@ export default {
             if (items.length === 0) {
                 items = [this.currentItem];
             }
-            items.forEach((el) => {
-                if (!this.itemCarrier.itemsX.find((it) => it.id === el.id)) {
+            for (let i = 0; i < items.length; i++) {
+                let item = JSON.parse(JSON.stringify(items[i]));
+                if (!this.itemCarrier.itemsX.find((it) => it.item.id === item.id)) {
                     this.itemCarrier.itemsX.push({
-                        id: el.id,
-                        path: this.data_path[this.data_index],
-                        data_index: this.data_index,
-                        item: el,
+                        uri: this.data_path[this.data_index],
+                        item,
+                        choosen: true
                     });
                 }
-            });
+            }
             this.reviseItemCarrier({ itemsX: this.itemCarrier.itemsX });
         },
         removeItemsFromPartition() {
@@ -822,19 +822,19 @@ export default {
                 ids
             )
                 .then((res) => {
-                    if (res.status === "success") {
+                    if (res.status === 'success') {
                         this.currentChoosen = [];
                         this.editable = false;
                         this.getItems();
                     } else {
                         this.$barWarning(res.message, {
-                            status: "warning",
+                            status: 'warning'
                         });
                     }
                 })
                 .catch((res) => {
                     this.$barWarning(res.message, {
-                        status: "error",
+                        status: 'error'
                     });
                 });
         },
@@ -853,9 +853,9 @@ export default {
                 this.data_path[this.data_index],
                 item
             );
-            if (res.status !== "success") {
+            if (res.status !== 'success') {
                 this.$barWarning(res.message, {
-                    status: "warning",
+                    status: 'warning'
                 });
             }
         },
@@ -867,9 +867,9 @@ export default {
                 item.id,
                 page
             );
-            if (res.status !== "success") {
+            if (res.status !== 'success') {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
             }
         },
@@ -880,9 +880,9 @@ export default {
                 item.id,
                 page.id
             );
-            if (res.status !== "success") {
+            if (res.status !== 'success') {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
             } else {
                 item.pages.push(res.data);
@@ -890,10 +890,10 @@ export default {
         },
         async deleteItemPage(itemId, pageId) {
             this.$infoBox(this.local(`Are you sure to delete this page?`), {
-                status: "error",
-                title: this.local("Delete Page"),
-                confirmTitle: this.local("Confirm"),
-                cancelTitle: this.local("Cancel"),
+                status: 'error',
+                title: this.local('Delete Page'),
+                confirmTitle: this.local('Confirm'),
+                cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
                     let res = await this.$local_api.Academic.deleteItemPage(
@@ -901,16 +901,16 @@ export default {
                         itemId,
                         pageId
                     );
-                    if (res.status !== "success") {
+                    if (res.status !== 'success') {
                         this.$barWarning(res.message, {
-                            status: "error",
+                            status: 'error'
                         });
                     }
                 },
-                cancel: () => {},
+                cancel: () => {}
             });
-        },
-    },
+        }
+    }
 };
 </script>
 
