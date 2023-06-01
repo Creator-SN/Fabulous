@@ -177,8 +177,7 @@ import rightMenu from '@/components/general/rightMenu.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
-const { ipcRenderer: ipc } = require('electron');
-const { dialog, process } = require('@electron/remote');
+import { NotebookWatcher } from '@/js/eventManager.js';
 
 import folderImg from '@/assets/nav/folder.svg';
 import noteImg from '@/assets/nav/note.svg';
@@ -236,6 +235,7 @@ export default {
             copyList: [],
             posX: 0,
             posY: 0,
+            nw: new NotebookWatcher(),
             rightMenuItem: {},
             rightMenuHeight: 0,
             show: {
@@ -301,7 +301,7 @@ export default {
         //     console.log(this.treeList);
         // },
         eventInit() {
-            ipc.on('watch-path-localTree', (e, { event, path, file }) => {
+            this.nw.on('watch-path-localTree', (e, { event, path, file }) => {
                 // console.log(event, file);
                 if (event === 'addDir' || event === 'add') {
                     let fileItem = this.computeTreeItem(file);
@@ -361,7 +361,7 @@ export default {
                     }
                 }
 
-                ipc.on('open-notebook', async (event, argv) => {
+                this.nw.on('open-notebook', async (event, argv) => {
                     console.log(argv);
                     let id = this.$Guid();
                     let path = argv[argv.length - 1];
@@ -392,13 +392,13 @@ export default {
             window.addEventListener('click', this.whiteClickClearTmp);
         },
         async chooseFolder() {
-            let path = (
-                await dialog.showOpenDialog({
-                    properties: ['openDirectory']
-                })
-            ).filePaths[0];
-            if (!path) return;
-            this.path = path;
+            await this.$local_api.Config.selectLocalDataSourcePath().then(
+                (res) => {
+                    if (res.status === 'success') {
+                        this.path = res.data;
+                    }
+                }
+            );
         },
         refreshFolder() {
             this.treeList = [];
@@ -407,7 +407,7 @@ export default {
                 // let computePath =
                 //     this.path.replace(/\\/g, "/") +
                 //     (this.watchAllExtensions ? "" : "/**/*.+(fbn|json|html)");
-                ipc.send('watch-path', {
+                this.nw.send('watch-path', {
                     id: 'localTree',
                     path: this.path,
                     target: null
@@ -928,7 +928,7 @@ export default {
         openFile(item) {
             let url = item.filePath;
             if (!item.isDir) url = this.findParentPath(item).path;
-            this.$local_api.Academic.openFile(this.uri, url);
+            this.$local_api.Notebook.openFile(this.uri, url);
         },
         whiteClickClearTmp(event) {
             let x = event.target;
@@ -950,27 +950,32 @@ export default {
         },
         async openNotebook() {
             let id = this.$Guid();
-            if (process.argv.length >= 2) {
-                let path = process.argv[1];
-                if (path === 'dist_electron') return;
-                let url = `/notebook/${encodeURI(path.replace(/\//g, '\\'))}`;
-                this.$local_api.Notebook.existsPathAsync(id, url)
-                    .then((res) => {
-                        if (res.status === 'success') {
-                            if (res.data)
-                                setTimeout(() => {
-                                    this.toggleEditor(false);
-                                    this.Go(url);
-                                }, 300);
-                        }
-                    })
-                    .catch((res) => {
-                        console.error(res);
-                        this.$barWarning(res, {
-                            status: 'error'
+            this.$local_api.Notebook.getLocalProcess().then((res) => {
+                let process = res.data;
+                if (process.argv.length >= 2) {
+                    let path = process.argv[1];
+                    if (path === 'dist_electron') return;
+                    let url = `/notebook/${encodeURI(
+                        path.replace(/\//g, '\\')
+                    )}`;
+                    this.$local_api.Notebook.existsPathAsync(id, url)
+                        .then((res) => {
+                            if (res.status === 'success') {
+                                if (res.data)
+                                    setTimeout(() => {
+                                        this.toggleEditor(false);
+                                        this.Go(url);
+                                    }, 300);
+                            }
+                        })
+                        .catch((res) => {
+                            console.error(res);
+                            this.$barWarning(res, {
+                                status: 'error'
+                            });
                         });
-                    });
-            }
+                }
+            });
         }
     },
     beforeDestroy() {

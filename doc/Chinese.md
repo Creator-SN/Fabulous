@@ -1,16 +1,16 @@
-# Fab
+# 快卷 (FAB)
 
-**Fab (Fabulous)** - 集文献管理和出色笔记体验的应用
+**F (Fast and Fluent) A (Academic) B (Baseline)** - 即流畅学术辅助体系, 助力学术内卷. 它是一款集文献管理和出色笔记体验的应用
 
-**Fab** 是`Electron`驱动的基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/) Win UI 3.0的文献管理 + 笔记管理综合应用。
+**快卷 (FAB)** 是`Electron`驱动的基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/) Win UI 3.0的文献管理 + 笔记管理综合应用。
 
 > 关于UI组件库的更多信息, 请了解[VFluent](https://github.com/aleversn/VFluent)。
 
 > 该项目仍在进行中，我们欢迎您成为贡献者。 😄
 
-## 🤔 Fab可以做什么?
+## 🤔 快卷 (FAB)可以做什么?
 
-**Fabulous**提供完整的**PDF文献管理**和出色的**妙动笔记**体验。我们提供:
+**快卷 (FAB)**提供完整的**PDF文献管理**和出色的**妙动笔记**体验。我们提供:
 
 - PDF文献元数据自动检索归纳
 - PDF文献阅读划词翻译
@@ -44,7 +44,7 @@
 
 **文献管理**
 
-直接拖入一篇或多篇文献PDF文件即可将文献导入到Fab中，Fab会自动解析并检索文献的元数据。
+直接拖入一篇或多篇文献PDF文件即可将文献导入到快卷 (FAB)中，快卷 (FAB)会自动解析并检索文献的元数据。
 
 ![f3](./assets/Chinese-f3.png)
 
@@ -54,7 +54,7 @@
 
 **添加文献**
 
-您也可以单击`导入`按钮在每个`分区`页面中导入文章，**Fabulous**会自动为每篇文章创建一个`项目`。
+您也可以单击`导入`按钮在每个`分区`页面中导入文章，**快卷 (FAB)**会自动为每篇文章创建一个`项目`。
 
 **文献笔记**
 
@@ -86,7 +86,7 @@
 
 **与PDF联动**
 
-Fab妙动笔记支持通过添加`PDF Note`来生成与对应PDF文献位置关联的笔记，你只需在PDF浏览器上选择指定内容，然后点击黄色小按钮即可在妙动笔记里创建对应的笔记。
+快卷 (FAB)妙动笔记支持通过添加`PDF Note`来生成与对应PDF文献位置关联的笔记，你只需在PDF浏览器上选择指定内容，然后点击黄色小按钮即可在妙动笔记里创建对应的笔记。
 
 ![f7](./assets/Chinese-f7.png)
 

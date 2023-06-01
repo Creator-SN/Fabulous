@@ -22,11 +22,12 @@ export class EventManager {
     }
 }
 
-class NotebookWatcher extends EventWatcher {
+export class NotebookWatcher extends EventManager {
     constructor() {
         super();
 
         this.ipcInit();
+        this.ipcEventInit();
     }
 
     ipcInit() {
@@ -36,19 +37,18 @@ class NotebookWatcher extends EventWatcher {
 
     ipcEventInit() {
         let forwardIPCList = [
-            "output-file-localTree",
-            "ensure-folder-localTree",
-            "copy-file-localTree",
-            "move-file-localTree",
-            "remove-file-localTree",
-            "remove-folder-localTree",
-            "rename-localTree",
-            "watch-path-localTree"
+            "watch-path-localTree",
+            "open-notebook",
+            "updater-callback"
         ];
         for (let item of forwardIPCList) {
             this.ipc.on(item, (event, arg) => {
                 this.emit(item, event, arg);
             });
         }
+    }
+
+    send(eventName, obj) {
+        this.ipc.send(eventName, obj);
     }
 }

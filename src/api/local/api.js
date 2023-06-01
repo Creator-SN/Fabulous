@@ -2579,6 +2579,7 @@ export class Notebook {
      * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
      * @param {string} filePath 文件路径 (File path)
      * @param {string} content 文件内容 (File content)
+     * @returns {Promise} 创建结果 (Create result)
      * @description 文件内容为PowerEditor json格式
     */
     static async createDocumentAsync(uri, filePath, content) {
@@ -2611,9 +2612,46 @@ export class Notebook {
     }
 
     /**
+     * @summary 更新笔记文件 (Update note file)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 文件路径 (File path)
+     * @param {string} content 文件内容 (File content)
+     * @returns {Promise} 保存结果 (Save result)
+     * @description 文件内容为PowerEditor json格式
+    */
+    static async updateDocumentAsync(uri, filePath, content) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("output-file", {
+                id: uri + filePath,
+                path: filePath,
+                data: content,
+            });
+            ipc.on(`output-file-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '保存文件成功 (Save file successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            });
+        });
+    }
+
+    /**
      * @summary 删除笔记文件 (Delete note file)
      * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
      * @param {string} filePath 文件路径 (File path)
+     * @returns {Promise} 删除结果 (Delete result)
      * @description 文件内容为PowerEditor json格式
     */
     static async removeDocumentAsync(uri, filePath) {
@@ -2882,6 +2920,32 @@ export class Notebook {
                 }
             });
 
+        });
+    }
+
+    /**
+     * @summary 获取本地程序下的Process (Get Process under local program)
+     * @returns {Promise} Process
+    */
+    static async getLocalProcess() {
+        return await new Promise((resolve, reject) => {
+            try {
+                const { process } = require('@electron/remote');
+                resolve({
+                    status: 'success',
+                    data: process,
+                    code: 200,
+                    message: '获取Process成功 (Get Process successfully)'
+                });
+            }
+            catch (e) {
+                reject({
+                    status: 'error',
+                    data: null,
+                    code: 500,
+                    message: '获取Process失败 (Failed to get Process)'
+                });
+            }
         });
     }
 }

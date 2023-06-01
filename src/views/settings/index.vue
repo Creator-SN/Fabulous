@@ -339,7 +339,7 @@ import OneDrive from '@/assets/settings/OneDrive.svg';
 
 import ThemeColor from '@/js/themeColorPicker.js';
 
-const { ipcRenderer: ipc } = require('electron');
+import { NotebookWatcher } from '@/js/eventManager.js';
 
 export default {
     components: {
@@ -372,6 +372,7 @@ export default {
             img: {
                 OneDrive
             },
+            nw: new NotebookWatcher(),
             updater: {
                 status: 'init',
                 downloadPercent: 0,
@@ -480,7 +481,7 @@ export default {
             this.watch_all_extensions = this.watchAllExtensions;
         },
         eventInit() {
-            ipc.on('updater-callback', (event, { status, info }) => {
+            this.nw.on('updater-callback', (event, { status, info }) => {
                 this.updater.status = status;
                 if (status === 'latest')
                     this.updater.version = info.releaseName;

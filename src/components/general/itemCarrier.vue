@@ -15,6 +15,7 @@
             <fv-panel
                 v-model="show.panel"
                 :title="local('Item Transfer Carrier')"
+                :title-size="15"
                 :theme="theme"
                 width="600px"
                 height="60%"

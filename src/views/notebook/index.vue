@@ -220,25 +220,29 @@
                 </template>
             </fv-slider>
         </div>
+        <save-options
+            :show.sync="show.saveOptions"
+            @save="confirmSaveAs"
+        ></save-options>
     </div>
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
-import { fabulous_notebook } from "@/js/data_sample.js";
+import saveOptions from '@/components/notebook/saveOptions.vue';
 
-const { ipcRenderer: ipc } = require("electron");
-const { dialog } = require("@electron/remote");
-const path = require("path");
+import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
-    components: {},
+    components: {
+        saveOptions
+    },
     data() {
         return {
-            path: "",
-            content: "",
-            contentType: "", // json, html, fabulous_notebook
+            path: '',
+            content: '',
+            contentType: '', // json, html, fabulous_notebook
             fabulousNotebook: {
                 title: null,
                 description: null,
@@ -246,7 +250,7 @@ export default {
                 content: null,
                 author: [],
                 createDate: null,
-                updateDate: null,
+                updateDate: null
             },
             readonly: false,
             fontSize: 16,
@@ -254,22 +258,23 @@ export default {
             history: [],
             auto_save: false,
             containerPos: {
-                scrollTop: 0,
+                scrollTop: 0
             },
             lock: {
-                loading: true,
+                loading: true
             },
             show: {
                 bottomControl: false,
+                saveOptions: false
             },
             timer: {
-                autoSave: undefined,
-            },
+                autoSave: undefined
+            }
         };
     },
     watch: {
         $route() {
-            if (this.$route.name === "NoteBook") {
+            if (this.$route.name === 'NoteBook') {
                 this.refreshPath();
                 this.refreshContent();
             }
@@ -285,33 +290,32 @@ export default {
         },
         expandContent(val) {
             this.reviseConfig({
-                editorExpandContent: val,
+                editorExpandContent: val
             });
         },
         editorExpandContent(val) {
             this.expandContent = val;
-        },
+        }
     },
     computed: {
         ...mapState({
+            data_path: (state) => state.config.data_path,
+            data_index: (state) => state.config.data_index,
             unsave: (state) => state.editor.unsave,
             autoSave: (state) => state.config.autoSave,
             language: (state) => state.config.language,
             editorExpandContent: (state) => state.config.editorExpandContent,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
-        dir() {
-            return path.dirname(this.path);
-        },
+        ...mapGetters(['local']),
         currentBanner() {
-            if (!this.fabulousNotebook.banner) return "";
+            if (!this.fabulousNotebook.banner) return '';
             return this.fabulousNotebook.banner;
         },
         toolbarHeight() {
-            if (this.contentType !== "fabulous_notebook") return 160;
+            if (this.contentType !== 'fabulous_notebook') return 160;
             return 230;
-        },
+        }
     },
     mounted() {
         this.eventInit();
@@ -322,12 +326,12 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseConfig: "reviseConfig",
-            reviseEditor: "reviseEditor",
+            reviseConfig: 'reviseConfig',
+            reviseEditor: 'reviseEditor'
         }),
         eventInit() {
             this.$el.addEventListener(
-                "dragenter",
+                'dragenter',
                 (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -335,60 +339,12 @@ export default {
                 false
             );
             this.$el.addEventListener(
-                "dragover",
+                'dragover',
                 (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                 },
                 false
-            );
-
-            ipc.on("output-file-notebook", (event, { status, message }) => {
-                if (status !== 200) {
-                    console.error(message);
-                    this.$barWarning(this.local(`Save Content Failed`), {
-                        status: "warning",
-                    });
-                    return;
-                }
-                this.toggleUnsave(false);
-            });
-            ipc.on(
-                `read-file-notebook`,
-                (event, { status, message, target, data }) => {
-                    if (status !== 200) {
-                        console.error(message);
-                        this.$barWarning(this.local(`Read File Failed`), {
-                            status: "warning",
-                        });
-                        return;
-                    }
-                    try {
-                        let rawJson = JSON.parse(data);
-                        if (rawJson.fabulous_notebook) {
-                            this.contentType = "fabulous_notebook";
-                            for (let key in this.fabulousNotebook)
-                                this.fabulousNotebook[key] = rawJson[key];
-                        } else {
-                            this.contentType = "json";
-                            this.fabulousNotebook.content = rawJson;
-                        }
-                        this.lock.loading = true;
-                    } catch (e) {
-                        let ext = path.extname(target);
-                        if (ext === ".md") {
-                            this.contentType = "md";
-                            this.fabulousNotebook.content =
-                                this.$refs.editor.insertMarkdown(data);
-                        } else {
-                            this.contentType = "html";
-                            this.fabulousNotebook.content = data;
-                        }
-                        this.lock.loading = true;
-                    }
-                    if (this.fabulousNotebook.content === "")
-                        this.$refs.editor.focus();
-                }
             );
         },
         configInit() {
@@ -400,10 +356,10 @@ export default {
             this.timer.autoSave = setInterval(this.autoSaveContent, 10000);
         },
         ShortCutInit() {
-            window.addEventListener("keydown", this.shortCutEvent);
+            window.addEventListener('keydown', this.shortCutEvent);
         },
         shortCutEvent(event) {
-            if (this.$route.name !== "NoteBook") return;
+            if (this.$route.name !== 'NoteBook') return;
             let ctrl = event.ctrlKey || event.metaKey;
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                 this.getEditor().save();
@@ -421,12 +377,12 @@ export default {
             if (event.keyCode === 9) {
                 event.preventDefault();
                 if (
-                    this.getEditor().editor.isActive("bulletList") ||
-                    this.getEditor().editor.isActive("orderedList")
+                    this.getEditor().editor.isActive('bulletList') ||
+                    this.getEditor().editor.isActive('orderedList')
                 )
                     return;
                 if (this.readonly) return;
-                this.getEditor().editor.commands.insertContent("    ");
+                this.getEditor().editor.commands.insertContent('    ');
             }
         },
         getEditor() {
@@ -434,30 +390,65 @@ export default {
         },
         toggleUnsave(status = true) {
             this.reviseEditor({
-                unsave: status,
+                unsave: status
             });
         },
         switchAutoSave() {
             this.reviseConfig({
-                autoSave: this.auto_save,
+                autoSave: this.auto_save
             });
         },
         refreshPath() {
             let path = decodeURI(this.$route.params.path);
             if (!path) return;
-            path = path.replace(/\\/g, "/");
+            path = path.replace(/\\/g, '/');
             this.path = path;
         },
         async refreshContent() {
-            if (!path) return;
+            if (!this.path) return;
             if (!this.lock.loading) return;
             this.lock.loading = false;
             this.fabulousNotebook.banner = null;
-            ipc.send("read-file", {
-                id: "notebook",
-                path: this.path,
-                target: this.path,
-            });
+            this.$local_api.Notebook.getDocumentAsync(
+                this.data_path[this.data_index],
+                this.path
+            )
+                .then((res) => {
+                    if (res.status === 'success') {
+                        try {
+                            let rawJson = JSON.parse(res.data);
+                            if (rawJson.fabulous_notebook) {
+                                this.contentType = 'fabulous_notebook';
+                                for (let key in this.fabulousNotebook)
+                                    this.fabulousNotebook[key] = rawJson[key];
+                            } else {
+                                this.contentType = 'json';
+                                this.fabulousNotebook.content = rawJson;
+                            }
+                            this.lock.loading = true;
+                        } catch (e) {
+                            let ext = this.path.split('.').pop();
+                            if (ext === 'md') {
+                                this.contentType = 'md';
+                                this.fabulousNotebook.content =
+                                    this.$refs.editor.insertMarkdown(res.data);
+                            } else {
+                                this.contentType = 'html';
+                                this.fabulousNotebook.content = res.data;
+                            }
+                            this.lock.loading = true;
+                        }
+                        if (this.fabulousNotebook.content === '')
+                            this.$refs.editor.focus();
+                    }
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Read File Failed`), {
+                        status: 'warning'
+                    });
+                    this.lock.loading = true;
+                });
         },
         autoSaveContent() {
             if (this.auto_save) {
@@ -466,7 +457,7 @@ export default {
         },
         saveContent(json) {
             let saveContent = null;
-            if (this.contentType === "fabulous_notebook") {
+            if (this.contentType === 'fabulous_notebook') {
                 this.fabulousNotebook.content = json;
                 this.fabulousNotebook.updateDate = new Date();
                 let _fabulous_notebook = JSON.parse(
@@ -483,11 +474,22 @@ export default {
         },
         saveConfirm(obj) {
             let saveContent = this.saveContent(obj);
-            ipc.send("output-file", {
-                id: "notebook",
-                path: this.path,
-                data: JSON.stringify(saveContent),
-            });
+            this.$local_api.Notebook.updateDocumentAsync(
+                this.data_path[this.data_index],
+                this.path,
+                JSON.stringify(saveContent)
+            )
+                .then((res) => {
+                    if (res.status === 'success') {
+                        this.toggleUnsave(false);
+                    }
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Save Content Failed`), {
+                        status: 'warning'
+                    });
+                });
         },
         onMouseWheel(event) {
             if (event.ctrlKey) {
@@ -500,8 +502,8 @@ export default {
             }
         },
         upgrade() {
-            this.contentType = "fabulous_notebook";
-            this.fabulousNotebook.title = "";
+            this.contentType = 'fabulous_notebook';
+            this.fabulousNotebook.title = '';
         },
         chooseBanner() {
             if (this.$refs.input.files.length === 0) return;
@@ -509,7 +511,7 @@ export default {
             let reader = new FileReader();
             reader.onload = (e) => {
                 this.fabulousNotebook.banner = e.target.result;
-                this.$refs.input.value = "";
+                this.$refs.input.value = '';
             };
             reader.readAsDataURL(file);
         },
@@ -518,78 +520,61 @@ export default {
             this.toggleUnsave(false);
         },
         saveAs() {
-            let filters = [
-                {
-                    name: this.local("Fabulous Notebook"),
-                    extensions: ["fbn"],
-                },
-                {
-                    name: this.local("Markdown File"),
-                    extensions: ["md"],
-                },
-                {
-                    name: this.local("JSON"),
-                    extensions: ["json"],
-                },
-                {
-                    name: this.local("HTML"),
-                    extensions: ["html"],
-                },
-            ];
-            if (this.contentType === "json") filters = filters.slice(2);
-            if (this.contentType === "html") filters = filters.slice(3);
-            dialog
-                .showSaveDialog({
-                    title: this.local("Save As"),
-                    defaultPath: this.dir,
-                    filters: filters.concat([
+            this.show.saveOptions = true;
+        },
+        downloadTxtFile(text, filename) {
+            // 创建一个新的 Blob 对象，用于存储文本内容
+            const blob = new Blob([text], { type: 'text/plain' });
+
+            // 创建一个 <a> 元素
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            // 设置文件名
+            a.download = filename;
+
+            // 模拟点击下载链接
+            a.click();
+
+            // 释放 URL 对象
+            URL.revokeObjectURL(a.href);
+        },
+        confirmSaveAs(prop) {
+            let saveContent = '';
+            if (prop === 'md') {
+                try {
+                    saveContent = this.$refs.editor.saveMarkdown();
+                    this.downloadTxtFile(saveContent, `notebook.${prop}`);
+                } catch (e) {
+                    this.$barWarning(
+                        this.local(
+                            'Export Markdown Failed, Please Check Your Content.'
+                        ),
                         {
-                            name: this.local("All Files"),
-                            extensions: ["*"],
-                        },
-                    ]),
-                })
-                .then((result) => {
-                    if (result.canceled) return;
-                    let targetPath = result.filePath;
-                    let saveContent = "";
-                    if (path.extname(targetPath) === ".md") {
-                        try {
-                            saveContent = this.$refs.editor.saveMarkdown();
-                        } catch (e) {
-                            this.$barWarning(
-                                this.local(
-                                    "Export Markdown Failed, Please Check Your Content."
-                                ),
-                                {
-                                    status: "warning",
-                                }
-                            );
+                            status: 'warning'
                         }
-                    } else if (path.extname(targetPath) === ".html") {
-                        saveContent = this.$refs.editor.editor.getHTML();
-                    } else {
-                        let json = this.$refs.editor.editor.getJSON();
-                        saveContent = this.saveContent(json);
-                        saveContent = JSON.stringify(saveContent);
-                    }
-                    ipc.send("output-file", {
-                        id: "notebook",
-                        path: targetPath,
-                        data: saveContent,
-                    });
-                });
+                    );
+                }
+            } else if (prop === 'html') {
+                saveContent = this.$refs.editor.editor.getHTML();
+                this.downloadTxtFile(saveContent, `notebook.${prop}`);
+            } else {
+                let json = this.$refs.editor.editor.getJSON();
+                saveContent = this.saveContent(json);
+                saveContent = JSON.stringify(saveContent);
+                this.downloadTxtFile(saveContent, `notebook.${prop}`);
+            }
         },
         back() {
             let last = this.history[this.history.length - 1];
             this.history.splice(this.history.length - 1, 1);
             this.$Go(`/notebook/${encodeURI(last)}`);
-        },
+        }
     },
     beforeDestroy() {
         clearInterval(this.timer.autoSave);
-        window.removeEventListener("keydown", this.shortCutEvent);
-    },
+        window.removeEventListener('keydown', this.shortCutEvent);
+    }
 };
 </script>
 

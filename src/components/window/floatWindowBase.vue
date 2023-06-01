@@ -4,11 +4,12 @@
         :title="title"
         :theme="theme"
         width="600px"
-        height="80%"
+        :height="height"
         :background="theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)'"
+        :title-size="15"
         :isAcrylic="true"
         :is-central-side="true"
-        :is-footer="true"
+        :is-footer="isFooter"
     >
         <template v-slot:container>
             <div
@@ -37,6 +38,12 @@ export default {
         },
         title: {
             default: "Title",
+        },
+        height: {
+            default: "80%",
+        },
+        isFooter: {
+            default: true,
         },
         theme: {
             default: "light",
