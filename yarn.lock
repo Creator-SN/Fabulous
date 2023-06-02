@@ -13538,10 +13538,23 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.0.2, vfluentdesign@^1.0.2:
+vfluentdesign@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.0.2.tgz#e1f91d63fedf8ede98327ee9c699b3084b4f3f67"
   integrity sha512-enV7no75LT3CzuPTUvEgdPcOsJmbrSluGAe71iW5fAVqjlxI7odxwGlABh7gdHXFjwL0kwabGJCovUko4UWjYg==
+  dependencies:
+    core-js "^3.4.3"
+    fluent-reveal-effect "^1.1.1"
+    gsap "^3.1.1"
+    office-ui-fabric-core "^11.0.0"
+    onecolor "^3.1.0"
+    swiper "^8.3.2"
+    vuedraggable "^2.23.2"
+
+vfluentdesign@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.0.3.tgz#b98bedaaa6d4e22ad3071e1893b9ec0266ead1aa"
+  integrity sha512-oVzvxlGMxSx8u2sZnEZ6ifklmEVx7rOOKUj7fLIzAsHLznsDIRUcGr7rDd2vHhNefA/SQQygyYAH2hHuslGipw==
   dependencies:
     core-js "^3.4.3"
     fluent-reveal-effect "^1.1.1"

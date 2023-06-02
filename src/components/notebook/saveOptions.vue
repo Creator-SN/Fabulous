@@ -18,7 +18,7 @@
                     :key="index"
                     background="transparent"
                     :foreground="theme === 'dark' ? 'white' : 'black'"
-                    style="width: 90%; height: 60px; margin: 5px 0px; flex-shrink: 0;"
+                    style="width: calc(100% - 5px); height: 60px; margin: 5px 0px; flex-shrink: 0;"
                     @click="saveProp(item)"
                 >
                     <img

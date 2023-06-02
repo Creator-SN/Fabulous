@@ -1,13 +1,53 @@
 <template>
     <div class="local-tree-view-container">
+        <div
+            class="navigation-view-mode-block"
+            :class="[{dark: theme === 'dark'}]"
+            @click="menuDisplayMode = 1"
+        >
+            <div class="navigation-view-mode-left-block">
+                <img
+                    draggable="false"
+                    :src="img.notebook"
+                    alt=""
+                    class="icon-img"
+                >
+                <p class="title">{{!value ? local('Notebook') : localPathFolderName}}</p>
+            </div>
+            <div
+                v-show="value"
+                class="navigation-view-mode-right-block"
+            >
+                <i
+                    class="ms-Icon ms-Icon--SubscriptionAdd more-menu-btn"
+                    :title="local('New Note')"
+                    @click="() => createFile()"
+                ></i>
+                <i
+                    class="ms-Icon ms-Icon--NewFolder more-menu-btn"
+                    :title="local('New Folder')"
+                    @click="() => createFolder()"
+                ></i>
+                <i
+                    class="ms-Icon ms-Icon--Refresh more-menu-btn"
+                    :title="local('Refresh Folder')"
+                    @click="() => refreshFolder()"
+                ></i>
+                <i
+                    class="ms-Icon ms-Icon--CollapseContent more-menu-btn"
+                    :title="local('Collaspe All')"
+                    @click="() => collapseAll()"
+                ></i>
+            </div>
+        </div>
         <fv-TreeView
             v-show="treeList.length > 0"
             v-model="treeList"
             :theme="theme"
             ref="tree"
             :background="theme == 'dark' ? 'rgba(7, 7, 7, 0)' : 'rgba(245, 245, 245, 0)'"
-            :backgroundColorHover="theme == 'dark' ? 'rgba(36, 36, 36, 0.3)' : 'rgba(245, 245, 245, 0.3)'"
-            :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(245, 245, 245, 0.6)'"
+            :backgroundColorHover="theme == 'dark' ? 'rgba(36, 36, 36, 0.3)' : 'rgba(255, 255, 255, 0.3)'"
+            :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
             :leftIconForeground="'rgba(245, 78, 162, 0.8)'"
             :expandClickMode="'normal'"
             style="width: 100%; height: 100%; overflow: auto;"
@@ -86,6 +126,27 @@
                 style="width: calc(100% - 50px);"
                 @click="chooseFolder"
             >{{local('Open Folder')}}</fv-button>
+        </div>
+        <div
+            class="navigation-view-command-bar-block"
+            :class="[{dark: theme === 'dark'}]"
+        >
+            <div
+                v-for="(item, index) in notebookCmdList"
+                :key="`command-bar-item: ${index}`"
+                class="command-item"
+                :class="[{disabled: item.disabled()}]"
+                @click="() => {item.disabled() ? null : item.func()}"
+            >
+                <span class="command-item-icon">
+                    <img
+                        :src="img[item.img]"
+                        alt=""
+                        class="icon-img"
+                    >
+                </span>
+                <p class="command-item-content">{{item.name()}}</p>
+            </div>
         </div>
         <right-menu
             class="lt-right-menu"
@@ -170,18 +231,25 @@
 </template>
 
 <script>
+import { mapMutations, mapState, mapGetters } from 'vuex';
+
 import rightMenu from '@/components/general/rightMenu.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
 import { NotebookWatcher } from '@/js/eventManager.js';
 
+import notebook from '@/assets/nav/notebook.svg';
 import folderImg from '@/assets/nav/folder.svg';
 import noteImg from '@/assets/nav/note.svg';
 import jsonImg from '@/assets/nav/json.svg';
 import htmlImg from '@/assets/nav/html.svg';
 import fileImg from '@/assets/nav/file.svg';
 import markdownImg from '@/assets/nav/markdown.svg';
+import newFolderImg from '@/assets/nav/newFolder.svg';
+import refreshImg from '@/assets/nav/refresh.svg';
+import pasteImg from '@/assets/nav/paste.svg';
+import allImg from '@/assets/nav/all.svg';
 
 export default {
     components: { rightMenu },
@@ -189,44 +257,59 @@ export default {
         value: {
             default: ''
         },
-        local: {
-            default: () => {
-                return {};
-            }
-        },
-        watchAllExtensions: {
-            default: false
-        },
         rightMenuWidth: {
             default: 200
         },
-        toggleEditor: {
-            default: () => {}
-        },
-        unsave: {
-            default: false
-        },
-        uri: {
-            default: 'localTree'
-        },
         Go: {
             default: () => {}
-        },
-        theme: {
-            default: 'light'
         }
     },
     data() {
         return {
             path: '',
             treeList: [],
+            notebookCmdList: [
+                {
+                    name: () => this.local('New Folder'),
+                    func: () => this.createFolder(),
+                    img: 'newFolder',
+                    disabled: () => !this.value,
+                    iconColor: 'rgba(213, 99, 70, 1)'
+                },
+                {
+                    name: () => this.local('Choose Folder'),
+                    func: () => this.chooseFolder(),
+                    img: 'folder',
+                    disabled: () => false,
+                    iconColor: 'rgba(213, 99, 70, 1)'
+                },
+                {
+                    name: () => this.local('Refresh Folder'),
+                    func: () => this.refreshFolder(),
+                    img: 'refresh',
+                    disabled: () => !this.value,
+                    iconColor: 'rgba(172, 84, 206, 1)'
+                },
+                {
+                    name: () => this.local('Paste to Root'),
+                    img: 'paste',
+                    func: () => this.rootPaste(),
+                    disabled: () =>
+                        this.$refs.local_view ? this.rootPasteDisabled() : true
+                }
+            ],
             img: {
+                notebook,
                 folder: folderImg,
                 note: noteImg,
                 json: jsonImg,
                 html: htmlImg,
                 file: fileImg,
-                markdown: markdownImg
+                markdown: markdownImg,
+                newFolder: newFolderImg,
+                refresh: refreshImg,
+                paste: pasteImg,
+                all: allImg
             },
             FLAT: [],
             copyList: [],
@@ -248,6 +331,14 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            data_path: (state) => state.config.data_path,
+            data_index: (state) => state.config.data_index,
+            watchAllExtensions: (state) => state.config.watchAllExtensions,
+            unsave: (state) => state.editor.unsave,
+            theme: (state) => state.config.theme
+        }),
+        ...mapGetters(['local']),
         computeTreeItem() {
             return (fileObj) => {
                 let item = {
@@ -282,6 +373,18 @@ export default {
                 if (ext === 'md') return this.img.markdown;
                 return this.img.file;
             };
+        },
+        localPathFolderName() {
+            let pathList = this.value.split(/[\\/]/);
+            return pathList[pathList.length - 1];
+        },
+        SourceDisabled() {
+            return !this.data_path[this.data_index];
+        },
+        uri() {
+            if (this.data_path[this.data_index])
+                return this.data_path[this.data_index];
+            else return 'local';
         }
     },
     mounted() {
@@ -294,6 +397,9 @@ export default {
         //     this.$refs.tree.$forceUpdate();
         //     console.log(this.treeList);
         // },
+        ...mapMutations({
+            toggleEditor: 'toggleEditor'
+        }),
         eventInit() {
             this.nw.on('watch-path-localTree', (e, { event, path, file }) => {
                 // console.log(event, file);
@@ -660,7 +766,7 @@ export default {
                 });
         },
         renameConfirm(target) {
-            this.$local_api.Notebook.updateDirectoryAsync(
+            this.$local_api.Notebook.updateDirectoryInfoAsync(
                 this.uri,
                 target.filePath,
                 {
@@ -971,6 +1077,8 @@ export default {
     width: 100%;
     height: 100%;
     flex: 1;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     overflow-x: hidden;
 
