@@ -329,6 +329,7 @@ export default {
             reviseEditor: "reviseEditor",
         }),
         timerInit() {
+            // PDFViewer 定位刷新器 10ms (PDFViewer position refresher 10ms)
             this.timer.width = setInterval(() => {
                 window.requestAnimationFrame(() => {
                     const { left, top, right, bottom } =
@@ -343,10 +344,12 @@ export default {
             }, 10);
         },
         eventInit() {
+            // PDFViewer 滚动刷新器 (PDFViewer scroll refresher)
             this.$el.addEventListener("scroll", () => {
                 this.refreshCurrentPage();
                 this.container.scrollTop = this.$el.scrollTop;
             });
+            // 选中文本事件: 从RangeNodes中获取文本信息并替换多余空格 (Select text event: get text information from RangeNodes and replace extra spaces)
             let getTextEvent = () => {
                 let result = this.getRangeNodes(this.$refs.scroller_view);
                 let text = "";
@@ -369,6 +372,7 @@ export default {
                     rangeNodes: result,
                 };
             };
+            // 判断点击事件是否在文本层内 (Determine whether the click event is in the text layer)
             let insideTextLayer = (event) => {
                 let x = event.target;
                 let _self = false;
@@ -381,6 +385,7 @@ export default {
                 }
                 return _self;
             };
+            // 点击事件: 翻译 (Click event: translate)
             let translateEvent = (event) => {
                 if (!this.show.toolbar.translate) return;
                 if (!insideTextLayer(event)) return;
@@ -390,6 +395,7 @@ export default {
                     this.show.translate = true;
                 this.toTranslate();
             };
+            // 添加PDF笔记 (Click event: add PDF note)
             let addPDFNoteEvent = (event) => {
                 if (this.disabledEditor) return;
                 if (!insideTextLayer(event)) return;
@@ -431,6 +437,8 @@ export default {
             this.$refs.scroller_view.addEventListener("click", addPDFNoteEvent);
         },
         async initPDF() {
+            // 初始化PDF (Initialize PDF)
+            // 获取PDF文件并执行PDF.js读取获取PDF文档对象 (Get the PDF file and execute the PDF.js reading to get the PDF document object)
             if (!this.lock.init) return;
             this.lock.init = false;
             let res = null;
@@ -462,6 +470,7 @@ export default {
             });
         },
         refreshCurrentPage() {
+            // 刷新获取当前页码 (Refresh to get the current page number)
             if (!this.pdfDoc) return;
             let arr = [];
             for (let i = 1; i <= this.totalPages; i++) {
@@ -499,6 +508,7 @@ export default {
             }
         },
         onMouseWheel(event) {
+            // 滚轮事件: 缩放 (Mouse wheel event: zoom)
             if (event.ctrlKey) {
                 event.preventDefault();
                 if (event.deltaY > 0) {
@@ -509,6 +519,7 @@ export default {
             }
         },
         tryFindTextLayerIndex(node) {
+            // 尝试查找文本层索引 (Try to find the text layer index)
             let parent = node.parentNode;
             while (
                 parent &&

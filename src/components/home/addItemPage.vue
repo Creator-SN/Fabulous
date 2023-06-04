@@ -119,7 +119,7 @@ export default {
                 this.currentChoosen[0].content
             );
             if (res.status === "success") {
-                this.item.pages.push(_page);
+                this.item.pages.push(res.data);
                 this.thisShow = false;
             } else {
                 this.$barWarning(res.message, {

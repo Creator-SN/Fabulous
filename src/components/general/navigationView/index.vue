@@ -79,7 +79,7 @@ export default {
                 {
                     key: 0,
                     name: () => {
-                        return this.local('Notebook System');
+                        return this.local('Reference Management System');
                     },
                     img: dataSource,
                     show: () => this.activeSystemMode !== 'notebook',
@@ -88,7 +88,7 @@ export default {
                 {
                     key: 1,
                     name: () => {
-                        return this.local('Reference Management System');
+                        return this.local('Notebook System');
                     },
                     img: notebook,
                     show: () => this.activeSystemMode !== 'ds',
