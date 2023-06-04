@@ -254,11 +254,11 @@ export default {
     }
 
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
         height: 8px;
 
         &:hover {
-            width: 10px;
+            width: 16px;
         }
     }
     /*定义滚动条轨道
@@ -270,12 +270,11 @@ export default {
  内阴影+圆角*/
     ::-webkit-scrollbar-thumb {
         border-radius: 10px;
-        background-color: rgba(191, 190, 189, 0.3);
+        background-color: rgba(191, 190, 189, 0.2);
         transition: background-color 0.3s;
         cursor: pointer;
 
         &:hover {
-            width: 16px;
             background-color: rgba(191, 190, 189, 0.6);
         }
     }

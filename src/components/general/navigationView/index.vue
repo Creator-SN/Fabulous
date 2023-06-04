@@ -25,6 +25,7 @@
                         :items="pivotList"
                         :theme="theme"
                         slider-background="rgba(145, 145, 235, 1)"
+                        style="width: calc(100% - 20px);"
                         @change="menuDisplayMode = $event.key"
                     >
                         <template v-slot:container="x">
@@ -83,7 +84,7 @@ export default {
                     },
                     img: dataSource,
                     show: () => this.activeSystemMode !== 'notebook',
-                    width: 120
+                    width: '50%'
                 },
                 {
                     key: 1,
@@ -92,7 +93,7 @@ export default {
                     },
                     img: notebook,
                     show: () => this.activeSystemMode !== 'ds',
-                    width: 120
+                    width: '50%'
                 }
             ],
             img: {
@@ -190,7 +191,8 @@ export default {
 
             .control-title {
                 font-size: 12px;
-                margin-left: 5px;
+                margin-left: 10px;
+                text-align: center;
             }
 
             .icon-img {
