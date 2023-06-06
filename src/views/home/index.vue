@@ -21,7 +21,6 @@
                     borderWidth="1"
                     :border-radius="30"
                     :revealBorder="true"
-                    :is-box-shadow="true"
                     @debounce-input="currentSearch.debounce = $event"
                 ></fv-text-box>
                 <div class="sort-block">
@@ -29,7 +28,7 @@
                         v-model="sortKey"
                         :options="sortOptions"
                         :placeholder="local('Sort by')"
-                        :inputBackground="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(245, 245, 245, 1)'"
+                        :inputBackground="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(255, 255, 255, 0.6)'"
                         :borderRadius="3"
                         :theme="theme"
                         style="width: 120px;"
@@ -115,7 +114,7 @@
                                     style="width: 35px; height: 35px;"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
-                                    @click="openPDF(x.item, 'inside')"
+                                    @click="openFile(x.item.id)"
                                 >
                                     <img
                                         draggable="false"

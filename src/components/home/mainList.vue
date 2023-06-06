@@ -46,6 +46,7 @@
                     <div class="custom-collapse-title">
                         <p
                             class="title-content h"
+                            @click="itemTitleClick($event, item)"
                             @dblclick="item.pdf ? $emit('open-file', `${item.id}/${item.pdf}.pdf`) : $emit('open-file', `${item.id}`)"
                         >{{ x.title }}</p>
                     </div>
@@ -234,6 +235,10 @@ export default {
             this.$set(this.thisValue, index, t);
             this.$emit('change-value', this.thisValue);
             this.$emit('choose-items', this.currentChoosen);
+        },
+        itemTitleClick($event, item) {
+            $event.stopPropagation();
+            if(this.edit) this.itemChooseClick(item);
         }
     }
 };
