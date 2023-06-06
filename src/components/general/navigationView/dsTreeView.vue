@@ -44,7 +44,7 @@
                 :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :leftIconForeground="'rgba(255, 180, 0, 0.8)'"
                 :expandClickMode="'normal'"
-                style="width: 100%; height: 100%; overflow: auto;"
+                style="width: 100%; height: 100%; overflow: overlay;"
                 ref="tree"
                 @click="treeItemClick"
             >

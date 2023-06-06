@@ -33,19 +33,19 @@
 </template>
 
 <script>
-import i18n from "@/js/i18n.js";
-import starter from "@/components/general/starter.vue";
-import titleBar from "@/components/general/titleBar.vue";
-import progressBar from "@/components/general/progressbar.vue";
-import navigationView from "@/components/general/navigationView";
-import editorContainer from "@/components/general/editorContainer.vue";
-import pdfImporter from "@/components/general/pdfImporter.vue";
-import itemCarrier from "@/components/general/itemCarrier.vue";
-import { config } from "@/js/data_sample";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import i18n from '@/js/i18n.js';
+import starter from '@/components/general/starter.vue';
+import titleBar from '@/components/general/titleBar.vue';
+import progressBar from '@/components/general/progressbar.vue';
+import navigationView from '@/components/general/navigationView';
+import editorContainer from '@/components/general/editorContainer.vue';
+import pdfImporter from '@/components/general/pdfImporter.vue';
+import itemCarrier from '@/components/general/itemCarrier.vue';
+import { config } from '@/js/data_sample';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
 export default {
-    name: "App",
+    name: 'App',
     components: {
         starter,
         titleBar,
@@ -53,19 +53,19 @@ export default {
         navigationView,
         editorContainer,
         pdfImporter,
-        itemCarrier,
+        itemCarrier
     },
     data() {
         return {
             show: {
-                drop: false,
-            },
+                drop: false
+            }
         };
     },
     watch: {
         $route() {
             this.pdfImporterInit();
-        },
+        }
     },
     computed: {
         ...mapState({
@@ -76,9 +76,9 @@ export default {
             show_editor: (state) => state.editor.show,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         currentPath() {
             if (this.data_path[this.data_index])
                 return this.data_path[this.data_index];
@@ -86,7 +86,7 @@ export default {
         },
         SourceDisabled() {
             return !this.data_path[this.data_index];
-        },
+        }
     },
     mounted() {
         this.configInit();
@@ -94,15 +94,15 @@ export default {
         this.dropFilesInit();
         this.i18nInit();
         this.refreshWindowSizeInit();
-        if (this.$route.path !== "/") this.$Go("/");
+        if (this.$route.path !== '/') this.$Go('/');
     },
     methods: {
         ...mapMutations({
-            reviseConfig: "reviseConfig",
-            revisePdfImporter: "revisePdfImporter",
-            reviseProgress: "reviseProgress",
-            setWindowSize: "setWindowSize",
-            reviseI18N: "reviseI18N",
+            reviseConfig: 'reviseConfig',
+            revisePdfImporter: 'revisePdfImporter',
+            reviseProgress: 'reviseProgress',
+            setWindowSize: 'setWindowSize',
+            reviseI18N: 'reviseI18N'
         }),
         i18nInit() {
             this.reviseI18N(i18n);
@@ -110,7 +110,7 @@ export default {
         async configInit() {
             let _config = JSON.parse(JSON.stringify(config));
             this.$local_api.Config.getConfig().then((res) => {
-                if (res.status === "success") {
+                if (res.status === 'success') {
                     let target = res.data;
                     for (let key in _config) {
                         _config[key] = target[key];
@@ -118,19 +118,19 @@ export default {
                     this.reviseConfig(_config);
                 } else {
                     this.$barWarning(res.message, {
-                        status: "error",
+                        status: 'error'
                     });
                 }
             });
         },
         pdfImporterInit() {
             this.revisePdfImporter({
-                pdf_importer: this.$refs.pdf_importer,
+                pdf_importer: this.$refs.pdf_importer
             });
         },
         dropFilesInit() {
             this.$el.addEventListener(
-                "dragenter",
+                'dragenter',
                 (e) => {
                     if (!this.show_editor) {
                         this.show.drop = true;
@@ -142,7 +142,7 @@ export default {
             );
 
             this.$el.addEventListener(
-                "dragover",
+                'dragover',
                 (e) => {
                     if (!this.show_editor) {
                         this.show.drop = true;
@@ -154,7 +154,7 @@ export default {
             );
 
             this.$el.addEventListener(
-                "dragleave",
+                'dragleave',
                 (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -163,7 +163,7 @@ export default {
             );
 
             this.$refs.drop.addEventListener(
-                "dragleave",
+                'dragleave',
                 (e) => {
                     this.show.drop = false;
                     e.preventDefault();
@@ -172,7 +172,7 @@ export default {
                 false
             );
 
-            this.$el.addEventListener("drop", (e) => {
+            this.$el.addEventListener('drop', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -184,20 +184,20 @@ export default {
                     for (let i = 0; i < df.items.length; i++) {
                         let item = df.items[i];
                         let fileEntry = item.webkitGetAsEntry();
-                        let ext = fileEntry ? fileEntry.name.split(".") : [];
+                        let ext = fileEntry ? fileEntry.name.split('.') : [];
                         ext = ext[ext.length - 1];
                         // 用webkitGetAsEntry禁止上传目录
                         if (
-                            item.kind === "file" &&
+                            item.kind === 'file' &&
                             fileEntry.isFile &&
-                            item.type === "application/pdf"
+                            item.type === 'application/pdf'
                         ) {
                             let file = item.getAsFile();
                             files.push(file);
-                        } else if (ext === "fbn") {
+                        } else if (ext === 'fbn') {
                             let file = item.getAsFile();
                             let url = `/notebook/${encodeURI(
-                                file.path.replace(/\//g, "\\")
+                                file.path.replace(/\//g, '\\')
                             )}`;
                             if (this.$route.path === url) return;
                             this.$Go(url);
@@ -209,7 +209,7 @@ export default {
                 if (this.SourceDisabled) return;
 
                 this.revisePdfImporter({
-                    df: files,
+                    df: files
                 });
             });
         },
@@ -219,7 +219,7 @@ export default {
                 let height = document.body.clientHeight;
                 this.setWindowSize({
                     width,
-                    height,
+                    height
                 });
             }, 100);
         },
@@ -229,8 +229,8 @@ export default {
         Go(path) {
             if (this.$route.path === path) return 0;
             this.$Go(path);
-        },
-    },
+        }
+    }
 };
 </script>
 
@@ -276,6 +276,10 @@ export default {
 
         &:hover {
             background-color: rgba(191, 190, 189, 0.6);
+        }
+
+        &:active {
+            background-color: rgba(191, 190, 189, 0.8);
         }
     }
 

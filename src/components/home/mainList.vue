@@ -71,7 +71,7 @@
                         :value="item.labels"
                         :theme="theme"
                         class="tag-block"
-                        style="max-width: 120px; overflow: auto;"
+                        style="max-width: 120px; overflow: overlay;"
                         @click.native="$emit('label-click', item)"
                     ></fv-tag>
                 </template>
