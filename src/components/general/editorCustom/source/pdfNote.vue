@@ -7,7 +7,7 @@
             class="power-editor-pdf-note-label"
             contenteditable="false"
             :title="node.attrs.content"
-            @click="tryScrollToTop(node.attrs.rangeNodes)"
+            @click="tryScrollToTop(node.attrs.pos)"
         >
             <i class="label-name">PDF Note</i>
             <i
@@ -23,57 +23,57 @@
 </template>
 
 <script>
-import { NodeViewWrapper, NodeViewContent } from "@tiptap/vue-2";
-import { mapState } from "vuex";
+import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-2';
+import { mapState } from 'vuex';
 
 export default {
-    name: "drawingBlock",
+    name: 'drawingBlock',
 
     components: {
         NodeViewWrapper,
-        NodeViewContent,
+        NodeViewContent
     },
 
     props: {
         // the editor instance
         editor: {
-            type: Object,
+            type: Object
         },
 
         // the current node
         node: {
-            type: Object,
+            type: Object
         },
 
         // an array of decorations
         decorations: {
-            type: Array,
+            type: Array
         },
 
         // `true` when there is a `NodeSelection` at the current node view
         selected: {
-            type: Boolean,
+            type: Boolean
         },
 
         // access to the node extension, for example to get options
         extension: {
-            type: Object,
+            type: Object
         },
 
         // get the document position of the current node
         getPos: {
-            type: Function,
+            type: Function
         },
 
         // update attributes of the current node
         updateAttributes: {
-            type: Function,
+            type: Function
         },
 
         // delete the current node
         deleteNode: {
-            type: Function,
-        },
+            type: Function
+        }
     },
 
     data() {
@@ -82,36 +82,34 @@ export default {
 
     computed: {
         ...mapState({
-            pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
+            pdfNoteInfo: (state) => state.editor.pdfNoteInfo
         }),
         currentGuid() {
             return this.pdfNoteInfo.guid;
-        },
+        }
     },
     mounted() {},
     methods: {
-        tryScrollToTop(rangeNodes) {
+        tryScrollToTop(pos) {
             try {
-                let idx = rangeNodes[0].index;
                 let container = document.querySelectorAll(
-                    ".fabulous-pdf-container"
+                    '.fabulous-pdf-container'
                 );
-                let root = document.querySelectorAll(
-                    ".pdf-display-scroll-view"
-                );
+                let pdfItem = document.querySelectorAll('.pdf-item');
                 if (!container[0]) return;
-                if (!root[0]) return;
+                if (pdfItem.length < pos.canvasIndex - 1) return;
                 container = container[0];
-                root = root[0];
-                let el = root.querySelectorAll("span")[idx];
-                const { top } = el.getBoundingClientRect();
+                pdfItem = pdfItem[pos.canvasIndex - 1];
+                const { top } = pdfItem.getBoundingClientRect();
                 const { top: containerTop } = container.getBoundingClientRect();
-                container.scrollTop = container.scrollTop + top - containerTop - 75;
+                let offset = pos.top.toFixed(2) * pdfItem.clientHeight;
+                container.scrollTop =
+                    container.scrollTop + top + offset - containerTop - 75;
             } catch (e) {
                 console.log(e);
             }
-        },
-    },
+        }
+    }
 };
 </script>
 
@@ -124,8 +122,7 @@ export default {
     margin: 1rem 0;
     transition: all 0.3s;
 
-    &.dark
-    {
+    &.dark {
         background: rgba(28, 28, 28, 0.6);
     }
 

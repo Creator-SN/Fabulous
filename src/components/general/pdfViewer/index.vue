@@ -17,9 +17,7 @@
                 :root="$el"
                 :parent="$refs.scroller_view"
                 :pageIdx="pageIdx"
-                :hmrVersion="hmrVersion"
-                :displayMode="displayMode"
-                :local="local"
+                :currentPage="currentPage"
                 :currentScale.sync="currentScale"
                 :additionScaleRatio="additionScaleRatio"
                 :scrollTop="container.scrollTop"
@@ -27,9 +25,9 @@
                 :pdfNoteInfo="pdfNoteInfo"
                 :pdfNoteList="pdfNoteList"
                 :highlightNodes="highlightNodes"
-                :reviseEditor="reviseEditor"
                 :show="show.toolbar"
                 :theme="theme"
+                @add-queue="queueFunction.push($event)"
                 @update-page="revisePdfPage(pageIdx, $event)"
                 @show-quick-note="show.toolbar.quickNote = $event"
             ></pdf-item>
@@ -131,34 +129,34 @@
 </template>
 
 <script>
-import gsap from "gsap";
+import gsap from 'gsap';
 
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from 'vuex';
 
-import pdfItem from "./pdfItem.vue";
-import addRingButton from "./addRingButton.vue";
-import translatorBox from "@/components/general/pdfViewer/translatorBox.vue";
+import pdfItem from './pdfItem.vue';
+import addRingButton from './addRingButton.vue';
+import translatorBox from '@/components/general/pdfViewer/translatorBox.vue';
 
-import "pdfjs-dist/web/pdf_viewer.css";
+import 'pdfjs-dist/web/pdf_viewer.css';
 
 export default {
     components: {
         pdfItem,
         addRingButton,
-        translatorBox,
+        translatorBox
     },
     props: {
         disabledEditor: {
-            default: false,
+            default: false
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
             currentPage: 1,
-            currentPageStr: "1",
+            currentPageStr: '1',
             totalPages: 0,
             visualPages: [],
             currentScale: -1,
@@ -174,43 +172,46 @@ export default {
                 width: 0,
                 height: 0,
                 scrollTop: 0,
-                scrollTopRatio: 0,
+                scrollTopRatio: 0
             },
             scroller: {
-                width: `100%`,
+                width: `100%`
             },
             translateObj: {
-                selection: "",
-                text: "",
-                pronunciation: "",
+                selection: '',
+                text: '',
+                pronunciation: ''
             },
             selectionObj: {
                 pos: {
                     left: 0,
                     top: 0,
-                    canvasIndex: 0,
+                    canvasIndex: 0
                 },
                 rangeNodes: [],
-                content: "",
+                content: ''
             },
+            queueFunction: [],
             show: {
                 translate: false,
                 editable: false,
                 addNote: false,
                 toolbar: {
                     translate: true,
-                    quickNote: false,
-                },
+                    quickNote: false
+                }
             },
             timer: {
                 width: null,
                 translate: null,
+                queue: null
             },
             lock: {
                 init: true,
                 page: [],
                 scaling: false,
-            },
+                isQueueRunning: true
+            }
         };
     },
     watch: {
@@ -218,7 +219,7 @@ export default {
             this.$nextTick(() => {
                 this.totalPages = 0;
                 this.currentPage - 1;
-                this.currentPageStr - "1";
+                this.currentPageStr - '1';
                 this.hmrVersion = 0;
                 this.pdfPages = [];
                 this.initPDF();
@@ -230,11 +231,11 @@ export default {
         currentPage() {
             this.currentPageStr = this.currentPage.toString();
         },
-        "translateObj.selection"() {
-            this.translateObj.text = "";
+        'translateObj.selection'() {
+            this.translateObj.text = '';
             this.toTranslate(800);
         },
-        "show.toolbar.quickNote"() {
+        'show.toolbar.quickNote'() {
             this.widthFormat();
         },
         displayMode() {
@@ -242,6 +243,20 @@ export default {
                 this.alignFormat();
             }
         },
+        async 'queueFunction.length'() {
+            if (this.queueFunction.length === 0) return;
+            if (!this.lock.isQueueRunning) return;
+            this.lock.isQueueRunning = false;
+            while (this.queueFunction.length > 0) {
+                let func = this.queueFunction.shift();
+                try {
+                    await func();
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            this.lock.isQueueRunning = true;
+        }
     },
     computed: {
         ...mapState({
@@ -250,9 +265,9 @@ export default {
             item: (state) => state.editor.item,
             targetContent: (state) => state.editor.targetContent,
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
-            displayMode: (state) => state.editor.displayMode,
+            displayMode: (state) => state.editor.displayMode
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(['local']),
         highlightNodes() {
             let content = this.targetContent.content;
             let result = [];
@@ -260,12 +275,12 @@ export default {
                 let node = content[i];
                 if (node.content) content = content.concat(node.content);
                 try {
-                    if (node.type === "pdfNote") {
+                    if (node.type === 'pdfNote') {
                         result.push({
                             guid: node.attrs.guid,
                             pos: node.attrs.pos,
                             rangeNodes: node.attrs.rangeNodes,
-                            content: node.attrs.content,
+                            content: node.attrs.content
                         });
                     }
                 } catch (e) {
@@ -282,13 +297,13 @@ export default {
                 let node = content[i];
                 if (node.content) content = content.concat(node.content);
                 try {
-                    if (node.type === "pdfNote") {
+                    if (node.type === 'pdfNote') {
                         arr.push({
                             guid: node.attrs.guid,
                             type: node.type,
                             content: node.content,
                             idx: node.attrs.pos.canvasIndex,
-                            pos: node.attrs.pos,
+                            pos: node.attrs.pos
                         });
                     }
                 } catch (e) {
@@ -312,10 +327,10 @@ export default {
                           num: pageIdx,
                           page: null,
                           lock: true,
-                          version: -1,
+                          version: -1
                       };
             };
-        },
+        }
     },
     mounted() {
         this.timerInit();
@@ -326,7 +341,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseEditor: "reviseEditor",
+            reviseEditor: 'reviseEditor'
         }),
         timerInit() {
             // PDFViewer 定位刷新器 10ms (PDFViewer position refresher 10ms)
@@ -345,14 +360,14 @@ export default {
         },
         eventInit() {
             // PDFViewer 滚动刷新器 (PDFViewer scroll refresher)
-            this.$el.addEventListener("scroll", () => {
+            this.$el.addEventListener('scroll', () => {
                 this.refreshCurrentPage();
                 this.container.scrollTop = this.$el.scrollTop;
             });
             // 选中文本事件: 从RangeNodes中获取文本信息并替换多余空格 (Select text event: get text information from RangeNodes and replace extra spaces)
             let getTextEvent = () => {
                 let result = this.getRangeNodes(this.$refs.scroller_view);
-                let text = "";
+                let text = '';
                 if (result.length === 1) {
                     text = result[0].node.innerText.slice(
                         result[0].offset,
@@ -366,18 +381,18 @@ export default {
                         )} `;
                     });
                 }
-                text = text.replace(/ +/g, " ");
+                text = text.replace(/ +/g, ' ');
                 return {
                     text,
-                    rangeNodes: result,
+                    rangeNodes: result
                 };
             };
             // 判断点击事件是否在文本层内 (Determine whether the click event is in the text layer)
             let insideTextLayer = (event) => {
                 let x = event.target;
                 let _self = false;
-                while (x && x.tagName && x.tagName.toLowerCase() != "body") {
-                    if ([...x.classList].includes("textLayer")) {
+                while (x && x.tagName && x.tagName.toLowerCase() != 'body') {
+                    if ([...x.classList].includes('textLayer')) {
                         _self = true;
                         break;
                     }
@@ -391,7 +406,7 @@ export default {
                 if (!insideTextLayer(event)) return;
                 let text = getTextEvent().text;
                 this.translateObj.selection = text;
-                if (this.translateObj.selection !== "")
+                if (this.translateObj.selection !== '')
                     this.show.translate = true;
                 this.toTranslate();
             };
@@ -400,7 +415,7 @@ export default {
                 if (this.disabledEditor) return;
                 if (!insideTextLayer(event)) return;
                 let { text, rangeNodes } = getTextEvent();
-                if (text.replace(/ +/g, "") === "") {
+                if (text.replace(/ +/g, '') === '') {
                     this.show.addNote = false;
                     return;
                 }
@@ -409,12 +424,12 @@ export default {
                 let node = rangeNodes[0].node;
                 let targetNode = {
                     index: 0,
-                    node: null,
+                    node: null
                 };
                 for (let i = 1; i <= this.totalPages; i++) {
                     let pdf_item = this.$refs[`pdf_item:${i}`][0].$el;
                     let index = [].indexOf.call(
-                        pdf_item.querySelectorAll("span"),
+                        pdf_item.querySelectorAll('span'),
                         node
                     );
                     if (index > -1) {
@@ -425,16 +440,16 @@ export default {
                 }
                 this.selectionObj.pos.left =
                     parseFloat(
-                        getComputedStyle(node).getPropertyValue("left")
+                        getComputedStyle(node).getPropertyValue('left')
                     ) / targetNode.node.offsetWidth;
                 this.selectionObj.pos.top =
-                    parseFloat(getComputedStyle(node).getPropertyValue("top")) /
+                    parseFloat(getComputedStyle(node).getPropertyValue('top')) /
                     targetNode.node.offsetHeight;
                 this.selectionObj.pos.canvasIndex = targetNode.index;
                 this.show.addNote = true;
             };
-            this.$refs.scroller_view.addEventListener("click", translateEvent);
-            this.$refs.scroller_view.addEventListener("click", addPDFNoteEvent);
+            this.$refs.scroller_view.addEventListener('click', translateEvent);
+            this.$refs.scroller_view.addEventListener('click', addPDFNoteEvent);
         },
         async initPDF() {
             // 初始化PDF (Initialize PDF)
@@ -463,7 +478,7 @@ export default {
                             num: i,
                             page,
                             lock: true,
-                            version: -1,
+                            version: -1
                         });
                     });
                 }
@@ -478,7 +493,7 @@ export default {
                     this.$refs[`pdf_item:${i}`][0].$el.getBoundingClientRect();
                 arr.push({
                     i,
-                    value: Math.abs(bottom - this.container.height),
+                    value: Math.abs(bottom - this.container.height)
                 });
             }
             arr.sort((a, b) => {
@@ -524,10 +539,10 @@ export default {
             while (
                 parent &&
                 parent.tagName &&
-                parent.tagName.toLowerCase() != "body"
+                parent.tagName.toLowerCase() != 'body'
             ) {
-                if ([...parent.classList].includes("textLayer")) {
-                    let children = this.$el.querySelectorAll("div.textLayer");
+                if ([...parent.classList].includes('textLayer')) {
+                    let children = this.$el.querySelectorAll('div.textLayer');
                     return [...children].indexOf(parent) / 1 + 1;
                 }
                 parent = parent.parentNode;
@@ -548,34 +563,34 @@ export default {
                         index: null,
                         layerIndex: this.tryFindTextLayerIndex(root),
                         relativeIndex: [
-                            ...root.parentNode.querySelectorAll(root.tagName),
-                        ].indexOf(root),
-                    },
+                            ...root.parentNode.querySelectorAll(root.tagName)
+                        ].indexOf(root)
+                    }
                 ];
             }
             let start = {
                 node: range.startContainer,
                 offset: range.startOffset,
-                endOffset: Infinity,
+                endOffset: Infinity
             };
             let end = {
                 node: range.endContainer,
                 offset: null,
-                endOffset: range.endOffset,
+                endOffset: range.endOffset
             };
             if (start.node.nodeType === Node.TEXT_NODE)
                 start.node = start.node.parentNode;
             if (end.node.nodeType === Node.TEXT_NODE)
                 end.node = end.node.parentNode;
-            let children = root.querySelectorAll("span");
+            let children = root.querySelectorAll('span');
             start.index = [...children].indexOf(start.node);
             start.relativeIndex = [
-                ...start.node.parentNode.querySelectorAll("span"),
+                ...start.node.parentNode.querySelectorAll('span')
             ].indexOf(start.node);
             start.layerIndex = this.tryFindTextLayerIndex(start.node);
             end.index = [...children].indexOf(end.node);
             end.relativeIndex = [
-                ...end.node.parentNode.querySelectorAll("span"),
+                ...end.node.parentNode.querySelectorAll('span')
             ].indexOf(end.node);
             end.layerIndex = this.tryFindTextLayerIndex(end.node);
             if (
@@ -589,8 +604,8 @@ export default {
                         endOffset: range.endOffset,
                         index: start.index,
                         layerIndex: this.tryFindTextLayerIndex(start.node),
-                        relativeIndex: start.relativeIndex,
-                    },
+                        relativeIndex: start.relativeIndex
+                    }
                 ];
             }
             let result = [];
@@ -603,8 +618,8 @@ export default {
                     index: i,
                     layerIndex: this.tryFindTextLayerIndex(children[i]),
                     relativeIndex: [
-                        ...children[i].parentNode.querySelectorAll("span"),
-                    ].indexOf(children[i]),
+                        ...children[i].parentNode.querySelectorAll('span')
+                    ].indexOf(children[i])
                 });
             }
             result.push(end);
@@ -613,11 +628,11 @@ export default {
         toTranslate(period = 500) {
             clearTimeout(this.timer.translate);
             this.timer.translate = setTimeout(() => {
-                if (this.translateObj.selection !== "") {
+                if (this.translateObj.selection !== '') {
                     this.$local_api.Academic.getTranslation(
                         this.translateObj.selection,
-                        "en",
-                        "zh-CN"
+                        'en',
+                        'zh-CN'
                     ).then((res) => {
                         if (res.code !== 200) console.log(res.message);
                         this.translateObj.text = res.data.text;
@@ -633,7 +648,7 @@ export default {
         },
         widthFormat() {
             let el = this.$refs.scroller_view;
-            el = el.querySelectorAll(".pdf-item")[0];
+            el = el.querySelectorAll('.pdf-item')[0];
             if (!el) return;
             this.scroller.width = `${
                 el.offsetWidth +
@@ -665,22 +680,22 @@ export default {
                     pdfItem.offsetHeight +
                     parseFloat(
                         getComputedStyle(pdfItem).getPropertyValue(
-                            "margin-bottom"
+                            'margin-bottom'
                         )
                     );
             }
             gsap.to(this.$el, {
                 scrollTop: height + offset,
                 duration: 0.2,
-                ease: "power3.out",
+                ease: 'power3.out'
             });
-        },
+        }
     },
     beforeDestroy() {
         for (let key in this.timer) {
             clearInterval(this.timer[key]);
         }
-    },
+    }
 };
 </script>
 
