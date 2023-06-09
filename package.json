@@ -23,7 +23,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@creatorsn/powereditor": "^2.0.5",
+    "@creatorsn/powereditor": "^2.1.1",
     "@electron/remote": "^2.0.8",
     "axios": "^0.21.4",
     "chokidar": "^3.5.3",

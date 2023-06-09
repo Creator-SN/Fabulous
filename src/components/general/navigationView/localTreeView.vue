@@ -1116,6 +1116,7 @@ export default {
                 margin-left: 5px;
                 flex: 1;
                 user-select: none;
+                overflow: hidden;
                 cursor: default;
             }
 

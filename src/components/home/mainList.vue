@@ -237,7 +237,6 @@ export default {
             this.$emit('choose-items', this.currentChoosen);
         },
         itemTitleClick($event, item) {
-            $event.stopPropagation();
             if(this.edit) this.itemChooseClick(item);
         }
     }

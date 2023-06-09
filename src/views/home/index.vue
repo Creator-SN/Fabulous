@@ -36,8 +36,10 @@
                     <fv-button
                         :theme="theme"
                         :disabled="sortKey.key == undefined"
+                        :background="theme === 'light' ? 'white' : ''"
                         style="width: 35px; height: 35px; margin-left: 5px;"
                         :title="sortDesc == 1 ? local('Switch to Descending') : local('Switch to Ascending')"
+                        :is-box-shadow="true"
                         @click="sortDesc = -sortDesc"
                     >
                         <i

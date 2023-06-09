@@ -269,17 +269,24 @@ export default {
     /*定义滑块
  内阴影+圆角*/
     ::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        background-color: rgba(191, 190, 189, 0.2);
+        border-right: rgba(191, 190, 189, 0.2) solid 5px;
+        background-color: rgba(191, 190, 189, 0);
         transition: background-color 0.3s;
         cursor: pointer;
 
         &:hover {
+            border-radius: 10px;
+            border-color: transparent;
             background-color: rgba(191, 190, 189, 0.6);
         }
 
         &:active {
-            background-color: rgba(191, 190, 189, 0.8);
+            background-color: rgba(191, 190, 189, 0.5);
+        }
+
+        &:horizontal {
+            border-right: none;
+            border-bottom: rgba(191, 190, 189, 0.2) solid 5px;
         }
     }
 

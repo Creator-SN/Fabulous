@@ -1183,10 +1183,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.0.5.tgz#307ffc2daa6dc251f48ef3792f496a7e53412dd9"
-  integrity sha512-qxg0irmQCPbyW7drJHphrw4aW0rw/KyzmD41T7x3uSQf/YXoGiA4mFvb4fXXXGnRr7Ia/6+QmoCUHumSJUBPww==
+"@creatorsn/powereditor@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.1.1.tgz#94bd1a7454d76ea8f87338876fd112a549c76de9"
+  integrity sha512-ZarelAlzDx6FIWUs5KGdeDrDo+nmuXY7t+1fC2sUDWFLtiZdOTln7v3e62sDvivHRg1oZTrDJUBv2M0TAGwi/Q==
   dependencies:
     "@tiptap/core" "2.0.3"
     "@tiptap/extension-bubble-menu" "2.0.3"
@@ -1195,6 +1195,8 @@
     "@tiptap/extension-highlight" "2.0.3"
     "@tiptap/extension-link" "2.0.3"
     "@tiptap/extension-placeholder" "2.0.3"
+    "@tiptap/extension-subscript" "^2.0.3"
+    "@tiptap/extension-superscript" "^2.0.3"
     "@tiptap/extension-table" "2.0.3"
     "@tiptap/extension-table-cell" "2.0.3"
     "@tiptap/extension-table-header" "2.0.3"
@@ -1213,9 +1215,13 @@
     i18next "21.1.1"
     katex "0.13.18"
     lowlight "2.7.0"
-    marked "4.1.1"
+    markdown-it "^13.0.1"
+    markdown-it-katex "^2.0.3"
+    markdown-it-mark "^3.0.1"
+    markdown-it-sub "^1.0.0"
+    markdown-it-sup "^1.0.0"
     simplify-js "^1.2.4"
-    vfluentdesign "1.0.2"
+    vfluentdesign "1.1.1"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -2005,6 +2011,16 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-strike/-/extension-strike-2.0.3.tgz#4ec0001db5f51f86d06da22364114f20f073d4b3"
   integrity sha512-RO4/EYe2iPD6ifDHORT8fF6O9tfdtnzxLGwZIKZXnEgtweH+MgoqevEzXYdS+54Wraq4TUQGNcsYhe49pv7Rlw==
+
+"@tiptap/extension-subscript@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-subscript/-/extension-subscript-2.0.3.tgz#26be9609b52dcdc1ff0f0f00e9e3bc01dd464f78"
+  integrity sha512-XFAEUaKxWRmTq7ePEF4aj7knelJPr2fTz0y/iSXydtS094LKwBHBzxatIZY3phrgfpDc+f51ycwarsgz27UJfg==
+
+"@tiptap/extension-superscript@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-superscript/-/extension-superscript-2.0.3.tgz#7d57b2517a2f2e1ffb603edba5f05c6631bfe3a7"
+  integrity sha512-5EBjUvkw2SXL1e8C1i0UF26/GBNHxEbiNQKw7Shy88omVa4HTY+D8KWC/j29ZW/IomUbGPlbpXp1z+1TETzmyw==
 
 "@tiptap/extension-table-cell@2.0.3":
   version "2.0.3"
@@ -8771,6 +8787,13 @@ katex@0.13.18:
   dependencies:
     commander "^6.0.0"
 
+katex@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.6.0.tgz#12418e09121c05c92041b6b3b9fb6bab213cb6f3"
+  integrity sha512-rS4mY3SvHYg5LtQV6RBcK0if7ur6plyEukAOV+jGGPqFImuzu8fHL6M752iBmRGoUyF0bhZbAPoezehn7xYksA==
+  dependencies:
+    match-at "^0.1.0"
+
 kew@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/kew/-/kew-0.7.0.tgz#79d93d2d33363d6fdd2970b335d9141ad591d79b"
@@ -9198,6 +9221,28 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
+markdown-it-katex@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/markdown-it-katex/-/markdown-it-katex-2.0.3.tgz#d7b86a1aea0b9d6496fab4e7919a18fdef589c39"
+  integrity sha512-nUkkMtRWeg7OpdflamflE/Ho/pWl64Lk9wNBKOmaj33XkQdumhXAIYhI0WO03GeiycPCsxbmX536V5NEXpC3Ng==
+  dependencies:
+    katex "^0.6.0"
+
+markdown-it-mark@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/markdown-it-mark/-/markdown-it-mark-3.0.1.tgz#51257db58787d78aaf46dc13418d99a9f3f0ebd3"
+  integrity sha512-HyxjAu6BRsdt6Xcv6TKVQnkz/E70TdGXEFHRYBGLncRE9lBFwDNLVtFojKxjJWgJ+5XxUwLaHXy+2sGBbDn+4A==
+
+markdown-it-sub@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-sub/-/markdown-it-sub-1.0.0.tgz#375fd6026eae7ddcb012497f6411195ea1e3afe8"
+  integrity sha512-z2Rm/LzEE1wzwTSDrI+FlPEveAAbgdAdPhdWarq/ZGJrGW/uCQbKAnhoCsE4hAbc3SEym26+W2z/VQB0cQiA9Q==
+
+markdown-it-sup@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-sup/-/markdown-it-sup-1.0.0.tgz#cb9c9ff91a5255ac08f3fd3d63286e15df0a1fc3"
+  integrity sha512-E32m0nV9iyhRR7CrhnzL5msqic7rL1juWre6TQNxsnApg7Uf+F97JOKxUijg5YwXz86lZ0mqfOnutoryyNdntQ==
+
 markdown-it@^13.0.1:
   version "13.0.1"
   resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-13.0.1.tgz#c6ecc431cacf1a5da531423fc6a42807814af430"
@@ -9209,10 +9254,10 @@ markdown-it@^13.0.1:
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
 
-marked@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-4.1.1.tgz#2f709a4462abf65a283f2453dc1c42ab177d302e"
-  integrity sha512-0cNMnTcUJPxbA6uWmCmjWz4NJRe/0Xfk2NhXCUHjew9qJzFN20krFnsUe7QynwqOwa5m1fZ4UDg0ycKFVC0ccw==
+match-at@^0.1.0:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/match-at/-/match-at-0.1.1.tgz#25d040d291777704d5e6556bbb79230ec2de0540"
+  integrity sha512-h4Yd392z9mST+dzc+yjuybOGFNOZjmXIPKWjxBd1Bb23r4SmDOsk2NYCU2BMUBGbSpZqwVsZYNq26QS3xfaT3Q==
 
 matcher@^3.0.0:
   version "3.0.0"
@@ -13547,20 +13592,7 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.0.2.tgz#e1f91d63fedf8ede98327ee9c699b3084b4f3f67"
-  integrity sha512-enV7no75LT3CzuPTUvEgdPcOsJmbrSluGAe71iW5fAVqjlxI7odxwGlABh7gdHXFjwL0kwabGJCovUko4UWjYg==
-  dependencies:
-    core-js "^3.4.3"
-    fluent-reveal-effect "^1.1.1"
-    gsap "^3.1.1"
-    office-ui-fabric-core "^11.0.0"
-    onecolor "^3.1.0"
-    swiper "^8.3.2"
-    vuedraggable "^2.23.2"
-
-vfluentdesign@^1.1.1:
+vfluentdesign@1.1.1, vfluentdesign@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.1.1.tgz#c47f44a233bd1770a983accb7ae1228f2016c6b1"
   integrity sha512-i1tDVq5m+hOq+qApJm6DzIBl7G+k1M+VoofsvBkNzB79SuivftIn46U93vbcWXpgHSa3BuXt8/mfmqOMU1yPrA==
