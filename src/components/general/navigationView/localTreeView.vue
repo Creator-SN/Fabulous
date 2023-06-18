@@ -294,8 +294,7 @@ export default {
                     name: () => this.local('Paste to Root'),
                     img: 'paste',
                     func: () => this.rootPaste(),
-                    disabled: () =>
-                        this.$refs.local_view ? this.rootPasteDisabled() : true
+                    disabled: () => this.rootPasteDisabled()
                 }
             ],
             img: {

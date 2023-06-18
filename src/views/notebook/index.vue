@@ -1,11 +1,23 @@
 <template>
     <div
         class="fabulous-home-container"
-        :class="[{dark: theme === 'dark'}]"
+        :class="[{dark: theme === 'dark', 'full-screen': expandContainer}]"
         @mousewheel="onMouseWheel"
     >
         <div class="control-banner">
             <div class="control-left-block">
+                <fv-button
+                    :theme="theme"
+                    :borderRadius="30"
+                    class="control-btn"
+                    :is-box-shadow="true"
+                    @click="expandContainer ^= true"
+                >
+                    <i
+                        class="ms-Icon"
+                        :class="[`ms-Icon--${expandContainer ? 'BackToWindow' : 'FullScreen'}`]"
+                    ></i>
+                </fv-button>
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
@@ -78,10 +90,14 @@
                     :title="local('Auto Save')"
                     v-model="auto_save"
                     class="save-btn"
-                    :on="local('Turn Off Auto Save')"
-                    :off="local('Turn On Auto Save')"
+                    width="85"
+                    height="30"
+                    :on="local('Auto Save')"
+                    :off="local('Auto Save')"
                     :onForeground="theme === 'dark' ? '#fff' : '#000'"
                     :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    :switch-on-background="theme === 'dark' ? '#000' : 'rgba(140, 148, 228, 1)'"
+                    :insideContent="true"
                     style="margin-left: 10px;"
                 >
                 </fv-toggle-switch>
@@ -97,37 +113,6 @@
                 @root-click="back"
             ></fv-Breadcrumb>
         </div>
-        <div
-            v-show="!readonly && contentType === 'fabulous_notebook'"
-            class="fabulous-notebook-info-block"
-        >
-            <fv-button
-                v-show="!fabulousNotebook.banner"
-                :theme="theme"
-                icon="Picture"
-                background="transparent"
-                :border-radius="6"
-                foreground="rgba(120, 120, 120, 1)"
-                style="width: 120px; margin: 15px 10px;"
-                @click="$refs.input.click()"
-            >{{local('Add Banner')}}</fv-button>
-            <fv-button
-                v-show="fabulousNotebook.banner"
-                theme="dark"
-                icon="Picture"
-                background="rgba(220, 62, 72, 0.9)"
-                :border-radius="6"
-                style="width: 120px; margin: 15px 10px;"
-                @click="fabulousNotebook.banner = ''"
-            >{{local('Delete Banner')}}</fv-button>
-            <input
-                v-show="false"
-                type="file"
-                accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
-                ref="input"
-                @change="chooseBanner"
-            />
-        </div>
         <div class="main-display-block">
             <power-editor
                 v-show="lock.loading"
@@ -140,7 +125,8 @@
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
                 :editorOutSideBackground="
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
-                :toolbarHeight="toolbarHeight"
+                :toolbarHeight="160"
+                :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
                 :mobileDisplayWidth="0"
@@ -157,6 +143,37 @@
                         class="fabulous-notebook-banner-img"
                         @click.native="$refs.input.click()"
                     ></fv-img>
+                    <div
+                        v-show="!readonly && contentType === 'fabulous_notebook'"
+                        class="fabulous-notebook-info-block"
+                    >
+                        <fv-button
+                            v-show="!fabulousNotebook.banner"
+                            :theme="theme"
+                            icon="Picture"
+                            background="rgba(255, 255, 255, 0.6)"
+                            :border-radius="6"
+                            foreground="rgba(120, 120, 120, 1)"
+                            style="min-width: 120px; width: 50%; max-width: 300px;"
+                            @click="$refs.input.click()"
+                        >{{local('Add Banner')}}</fv-button>
+                        <fv-button
+                            v-show="fabulousNotebook.banner"
+                            theme="dark"
+                            icon="Picture"
+                            background="rgba(220, 62, 72, 0.9)"
+                            :border-radius="6"
+                            style="min-width: 120px; width: 50%; max-width: 300px;"
+                            @click="fabulousNotebook.banner = ''"
+                        >{{local('Delete Banner')}}</fv-button>
+                        <input
+                            v-show="false"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                            ref="input"
+                            @change="chooseBanner"
+                        />
+                    </div>
                     <div class="fabulous-notebook-title-block">
                         <fv-text-box
                             v-show="!readonly && contentType == 'fabulous_notebook'"
@@ -168,8 +185,8 @@
                             :background="`transparent`"
                             :border-color="`rgba(245, 78, 162, 0.3)`"
                             :focus-border-color="`rgba(245, 78, 162, 0.8)`"
-                            :border-width="2"
-                            :border-radius="6"
+                            :border-width="3"
+                            :border-radius="0"
                             underline
                             :readonly="readonly != false"
                             style="height: 60px;"
@@ -260,6 +277,7 @@ export default {
             containerPos: {
                 scrollTop: 0
             },
+            expandContainer: false,
             lock: {
                 loading: true
             },
@@ -276,7 +294,6 @@ export default {
         $route() {
             if (this.$route.name === 'NoteBook') {
                 this.refreshPath();
-                this.refreshContent();
             }
         },
         path() {
@@ -311,10 +328,6 @@ export default {
         currentBanner() {
             if (!this.fabulousNotebook.banner) return '';
             return this.fabulousNotebook.banner;
-        },
-        toolbarHeight() {
-            if (this.contentType !== 'fabulous_notebook') return 160;
-            return 230;
         }
     },
     mounted() {
@@ -353,7 +366,11 @@ export default {
         },
         timerInit() {
             clearInterval(this.timer.autoSave);
-            this.timer.autoSave = setInterval(this.autoSaveContent, 10000);
+            this.timer.autoSave = setInterval(() => {
+                if (this.auto_save) {
+                    this.$refs.editor.save();
+                }
+            }, 10000);
         },
         ShortCutInit() {
             window.addEventListener('keydown', this.shortCutEvent);
@@ -450,25 +467,22 @@ export default {
                     this.lock.loading = true;
                 });
         },
-        autoSaveContent() {
-            if (this.auto_save) {
-                this.$refs.editor.save();
-            }
-        },
         saveContent(json) {
             let saveContent = null;
             if (this.contentType === 'fabulous_notebook') {
-                this.fabulousNotebook.content = json;
-                this.fabulousNotebook.updateDate = new Date();
                 let _fabulous_notebook = JSON.parse(
                     JSON.stringify(fabulous_notebook)
                 );
                 for (let key in this.fabulousNotebook) {
                     _fabulous_notebook[key] = this.fabulousNotebook[key];
                 }
-                saveContent = _fabulous_notebook;
+                _fabulous_notebook.content = json;
+                _fabulous_notebook.updateDate = new Date();
+                saveContent = JSON.stringify(_fabulous_notebook);
+            } else if (this.contentType == 'md') {
+                saveContent = this.$refs.editor.saveMarkdown();
             } else {
-                saveContent = json;
+                saveContent = JSON.stringify(json);
             }
             return saveContent;
         },
@@ -477,7 +491,7 @@ export default {
             this.$local_api.Notebook.updateDocumentAsync(
                 this.data_path[this.data_index],
                 this.path,
-                JSON.stringify(saveContent)
+                saveContent
             )
                 .then((res) => {
                     if (res.status === 'success') {
@@ -583,7 +597,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 0.9);
+    background: rgba(245, 245, 245, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -592,6 +606,15 @@ export default {
 
     &.dark {
         background: rgba(36, 36, 36, 0.9);
+    }
+
+    &.full-screen {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
     }
 
     .control-banner {
@@ -649,19 +672,13 @@ export default {
     }
 
     .fabulous-notebook-info-block {
-        position: absolute;
-        left: 6px;
-        top: 5px;
-        width: calc(100% - 12px);
-        height: 170px;
+        @include HcenterVcenter;
+
+        position: relative;
+        width: 100%;
+        height: 50px;
         padding: 0px 5px;
         box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-end;
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
         overflow: hidden;
         z-index: 2;
     }
@@ -693,6 +710,7 @@ export default {
         padding: 15px;
         font-size: 24px;
         font-weight: 600;
+        box-sizing: border-box;
 
         &.dark {
             color: whitesmoke;

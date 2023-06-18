@@ -38,7 +38,7 @@ import starter from '@/components/general/starter.vue';
 import titleBar from '@/components/general/titleBar.vue';
 import progressBar from '@/components/general/progressbar.vue';
 import navigationView from '@/components/general/navigationView';
-import editorContainer from '@/components/general/editorContainer.vue';
+import editorContainer from '@/components/general/editorContainer';
 import pdfImporter from '@/components/general/pdfImporter.vue';
 import itemCarrier from '@/components/general/itemCarrier.vue';
 import { config } from '@/js/data_sample';
@@ -113,6 +113,9 @@ export default {
                 if (res.status === 'success') {
                     let target = res.data;
                     for (let key in _config) {
+                        if (!Object.prototype.hasOwnProperty.call(target, key))
+                            // 要用undefined比较好, 因为其他情况也有可能false.
+                            continue;
                         _config[key] = target[key];
                     }
                     this.reviseConfig(_config);

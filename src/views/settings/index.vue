@@ -456,6 +456,9 @@ export default {
                 if (res.status === 'success') {
                     let target = res.data;
                     for (let key in _config) {
+                        if (!Object.prototype.hasOwnProperty.call(target, key))
+                            // 要用undefined比较好, 因为其他情况也有可能false.
+                            continue;
                         _config[key] = target[key];
                     }
                     this.reviseConfig(_config);
