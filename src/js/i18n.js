@@ -856,5 +856,21 @@ export default {
     "From Path": {
         "en": "From",
         "cn": "来自"
+    },
+    "Show Navigation on Editor": {
+        "en": "Show Navigation on Editor",
+        "cn": "在编辑器上显示导航"
+    },
+    "Switch Editor Navigation": {
+        "en": "Switch Editor Navigation",
+        "cn": "切换编辑器导航"
+    },
+    "Show Navigation": {
+        "en": "Show Navigation",
+        "cn": "显示导航"
+    },
+    "Hide Navigation": {
+        "en": "Hide Navigation",
+        "cn": "隐藏导航"
     }
 }

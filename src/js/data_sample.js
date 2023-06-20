@@ -7,6 +7,7 @@ export const config = {
     lastLocalPath: "",
     editorExpandContent: false,
     editorSplitRatio: 0.5,
+    editorShowNav: true,
     activeSystemMode: 'both', // ds, notebook, both
     dynamicEffect: true,
     watchAllExtensions: false,

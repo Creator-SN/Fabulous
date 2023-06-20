@@ -140,7 +140,8 @@ export class Config {
             try {
                 let _config = JSON.parse(JSON.stringify(config));
                 for (let key in _config) {
-                    _config[key] = configDB.get(key).value();
+                    if (Object.prototype.hasOwnProperty.call(_config, key))
+                        _config[key] = configDB.get(key).value();
                 }
                 resolve({
                     status: 'success',

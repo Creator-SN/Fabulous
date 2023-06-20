@@ -162,6 +162,26 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="'ButtonMenu'"
+                :title="local('Show Navigation')"
+                :content="local('Show Navigation on Editor')"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px;"
+            >
+                <template v-slot:extension>
+                    <fv-toggle-switch
+                        :title="local('Switch Editor Navigation')"
+                        v-model="editor_show_nav"
+                        :on="local('Show Navigation')"
+                        :off="local('Hide Navigation')"
+                        :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                        :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    >
+                    </fv-toggle-switch>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
                 v-show="false"
                 :disabledCollapse="true"
                 :theme="theme"
@@ -367,6 +387,7 @@ export default {
             auto_save: false,
             dynamic_effect: true,
             editor_expand_content: false,
+            editor_show_nav: false,
             watch_all_extensions: false,
             db_index: -1,
             img: {
@@ -389,34 +410,40 @@ export default {
             this.configInit();
         },
         language() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         },
         auto_save() {
             this.switchAutoSave();
         },
         autoSave() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         },
         dynamic_effect() {
             this.switchDynamicEffect();
         },
         dynamicEffect() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         },
         editor_expand_content() {
             this.switchEditorExpandContent();
         },
+        editor_show_nav() {
+            this.switchEditorShowNav();
+        },
+        editorShowNav() {
+            this.syncFromConfig();
+        },
         activeSystemMode() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         },
         editorExpandContent() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         },
         watch_all_extensions() {
             this.switchWatchAllExtensions();
         },
         watchAllExtensions() {
-            this.thisConfigSync();
+            this.syncFromConfig();
         }
     },
     computed: {
@@ -428,6 +455,7 @@ export default {
             autoSave: (state) => state.config.autoSave,
             activeSystemMode: (state) => state.config.activeSystemMode,
             editorExpandContent: (state) => state.config.editorExpandContent,
+            editorShowNav: (state) => state.config.editorShowNav,
             dynamicEffect: (state) => state.config.dynamicEffect,
             watchAllExtensions: (state) => state.config.watchAllExtensions,
             themeColorList: (state) => state.config.themeColorList,
@@ -462,7 +490,7 @@ export default {
                         _config[key] = target[key];
                     }
                     this.reviseConfig(_config);
-                    this.thisConfigSync();
+                    this.syncFromConfig();
                     this.refreshDSList();
                 } else {
                     this.$barWarning(res.message, {
@@ -471,7 +499,7 @@ export default {
                 }
             });
         },
-        thisConfigSync() {
+        syncFromConfig() {
             this.cur_language = this.languages.find(
                 (item) => item.key === this.language
             );
@@ -482,6 +510,7 @@ export default {
             this.dynamic_effect = this.dynamicEffect;
             this.editor_expand_content = this.editorExpandContent;
             this.watch_all_extensions = this.watchAllExtensions;
+            this.editor_show_nav = this.editorShowNav;
         },
         eventInit() {
             this.nw.on('updater-callback', (event, { status, info }) => {
@@ -547,6 +576,11 @@ export default {
         switchEditorExpandContent() {
             this.reviseConfig({
                 editorExpandContent: this.editor_expand_content
+            });
+        },
+        switchEditorShowNav() {
+            this.reviseConfig({
+                editorShowNav: this.editor_show_nav
             });
         },
         switchWatchAllExtensions() {

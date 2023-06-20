@@ -51,6 +51,16 @@
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
+                    :background="showNav ? 'rgba(0, 98, 158, 1)' : ''"
+                    :foreground="showNav ? '#fff' : ''"
+                    class="control-btn"
+                    @click="showNav = showNav ? false : true"
+                >
+                    <i class="ms-Icon ms-Icon--ButtonMenu"></i>
+                </fv-button>
+                <fv-button
+                    :theme="theme"
+                    :borderRadius="30"
                     class="control-btn"
                     :title="local('Save')"
                     @click="saveClick"
@@ -135,6 +145,8 @@
                 style="position: relative; width: 100%; height: 100%; flex: 1;"
                 @save-json="saveConfirm"
                 @click.native="show.quickNav = false"
+                @change="editorContentChange"
+                @content-change="editorSetContentChange"
             >
                 <template v-slot:front-content>
                     <fv-img
@@ -164,7 +176,7 @@
                             background="rgba(220, 62, 72, 0.9)"
                             :border-radius="6"
                             style="min-width: 120px; width: 50%; max-width: 300px;"
-                            @click="fabulousNotebook.banner = ''"
+                            @click="() => { fabulousNotebook.banner = ''; toggleUnsave(true); }"
                         >{{local('Delete Banner')}}</fv-button>
                         <input
                             v-show="false"
@@ -189,6 +201,7 @@
                             :border-radius="0"
                             underline
                             :readonly="readonly != false"
+                            @keydown="toggleUnsave(true)"
                             style="height: 60px;"
                             :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
                         ></fv-text-box>
@@ -199,6 +212,11 @@
                             :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
                         >{{fabulousNotebook.title}}</p>
                     </div>
+                    <editor-nav
+                        v-show="showNav"
+                        :el="() => $refs.editor"
+                        ref="editor_nav"
+                    ></editor-nav>
                 </template>
             </power-editor>
         </div>
@@ -246,19 +264,22 @@
 
 <script>
 import { mapMutations, mapState, mapGetters } from 'vuex';
+import * as Diff from 'diff';
 
+import editorNav from '@/components/general/editorContainer/editorNav.vue';
 import saveOptions from '@/components/notebook/saveOptions.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
     components: {
+        editorNav,
         saveOptions
     },
     data() {
         return {
             path: '',
-            content: '',
+            storeContent: '',
             contentType: '', // json, html, fabulous_notebook
             fabulousNotebook: {
                 title: null,
@@ -272,6 +293,7 @@ export default {
             readonly: false,
             fontSize: 16,
             expandContent: false,
+            showNav: false,
             history: [],
             auto_save: false,
             containerPos: {
@@ -279,13 +301,16 @@ export default {
             },
             expandContainer: false,
             lock: {
-                loading: true
+                loading: true,
+                diff: true,
+                save: true
             },
             show: {
                 bottomControl: false,
                 saveOptions: false
             },
             timer: {
+                diff: undefined,
                 autoSave: undefined
             }
         };
@@ -312,6 +337,14 @@ export default {
         },
         editorExpandContent(val) {
             this.expandContent = val;
+        },
+        showNav(val) {
+            this.reviseConfig({
+                editorShowNav: val
+            });
+        },
+        editorShowNav(val) {
+            this.showNav = val;
         }
     },
     computed: {
@@ -322,6 +355,7 @@ export default {
             autoSave: (state) => state.config.autoSave,
             language: (state) => state.config.language,
             editorExpandContent: (state) => state.config.editorExpandContent,
+            editorShowNav: (state) => state.config.editorShowNav,
             theme: (state) => state.config.theme
         }),
         ...mapGetters(['local']),
@@ -363,14 +397,53 @@ export default {
         configInit() {
             this.auto_save = this.autoSave;
             this.expandContent = this.editorExpandContent;
+            this.showNav = this.editorShowNav;
         },
         timerInit() {
             clearInterval(this.timer.autoSave);
             this.timer.autoSave = setInterval(() => {
-                if (this.auto_save) {
+                if (this.auto_save && this.unsave) {
                     this.$refs.editor.save();
                 }
-            }, 10000);
+            }, 300);
+        },
+        diffContent() {
+            let nodeDirtyAttrRemove = (obj) => {
+                let dirtyAttrs = ['theme', 'headerForeground'];
+                let arr = obj.content;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i].content && arr[i].content.length > 0)
+                        arr = arr.concat(arr[i].content);
+                }
+                arr.forEach((el) => {
+                    if (el.attrs) {
+                        dirtyAttrs.forEach((attr) => {
+                            if (el.attrs[attr]) delete el.attrs[attr];
+                        });
+                    }
+                });
+            };
+            clearTimeout(this.timer.diff);
+            this.timer.diff = setTimeout(() => {
+                if (!this.lock.diff) return;
+                this.lock.diff = false;
+                let status = false;
+                let thisContent = JSON.parse(
+                    JSON.stringify(this.$refs.editor.editor.getJSON())
+                );
+                let storeContent = JSON.parse(
+                    JSON.stringify(this.storeContent)
+                );
+                nodeDirtyAttrRemove(thisContent);
+                nodeDirtyAttrRemove(storeContent);
+                let diff = Diff.diffJson(storeContent, thisContent);
+                if (diff.length > 1) status = true;
+                else {
+                    if (diff[0].added || diff[0].removed) status = true;
+                }
+                this.toggleUnsave(status);
+                this.lock.diff = true;
+            }, 300);
         },
         ShortCutInit() {
             window.addEventListener('keydown', this.shortCutEvent);
@@ -380,15 +453,8 @@ export default {
             let ctrl = event.ctrlKey || event.metaKey;
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                 this.getEditor().save();
-                this.toggleUnsave(false);
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                 this.saveAs();
-                this.toggleUnsave(false);
-            } else {
-                let filterKey = [16, 17, 18, 20];
-                if (filterKey.indexOf(event.keyCode) < 0) {
-                    if (!this.readonly) this.toggleUnsave(true);
-                }
             }
 
             if (event.keyCode === 9) {
@@ -426,7 +492,7 @@ export default {
             if (!this.lock.loading) return;
             this.lock.loading = false;
             this.fabulousNotebook.banner = null;
-            this.$local_api.Notebook.getDocumentAsync(
+            await this.$local_api.Notebook.getDocumentAsync(
                 this.data_path[this.data_index],
                 this.path
             )
@@ -467,6 +533,15 @@ export default {
                     this.lock.loading = true;
                 });
         },
+        editorContentChange() {
+            this.diffContent();
+            this.$refs.editor_nav.getEditorNavList();
+        },
+        editorSetContentChange() {
+            // 外部修改绑定内容后, 内部设置完content触发content-change事件
+            this.storeContent = this.getEditor().editor.getJSON();
+            this.$refs.editor_nav.getEditorNavList();
+        },
         saveContent(json) {
             let saveContent = null;
             if (this.contentType === 'fabulous_notebook') {
@@ -486,15 +561,18 @@ export default {
             }
             return saveContent;
         },
-        saveConfirm(obj) {
+        async saveConfirm(obj) {
+            if (!this.lock.save) return;
+            this.lock.save = false;
             let saveContent = this.saveContent(obj);
-            this.$local_api.Notebook.updateDocumentAsync(
+            await this.$local_api.Notebook.updateDocumentAsync(
                 this.data_path[this.data_index],
                 this.path,
                 saveContent
             )
                 .then((res) => {
                     if (res.status === 'success') {
+                        this.storeContent = this.getEditor().editor.getJSON();
                         this.toggleUnsave(false);
                     }
                 })
@@ -504,6 +582,7 @@ export default {
                         status: 'warning'
                     });
                 });
+            this.lock.save = true;
         },
         onMouseWheel(event) {
             if (event.ctrlKey) {
@@ -528,6 +607,7 @@ export default {
                 this.$refs.input.value = '';
             };
             reader.readAsDataURL(file);
+            this.toggleUnsave(true);
         },
         saveClick() {
             this.$refs.editor.save();
@@ -605,7 +685,7 @@ export default {
     z-index: 1;
 
     &.dark {
-        background: rgba(36, 36, 36, 0.9);
+        background: rgba(36, 36, 36, 1);
     }
 
     &.full-screen {

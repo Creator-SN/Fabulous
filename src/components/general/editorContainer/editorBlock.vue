@@ -36,6 +36,16 @@
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
+                    :background="editor_show_nav ? 'rgba(0, 98, 158, 1)' : ''"
+                    :foreground="editor_show_nav ? '#fff' : ''"
+                    class="control-btn"
+                    @click="editor_show_nav = editor_show_nav ? false : true"
+                >
+                    <i class="ms-Icon ms-Icon--ButtonMenu"></i>
+                </fv-button>
+                <fv-button
+                    :theme="theme"
+                    :borderRadius="30"
                     class="control-btn"
                     :title="local('Save As')"
                     @click="saveAs"
@@ -112,6 +122,7 @@
                 :editorOutSideBackground="
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
                 :toolbarHeight="150"
+                :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
                 :mobileDisplayWidth="0"
@@ -122,7 +133,16 @@
                 style="position: relative; width: 100%; height: 100%; flex: 1;"
                 @save-json="saveContent"
                 @click.native="show.quickNav = false"
+                @change="editorContentChange"
+                @content-change="editorSetContentChange"
             >
+                <template v-slot:front-content>
+                    <editor-nav
+                        v-show="editor_show_nav"
+                        :el="() => $refs.editor"
+                        ref="editor_nav"
+                    ></editor-nav>
+                </template>
             </power-editor>
         </div>
         <div
@@ -165,6 +185,9 @@
 
 <script>
 import { mapMutations, mapState, mapGetters } from 'vuex';
+import * as Diff from 'diff';
+
+import editorNav from '@/components/general/editorContainer/editorNav.vue';
 
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js';
 
@@ -175,12 +198,16 @@ import markdown from '@/assets/home/md.svg';
 import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
+    components: {
+        editorNav
+    },
     data() {
         return {
             content: '',
             readonly: false,
             fontSize: 16,
             expandContent: false,
+            editor_show_nav: false,
             auto_save: false,
             editorMentionItemAttr: {
                 mentionList: this.mentionList,
@@ -226,14 +253,17 @@ export default {
                 markdown: markdown
             },
             lock: {
-                loading: true
+                loading: true,
+                diff: true,
+                save: true
             },
             show: {
                 quickNav: false,
                 addItemPage: false,
                 bottomControl: false
             },
-            timeout: {
+            timer: {
+                diff: undefined,
                 autoSave: undefined
             }
         };
@@ -269,6 +299,14 @@ export default {
         },
         editorExpandContent(val) {
             this.expandContent = val;
+        },
+        editor_show_nav(val) {
+            this.reviseConfig({
+                editorShowNav: val
+            });
+        },
+        editorShowNav(val) {
+            this.editor_show_nav = val;
         }
     },
     computed: {
@@ -278,6 +316,7 @@ export default {
             language: (state) => state.config.language,
             autoSave: (state) => state.config.autoSave,
             editorExpandContent: (state) => state.config.editorExpandContent,
+            editorShowNav: (state) => state.config.editorShowNav,
             theme: (state) => state.config.theme,
             show_editor: (state) => state.editor.show,
             type: (state) => state.editor.type,
@@ -285,6 +324,7 @@ export default {
             history: (state) => state.editor.history,
             item: (state) => state.editor.item,
             displayMode: (state) => state.editor.displayMode,
+            targetContent: (state) => state.editor.targetContent,
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
@@ -308,7 +348,7 @@ export default {
     mounted() {
         this.configInit();
         this.ShortCutInit();
-        this.TimeoutInit();
+        this.timerInit();
     },
     methods: {
         ...mapMutations({
@@ -319,18 +359,58 @@ export default {
         configInit() {
             this.auto_save = this.autoSave;
             this.expandContent = this.editorExpandContent;
+            this.editor_show_nav = this.editorShowNav;
         },
-        TimeoutInit() {
-            this.timeout.autoSave = setInterval(() => {
-                if (this.auto_save && this.show_editor) {
+        timerInit() {
+            clearInterval(this.timer.autoSave);
+            this.timer.autoSave = setInterval(() => {
+                if (this.show_editor && this.auto_save && this.unsave) {
                     let editor = this.getEditor();
                     editor.save();
                     this.toggleUnsave(false);
                 }
-            }, 10000);
+            }, 300);
         },
-        TimeoutDestroy() {
-            clearInterval(this.timeout.autoSave);
+        diffContent() {
+            let nodeDirtyAttrRemove = (obj) => {
+                let dirtyAttrs = ['theme', 'headerForeground'];
+                let arr = obj.content;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i].content && arr[i].content.length > 0)
+                        arr = arr.concat(arr[i].content);
+                }
+                arr.forEach((el) => {
+                    if (el.attrs) {
+                        dirtyAttrs.forEach((attr) => {
+                            if (el.attrs[attr]) delete el.attrs[attr];
+                        });
+                    }
+                });
+            };
+            clearTimeout(this.timer.diff);
+            this.timer.diff = setTimeout(() => {
+                if (this.show_editor && this.lock.diff) {
+                    this.lock.diff = false;
+                    let editor = this.getEditor();
+
+                    let targetContent = JSON.parse(
+                        JSON.stringify(this.targetContent)
+                    );
+                    let thisContent = JSON.parse(
+                        JSON.stringify(editor.editor.getJSON())
+                    );
+                    nodeDirtyAttrRemove(targetContent);
+                    nodeDirtyAttrRemove(thisContent);
+                    let diff = Diff.diffJson(targetContent, thisContent);
+                    if (diff.length > 1) this.toggleUnsave(true);
+                    else {
+                        if (diff[0].added || diff[0].removed)
+                            this.toggleUnsave(true);
+                        else this.toggleUnsave(false);
+                    }
+                    this.lock.diff = true;
+                }
+            }, 300);
         },
         ShortCutInit() {
             window.addEventListener('keydown', this.shortCutEvent);
@@ -344,11 +424,6 @@ export default {
                 this.toggleUnsave(false);
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                 this.saveAs();
-            } else {
-                let filterKey = [16, 17, 18, 20];
-                if (filterKey.indexOf(event.keyCode) < 0) {
-                    if (!this.readonly) this.toggleUnsave(true);
-                }
             }
 
             if (event.keyCode === 9) {
@@ -419,29 +494,43 @@ export default {
         },
         async saveContent(json) {
             if (!this.type || !this.target.id || this.displayMode === 1) return;
-            let res = null;
+            if (!this.lock.save) return;
+            this.lock.save = false;
             if (this.type === 'item') {
-                res = await this.$local_api.Academic.saveItemPageContent(
+                await this.$local_api.Academic.saveItemPageContent(
                     this.data_path[this.data_index],
                     this.item.id,
                     this.target.id,
                     JSON.stringify(json)
-                );
+                )
+                    .then(() => {
+                        this.reviseEditor({
+                            targetContent: json
+                        });
+                    })
+                    .catch((res) => {
+                        this.$barWarning(res.message, {
+                            status: 'error'
+                        });
+                    });
             } else {
-                res = await this.$local_api.Academic.saveTemplateContent(
+                await this.$local_api.Academic.saveTemplateContent(
                     this.data_path[this.data_index],
                     this.target.id,
                     JSON.stringify(json)
-                );
+                )
+                    .then(() => {
+                        this.reviseEditor({
+                            targetContent: json
+                        });
+                    })
+                    .catch((res) => {
+                        this.$barWarning(res.message, {
+                            status: 'error'
+                        });
+                    });
             }
-            if (res.code !== 200) {
-                this.$barWarning(res.message, {
-                    status: 'error'
-                });
-            }
-            this.reviseEditor({
-                targetContent: json
-            });
+            this.lock.save = true;
         },
         downloadTxtFile(text, filename) {
             // 创建一个新的 Blob 对象，用于存储文本内容
@@ -471,6 +560,13 @@ export default {
         saveMarkdown() {
             let saveContent = this.$refs.editor.saveMarkdown();
             this.downloadTxtFile(saveContent, 'note.md');
+        },
+        editorSetContentChange () {
+            this.$refs.editor_nav.getEditorNavList();
+        },
+        editorContentChange() {
+            this.diffContent();
+            this.$refs.editor_nav.getEditorNavList();
         },
         openEditor(item, page) {
             if (!this.lock.loading) return;
@@ -632,7 +728,7 @@ export default {
         }
     },
     beforeDestroy() {
-        this.TimeoutDestroy();
+        clearInterval(this.timer.autoSave);
     }
 };
 </script>

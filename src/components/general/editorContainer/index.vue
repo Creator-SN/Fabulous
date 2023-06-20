@@ -92,7 +92,7 @@
                     :style="{left: `${splitRatio * 100}%`}"
                 ></split-bar>
                 <pdf-viewer
-                    v-if="displayMode !== 0 && item.pdf"
+                    v-if="show_editor && displayMode !== 0 && item.pdf"
                     :theme="theme"
                     :disabledEditor="!disabledEditor"
                     class="pdf-viewer"
