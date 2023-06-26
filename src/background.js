@@ -348,6 +348,11 @@ async function createWindow() {
                         fileObj.name = path.basename(p);
                         fileObj.isFile = stats.isFile();
                         fileObj.isDir = stats.isDirectory();
+                        if (fileObj.isFile) {
+                            let filterExt = ['.md', '.fbn', '.html', '.json'];
+                            let ext = path.extname(p);
+                            if (filterExt.indexOf(ext) === -1) return;
+                        }
                         win.webContents.send(`watch-path-${obj.id}`, {
                             status: 200,
                             file: fileObj,

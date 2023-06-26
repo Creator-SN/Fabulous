@@ -2,7 +2,7 @@
     <div
         v-show="navList.length > 0"
         class="editor-nav-wrapper"
-        :class="[{dark: theme === 'dark'}, {fixed}]"
+        :class="[{dark: theme === 'dark'}, {fixed}, {expand: editorExpandContent}]"
         :style="{width: fixed ? width + 'px' : ''}"
     >
         <div class="editor-nav-container">
@@ -56,12 +56,16 @@ export default {
             navList: [],
             timer: {
                 nav: null
+            },
+            lock: {
+                raf: true
             }
         };
     },
     watch: {},
     computed: {
         ...mapState({
+            editorExpandContent: (state) => state.config.editorExpandContent,
             theme: (state) => state.config.theme
         }),
         isChoosen() {
@@ -82,15 +86,17 @@ export default {
     methods: {
         eventInit() {
             let editorContainer = this.el().$refs.container;
+            let contentContainer = this.el().$refs.editor.$el;
             editorContainer.addEventListener('scroll', this.layoutFormat);
-            const resizeObserver = new ResizeObserver((entries) => {
-                for (const entry of entries) {
-                    const { contentRect } = entry;
-                    const { width } = contentRect;
-                    if (width > 0) this.layoutFormat();
-                }
+            const resizeObserver = new ResizeObserver(() => {
+                // for (const entry of entries) {
+                //     const { contentRect, target } = entry;
+                //     const { width } = contentRect;
+                // }
+                this.layoutFormat();
             });
             resizeObserver.observe(editorContainer);
+            resizeObserver.observe(contentContainer);
         },
         jumpTo(item) {
             let editorContainer = this.el().$refs.container;
@@ -139,21 +145,26 @@ export default {
             }, 300);
         },
         layoutFormat() {
-            let editorContainer = this.el().$refs.container;
-            let contentContainer = this.el().$refs.editor.$el;
-            let editorWidth = editorContainer.offsetWidth;
-            let contentWidth = contentContainer.offsetWidth;
-            let top = editorContainer.scrollTop;
-            let width = (editorWidth - contentWidth) / 2;
-            this.width = width - 30;
-            this.scrollTop = top;
-            if (editorWidth > 1360) {
-                this.$el.style.top = top + 'px';
-                this.fixed = true;
-            } else {
-                this.$el.style.top = '';
-                this.fixed = false;
-            }
+            if (!this.lock.raf) return;
+            this.lock.raf = false;
+            window.requestAnimationFrame(() => {
+                let editorContainer = this.el().$refs.container;
+                let contentContainer = this.el().$refs.editor.$el;
+                let editorWidth = editorContainer.offsetWidth;
+                let contentWidth = contentContainer.offsetWidth;
+                let top = editorContainer.scrollTop;
+                let width = (editorWidth - contentWidth) / 2;
+                this.width = width - 30;
+                this.scrollTop = top;
+                if (editorWidth - contentWidth > 460) {
+                    this.$el.style.top = top + 'px';
+                    this.fixed = true;
+                } else {
+                    this.$el.style.top = '';
+                    this.fixed = false;
+                }
+                this.lock.raf = true;
+            });
         }
     },
     beforeDestroy() {
@@ -186,6 +197,12 @@ export default {
 
         .editor-nav-container {
             max-width: 270px;
+        }
+    }
+
+    &.expand {
+        .editor-nav-container {
+            max-width: none;
         }
     }
 
