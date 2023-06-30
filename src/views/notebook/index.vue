@@ -655,7 +655,6 @@ export default {
             } else {
                 let json = this.$refs.editor.editor.getJSON();
                 saveContent = this.saveContent(json);
-                saveContent = JSON.stringify(saveContent);
                 this.downloadTxtFile(saveContent, `notebook.${prop}`);
             }
         },
