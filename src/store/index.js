@@ -4,29 +4,12 @@ import Vuex from "vuex";
 // entry
 import User from "./User";
 import Theme from "./Theme";
+import config from "./Config";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        // config //
-        config: {
-            init_status: false,
-            data_path: [],
-            data_index: -1,
-            language: 'en',
-            autoSave: false,
-            lastLocalPath: '',
-            editorExpandContent: false,
-            editorSplitRatio: 0.5,
-            editorShowNav: true,
-            activeSystemMode: 'both', // ds, notebook, both
-            dynamicEffect: true,
-            watchAllExtensions: false,
-            themeColorList: [],
-            theme: 'light'
-        },
-        //
         editor: {
             show: false, // 显示编辑器
             type: null, // 编辑器操作类型 item 或 template
@@ -99,7 +82,12 @@ export default new Vuex.Store({
         reviseI18N(state, i18n) {
             state.i18n = i18n
         },
-        async toggleTheme(state) {
+        toggleEditor(state, status) {
+            state.editor.show = status;
+        }
+    },
+    actions: {
+        async toggleTheme({ state }) {
             if (state.config.theme == 'light') {
                 state.config.theme = 'dark'
             } else {
@@ -107,18 +95,8 @@ export default new Vuex.Store({
             }
             await Vue.prototype.$local_api.Config.updateConfig(state.config);
         },
-        toggleEditor(state, status) {
-            state.editor.show = status;
-        }
-    },
-    actions: {
-        async reviseConfig({ state }, obj) {
-            for (let key in obj) {
-                if (!Object.prototype.hasOwnProperty.call(state.config, key)) // 要用undefined比较好, 因为其他情况也有可能false.
-                    continue;
-                state.config[key] = obj[key];
-            }
-            await Vue.prototype.$local_api.Config.updateConfig(state.config);
+        async reviseConfig(context, obj) {
+            context.dispatch("config/reviseConfig", obj);
         }
     },
     getters: {
@@ -131,6 +109,7 @@ export default new Vuex.Store({
     },
     modules: {
         User,
-        Theme
+        Theme,
+        config
     }
 });

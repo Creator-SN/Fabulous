@@ -481,11 +481,10 @@ export default {
         this.configInit();
     },
     methods: {
-        ...mapMutations({
-            toggleTheme: 'toggleTheme'
-        }),
+        ...mapMutations({}),
         ...mapActions({
-            reviseConfig: 'reviseConfig',
+            toggleTheme: 'toggleTheme',
+            reviseConfig: 'reviseConfig'
         }),
         configInit() {
             let _config = JSON.parse(JSON.stringify(config));
