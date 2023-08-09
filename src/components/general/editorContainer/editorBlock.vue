@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 import * as Diff from 'diff';
 
 import editorNav from '@/components/general/editorContainer/editorNav.vue';
@@ -352,9 +352,11 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseConfig: 'reviseConfig',
             reviseEditor: 'reviseEditor',
             toggleEditor: 'toggleEditor'
+        }),
+        ...mapActions({
+            reviseConfig: 'reviseConfig',
         }),
         configInit() {
             this.auto_save = this.autoSave;

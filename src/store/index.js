@@ -1,6 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+// entry
+import User from "./User";
+import Theme from "./Theme";
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -68,14 +72,6 @@ export default new Vuex.Store({
             state.window.width = obj.width;
             state.window.height = obj.height;
         },
-        async reviseConfig(state, obj) {
-            for (let key in obj) {
-                if (!Object.prototype.hasOwnProperty.call(state.config, key)) // 要用undefined比较好, 因为其他情况也有可能false.
-                    continue;
-                state.config[key] = obj[key];
-            }
-            await Vue.prototype.$local_api.Config.updateConfig(state.config);
-        },
         reviseEditor(state, obj) {
             for (let key in obj) {
                 if (!Object.prototype.hasOwnProperty.call(state.editor, key))
@@ -115,7 +111,16 @@ export default new Vuex.Store({
             state.editor.show = status;
         }
     },
-    actions: {},
+    actions: {
+        async reviseConfig({ state }, obj) {
+            for (let key in obj) {
+                if (!Object.prototype.hasOwnProperty.call(state.config, key)) // 要用undefined比较好, 因为其他情况也有可能false.
+                    continue;
+                state.config[key] = obj[key];
+            }
+            await Vue.prototype.$local_api.Config.updateConfig(state.config);
+        }
+    },
     getters: {
         local: state => text => {
             let result = state.i18n[text];
@@ -125,6 +130,7 @@ export default new Vuex.Store({
         }
     },
     modules: {
-
+        User,
+        Theme
     }
 });

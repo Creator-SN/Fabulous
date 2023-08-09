@@ -194,7 +194,7 @@ import refManagementImg from '@/assets/nav/refManagement.svg';
 import notebookImg from '@/assets/nav/notebook.svg';
 import allImg from '@/assets/nav/all.svg';
 
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import { config } from '@/js/data_sample.js';
 
 export default {
@@ -250,7 +250,7 @@ export default {
         this.configInit();
     },
     methods: {
-        ...mapMutations({
+        ...mapActions({
             reviseConfig: 'reviseConfig'
         }),
         async configInit() {

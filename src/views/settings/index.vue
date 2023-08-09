@@ -9,6 +9,7 @@
                 style="margin-top: 20px;"
             >{{local('Setting')}}</p>
         </div>
+        <user-profile @switch-block="show.login = true"></user-profile>
         <div class="scroll-view">
             <fv-Collapse
                 :disabledCollapse="true"
@@ -344,11 +345,14 @@
             :theme="theme"
             @finished="configInit"
         ></add-ds>
+        <login-window v-model="show.login"></login-window>
     </div>
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
+import userProfile from './profile/userProfile.vue';
+import loginWindow from './login';
 import initDs from '@/components/settings/initDS.vue';
 import addDs from '@/components/settings/addDS.vue';
 import dataPathItem from '@/components/settings/dataPathItem.vue';
@@ -363,6 +367,8 @@ import { NotebookWatcher } from '@/js/eventManager.js';
 
 export default {
     components: {
+        userProfile,
+        loginWindow,
         initDs,
         addDs,
         dataPathItem
@@ -401,7 +407,8 @@ export default {
             },
             show: {
                 initDS: false,
-                addDS: false
+                addDS: false,
+                login: false
             }
         };
     },
@@ -475,8 +482,10 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseConfig: 'reviseConfig',
             toggleTheme: 'toggleTheme'
+        }),
+        ...mapActions({
+            reviseConfig: 'reviseConfig',
         }),
         configInit() {
             let _config = JSON.parse(JSON.stringify(config));

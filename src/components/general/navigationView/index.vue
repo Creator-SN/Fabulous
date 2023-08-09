@@ -57,7 +57,7 @@
 <script>
 import dsTreeView from '@/components/general/navigationView/dsTreeView.vue';
 import localTreeView from '@/components/general/navigationView/localTreeView.vue';
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 
 import dataSource from '@/assets/nav/dataSource.svg';
 import notebook from '@/assets/nav/notebook.svg';
@@ -155,7 +155,7 @@ export default {
         this.localPath = this.lastLocalPath;
     },
     methods: {
-        ...mapMutations({
+        ...mapActions({
             reviseConfig: 'reviseConfig'
         }),
         Go(path) {

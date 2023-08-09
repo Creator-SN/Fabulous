@@ -263,7 +263,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 import * as Diff from 'diff';
 
 import editorNav from '@/components/general/editorContainer/editorNav.vue';
@@ -373,8 +373,10 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseConfig: 'reviseConfig',
             reviseEditor: 'reviseEditor'
+        }),
+        ...mapActions({
+            reviseConfig: 'reviseConfig',
         }),
         eventInit() {
             this.$el.addEventListener(

@@ -311,10 +311,6 @@ export default {
         "en": "Click Me to Choose Data Source Path ...",
         "cn": "点击此处选择数据源存放在何处 ..."
     },
-    "Data Source Name'": {
-        "en": "Data Source Name'",
-        "cn": "数据源名称"
-    },
     "Input Data Source Name": {
         "en": "Input Data Source Name",
         "cn": "输入数据源名称"
@@ -383,39 +379,39 @@ export default {
         "en": "Sort by",
         "cn": "按类型排序"
     },
-    'Switch to Descending': {
+    "Switch to Descending": {
         "en": "Switch to Descending",
         "cn": "切换到降序"
     },
-    'Switch to Ascending': {
+    "Switch to Ascending": {
         "en": "Switch to Ascending",
         "cn": "切换到升序"
     },
-    'Retrieve Metadata': {
+    "Retrieve Metadata": {
         "en": "Retrieve Metadata",
         "cn": "检索元数据"
     },
-    'Searching Metadata': {
+    "Searching Metadata": {
         "en": "Searching Metadata",
         "cn": "正在搜索元数据"
     },
-    'is required': {
+    "is required": {
         "en": "is required",
         "cn": "需要被补充"
     },
-    'Successfully copied to clipboard': {
+    "Successfully copied to clipboard": {
         "en": "Successfully copied to clipboard",
         "cn": "成功复制到剪贴板"
     },
-    'Select Type': {
+    "Select Type": {
         "en": "Select Type",
         "cn": "选择类型"
     },
-    'Generate BibTex': {
+    "Generate BibTex": {
         "en": "Generate BibTex",
         "cn": "生成BibTex"
     },
-    'BibTex Content': {
+    "BibTex Content": {
         "en": "BibTex Content",
         "cn": "BibTex内容"
     },
@@ -839,13 +835,11 @@ export default {
         "en": "Export Markdown",
         "cn": "导出Markdown"
     },
-    "Export Markdown Failed, Please Check Your Content.":
-    {
+    "Export Markdown Failed, Please Check Your Content.": {
         "en": "Export Markdown Failed, Please Check Your Content.",
         "cn": "导出Markdown失败, 请检查内容。"
     },
-    "When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.":
-    {
+    "When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.": {
         "en": "When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.",
         "cn": "添加数据源时, 会在数据源路径下创建一个数据源文件夹, 并在数据源文件夹下创建一个数据源配置文件。"
     },
@@ -872,5 +866,209 @@ export default {
     "Hide Navigation": {
         "en": "Hide Navigation",
         "cn": "隐藏导航"
+    },
+    "Choose A Mode": {
+        "en": "Choose A Mode",
+        "cn": "选择一种模式"
+    },
+    "New Item (Not Useful)": {
+        "en": "New Item (Not Useful)",
+        "cn": "新建项目（无用）"
+    },
+    "Name cannot contain special characters": {
+        "en": "Name cannot contain special characters",
+        "cn": "名称不能包含特殊字符"
+    },
+    "Please Input title...": {
+        "en": "Please Input title...",
+        "cn": "请输入标题..."
+    },
+    "Please Input publisher...": {
+        "en": "Please Input publisher...",
+        "cn": "请输入出版社..."
+    },
+    "Please Input year...": {
+        "en": "Please Input year...",
+        "cn": "请输入年份..."
+    },
+    "Please Input DOI...": {
+        "en": "Please Input DOI...",
+        "cn": "请输入DOI..."
+    },
+    "Please Input createDate...": {
+        "en": "Please Input createDate...",
+        "cn": "请输入创建日期..."
+    },
+    "Please Input source...": {
+        "en": "Please Input source...",
+        "cn": "请输入来源..."
+    },
+    "Please Input url...": {
+        "en": "Please Input url...",
+        "cn": "请输入网址..."
+    },
+    "Please Input containerTitle...": {
+        "en": "Please Input containerTitle...",
+        "cn": "请输入容器标题..."
+    },
+    "Please Input abstract...": {
+        "en": "Please Input abstract...",
+        "cn": "请输入摘要..."
+    },
+    "Please Input ISSN...": {
+        "en": "Please Input ISSN...",
+        "cn": "请输入ISSN..."
+    },
+    "Please Input language...": {
+        "en": "Please Input language...",
+        "cn": "请输入语言..."
+    },
+    "Please Input chapter...": {
+        "en": "Please Input chapter...",
+        "cn": "请输入章节..."
+    },
+    "Please Input pages...": {
+        "en": "Please Input pages...",
+        "cn": "请输入页数..."
+    },
+    "Please Input note...": {
+        "en": "Please Input note...",
+        "cn": "请输入备注..."
+    },
+    "Please Input school...": {
+        "en": "Please Input school...",
+        "cn": "请输入学校..."
+    },
+    "New Data Source Name": {
+        "en": "New Data Source Name",
+        "cn": "新数据源名称"
+    },
+    "Login": {
+        "en": "Login",
+        "cn": "登录"
+    },
+    "login": {
+        "en": "Login",
+        "cn": "登录"
+    },
+    "apply": {
+        "en": "Apply",
+        "cn": "注册"
+    },
+    "forgot": {
+        "en": "Forgot",
+        "cn": "忘记密码"
+    },
+    "No content here ...": {
+        "en": "No content here ...",
+        "cn": "没有任何内容..."
+    },
+    "Switch whether to watch all extension files on Notebook system": {
+        "en": "Switch whether to watch all extension files on Notebook system",
+        "cn": "是否查看Notebook系统上的所有扩展文件"
+    },
+    "Apply New Account": {
+        "en": "Apply New Account",
+        "cn": "申请新帐户"
+    },
+    "Get the Full Experience by Creating Account.": {
+        "en": "Get the Full Experience by Creating Account.",
+        "cn": "通过创建帐户获得完整体验。"
+    },
+    "Passwords, 8-20 characters": {
+        "en": "Passwords, 8-20 characters",
+        "cn": "密码，8-20 个字符"
+    },
+    "I agree to the privacy policy and terms of service of this site by default when registering.": {
+        "en": "I agree to the privacy policy and terms of service of this site by default when registering.",
+        "cn": "注册时默认同意本站隐私政策和服务条款。"
+    },
+    "Privacy Policy": {
+        "en": "Privacy Policy",
+        "cn": "隐私政策"
+    },
+    "Term of Service": {
+        "en": "Term of Service",
+        "cn": "服务条款"
+    },
+    "Already have an account? Log in": {
+        "en": "Already have an account? Log in",
+        "cn": "已经有帐户？登录"
+    },
+    "Email can not be empty.": {
+        "en": "Email can not be empty.",
+        "cn": "电子邮件不能为空。"
+    },
+    "Password can not be empty.": {
+        "en": "Password can not be empty.",
+        "cn": "密码不能为空。"
+    },
+    "Forgot Password": {
+        "en": "Forgot Password",
+        "cn": "忘记密码"
+    },
+    "Email": {
+        "en": "Email",
+        "cn": "电子邮件"
+    },
+    "Continue": {
+        "en": "Continue",
+        "cn": "继续"
+    },
+    "Verify": {
+        "en": "Verify",
+        "cn": "核实"
+    },
+    "Password": {
+        "en": "Password",
+        "cn": "密码"
+    },
+    "Resend Code": {
+        "en": "Resend Code",
+        "cn": "重新发送验证码"
+    },
+    "No account yet?": {
+        "en": "No account yet?",
+        "cn": "还没有帐户？"
+    },
+    "Terms and Conditions": {
+        "en": "Terms and Conditions",
+        "cn": "条款和条件"
+    },
+    "Update Password Success.": {
+        "en": "Update Password Success.",
+        "cn": "更新密码成功。"
+    },
+    "User Not Exists": {
+        "en": "User Not Exists",
+        "cn": "用户不存在"
+    },
+    "Password Error": {
+        "en": "Password Error",
+        "cn": "密码错误"
+    },
+    "Verify Code Error": {
+        "en": "Verify Code Error",
+        "cn": "验证码错误"
+    },
+    "Email code has been sent.": {
+        "en": "Email code has been sent.",
+        "cn": "电子邮件代码已发送。"
+    },
+    "Code Exists.": {
+        "en": "Code Exists.",
+        "cn": "代码存在。"
+    },
+    "Forget Password": {
+        "en": "Forget Password",
+        "cn": "忘记密码"
+    },
+    "Login Success": {
+        "en": "Login Success",
+        "cn": "登录成功"
+    },
+    "Code Exists, Please wait for a while.": {
+        "en": "Code Exists, Please wait for a while.",
+        "cn": "代码已存在，请稍等。"
     }
 }

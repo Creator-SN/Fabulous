@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import OneDrive from '@/assets/settings/OneDrive.svg';
 
@@ -117,7 +117,7 @@ export default {
         this.scanDS();
     },
     methods: {
-        ...mapMutations({
+        ...mapActions({
             reviseConfig: 'reviseConfig'
         }),
         scanDS() {

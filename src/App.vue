@@ -42,7 +42,7 @@ import editorContainer from '@/components/general/editorContainer';
 import pdfImporter from '@/components/general/pdfImporter.vue';
 import itemCarrier from '@/components/general/itemCarrier.vue';
 import { config } from '@/js/data_sample';
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
     name: 'App',
@@ -65,6 +65,7 @@ export default {
     watch: {
         $route() {
             this.pdfImporterInit();
+            this.refreshUserInfo();
         }
     },
     computed: {
@@ -76,6 +77,7 @@ export default {
             show_editor: (state) => state.editor.show,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
+            userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
         ...mapGetters(['local']),
@@ -94,15 +96,25 @@ export default {
         this.dropFilesInit();
         this.i18nInit();
         this.refreshWindowSizeInit();
+        this.refreshUserInfo();
         if (this.$route.path !== '/') this.$Go('/');
     },
     methods: {
         ...mapMutations({
-            reviseConfig: 'reviseConfig',
             revisePdfImporter: 'revisePdfImporter',
             reviseProgress: 'reviseProgress',
             setWindowSize: 'setWindowSize',
             reviseI18N: 'reviseI18N'
+        }),
+        ...mapActions({
+            reviseConfig: 'reviseConfig'
+        }),
+        ...mapMutations('User', {
+            setInfo: 'setInfo'
+        }),
+        ...mapActions('User', {
+            getInfo: 'getInfo',
+            getAvatar: 'getAvatar'
         }),
         i18nInit() {
             this.reviseI18N(i18n);
@@ -125,6 +137,12 @@ export default {
                     });
                 }
             });
+        },
+        async refreshUserInfo() {
+            if (localStorage.getItem('ApiToken')) {
+                await this.getInfo();
+                await this.getAvatar();
+            }
         },
         pdfImporterInit() {
             this.revisePdfImporter({

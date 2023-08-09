@@ -15,6 +15,7 @@ import "@/style/global.scss";
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+import api from "./api/remote";
 import local_api from "./api/local";
 
 
@@ -33,6 +34,7 @@ Vue.use(VueAxios, fab_axios);
 
 Vue.use(VueFluent, Vuex);
 Vue.use(PowerEditor);
+Vue.use(api);
 Vue.use(local_api);
 
 Vue.config.productionTip = false

@@ -59,3 +59,31 @@
     font-weight: 400;
     font-style: normal;
 }
+
+@mixin a-link
+{
+    @include nowrap;
+    
+    font-size: 13.8px;
+    color: #8189a9;
+    user-select: none;
+    cursor: pointer;
+    
+    &:hover
+    {
+        color: #a6adc9;
+    }
+}
+
+@mixin fab-color($color) {
+    background-image: $color;
+    background-clip: text;
+    -webkit-background-image: $color;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@mixin color-pink-blue
+{
+    @include fab-color(linear-gradient(45deg, rgba(159, 107, 209, 1), rgba(113, 132, 218, 1)));
+}
