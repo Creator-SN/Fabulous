@@ -79,14 +79,12 @@ export default {
             userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentPath() {
-            if (this.data_path[this.data_index])
-                return this.data_path[this.data_index];
-            else return null;
+            return this.currentDataPath;
         },
         SourceDisabled() {
-            return !this.data_path[this.data_index];
+            return !this.currentDataPath;
         }
     },
     mounted() {

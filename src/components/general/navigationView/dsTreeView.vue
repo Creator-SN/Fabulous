@@ -293,9 +293,9 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         SourceDisabled() {
-            return !this.data_path[this.data_index];
+            return !this.currentDataPath;
         }
     },
     mounted() {
@@ -307,7 +307,7 @@ export default {
         getDSInfo() {
             if (this.SourceDisabled) return;
             this.$local_api.AcademicController.getDataSourceInfo(
-                this.data_path[this.data_index]
+                this.currentDataPath
             )
                 .then((res) => {
                     if (res.status === 'success') {
@@ -324,17 +324,17 @@ export default {
                 });
         },
         async refreshTreeList() {
-            if (!this.data_path[this.data_index]) return;
+            if (!this.currentDataPath) return;
             if (!this.lock.treeList) return;
             this.lock.treeList = false;
             this.treeList = [];
             this.FLAT = [];
             let result = [];
             let groups = await this.$local_api.AcademicController.getRootGroups(
-                this.data_path[this.data_index]
+                this.currentDataPath
             );
             let partitions = await this.$local_api.AcademicController.getRootPartitions(
-                this.data_path[this.data_index]
+                this.currentDataPath
             );
             groups = groups.data;
             partitions = partitions.data;
@@ -396,7 +396,7 @@ export default {
             let groupList = [];
             let partitionList = [];
             await this.$local_api.AcademicController.getGroups(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id
             )
                 .then((res) => {
@@ -420,7 +420,7 @@ export default {
                     item.loading = false;
                 });
             await this.$local_api.AcademicController.getPartitions(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id
             )
                 .then((res) => {
@@ -546,13 +546,13 @@ export default {
             if (item.isTmp) {
                 if (item.type === 'group') {
                     res = await this.$local_api.AcademicController.createGroup(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         item.parent,
                         item
                     );
                 } else
                     res = await this.$local_api.AcademicController.createPartition(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         item.parent,
                         item
                     );
@@ -560,12 +560,12 @@ export default {
             } else {
                 if (item.type === 'group') {
                     res = await this.$local_api.AcademicController.updateGroup(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         item
                     );
                 } else
                     res = await this.$local_api.AcademicController.updatePartition(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         item.parent,
                         item
                     );
@@ -595,12 +595,12 @@ export default {
             let res = null;
             if (item.type === 'group') {
                 res = await this.$local_api.AcademicController.updateGroup(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     item
                 );
             } else
                 res = await this.$local_api.AcademicController.updatePartition(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     item.parent,
                     item
                 );
@@ -636,12 +636,12 @@ export default {
             let res = null;
             if (item.type === 'group') {
                 res = await this.$local_api.AcademicController.deleteGroup(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     item.id
                 );
             } else
                 res = await this.$local_api.AcademicController.deletePartition(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     item.parent,
                     item.id
                 );

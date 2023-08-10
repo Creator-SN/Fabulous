@@ -105,6 +105,16 @@ export default new Vuex.Store({
             if (!result)
                 return text;
             return result[state.config.language];
+        },
+        currentDataPath: state => {
+            if (state.config.data_path.length == 0)
+                return null;
+            if (state.config.data_path[state.config.data_index])
+                return state.config.data_path[state.config.data_index].path;
+            let dataPathItem = state.config.data_path.find(item => item.path === state.config.data_index);
+            if (dataPathItem)
+                return dataPathItem.path;
+            return null;
         }
     },
     modules: {

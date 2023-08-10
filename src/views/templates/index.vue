@@ -139,9 +139,9 @@ export default {
             data_index: (state) => state.config.data_index,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
         SourceDisabled() {
-            return !this.data_path[this.data_index];
+            return !this.currentDataPath;
         }
     },
     mounted() {
@@ -154,7 +154,7 @@ export default {
         }),
         async getTemplates() {
             let res = await this.$local_api.AcademicController.getTemplatesInfo(
-                this.data_path[this.data_index]
+                this.currentDataPath
             );
             if (res.status === "success") {
                 this.templates = res.data;
@@ -175,7 +175,7 @@ export default {
                 confirm: async () => {
                     this.lock = false;
                     let res = await this.$local_api.AcademicController.deleteTemplate(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         this.currentItem.id
                     );
                     if (res.status !== "success") {
@@ -205,7 +205,7 @@ export default {
                         for (let i = 0; i < this.currentChoosen.length; i++) {
                             let res =
                                 await this.$local_api.AcademicController.deleteTemplate(
-                                    this.data_path[this.data_index],
+                                    this.currentDataPath,
                                     this.currentChoosen[i].id
                                 );
                             if (res.status !== "success") {

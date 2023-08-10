@@ -127,7 +127,7 @@ export default {
             mobileDisplay: (state) => state.window.mobileDisplay,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
             return 'rgba(0, 0, 0, 0.8)';

@@ -156,7 +156,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         ...mapGetters('Theme', ['color', 'gradient']),
         ...mapState({
             userInfo: (state) => state.User.info,

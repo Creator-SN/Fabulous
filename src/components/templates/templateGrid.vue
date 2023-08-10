@@ -161,7 +161,7 @@ export default {
             show_editor: (state) => state.editor.show,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.templates.length; i++) {
@@ -202,7 +202,7 @@ export default {
                 template.choosen = false;
                 template.show = true;
                 let res = await this.$local_api.AcademicController.getTemplateContent(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     el.id
                 );
                 if (res.code !== 200) {

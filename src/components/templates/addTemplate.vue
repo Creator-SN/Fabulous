@@ -72,7 +72,7 @@ export default {
             data_path: (state) => state.config.data_path,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     mounted() {},
     methods: {
@@ -84,7 +84,7 @@ export default {
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
             let res = await this.$local_api.AcademicController.createTemplate(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 _page
             );
             if (res.status === "success") {

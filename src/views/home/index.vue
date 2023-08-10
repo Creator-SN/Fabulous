@@ -554,13 +554,13 @@ export default {
             mode: (state) => state.pdfImporter.mode,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         pid() {
             if (!this.$route.params.id) return null;
             return this.$route.params.id;
         },
         SourceDisabled() {
-            return !this.data_path[this.data_index];
+            return !this.currentDataPath;
         }
     },
     mounted() {
@@ -583,7 +583,7 @@ export default {
                 return;
             }
             this.$local_api.AcademicController.getPartition(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.pid
             )
                 .then((res) => {
@@ -605,7 +605,7 @@ export default {
             if (this.SourceDisabled) return;
             if (!this.currentSearch.debounce) {
                 this.$local_api.AcademicController.getItems(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.pid,
                     -1,
                     0,
@@ -631,7 +631,7 @@ export default {
                     });
             } else
                 this.$local_api.AcademicController.getSearchItems(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.pid,
                     this.currentSearch.debounce,
                     50,
@@ -668,7 +668,7 @@ export default {
                 confirm: async () => {
                     this.lock = false;
                     await this.$local_api.AcademicController.deleteItem(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         this.currentItem.id
                     ).then((res) => {
                         if (res.code !== 200)
@@ -693,7 +693,7 @@ export default {
                     this.lock = false;
                     let ids = this.currentChoosen.map((el) => el.id);
                     let res = await this.$local_api.AcademicController.deleteItems(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         ids
                     );
                     if (res.code !== 200)
@@ -737,7 +737,7 @@ export default {
         },
         openFile(itemid, fileid, type = 'pdf') {
             this.$local_api.AcademicController.openItemFile(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 itemid,
                 fileid,
                 type
@@ -771,7 +771,7 @@ export default {
             for (let partition of partitions) {
                 let partitionid = partition.id;
                 let res = await this.$local_api.AcademicController.addItemsToPartition(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     partitionid,
                     ids
                 );
@@ -803,7 +803,7 @@ export default {
                     )
                 ) {
                     this.itemCarrier.itemsX.push({
-                        uri: this.data_path[this.data_index],
+                        uri: this.currentDataPath,
                         item,
                         choosen: true
                     });
@@ -823,7 +823,7 @@ export default {
             if (choosen.length === 0) return;
             let ids = choosen.map((el) => el.id);
             this.$local_api.AcademicController.removeItemsFromPartition(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.pid,
                 ids
             )
@@ -856,7 +856,7 @@ export default {
         async reviseItemEmoji(item, emoji) {
             item.emoji = emoji;
             let res = await this.$local_api.AcademicController.updateItem(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item
             );
             if (res.status !== 'success') {
@@ -869,7 +869,7 @@ export default {
             if (!this.items) return;
             page.emoji = emoji;
             let res = await this.$local_api.AcademicController.updateItemPage(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id,
                 page
             );
@@ -882,7 +882,7 @@ export default {
         async duplicateItemPage(item, page) {
             if (!this.items) return;
             let res = await this.$local_api.AcademicController.duplicateItemPage(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id,
                 page.id
             );
@@ -903,7 +903,7 @@ export default {
                 theme: this.theme,
                 confirm: async () => {
                     let res = await this.$local_api.AcademicController.deleteItemPage(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         itemId,
                         pageId
                     );

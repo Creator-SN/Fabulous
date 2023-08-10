@@ -243,7 +243,7 @@ export default {
             activeSystemMode: (state) => state.config.activeSystemMode,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local'])
+        ...mapGetters(['local', 'currentDataPath'])
     },
     mounted() {
         this.configInit();

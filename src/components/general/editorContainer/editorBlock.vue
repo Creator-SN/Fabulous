@@ -329,7 +329,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         showNav() {
             return (
                 this.type === 'item' &&
@@ -449,13 +449,13 @@ export default {
             let res = null;
             if (this.type === 'item') {
                 res = await this.$local_api.AcademicController.getItemPageContent(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.item.id,
                     this.target.id
                 );
             } else {
                 res = await this.$local_api.AcademicController.getTemplateContent(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.target.id
                 );
             }
@@ -500,7 +500,7 @@ export default {
             this.lock.save = false;
             if (this.type === 'item') {
                 await this.$local_api.AcademicController.saveItemPageContent(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.item.id,
                     this.target.id,
                     JSON.stringify(json)
@@ -517,7 +517,7 @@ export default {
                     });
             } else {
                 await this.$local_api.AcademicController.saveTemplateContent(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.target.id,
                     JSON.stringify(json)
                 )
@@ -591,7 +591,7 @@ export default {
         },
         openFile(itemid, fileid, type = 'pdf') {
             this.$local_api.AcademicController.openItemFile(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 itemid,
                 fileid,
                 type
@@ -612,7 +612,7 @@ export default {
 
             let res = null;
             res = await this.$local_api.AcademicController.getSearchItems(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 null,
                 value.split('/')[0],
                 20,

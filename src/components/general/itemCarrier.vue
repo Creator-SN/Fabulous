@@ -137,7 +137,7 @@ export default {
             counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.itemCarrier.itemsX.length; i++) {
@@ -227,7 +227,7 @@ export default {
             for (let i = 0; i < dataList.length; i++) {
                 let { item } = dataList[i];
 
-                let targetUri = this.data_path[this.data_index];
+                let targetUri = this.currentDataPath;
 
                 let pureItem = JSON.parse(JSON.stringify(item));
                 pureItem.pdf = null;
@@ -324,7 +324,7 @@ export default {
                 let partitionid = this.$route.params.id;
                 let ids = newItemsCollection.map((item) => item.id);
                 await this.$local_api.AcademicController.addItemsToPartition(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     partitionid,
                     ids
                 ).catch((res) => {

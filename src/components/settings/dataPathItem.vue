@@ -14,7 +14,8 @@
             >
             <i
                 v-else
-                class="ms-Icon ms-Icon--Link"
+                class="ms-Icon"
+                :class="[`ms-Icon--${thisValue.local ? 'Link' : 'Cloud'}`]"
             ></i>
         </div>
         <div class="middle-block">
@@ -146,10 +147,10 @@ export default {
                 });
         },
         switchDataIndex() {
+            if (this.disabled) return;
             if (this.scanValue.status !== 'normal') return;
-            let index = this.data_path.indexOf(this.thisValue.path);
             this.reviseConfig({
-                data_index: index
+                data_index: this.thisValue.path
             });
         }
     }

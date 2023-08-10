@@ -132,7 +132,7 @@ export default {
             counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     mounted() {},
     methods: {
@@ -145,7 +145,7 @@ export default {
             _item.labels = this.labels;
             _item.createDate = this.$SDate.DateToString(new Date());
             let res = await this.$local_api.AcademicController.createItem(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 _item
             );
             if (res.code !== 200) {
@@ -157,7 +157,7 @@ export default {
             if (this.partitionId) {
                 let itemid = res.data.id;
                 res = await this.$local_api.AcademicController.addItemsToPartition(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     this.partitionId,
                     [itemid]
                 );

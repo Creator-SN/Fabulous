@@ -358,7 +358,7 @@ export default {
             editorShowNav: (state) => state.config.editorShowNav,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentBanner() {
             if (!this.fabulousNotebook.banner) return '';
             return this.fabulousNotebook.banner;
@@ -495,7 +495,7 @@ export default {
             this.lock.loading = false;
             this.fabulousNotebook.banner = null;
             await this.$local_api.NotebookController.getDocumentAsync(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.path
             )
                 .then((res) => {
@@ -568,7 +568,7 @@ export default {
             this.lock.save = false;
             let saveContent = this.saveContent(obj);
             await this.$local_api.NotebookController.updateDocumentAsync(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.path,
                 saveContent
             )

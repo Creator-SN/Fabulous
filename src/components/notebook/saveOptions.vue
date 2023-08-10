@@ -82,7 +82,7 @@ export default {
         ...mapState({
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local'])
+        ...mapGetters(['local', 'currentDataPath'])
     },
     methods: {
         saveProp(item) {

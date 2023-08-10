@@ -6,7 +6,7 @@ import path from 'path'
 import { app } from 'electron' // 引入remote模块
 import * as remote from "@electron/remote"
 
-import { config, data_structure, group as Group, partition as Partition, item as Item, metadata as Metadata, page as Page } from "@/js/data_sample";
+import { config, data_path_item, data_structure, group as Group, partition as Partition, item as Item, metadata as Metadata, page as Page } from "@/js/data_sample";
 
 const APP = process.type === 'renderer' ? remote.app : app // 根据process.type来分辨在哪种模式使用哪种模块
 const STORE_PATH = APP.getPath('userData') // 获取electron应用的用户目录
@@ -237,7 +237,7 @@ export class ConfigController {
                 }
                 if (!_config.data_path)
                     _config.data_path = [];
-                if (_config.data_path.indexOf(_path) > -1) {
+                if (_config.data_path.find(it => it.path === _path)) {
                     reject({
                         status: 'error',
                         data: null,
@@ -246,7 +246,9 @@ export class ConfigController {
                     });
                     return;
                 }
-                _config.data_path.push(_path);
+                let _data_path_item = JSON.parse(JSON.stringify(data_path_item));
+                _data_path_item.path = _path;
+                _config.data_path.push(_data_path_item);
                 ipc.send("ensure-folder", { id: id, dir: _path });
                 ipc.on(`ensure-folder-${id}`, (event, arg) => {
                     if (arg.status !== 200) {
@@ -284,7 +286,7 @@ export class ConfigController {
                     configDB.set('data_path', _config.data_path).write();
                     resolve({
                         status: 'success',
-                        data: _path,
+                        data: _data_path_item,
                         code: 200,
                         message: '添加数据源成功 (Add data source successfully)'
                     });
@@ -377,7 +379,7 @@ export class ConfigController {
                 }
                 if (!_config.data_path)
                     _config.data_path = [];
-                if (_config.data_path.indexOf(path) > -1) {
+                if (_config.data_path.find(it => it.path === path)) {
                     reject({
                         status: 'error',
                         data: null,
@@ -386,11 +388,13 @@ export class ConfigController {
                     });
                     return;
                 }
-                _config.data_path.push(path);
+                let _data_path_item = JSON.parse(JSON.stringify(data_path_item));
+                _data_path_item.path = path;
+                _config.data_path.push(_data_path_item);
                 configDB.set('data_path', _config.data_path).write();
                 resolve({
                     status: 'success',
-                    data: null,
+                    data: _data_path_item,
                     code: 200,
                     message: '关联本地数据源成功 (Link to local data source successfully)'
                 });

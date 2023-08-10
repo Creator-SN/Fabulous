@@ -80,22 +80,22 @@ export default {
             data_path: (state) => state.config.data_path,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"])
+        ...mapGetters(["local", "currentDataPath"])
     },
     mounted() {
         this.refreshTreeList();
     },
     methods: {
         async refreshTreeList() {
-            if (!this.data_path[this.data_index]) return;
+            if (!this.currentDataPath) return;
             this.treeList = [];
             this.FLAT = [];
             let result = [];
             let groups = await this.$local_api.AcademicController.getRootGroups(
-                this.data_path[this.data_index]
+                this.currentDataPath
             );
             let partitions = await this.$local_api.AcademicController.getRootPartitions(
-                this.data_path[this.data_index]
+                this.currentDataPath
             );
             groups = groups.data;
             partitions = partitions.data;
@@ -156,7 +156,7 @@ export default {
             let groupList = [];
             let partitionList = [];
             await this.$local_api.AcademicController.getGroups(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id
             )
                 .then((res) => {
@@ -180,7 +180,7 @@ export default {
                     item.loading = false;
                 });
             await this.$local_api.AcademicController.getPartitions(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 item.id
             )
                 .then((res) => {

@@ -99,7 +99,7 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local'])
+        ...mapGetters(['local', 'currentDataPath'])
     },
     methods: {
         async choosePath() {

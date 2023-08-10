@@ -75,14 +75,14 @@ export default {
             data_path: (state) => state.config.data_path,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     methods: {
         async rename() {
             if (!this.value || this.name === "") return;
             this.value.name = this.name;
             let res = await this.$local_api.AcademicController.updateTemplate(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.value
             );
             if (res.status === "success") {

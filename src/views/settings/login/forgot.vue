@@ -164,7 +164,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         ...mapGetters('Theme', ['color', 'gradient']),
         ...mapState({
             theme: (state) => state.config.theme

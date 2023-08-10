@@ -525,7 +525,7 @@ export default {
             data_index: (state) => state.config.data_index,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     mounted() {
         this.metadataInit();
@@ -600,7 +600,7 @@ export default {
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
             let res = await this.$local_api.AcademicController.updateItemMetadata(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 id,
                 _metadata
             );

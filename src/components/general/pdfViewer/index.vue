@@ -267,7 +267,7 @@ export default {
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
             displayMode: (state) => state.editor.displayMode
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         highlightNodes() {
             let content = this.targetContent.content;
             let result = [];
@@ -458,7 +458,7 @@ export default {
             this.lock.init = false;
             let res = null;
             res = await this.$local_api.AcademicController.getItemPDF(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.item.id,
                 this.item.pdf
             );

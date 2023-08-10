@@ -133,7 +133,7 @@ export default {
             data_path: (state) => state.config.data_path,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     methods: {
         async confirm() {
@@ -141,7 +141,7 @@ export default {
             this.value.name = this.name;
             this.value.labels = this.labels;
             let res = await this.$local_api.AcademicController.updateItem(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 this.value
             );
             if (res.code !== 200) {

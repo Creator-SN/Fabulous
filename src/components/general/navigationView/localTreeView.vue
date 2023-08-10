@@ -337,7 +337,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         computeTreeItem() {
             return (fileObj) => {
                 let item = {
@@ -378,11 +378,11 @@ export default {
             return pathList[pathList.length - 1];
         },
         SourceDisabled() {
-            return !this.data_path[this.data_index];
+            return !this.currentDataPath;
         },
         uri() {
-            if (this.data_path[this.data_index])
-                return this.data_path[this.data_index];
+            if (this.currentDataPath)
+                return this.currentDataPath;
             else return 'local';
         }
     },

@@ -47,8 +47,8 @@
                     <template v-slot:listItem="x">
                         <data-path-item
                             :value="x.item"
-                            :choosen="data_index === x.index"
-                            :disabled="SourceIndexDisabled(x.index)"
+                            :choosen="data_index === x.item.path"
+                            :disabled="SourceIndexDisabled(x.item.path)"
                             :local="local"
                             :theme="theme"
                             @remove-ds="removeDS(x.item)"
@@ -466,11 +466,16 @@ export default {
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         SourceIndexDisabled() {
             return (index) => {
-                if (!this.data_path[index]) return true;
-                return false;
+                if (this.data_path.length == 0) return true;
+                if (this.data_path[index]) return false;
+                let dataPathItem = this.data_path.find(
+                    (item) => item.path === index
+                );
+                if (dataPathItem) return false;
+                return true;
             };
         }
     },
@@ -486,7 +491,7 @@ export default {
         ...mapActions('config', ['getConfig', 'reviseConfig']),
         async configInit() {
             await this.getConfig();
-            console.log('start sync config')
+            console.log('start sync config');
             this.syncFromConfig();
             this.refreshDSList();
         },
@@ -540,8 +545,8 @@ export default {
             pathList.forEach((el, idx) => {
                 thisPathList.push({
                     key: idx,
-                    name: pathList[idx],
-                    path: pathList[idx],
+                    name: el.path,
+                    ...el,
                     choosen: idx === this.data_index,
                     disabled: () => false
                 });

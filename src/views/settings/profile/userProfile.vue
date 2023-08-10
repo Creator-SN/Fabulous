@@ -50,7 +50,7 @@ export default {
             userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         ...mapGetters('Theme', ['color', 'gradient']),
         isLogin() {
             return this.userInfo.id;

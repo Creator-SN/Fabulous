@@ -72,7 +72,7 @@ export default {
             counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local"]),
+        ...mapGetters(["local", "currentDataPath"]),
     },
     mounted () {
 
@@ -133,7 +133,7 @@ export default {
                     _item.metadata = _metadata;
                     console.log('metadata:', _metadata);
                     let res = await this.$local_api.AcademicController.createItem(
-                        this.data_path[this.data_index],
+                        this.currentDataPath,
                         _item
                     );
                     if (res.code !== 200) {
@@ -189,7 +189,7 @@ export default {
                 _item.pdf = `${_item.id}`;
                 _item.metadata = _metadata;
                 let res = await this.$local_api.AcademicController.createItem(
-                    this.data_path[this.data_index],
+                    this.currentDataPath,
                     _item
                 );
                 if (res.code !== 200) {
@@ -219,7 +219,7 @@ export default {
             if (!id) return;
             let res = null;
             res = await this.$local_api.AcademicController.addItemsToPartition(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 id,
                 [itemid]
             );
@@ -234,7 +234,7 @@ export default {
             if (!id) id = this.item.id;
             let blob = await fetch(objURL).then((r) => r.blob());
             this.$local_api.AcademicController.updateItemPDF(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 id,
                 id,
                 blob
@@ -247,7 +247,7 @@ export default {
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
             let res = await this.$local_api.AcademicController.updateItemMetadata(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 id,
                 _metadata
             );

@@ -202,7 +202,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
         disabledEditor() {
             return (
                 this.type === 'item' &&
@@ -256,7 +256,7 @@ export default {
         },
         openFile(itemid, fileid, type = 'pdf') {
             this.$local_api.AcademicController.openItemFile(
-                this.data_path[this.data_index],
+                this.currentDataPath,
                 itemid,
                 fileid,
                 type

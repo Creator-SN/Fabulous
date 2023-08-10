@@ -10,7 +10,7 @@
                 @keyup.enter="initDs"
             >
                 <p class="w-title">{{local('Data Source Name')}}</p>
-                <p class="w-info">{{local('Path')}}: {{data_path[db_index]}}</p>
+                <p class="w-info">{{local('Path')}}: {{thisDataPath}}</p>
                 <fv-text-box
                     v-model="name"
                     :placeholder="local('Input data source name...')"
@@ -78,17 +78,27 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local']),
+        ...mapGetters(['local', 'currentDataPath']),
+        thisDataPath() {
+            if (this.data_path.length == 0) return null;
+            if (this.data_path[this.db_index])
+                return this.data_path[this.db_index].path;
+            let dataPathItem = this.data_path.find(
+                (item) => item.path === this.db_index
+            );
+            if (dataPathItem) return dataPathItem.path;
+            return null;
+        },
         v() {
             return this;
         }
     },
     methods: {
         initDs() {
-            if (this.db_index < 0 || this.name === '') return;
-            if (!this.data_path[this.db_index]) return;
+            if (!this.db_index || this.name === '') return;
+            if (!this.thisDataPath) return;
             this.$local_api.ConfigController.initDataSource(
-                this.data_path[this.db_index],
+                this.thisDataPath,
                 this.name
             ).then((res) => {
                 if (res.status !== 'success') {

@@ -62,7 +62,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['local'])
+        ...mapGetters(['local', 'currentDataPath'])
     },
     mounted() {
         this.init();
