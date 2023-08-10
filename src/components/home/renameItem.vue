@@ -140,7 +140,7 @@ export default {
             if (!this.value || this.name === "") return;
             this.value.name = this.name;
             this.value.labels = this.labels;
-            let res = await this.$local_api.Academic.updateItem(
+            let res = await this.$local_api.AcademicController.updateItem(
                 this.data_path[this.data_index],
                 this.value
             );

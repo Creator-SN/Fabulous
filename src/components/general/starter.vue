@@ -195,7 +195,6 @@ import notebookImg from '@/assets/nav/notebook.svg';
 import allImg from '@/assets/nav/all.svg';
 
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { config } from '@/js/data_sample.js';
 
 export default {
     data() {
@@ -250,28 +249,13 @@ export default {
         this.configInit();
     },
     methods: {
-        ...mapActions({
+        ...mapActions('config', {
+            getConfig: 'getConfig',
             reviseConfig: 'reviseConfig'
         }),
         async configInit() {
-            let _config = JSON.parse(JSON.stringify(config));
-            await this.$local_api.Config.getConfig().then((res) => {
-                if (res.status === 'success') {
-                    let target = res.data;
-                    for (let key in _config) {
-                        if (!Object.prototype.hasOwnProperty.call(target, key))
-                            // 要用undefined比较好, 因为其他情况也有可能false.
-                            continue;
-                        _config[key] = target[key];
-                    }
-                    this.reviseConfig(_config);
-                    this.thisConfigSync();
-                } else {
-                    this.$barWarning(res.message, {
-                        status: 'error'
-                    });
-                }
-            });
+            await this.getConfig();
+            this.thisConfigSync();
         },
         thisConfigSync() {
             this.cur_language = this.languages.find(
@@ -292,7 +276,7 @@ export default {
             });
         },
         async choosePath() {
-            await this.$local_api.Config.selectLocalDataSourcePath().then(
+            await this.$local_api.ConfigController.selectLocalDataSourcePath().then(
                 (res) => {
                     if (res.status === 'success') {
                         this.path = res.data;
@@ -302,7 +286,10 @@ export default {
         },
         async existsSource(url, name) {
             let res = null;
-            res = await this.$local_api.Config.existsDataSource(url, name);
+            res = await this.$local_api.ConfigController.existsDataSource(
+                url,
+                name
+            );
             return res.data;
         },
         async addSource() {
@@ -328,7 +315,10 @@ export default {
             } else this.addSourceConfirm(this.path, this.name);
         },
         async addSourceConfirm(path, name) {
-            let res = await this.$local_api.Config.createDataSource(path, name);
+            let res = await this.$local_api.ConfigController.createDataSource(
+                path,
+                name
+            );
             if (res.status !== 'success') {
                 this.$barWarning(res.message, {
                     status: 'warning'
@@ -347,7 +337,10 @@ export default {
             let path = name
                 ? this.path.replace(/\\/g, '/') + '/' + name
                 : this.path;
-            let res = await this.$local_api.Config.linkLocalDataSource(path);
+            let res =
+                await this.$local_api.ConfigController.linkLocalDataSource(
+                    path
+                );
             if (res.status == 'success') {
                 await this.configInit();
                 let index = this.data_path.indexOf(path);

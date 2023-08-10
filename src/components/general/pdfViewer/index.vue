@@ -457,7 +457,7 @@ export default {
             if (!this.lock.init) return;
             this.lock.init = false;
             let res = null;
-            res = await this.$local_api.Academic.getItemPDF(
+            res = await this.$local_api.AcademicController.getItemPDF(
                 this.data_path[this.data_index],
                 this.item.id,
                 this.item.pdf
@@ -629,7 +629,7 @@ export default {
             clearTimeout(this.timer.translate);
             this.timer.translate = setTimeout(() => {
                 if (this.translateObj.selection !== '') {
-                    this.$local_api.Academic.getTranslation(
+                    this.$local_api.AcademicController.getTranslation(
                         this.translateObj.selection,
                         'en',
                         'zh-CN'

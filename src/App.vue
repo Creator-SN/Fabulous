@@ -41,7 +41,6 @@ import navigationView from '@/components/general/navigationView';
 import editorContainer from '@/components/general/editorContainer';
 import pdfImporter from '@/components/general/pdfImporter.vue';
 import itemCarrier from '@/components/general/itemCarrier.vue';
-import { config } from '@/js/data_sample';
 import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -106,7 +105,8 @@ export default {
             setWindowSize: 'setWindowSize',
             reviseI18N: 'reviseI18N'
         }),
-        ...mapActions({
+        ...mapActions('config', {
+            getConfig: 'getConfig',
             reviseConfig: 'reviseConfig'
         }),
         ...mapMutations('User', {
@@ -120,23 +120,7 @@ export default {
             this.reviseI18N(i18n);
         },
         async configInit() {
-            let _config = JSON.parse(JSON.stringify(config));
-            this.$local_api.Config.getConfig().then((res) => {
-                if (res.status === 'success') {
-                    let target = res.data;
-                    for (let key in _config) {
-                        if (!Object.prototype.hasOwnProperty.call(target, key))
-                            // 要用undefined比较好, 因为其他情况也有可能false.
-                            continue;
-                        _config[key] = target[key];
-                    }
-                    this.reviseConfig(_config);
-                } else {
-                    this.$barWarning(res.message, {
-                        status: 'error'
-                    });
-                }
-            });
+            await this.getConfig();
         },
         async refreshUserInfo() {
             if (localStorage.getItem('ApiToken')) {

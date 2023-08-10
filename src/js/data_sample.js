@@ -1,4 +1,5 @@
 export const config = {
+    configId: null,
     init_status: true,
     data_path: [],
     data_index: -1,
@@ -15,6 +16,11 @@ export const config = {
     theme: "light"
 }
 
+export const data_path_item = {
+    path: null,
+    shared: false,
+    local: true
+}
 
 export const data_structure = {
     id: null,

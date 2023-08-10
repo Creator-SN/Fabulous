@@ -467,7 +467,7 @@ export default {
                     let url = `/notebook/${encodeURI(
                         path.replace(/\//g, '\\')
                     )}`;
-                    this.$local_api.Notebook.existsPathAsync(id, path)
+                    this.$local_api.NotebookController.existsPathAsync(id, path)
                         .then((res) => {
                             if (res.status === 'success') {
                                 if (res.data)
@@ -491,7 +491,7 @@ export default {
             window.addEventListener('click', this.whiteClickClearTmp);
         },
         async chooseFolder() {
-            await this.$local_api.Config.selectLocalDataSourcePath().then(
+            await this.$local_api.ConfigController.selectLocalDataSourcePath().then(
                 (res) => {
                     if (res.status === 'success') {
                         this.path = res.data;
@@ -726,7 +726,7 @@ export default {
             };
             fbn.createDate = new Date();
             fbn.updateDate = new Date();
-            this.$local_api.Notebook.createDocumentAsync(
+            this.$local_api.NotebookController.createDocumentAsync(
                 this.uri,
                 url,
                 JSON.stringify(fbn)
@@ -748,7 +748,7 @@ export default {
         },
         newFolderConfirm(target) {
             let url = target.dir.replace(/\\/g, '/') + `/${target.name}`;
-            this.$local_api.Notebook.createDirectoryAsync(this.uri, url)
+            this.$local_api.NotebookController.createDirectoryAsync(this.uri, url)
                 .then((res) => {
                     if (res.status === 'success') {
                         this.removeTmp();
@@ -765,7 +765,7 @@ export default {
                 });
         },
         renameConfirm(target) {
-            this.$local_api.Notebook.updateDirectoryInfoAsync(
+            this.$local_api.NotebookController.updateDirectoryInfoAsync(
                 this.uri,
                 target.filePath,
                 {
@@ -789,7 +789,7 @@ export default {
         deleteConfirm(target) {
             if (!target.filePath) return;
             if (target.isDir) {
-                this.$local_api.Notebook.removeDirectoryAsync(
+                this.$local_api.NotebookController.removeDirectoryAsync(
                     this.uri,
                     target.filePath
                 )
@@ -811,7 +811,7 @@ export default {
                         });
                     });
             } else {
-                this.$local_api.Notebook.removeDocumentAsync(
+                this.$local_api.NotebookController.removeDocumentAsync(
                     this.uri,
                     target.filePath
                 )
@@ -853,7 +853,7 @@ export default {
             if (!target.isDir) return;
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.Notebook.copyDirectoryAsync(
+                    this.$local_api.NotebookController.copyDirectoryAsync(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -886,7 +886,7 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.Notebook.moveDirectoryAsync(
+                    this.$local_api.NotebookController.moveDirectoryAsync(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -930,7 +930,7 @@ export default {
             };
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.Notebook.copyDirectoryAsync(
+                    this.$local_api.NotebookController.copyDirectoryAsync(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -963,7 +963,7 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.Notebook.moveDirectoryAsync(
+                    this.$local_api.NotebookController.moveDirectoryAsync(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -1014,7 +1014,7 @@ export default {
         openFile(item) {
             let url = item.filePath;
             if (!item.isDir) url = this.findParentPath(item).path;
-            this.$local_api.Notebook.openFile(this.uri, url);
+            this.$local_api.NotebookController.openFile(this.uri, url);
         },
         whiteClickClearTmp(event) {
             let x = event.target;
@@ -1036,7 +1036,7 @@ export default {
         },
         async openNotebook() {
             let id = this.$Guid();
-            this.$local_api.Notebook.getLocalProcess().then((res) => {
+            this.$local_api.NotebookController.getLocalProcess().then((res) => {
                 let process = res.data;
                 if (process.argv.length >= 2) {
                     let path = process.argv[1];
@@ -1044,7 +1044,7 @@ export default {
                     let url = `/notebook/${encodeURI(
                         path.replace(/\//g, '\\')
                     )}`;
-                    this.$local_api.Notebook.existsPathAsync(id, url)
+                    this.$local_api.NotebookController.existsPathAsync(id, url)
                         .then((res) => {
                             if (res.status === 'success') {
                                 if (res.data)

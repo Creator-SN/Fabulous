@@ -582,7 +582,7 @@ export default {
                 };
                 return;
             }
-            this.$local_api.Academic.getPartition(
+            this.$local_api.AcademicController.getPartition(
                 this.data_path[this.data_index],
                 this.pid
             )
@@ -604,7 +604,7 @@ export default {
         getItems() {
             if (this.SourceDisabled) return;
             if (!this.currentSearch.debounce) {
-                this.$local_api.Academic.getItems(
+                this.$local_api.AcademicController.getItems(
                     this.data_path[this.data_index],
                     this.pid,
                     -1,
@@ -630,7 +630,7 @@ export default {
                         });
                     });
             } else
-                this.$local_api.Academic.getSearchItems(
+                this.$local_api.AcademicController.getSearchItems(
                     this.data_path[this.data_index],
                     this.pid,
                     this.currentSearch.debounce,
@@ -667,7 +667,7 @@ export default {
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
-                    await this.$local_api.Academic.deleteItem(
+                    await this.$local_api.AcademicController.deleteItem(
                         this.data_path[this.data_index],
                         this.currentItem.id
                     ).then((res) => {
@@ -692,7 +692,7 @@ export default {
                 confirm: async () => {
                     this.lock = false;
                     let ids = this.currentChoosen.map((el) => el.id);
-                    let res = await this.$local_api.Academic.deleteItems(
+                    let res = await this.$local_api.AcademicController.deleteItems(
                         this.data_path[this.data_index],
                         ids
                     );
@@ -736,7 +736,7 @@ export default {
             this.toggleEditor(true);
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.Academic.openItemFile(
+            this.$local_api.AcademicController.openItemFile(
                 this.data_path[this.data_index],
                 itemid,
                 fileid,
@@ -770,7 +770,7 @@ export default {
             let ids = choosen.map((el) => el.id);
             for (let partition of partitions) {
                 let partitionid = partition.id;
-                let res = await this.$local_api.Academic.addItemsToPartition(
+                let res = await this.$local_api.AcademicController.addItemsToPartition(
                     this.data_path[this.data_index],
                     partitionid,
                     ids
@@ -822,7 +822,7 @@ export default {
                 choosen.push(this.currentItem);
             if (choosen.length === 0) return;
             let ids = choosen.map((el) => el.id);
-            this.$local_api.Academic.removeItemsFromPartition(
+            this.$local_api.AcademicController.removeItemsFromPartition(
                 this.data_path[this.data_index],
                 this.pid,
                 ids
@@ -855,7 +855,7 @@ export default {
         },
         async reviseItemEmoji(item, emoji) {
             item.emoji = emoji;
-            let res = await this.$local_api.Academic.updateItem(
+            let res = await this.$local_api.AcademicController.updateItem(
                 this.data_path[this.data_index],
                 item
             );
@@ -868,7 +868,7 @@ export default {
         async revisePageEmoji(item, page, emoji) {
             if (!this.items) return;
             page.emoji = emoji;
-            let res = await this.$local_api.Academic.updateItemPage(
+            let res = await this.$local_api.AcademicController.updateItemPage(
                 this.data_path[this.data_index],
                 item.id,
                 page
@@ -881,7 +881,7 @@ export default {
         },
         async duplicateItemPage(item, page) {
             if (!this.items) return;
-            let res = await this.$local_api.Academic.duplicateItemPage(
+            let res = await this.$local_api.AcademicController.duplicateItemPage(
                 this.data_path[this.data_index],
                 item.id,
                 page.id
@@ -902,7 +902,7 @@ export default {
                 cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
-                    let res = await this.$local_api.Academic.deleteItemPage(
+                    let res = await this.$local_api.AcademicController.deleteItemPage(
                         this.data_path[this.data_index],
                         itemId,
                         pageId

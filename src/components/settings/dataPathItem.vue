@@ -123,7 +123,7 @@ export default {
         scanDS() {
             if (!this.thisValue.path) return;
             let path = this.thisValue.path;
-            this.$local_api.Academic.getDataSourceInfo(path)
+            this.$local_api.AcademicController.getDataSourceInfo(path)
                 .then((res) => {
                     if (res.status === 'success') {
                         let data = res.data;

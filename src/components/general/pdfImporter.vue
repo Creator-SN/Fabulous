@@ -132,7 +132,7 @@ export default {
                     _item.pdf = `${_item.id}`;
                     _item.metadata = _metadata;
                     console.log('metadata:', _metadata);
-                    let res = await this.$local_api.Academic.createItem(
+                    let res = await this.$local_api.AcademicController.createItem(
                         this.data_path[this.data_index],
                         _item
                     );
@@ -188,7 +188,7 @@ export default {
                 _item.createDate = this.$SDate.DateToString(new Date());
                 _item.pdf = `${_item.id}`;
                 _item.metadata = _metadata;
-                let res = await this.$local_api.Academic.createItem(
+                let res = await this.$local_api.AcademicController.createItem(
                     this.data_path[this.data_index],
                     _item
                 );
@@ -218,7 +218,7 @@ export default {
             let id = this.$route.params.id;
             if (!id) return;
             let res = null;
-            res = await this.$local_api.Academic.addItemsToPartition(
+            res = await this.$local_api.AcademicController.addItemsToPartition(
                 this.data_path[this.data_index],
                 id,
                 [itemid]
@@ -233,7 +233,7 @@ export default {
         async copyPdf(objURL, id = null) {
             if (!id) id = this.item.id;
             let blob = await fetch(objURL).then((r) => r.blob());
-            this.$local_api.Academic.updateItemPDF(
+            this.$local_api.AcademicController.updateItemPDF(
                 this.data_path[this.data_index],
                 id,
                 id,
@@ -246,7 +246,7 @@ export default {
         },
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
-            let res = await this.$local_api.Academic.updateItemMetadata(
+            let res = await this.$local_api.AcademicController.updateItemMetadata(
                 this.data_path[this.data_index],
                 id,
                 _metadata

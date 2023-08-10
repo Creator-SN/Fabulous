@@ -182,7 +182,7 @@ export default {
                 if (!Array.isArray(item.pages)) item.pages = [];
 
                 for (let page of item.pages) {
-                    await this.$local_api.Academic.getItemPageContent(
+                    await this.$local_api.AcademicController.getItemPageContent(
                         uri,
                         item.id,
                         page.id
@@ -200,7 +200,7 @@ export default {
 
                 // 迁移PDF (Migrate PDF)
                 if (item.pdf) {
-                    await this.$local_api.Academic.getItemPDF(
+                    await this.$local_api.AcademicController.getItemPDF(
                         uri,
                         item.id,
                         item.pdf
@@ -235,7 +235,7 @@ export default {
                 pureItem.pages = [];
 
                 // 创建新数据项 (Create New Item)
-                let res = await this.$local_api.Academic.createItem(
+                let res = await this.$local_api.AcademicController.createItem(
                     targetUri,
                     pureItem
                 );
@@ -252,7 +252,7 @@ export default {
 
                 // 创建新PDF (Create New PDF)
                 if (item.pdfFile) {
-                    let res = await this.$local_api.Academic.updateItemPDF(
+                    let res = await this.$local_api.AcademicController.updateItemPDF(
                         targetUri,
                         newItem.id,
                         newItem.id,
@@ -276,7 +276,7 @@ export default {
                         _metadata[key] = item.metadata[key];
                 }
 
-                res = await this.$local_api.Academic.updateItemMetadata(
+                res = await this.$local_api.AcademicController.updateItemMetadata(
                     targetUri,
                     newItem.id,
                     _metadata
@@ -293,7 +293,7 @@ export default {
 
                 // 创建新Pages (Create New Pages)
                 for (let page of item.pages) {
-                    let res = await this.$local_api.Academic.createItemPage(
+                    let res = await this.$local_api.AcademicController.createItemPage(
                         targetUri,
                         newItem.id,
                         page,
@@ -323,7 +323,7 @@ export default {
             if (this.$route.params.id) {
                 let partitionid = this.$route.params.id;
                 let ids = newItemsCollection.map((item) => item.id);
-                await this.$local_api.Academic.addItemsToPartition(
+                await this.$local_api.AcademicController.addItemsToPartition(
                     this.data_path[this.data_index],
                     partitionid,
                     ids

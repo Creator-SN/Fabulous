@@ -144,7 +144,7 @@ export default {
             _item.emoji = "📦";
             _item.labels = this.labels;
             _item.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.Academic.createItem(
+            let res = await this.$local_api.AcademicController.createItem(
                 this.data_path[this.data_index],
                 _item
             );
@@ -156,7 +156,7 @@ export default {
             }
             if (this.partitionId) {
                 let itemid = res.data.id;
-                res = await this.$local_api.Academic.addItemsToPartition(
+                res = await this.$local_api.AcademicController.addItemsToPartition(
                     this.data_path[this.data_index],
                     this.partitionId,
                     [itemid]

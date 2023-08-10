@@ -87,7 +87,7 @@ export default {
         initDs() {
             if (this.db_index < 0 || this.name === '') return;
             if (!this.data_path[this.db_index]) return;
-            this.$local_api.Config.initDataSource(
+            this.$local_api.ConfigController.initDataSource(
                 this.data_path[this.db_index],
                 this.name
             ).then((res) => {

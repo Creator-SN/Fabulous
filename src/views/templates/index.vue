@@ -153,7 +153,7 @@ export default {
             toggleEditor: "toggleEditor",
         }),
         async getTemplates() {
-            let res = await this.$local_api.Academic.getTemplatesInfo(
+            let res = await this.$local_api.AcademicController.getTemplatesInfo(
                 this.data_path[this.data_index]
             );
             if (res.status === "success") {
@@ -174,7 +174,7 @@ export default {
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
-                    let res = await this.$local_api.Academic.deleteTemplate(
+                    let res = await this.$local_api.AcademicController.deleteTemplate(
                         this.data_path[this.data_index],
                         this.currentItem.id
                     );
@@ -204,7 +204,7 @@ export default {
                         this.lock = false;
                         for (let i = 0; i < this.currentChoosen.length; i++) {
                             let res =
-                                await this.$local_api.Academic.deleteTemplate(
+                                await this.$local_api.AcademicController.deleteTemplate(
                                     this.data_path[this.data_index],
                                     this.currentChoosen[i].id
                                 );

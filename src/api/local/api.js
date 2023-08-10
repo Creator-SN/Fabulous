@@ -129,7 +129,7 @@ const dataDBList = {};
  * @summary 本地配置接口 (Local configuration interface)
  * @description 本地配置接口 (Local configuration interface)
 */
-export class Config {
+export class ConfigController {
 
     /**
      * @summary 获取配置文件信息 (Get config information)
@@ -167,7 +167,7 @@ export class Config {
      * @returns {Promise} 更新结果 (Update result)
      * @description 更新配置文件信息时，只更新传入的配置文件信息，未传入的配置文件信息不做处理 (When updating the configuration file information, only the passed-in configuration file information is updated, and the unpassed configuration file information is not processed)
     */
-    static async updateConfig(target) {
+    static async createOrUpdateConfig(target) {
         return await new Promise((resolve, reject) => {
             try {
                 let _config = JSON.parse(JSON.stringify(config));
@@ -463,7 +463,7 @@ export class Config {
  * @summary 文献管理接口 (Literature management interface)
  * @description 文献管理接口 (Literature management interface)
 */
-export class Academic {
+export class AcademicController {
 
     /**
      * @summary 确保数据源 DataAdapter存在 (Ensure that the data source DataAdapter exists)
@@ -2537,7 +2537,7 @@ export class Academic {
     }
 }
 
-export class Notebook {
+export class NotebookController {
 
     /**
      * @summary 读取文件 (Read file)

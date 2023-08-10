@@ -357,8 +357,6 @@ import initDs from '@/components/settings/initDS.vue';
 import addDs from '@/components/settings/addDS.vue';
 import dataPathItem from '@/components/settings/dataPathItem.vue';
 
-import { config } from '@/js/data_sample';
-
 import OneDrive from '@/assets/settings/OneDrive.svg';
 
 import ThemeColor from '@/js/themeColorPicker.js';
@@ -483,29 +481,14 @@ export default {
     methods: {
         ...mapMutations({}),
         ...mapActions({
-            toggleTheme: 'toggleTheme',
-            reviseConfig: 'reviseConfig'
+            toggleTheme: 'toggleTheme'
         }),
-        configInit() {
-            let _config = JSON.parse(JSON.stringify(config));
-            this.$local_api.Config.getConfig().then((res) => {
-                if (res.status === 'success') {
-                    let target = res.data;
-                    for (let key in _config) {
-                        if (!Object.prototype.hasOwnProperty.call(target, key))
-                            // 要用undefined比较好, 因为其他情况也有可能false.
-                            continue;
-                        _config[key] = target[key];
-                    }
-                    this.reviseConfig(_config);
-                    this.syncFromConfig();
-                    this.refreshDSList();
-                } else {
-                    this.$barWarning(res.message, {
-                        status: 'error'
-                    });
-                }
-            });
+        ...mapActions('config', ['getConfig', 'reviseConfig']),
+        async configInit() {
+            await this.getConfig();
+            console.log('start sync config')
+            this.syncFromConfig();
+            this.refreshDSList();
         },
         syncFromConfig() {
             this.cur_language = this.languages.find(
@@ -600,11 +583,13 @@ export default {
             this.show.addDS = true;
         },
         async linkSource() {
-            this.$local_api.Config.linkLocalDataSource().then((res) => {
-                if (res.status == 'success') {
-                    this.configInit();
+            this.$local_api.ConfigController.linkLocalDataSource().then(
+                (res) => {
+                    if (res.status == 'success') {
+                        this.configInit();
+                    }
                 }
-            });
+            );
         },
         showInitDS(item) {
             let index = this.data_path.indexOf(item.path);

@@ -81,7 +81,7 @@ export default {
         async rename() {
             if (!this.value || this.name === "") return;
             this.value.name = this.name;
-            let res = await this.$local_api.Academic.updateTemplate(
+            let res = await this.$local_api.AcademicController.updateTemplate(
                 this.data_path[this.data_index],
                 this.value
             );

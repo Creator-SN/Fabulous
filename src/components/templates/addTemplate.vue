@@ -83,7 +83,7 @@ export default {
             _page.name = this.name;
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.Academic.createTemplate(
+            let res = await this.$local_api.AcademicController.createTemplate(
                 this.data_path[this.data_index],
                 _page
             );

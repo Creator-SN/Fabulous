@@ -306,7 +306,7 @@ export default {
     methods: {
         getDSInfo() {
             if (this.SourceDisabled) return;
-            this.$local_api.Academic.getDataSourceInfo(
+            this.$local_api.AcademicController.getDataSourceInfo(
                 this.data_path[this.data_index]
             )
                 .then((res) => {
@@ -330,10 +330,10 @@ export default {
             this.treeList = [];
             this.FLAT = [];
             let result = [];
-            let groups = await this.$local_api.Academic.getRootGroups(
+            let groups = await this.$local_api.AcademicController.getRootGroups(
                 this.data_path[this.data_index]
             );
-            let partitions = await this.$local_api.Academic.getRootPartitions(
+            let partitions = await this.$local_api.AcademicController.getRootPartitions(
                 this.data_path[this.data_index]
             );
             groups = groups.data;
@@ -395,7 +395,7 @@ export default {
             item.loading = true;
             let groupList = [];
             let partitionList = [];
-            await this.$local_api.Academic.getGroups(
+            await this.$local_api.AcademicController.getGroups(
                 this.data_path[this.data_index],
                 item.id
             )
@@ -419,7 +419,7 @@ export default {
                     });
                     item.loading = false;
                 });
-            await this.$local_api.Academic.getPartitions(
+            await this.$local_api.AcademicController.getPartitions(
                 this.data_path[this.data_index],
                 item.id
             )
@@ -545,13 +545,13 @@ export default {
             let mode = null;
             if (item.isTmp) {
                 if (item.type === 'group') {
-                    res = await this.$local_api.Academic.createGroup(
+                    res = await this.$local_api.AcademicController.createGroup(
                         this.data_path[this.data_index],
                         item.parent,
                         item
                     );
                 } else
-                    res = await this.$local_api.Academic.createPartition(
+                    res = await this.$local_api.AcademicController.createPartition(
                         this.data_path[this.data_index],
                         item.parent,
                         item
@@ -559,12 +559,12 @@ export default {
                 mode = 'add';
             } else {
                 if (item.type === 'group') {
-                    res = await this.$local_api.Academic.updateGroup(
+                    res = await this.$local_api.AcademicController.updateGroup(
                         this.data_path[this.data_index],
                         item
                     );
                 } else
-                    res = await this.$local_api.Academic.updatePartition(
+                    res = await this.$local_api.AcademicController.updatePartition(
                         this.data_path[this.data_index],
                         item.parent,
                         item
@@ -594,12 +594,12 @@ export default {
             item.loading = true;
             let res = null;
             if (item.type === 'group') {
-                res = await this.$local_api.Academic.updateGroup(
+                res = await this.$local_api.AcademicController.updateGroup(
                     this.data_path[this.data_index],
                     item
                 );
             } else
-                res = await this.$local_api.Academic.updatePartition(
+                res = await this.$local_api.AcademicController.updatePartition(
                     this.data_path[this.data_index],
                     item.parent,
                     item
@@ -635,12 +635,12 @@ export default {
             item.loading = true;
             let res = null;
             if (item.type === 'group') {
-                res = await this.$local_api.Academic.deleteGroup(
+                res = await this.$local_api.AcademicController.deleteGroup(
                     this.data_path[this.data_index],
                     item.id
                 );
             } else
-                res = await this.$local_api.Academic.deletePartition(
+                res = await this.$local_api.AcademicController.deletePartition(
                     this.data_path[this.data_index],
                     item.parent,
                     item.id

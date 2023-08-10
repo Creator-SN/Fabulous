@@ -448,13 +448,13 @@ export default {
             this.lock.loading = false;
             let res = null;
             if (this.type === 'item') {
-                res = await this.$local_api.Academic.getItemPageContent(
+                res = await this.$local_api.AcademicController.getItemPageContent(
                     this.data_path[this.data_index],
                     this.item.id,
                     this.target.id
                 );
             } else {
-                res = await this.$local_api.Academic.getTemplateContent(
+                res = await this.$local_api.AcademicController.getTemplateContent(
                     this.data_path[this.data_index],
                     this.target.id
                 );
@@ -499,7 +499,7 @@ export default {
             if (!this.lock.save) return;
             this.lock.save = false;
             if (this.type === 'item') {
-                await this.$local_api.Academic.saveItemPageContent(
+                await this.$local_api.AcademicController.saveItemPageContent(
                     this.data_path[this.data_index],
                     this.item.id,
                     this.target.id,
@@ -516,7 +516,7 @@ export default {
                         });
                     });
             } else {
-                await this.$local_api.Academic.saveTemplateContent(
+                await this.$local_api.AcademicController.saveTemplateContent(
                     this.data_path[this.data_index],
                     this.target.id,
                     JSON.stringify(json)
@@ -590,7 +590,7 @@ export default {
             });
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.Academic.openItemFile(
+            this.$local_api.AcademicController.openItemFile(
                 this.data_path[this.data_index],
                 itemid,
                 fileid,
@@ -611,7 +611,7 @@ export default {
                 value.split('/').length > 1 ? value.split('/')[1] : '';
 
             let res = null;
-            res = await this.$local_api.Academic.getSearchItems(
+            res = await this.$local_api.AcademicController.getSearchItems(
                 this.data_path[this.data_index],
                 null,
                 value.split('/')[0],

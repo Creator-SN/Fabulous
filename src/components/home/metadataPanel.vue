@@ -599,7 +599,7 @@ export default {
         },
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
-            let res = await this.$local_api.Academic.updateItemMetadata(
+            let res = await this.$local_api.AcademicController.updateItemMetadata(
                 this.data_path[this.data_index],
                 id,
                 _metadata

@@ -103,7 +103,7 @@ export default {
     },
     methods: {
         async choosePath() {
-            await this.$local_api.Config.selectLocalDataSourcePath().then(
+            await this.$local_api.ConfigController.selectLocalDataSourcePath().then(
                 (res) => {
                     if (res.status === 'success') {
                         this.path = res.data;
@@ -114,7 +114,7 @@ export default {
         async addDS() {
             if (this.path === '') return;
             if (this.name === '') return;
-            this.$local_api.Config.createDataSource(this.path, this.name)
+            this.$local_api.ConfigController.createDataSource(this.path, this.name)
                 .then((res) => {
                     if (res.status !== 'success') {
                         this.$barWarning(res.message, {

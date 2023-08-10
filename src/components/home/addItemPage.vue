@@ -112,7 +112,7 @@ export default {
             _page.name = this.name;
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.Academic.createItemPage(
+            let res = await this.$local_api.AcademicController.createItemPage(
                 this.data_path[this.data_index],
                 this.item.id,
                 _page,
@@ -128,7 +128,7 @@ export default {
             }
         },
         async getTemplates() {
-            let res = await this.$local_api.Academic.getTemplatesInfo(
+            let res = await this.$local_api.AcademicController.getTemplatesInfo(
                 this.data_path[this.data_index]
             );
             if (res.status === "success") {

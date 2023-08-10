@@ -93,7 +93,7 @@ export default new Vuex.Store({
             } else {
                 state.config.theme = 'light'
             }
-            await Vue.prototype.$local_api.Config.updateConfig(state.config);
+            await Vue.prototype.$local_api.ConfigController.createOrUpdateConfig(state.config);
         },
         async reviseConfig(context, obj) {
             context.dispatch("config/reviseConfig", obj);

@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
 import addItemPage from '@/components/home/addItemPage.vue';
 import editorBlock from '@/components/general/editorContainer/editorBlock.vue';
@@ -221,9 +221,11 @@ export default {
     mounted() {},
     methods: {
         ...mapMutations({
-            reviseConfig: 'reviseConfig',
             reviseEditor: 'reviseEditor',
             toggleEditor: 'toggleEditor'
+        }),
+        ...mapActions({
+            reviseConfig: 'reviseConfig'
         }),
         getEditor() {
             return this.$refs.editor_block.getEditor();
@@ -253,7 +255,7 @@ export default {
             });
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.Academic.openItemFile(
+            this.$local_api.AcademicController.openItemFile(
                 this.data_path[this.data_index],
                 itemid,
                 fileid,

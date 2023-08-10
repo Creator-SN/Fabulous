@@ -494,7 +494,7 @@ export default {
             if (!this.lock.loading) return;
             this.lock.loading = false;
             this.fabulousNotebook.banner = null;
-            await this.$local_api.Notebook.getDocumentAsync(
+            await this.$local_api.NotebookController.getDocumentAsync(
                 this.data_path[this.data_index],
                 this.path
             )
@@ -567,7 +567,7 @@ export default {
             if (!this.lock.save) return;
             this.lock.save = false;
             let saveContent = this.saveContent(obj);
-            await this.$local_api.Notebook.updateDocumentAsync(
+            await this.$local_api.NotebookController.updateDocumentAsync(
                 this.data_path[this.data_index],
                 this.path,
                 saveContent
