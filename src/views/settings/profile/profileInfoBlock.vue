@@ -156,7 +156,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         ...mapGetters('Theme', ['color', 'gradient']),
         ...mapState({
             userInfo: (state) => state.User.info,

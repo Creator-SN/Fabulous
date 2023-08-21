@@ -105,6 +105,23 @@ export class GroupUpdateDTO {
     parent=undefined
     
 }
+export class DataSourceUpdateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     */ 
+    constructor(name = undefined){
+        this.name = name
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined
+    
+}
 export class UserRegister {
   
     /**
@@ -503,12 +520,14 @@ export class NoteBookCreateDTO {
      * @param {String} description 
      * @param {String} banner 
      * @param {String} parent 
+     * @param {String} sourceId 
      */ 
-    constructor(title = undefined,description = undefined,banner = undefined,parent = undefined){
+    constructor(title = undefined,description = undefined,banner = undefined,parent = undefined,sourceId = undefined){
         this.title = title
         this.description = description
         this.banner = banner
         this.parent = parent
+        this.sourceId = sourceId
     }
        
     /**
@@ -530,7 +549,12 @@ export class NoteBookCreateDTO {
      * 
      * @type {String}
      */
-    parent=undefined
+    parent=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined
     
 }
 export class GroupCreateDTO {
@@ -540,11 +564,13 @@ export class GroupCreateDTO {
      * @param {String} name 
      * @param {String} emoji 图标
      * @param {String} parent 父节点
+     * @param {String} sourceId 数据源
      */ 
-    constructor(name = undefined,emoji = undefined,parent = undefined){
+    constructor(name = undefined,emoji = undefined,parent = undefined,sourceId = undefined){
         this.name = name
         this.emoji = emoji
         this.parent = parent
+        this.sourceId = sourceId
     }
        
     /**
@@ -561,7 +587,12 @@ export class GroupCreateDTO {
      * 父节点
      * @type {String}
      */
-    parent=undefined
+    parent=undefined   
+    /**
+     * 数据源
+     * @type {String}
+     */
+    sourceId=undefined
     
 }
 export class ConfigCreateOrUpdateDTO {
@@ -569,8 +600,7 @@ export class ConfigCreateOrUpdateDTO {
     /**
      *
      * @param {String} configId 
-     * @param {Array} dataPath 
-     * @param {Number} dataIndex 
+     * @param {String} data_index 
      * @param {String} language 
      * @param {undefined} autoSave 
      * @param {undefined} initStatus 
@@ -582,10 +612,9 @@ export class ConfigCreateOrUpdateDTO {
      * @param {undefined} watchAllExtensions 
      * @param {String} theme 
      */ 
-    constructor(configId = undefined,dataPath = undefined,dataIndex = undefined,language = undefined,autoSave = undefined,initStatus = undefined,name = undefined,lastLocalPath = undefined,editorExpandContent = undefined,activeSystemMode = undefined,dynamicEffect = undefined,watchAllExtensions = undefined,theme = undefined){
+    constructor(configId = undefined,data_index = undefined,language = undefined,autoSave = undefined,initStatus = undefined,name = undefined,lastLocalPath = undefined,editorExpandContent = undefined,activeSystemMode = undefined,dynamicEffect = undefined,watchAllExtensions = undefined,theme = undefined){
         this.configId = configId
-        this.dataPath = dataPath
-        this.dataIndex = dataIndex
+        this.data_index = data_index
         this.language = language
         this.autoSave = autoSave
         this.initStatus = initStatus
@@ -605,14 +634,9 @@ export class ConfigCreateOrUpdateDTO {
     configId=undefined   
     /**
      * 
-     * @type {Array}
+     * @type {String}
      */
-    dataPath=undefined   
-    /**
-     * 
-     * @type {Number}
-     */
-    dataIndex=undefined   
+    data_index=undefined   
     /**
      * 
      * @type {String}
@@ -663,5 +687,39 @@ export class ConfigCreateOrUpdateDTO {
      * @type {String}
      */
     theme=undefined
+    
+}
+export class DataSourceCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     */ 
+    constructor(name = undefined){
+        this.name = name
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined
+    
+}
+export class SseEmitter {
+  
+    /**
+     *
+     * @param {Number} timeout 
+     */ 
+    constructor(timeout = undefined){
+        this.timeout = timeout
+    }
+       
+    /**
+     * 
+     * @type {Number}
+     */
+    timeout=undefined
     
 }

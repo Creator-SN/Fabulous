@@ -293,7 +293,7 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         SourceDisabled() {
             return !this.currentDataPath;
         }

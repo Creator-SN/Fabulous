@@ -554,7 +554,7 @@ export default {
             mode: (state) => state.pdfImporter.mode,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         pid() {
             if (!this.$route.params.id) return null;
             return this.$route.params.id;

@@ -329,7 +329,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         showNav() {
             return (
                 this.type === 'item' &&

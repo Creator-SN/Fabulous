@@ -124,27 +124,41 @@ export default {
         scanDS() {
             if (!this.thisValue.path) return;
             let path = this.thisValue.path;
-            this.$local_api.AcademicController.getDataSourceInfo(path)
-                .then((res) => {
-                    if (res.status === 'success') {
-                        let data = res.data;
-                        this.scanValue.id = data.id;
-                        if (!this.scanValue.id) {
-                            this.scanValue.status = 'missing';
-                            return;
-                        }
-                        this.scanValue.name = data.name;
-                        this.scanValue.groupLength = data.groupLength;
-                        this.scanValue.itemLength = data.itemLength;
-                        this.scanValue.createDate = data.createDate;
-                        this.scanValue.templatesLength = data.templatesLength;
-                        this.scanValue.partitionsLength = data.partitionsLength;
-                        this.scanValue.status = 'normal';
-                    } else this.scanValue.status = 'missing';
-                })
-                .catch(() => {
-                    this.scanValue.status = 'missing';
-                });
+            if (this.thisValue.local)
+                this.$local_api.AcademicController.getDataSourceInfo(path)
+                    .then((res) => {
+                        if (res.status === 'success') {
+                            let data = res.data;
+                            this.scanValue.id = data.id;
+                            if (!this.scanValue.id) {
+                                this.scanValue.status = 'missing';
+                                return;
+                            }
+                            this.scanValue.name = data.name;
+                            this.scanValue.groupLength = data.groupLength;
+                            this.scanValue.itemLength = data.itemLength;
+                            this.scanValue.createDate = data.createDate;
+                            this.scanValue.templatesLength =
+                                data.templatesLength;
+                            this.scanValue.partitionsLength =
+                                data.partitionsLength;
+                            this.scanValue.status = 'normal';
+                        } else this.scanValue.status = 'missing';
+                    })
+                    .catch(() => {
+                        this.scanValue.status = 'missing';
+                    });
+            else {
+                this.scanValue.id = this.thisValue.id;
+                this.scanValue.name = this.thisValue.name;
+                this.scanValue.groupLength = this.thisValue.groupLength;
+                this.scanValue.itemLength = this.thisValue.itemLength;
+                this.scanValue.createDate = this.thisValue.createDate;
+                this.scanValue.templatesLength = this.thisValue.templatesLength;
+                this.scanValue.partitionsLength =
+                    this.thisValue.partitionsLength;
+                this.scanValue.status = 'normal';
+            }
         },
         switchDataIndex() {
             if (this.disabled) return;

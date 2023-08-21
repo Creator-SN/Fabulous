@@ -466,7 +466,7 @@ export default {
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         SourceIndexDisabled() {
             return (index) => {
                 if (this.data_path.length == 0) return true;
@@ -543,11 +543,12 @@ export default {
             }
             let thisPathList = [];
             pathList.forEach((el, idx) => {
+                el.path = el.path ? el.path : el.id;
                 thisPathList.push({
                     key: idx,
                     name: el.path,
                     ...el,
-                    choosen: idx === this.data_index,
+                    choosen: el.path === this.data_index,
                     disabled: () => false
                 });
             });

@@ -2550,7 +2550,7 @@ export class NotebookController {
      * @returns {Promise} 文件内容 (File content)
      * @description 文件内容为PowerEditor json格式
     */
-    static async getDocumentAsync(uri, filePath) {
+    static async getDocument(uri, filePath) {
         return await new Promise((resolve, reject) => {
             ipc.send("read-file", {
                 id: uri + filePath,
@@ -2587,7 +2587,7 @@ export class NotebookController {
      * @returns {Promise} 创建结果 (Create result)
      * @description 文件内容为PowerEditor json格式
     */
-    static async createDocumentAsync(uri, filePath, content) {
+    static async createDocument(uri, filePath, content) {
         return await new Promise((resolve, reject) => {
             ipc.send("output-file", {
                 id: uri + filePath,
@@ -2624,7 +2624,7 @@ export class NotebookController {
      * @returns {Promise} 保存结果 (Save result)
      * @description 文件内容为PowerEditor json格式
     */
-    static async updateDocumentAsync(uri, filePath, content) {
+    static async updateDocument(uri, filePath, content) {
         return await new Promise((resolve, reject) => {
             ipc.send("output-file", {
                 id: uri + filePath,
@@ -2659,7 +2659,7 @@ export class NotebookController {
      * @returns {Promise} 删除结果 (Delete result)
      * @description 文件内容为PowerEditor json格式
     */
-    static async removeDocumentAsync(uri, filePath) {
+    static async removeDocument(uri, filePath) {
         return await new Promise((resolve, reject) => {
             ipc.send("remove-file", {
                 id: uri + filePath,
@@ -2692,7 +2692,7 @@ export class NotebookController {
      * @param {string} filePath 文件路径, 既能判断目录是否存在, 也能判断目录下的文件是否存在 (File path, can determine whether the directory exists, and can also determine whether the file under the directory exists)
      * @returns {Promise} 是否存在 (Whether it exists)
     */
-    static async existsPathAsync(uri, filePath) {
+    static async existsPath(uri, filePath) {
         return await new Promise((resolve, reject) => {
             ipc.send("exists-path", {
                 id: uri + filePath,
@@ -2726,7 +2726,7 @@ export class NotebookController {
      * @param {string} filePath 目录路径 (Directory path)
      * @returns {Promise} 是否创建成功 (Whether it is created successfully)
     */
-    static async createDirectoryAsync(uri, filePath) {
+    static async createDirectory(uri, filePath) {
         return await new Promise((resolve, reject) => {
             ipc.send("ensure-folder", {
                 id: uri + filePath,
@@ -2761,7 +2761,7 @@ export class NotebookController {
      * @param {object} info 目录信息 (Directory information)
      * @returns {Promise} 是否更新成功 (Whether it is updated successfully)
     */
-    static async updateDirectoryInfoAsync(uri, filePath, info) {
+    static async updateDirectoryInfo(uri, filePath, info) {
         return await new Promise((resolve, reject) => {
             ipc.send("rename", {
                 id: uri + filePath,
@@ -2797,7 +2797,7 @@ export class NotebookController {
      * @returns {Promise} 是否删除成功 (Whether it is deleted successfully)
      * @description 本地删除目录时, 会将目录下的所有文件一并删除 (When deleting a directory locally, all files under the directory will be deleted together)
     */
-    static async removeDirectoryAsync(uri, filePath) {
+    static async removeDirectory(uri, filePath) {
         return await new Promise((resolve, reject) => {
             ipc.send("remove-folder", {
                 id: uri + filePath,
@@ -2833,7 +2833,7 @@ export class NotebookController {
      * @returns {Promise} 是否复制成功 (Whether it is copied successfully)
      * @description 本地复制目录或文件时, 会将目录下的所有文件一并复制 (When copying a directory or file locally, all files under the directory will be copied together)
     */
-    static async copyDirectoryAsync(uri, filePath, newPath) {
+    static async copyDirectory(uri, filePath, newPath) {
         return await new Promise((resolve, reject) => {
             ipc.send("copy-file", {
                 id: uri + filePath + '@' + newPath,
@@ -2867,7 +2867,7 @@ export class NotebookController {
      * @returns {Promise} 是否移动成功 (Whether it is moved successfully)
      * @description 本地移动目录时, 会将目录下的所有文件一并移动 (When moving a directory locally, all files under the directory will be moved together)
     */
-    static async moveDirectoryAsync(uri, filePath, newPath) {
+    static async moveDirectory(uri, filePath, newPath) {
         return await new Promise((resolve, reject) => {
             ipc.send("move-file", {
                 id: uri + filePath + '@' + newPath,

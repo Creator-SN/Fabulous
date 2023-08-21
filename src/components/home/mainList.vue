@@ -178,7 +178,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.thisValue.length; i++) {

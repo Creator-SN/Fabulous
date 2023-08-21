@@ -358,7 +358,7 @@ export default {
             editorShowNav: (state) => state.config.editorShowNav,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         currentBanner() {
             if (!this.fabulousNotebook.banner) return '';
             return this.fabulousNotebook.banner;

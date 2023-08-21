@@ -78,7 +78,7 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         thisDataPath() {
             if (this.data_path.length == 0) return null;
             if (this.data_path[this.db_index])

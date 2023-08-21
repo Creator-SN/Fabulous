@@ -49,7 +49,7 @@ export default {
         ...mapState({
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(["local", "currentDataPath"]),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
     },
 };
 </script>

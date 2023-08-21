@@ -79,7 +79,7 @@ export default {
             userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         currentPath() {
             return this.currentDataPath;
         },

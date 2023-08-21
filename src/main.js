@@ -18,6 +18,8 @@ import VueAxios from 'vue-axios'
 import api from "./api/remote";
 import local_api from "./api/local";
 
+const isdev = (process.env.NODE_ENV === "development")
+
 
 let PDFJS = require("pdfjs-dist");
 // fix pdf workerSrc
@@ -59,6 +61,11 @@ new Vue({
             let guid = this.$SUtility.Guid();
             guid = guid.split('-')[0];
             return guid;
+        }
+        if (isdev) {
+            Vue.prototype.$server = "http://59.77.134.155:5080";
+        } else {
+            Vue.prototype.$server = `/api`;
         }
     }
 }).$mount('#app')

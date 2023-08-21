@@ -26,7 +26,7 @@
                         :theme="theme"
                         slider-background="rgba(145, 145, 235, 1)"
                         style="width: calc(100% - 20px);"
-                        @change="menuDisplayMode = $event.key"
+                        @change="switchDisplay"
                     >
                         <template v-slot:container="x">
                             <img
@@ -39,15 +39,35 @@
                         </template>
                     </fv-pivot>
                 </div>
+                <div
+                    v-if="menuDisplayMode.key != 0 && isLogin"
+                    class="navigation-view-pivot"
+                >
+                    <fv-Pivot
+                        v-model="menuDisplayMode"
+                        :items="notebookPivot"
+                        :tab="true"
+                        :font-size="12"
+                        style="width: calc(100% - 20px);"
+                        @change="switchDisplay"
+                    ></fv-Pivot>
+                </div>
                 <ds-tree-view
                     v-show="expand && activeSystemMode !== 'notebook' && computeDisplay('ds')"
                     :Go="Go"
                 ></ds-tree-view>
                 <local-tree-view
-                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('notebook')"
+                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('local_notebook')"
                     v-model="localPath"
                     :Go="Go"
                     ref="local_view"
+                ></local-tree-view>
+                <local-tree-view
+                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('remote_notebook')"
+                    v-model="currentDataPath"
+                    :isRemote="true"
+                    :Go="Go"
+                    ref="remote_view"
                 ></local-tree-view>
             </div>
         </template>
@@ -96,12 +116,34 @@ export default {
                     width: '50%'
                 }
             ],
+            notebookPivot: [
+                {
+                    key: 2,
+                    name: () => {
+                        return this.local('Local Notebook');
+                    },
+                    img: notebook,
+                    show: () => this.activeSystemMode !== 'ds',
+                    width: '50%'
+                },
+                {
+                    key: 3,
+                    name: () => {
+                        return this.local('Remote Notebook');
+                    },
+                    img: notebook,
+                    show: () => this.activeSystemMode !== 'ds',
+                    width: '50%'
+                }
+            ],
             img: {
                 dataSource,
                 notebook
             },
             localPath: '',
-            menuDisplayMode: 0
+            menuDisplayMode: {
+                key: 0
+            }
         };
     },
     watch: {
@@ -125,9 +167,10 @@ export default {
             watchAllExtensions: (state) => state.config.watchAllExtensions,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
+            userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
             return 'rgba(0, 0, 0, 0.8)';
@@ -136,17 +179,26 @@ export default {
             let pathList = this.localPath.split(/[\\/]/);
             return pathList[pathList.length - 1];
         },
+        isLogin() {
+            return this.userInfo.id;
+        },
         computeDisplay() {
             return (name) => {
                 if (name === 'ds') {
                     if (this.activeSystemMode === 'ds') return true;
                     if (this.activeSystemMode === 'notebook') return false;
-                    return this.menuDisplayMode === 0;
+                    return this.menuDisplayMode.key === 0;
                 }
-                if (name === 'notebook') {
+                if (name === 'local_notebook') {
                     if (this.activeSystemMode === 'ds') return false;
-                    if (this.activeSystemMode === 'notebook') return true;
-                    return this.menuDisplayMode === 1;
+                    if (this.activeSystemMode === 'notebook' && !this.isLogin)
+                        return true;
+                    return this.menuDisplayMode.key === 2;
+                }
+                if (name === 'remote_notebook') {
+                    if (this.activeSystemMode === 'ds') return false;
+                    if (!this.isLogin) return false;
+                    return this.menuDisplayMode.key === 3;
                 }
             };
         }
@@ -158,6 +210,15 @@ export default {
         ...mapActions({
             reviseConfig: 'reviseConfig'
         }),
+        switchDisplay(event) {
+            const key = event.key;
+            if (key === 1) {
+                if (!this.isLogin) this.menuDisplayMode = this.notebookPivot[0];
+                else this.menuDisplayMode = this.notebookPivot[1];
+                return;
+            }
+            this.menuDisplayMode = event;
+        },
         Go(path) {
             if (this.$route.path === path) return 0;
             if (this.windowWidth < this.mobileDisplay) this.expand = false;

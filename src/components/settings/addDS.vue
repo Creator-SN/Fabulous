@@ -27,8 +27,28 @@
                 <p
                     class="w-title"
                     style="margin-top: 25px;"
+                >{{local(`Select to Create at Local or Remote`)}}</p>
+                <fv-toggle-switch
+                    v-show="isLogin"
+                    :title="local('Select to Create at Local or Remote')"
+                    v-model="remote"
+                    width="120"
+                    height="30"
+                    :on="local('Create at Remote')"
+                    :off="local('Create at Local')"
+                    :onForeground="theme === 'dark' ? '#fff' : '#000'"
+                    :offForeground="theme === 'dark' ? '#fff' : '#000'"
+                    :switch-on-background="theme === 'dark' ? '#000' : 'rgba(140, 148, 228, 1)'"
+                    :insideContent="true"
+                >
+                </fv-toggle-switch>
+                <p
+                    v-show="!isLogin || !remote"
+                    class="w-title"
+                    style="margin-top: 25px;"
                 >{{local('Choose Folder')}}</p>
                 <fv-text-box
+                    v-show="!isLogin || !remote"
                     v-model="path"
                     :placeholder="local('Choose Data Source Directory ...')"
                     :theme="theme"
@@ -44,15 +64,26 @@
                     style="width: 90%; height: 45px; margin-top: 5px;"
                     @click.native="choosePath"
                 ></fv-text-box>
-                <p class="w-info">{{local('When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.')}}</p>
+                <p
+                    v-show="!isLogin || !remote"
+                    class="w-info"
+                >{{local('When adding a data source, a data source folder will be created under the data source path, and a data source configuration file will be created under the data source folder.')}}</p>
             </div>
         </template>
         <template v-slot:control>
             <fv-button
+                v-if="!isLogin || !remote"
                 theme="dark"
                 background="rgba(0, 98, 158, 1)"
                 :disabled="name === '' || path === ''"
                 @click="addDS"
+            >{{local('Confirm')}}</fv-button>
+            <fv-button
+                v-else
+                theme="dark"
+                background="rgba(0, 98, 158, 1)"
+                :disabled="name === ''"
+                @click="addDSRemote"
             >{{local('Confirm')}}</fv-button>
             <fv-button
                 :theme="theme"
@@ -80,7 +111,8 @@ export default {
         return {
             thisShow: this.show,
             name: '',
-            path: ''
+            path: '',
+            remote: false
         };
     },
     watch: {
@@ -97,9 +129,13 @@ export default {
         ...mapState({
             data_path: (state) => state.config.data_path,
             language: (state) => state.config.language,
+            userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath'])
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        isLogin() {
+            return this.userInfo.id;
+        }
     },
     methods: {
         async choosePath() {
@@ -114,9 +150,33 @@ export default {
         async addDS() {
             if (this.path === '') return;
             if (this.name === '') return;
-            this.$local_api.ConfigController.createDataSource(this.path, this.name)
+            this.$local_api.ConfigController.createDataSource(
+                this.path,
+                this.name
+            )
                 .then((res) => {
                     if (res.status !== 'success') {
+                        this.$barWarning(res.message, {
+                            status: 'warning'
+                        });
+                    } else {
+                        this.$emit('finished');
+                        this.thisShow = false;
+                    }
+                })
+                .catch((res) => {
+                    this.$barWarning(res.message, {
+                        status: 'warning'
+                    });
+                });
+        },
+        async addDSRemote() {
+            if (this.name === '') return;
+            this.$api.ConfigController.createDataSource({
+                name: this.name
+            })
+                .then((res) => {
+                    if (res.code !== 200) {
                         this.$barWarning(res.message, {
                             status: 'warning'
                         });

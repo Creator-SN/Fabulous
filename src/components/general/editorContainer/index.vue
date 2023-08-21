@@ -202,7 +202,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         disabledEditor() {
             return (
                 this.type === 'item' &&

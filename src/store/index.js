@@ -87,13 +87,14 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        async toggleTheme({ state }) {
+        async toggleTheme(context) {
+            const state = context.state;
             if (state.config.theme == 'light') {
                 state.config.theme = 'dark'
             } else {
                 state.config.theme = 'light'
             }
-            await Vue.prototype.$local_api.ConfigController.createOrUpdateConfig(state.config);
+            await context.dispatch("config/reviseConfig", state.config);
         },
         async reviseConfig(context, obj) {
             context.dispatch("config/reviseConfig", obj);
@@ -115,6 +116,16 @@ export default new Vuex.Store({
             if (dataPathItem)
                 return dataPathItem.path;
             return null;
+        },
+        $auto: state => {
+            let isLocal = true;
+            if (state.config.data_path[state.config.data_index])
+                isLocal = state.config.data_path[state.config.data_index].local;
+            let dataPathItem = state.config.data_path.find(item => item.path === state.config.data_index);
+            if (dataPathItem)
+                isLocal = dataPathItem.local;
+            if (isLocal) return Vue.prototype.$local_api;
+            return Vue.prototype.$api;
         }
     },
     modules: {

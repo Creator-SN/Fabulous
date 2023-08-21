@@ -243,7 +243,7 @@ export default {
             activeSystemMode: (state) => state.config.activeSystemMode,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath'])
+        ...mapGetters(['local', 'currentDataPath', '$auto'])
     },
     mounted() {
         this.configInit();

@@ -52,3 +52,44 @@ export class NotebookWatcher extends EventManager {
         this.ipc.send(eventName, obj);
     }
 }
+
+export class RemoteNotebookWatcher extends EventManager {
+    constructor() {
+        super();
+    }
+
+    eventSourceInit(dataPath) {
+        let token = localStorage.getItem('ApiToken');
+        if (!token) return;
+        token = token.replace('Bearer ', '');
+        if (this.eventSource) this.eventSource.close();
+        this.eventSource = new EventSource(
+            `${this.$server}/configs/sources/${dataPath}/chokidar?Authorization=${token}`
+        );
+    }
+
+    callbackEventInit() {
+        this.eventSource.addEventListener('message', (event) => {
+            let data = JSON.parse(event.data);
+            this.emit("watch-path-localTree", event, {
+                ...data
+            });
+        });
+        this.eventSource.addEventListener('error', (error) => {
+            // console.log(error);
+            this.emit("watch-path-localTree", error, {
+                status: 500,
+                message: error
+            });
+            this.eventSource.close();
+        });
+    }
+
+    send(eventName, obj) {
+        if (eventName === 'watch-path-localTree') {
+            this.eventSource.close();
+            this.eventSourceInit(obj.path);
+            this.callbackEventInit();
+        }
+    }
+}

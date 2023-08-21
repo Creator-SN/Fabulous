@@ -167,7 +167,7 @@ export default {
         ...mapState({
             unsave: (state) => state.editor.unsave,
         }),
-        ...mapGetters(["local", "currentDataPath"]),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
     },
     mounted() {
         this.timerInit();

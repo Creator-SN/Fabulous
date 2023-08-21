@@ -237,7 +237,7 @@ import rightMenu from '@/components/general/rightMenu.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
-import { NotebookWatcher } from '@/js/eventManager.js';
+import { NotebookWatcher, RemoteNotebookWatcher } from '@/js/eventManager.js';
 
 import notebook from '@/assets/nav/notebook.svg';
 import folderImg from '@/assets/nav/folder.svg';
@@ -259,6 +259,9 @@ export default {
         },
         rightMenuWidth: {
             default: 200
+        },
+        isRemote: {
+            default: false
         },
         Go: {
             default: () => {}
@@ -312,7 +315,9 @@ export default {
             },
             FLAT: [],
             copyList: [],
-            nw: new NotebookWatcher(),
+            nw: !this.isRemote
+                ? new NotebookWatcher()
+                : new RemoteNotebookWatcher(),
             rightMenuItem: {},
             show: {
                 rightMenu: false
@@ -337,7 +342,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', '$auto']),
         computeTreeItem() {
             return (fileObj) => {
                 let item = {
@@ -381,8 +386,7 @@ export default {
             return !this.currentDataPath;
         },
         uri() {
-            if (this.currentDataPath)
-                return this.currentDataPath;
+            if (this.currentDataPath) return this.currentDataPath;
             else return 'local';
         }
     },
@@ -467,7 +471,7 @@ export default {
                     let url = `/notebook/${encodeURI(
                         path.replace(/\//g, '\\')
                     )}`;
-                    this.$local_api.NotebookController.existsPathAsync(id, path)
+                    this.$local_api.NotebookController.existsPath(id, path)
                         .then((res) => {
                             if (res.status === 'success') {
                                 if (res.data)
@@ -726,7 +730,7 @@ export default {
             };
             fbn.createDate = new Date();
             fbn.updateDate = new Date();
-            this.$local_api.NotebookController.createDocumentAsync(
+            this.$local_api.NotebookController.createDocument(
                 this.uri,
                 url,
                 JSON.stringify(fbn)
@@ -748,7 +752,10 @@ export default {
         },
         newFolderConfirm(target) {
             let url = target.dir.replace(/\\/g, '/') + `/${target.name}`;
-            this.$local_api.NotebookController.createDirectoryAsync(this.uri, url)
+            this.$local_api.NotebookController.createDirectory(
+                this.uri,
+                url
+            )
                 .then((res) => {
                     if (res.status === 'success') {
                         this.removeTmp();
@@ -765,7 +772,7 @@ export default {
                 });
         },
         renameConfirm(target) {
-            this.$local_api.NotebookController.updateDirectoryInfoAsync(
+            this.$local_api.NotebookController.updateDirectoryInfo(
                 this.uri,
                 target.filePath,
                 {
@@ -789,7 +796,7 @@ export default {
         deleteConfirm(target) {
             if (!target.filePath) return;
             if (target.isDir) {
-                this.$local_api.NotebookController.removeDirectoryAsync(
+                this.$local_api.NotebookController.removeDirectory(
                     this.uri,
                     target.filePath
                 )
@@ -811,7 +818,7 @@ export default {
                         });
                     });
             } else {
-                this.$local_api.NotebookController.removeDocumentAsync(
+                this.$local_api.NotebookController.removeDocument(
                     this.uri,
                     target.filePath
                 )
@@ -853,7 +860,7 @@ export default {
             if (!target.isDir) return;
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.NotebookController.copyDirectoryAsync(
+                    this.$local_api.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -886,7 +893,7 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.NotebookController.moveDirectoryAsync(
+                    this.$local_api.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -930,7 +937,7 @@ export default {
             };
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.NotebookController.copyDirectoryAsync(
+                    this.$local_api.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -963,7 +970,7 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.NotebookController.moveDirectoryAsync(
+                    this.$local_api.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
@@ -1036,6 +1043,10 @@ export default {
         },
         async openNotebook() {
             let id = this.$Guid();
+            if (this.isRemote) {
+                console.log('open-remote');
+                return;
+            }
             this.$local_api.NotebookController.getLocalProcess().then((res) => {
                 let process = res.data;
                 if (process.argv.length >= 2) {
@@ -1044,7 +1055,7 @@ export default {
                     let url = `/notebook/${encodeURI(
                         path.replace(/\//g, '\\')
                     )}`;
-                    this.$local_api.NotebookController.existsPathAsync(id, url)
+                    this.$local_api.NotebookController.existsPath(id, url)
                         .then((res) => {
                             if (res.status === 'success') {
                                 if (res.data)
