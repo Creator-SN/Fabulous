@@ -78,7 +78,7 @@ export default {
             data_path: (state) => state.config.data_path,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
     },
     methods: {
         async rename() {

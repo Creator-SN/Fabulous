@@ -116,6 +116,7 @@
             </template>
         </fv-TreeView>
         <div
+            v-if="!isRemote"
             v-show="!path"
             class="local-empty-block"
         >
@@ -132,6 +133,7 @@
             :class="[{dark: theme === 'dark'}]"
         >
             <div
+                v-show="item.show()"
                 v-for="(item, index) in notebookCmdList"
                 :key="`command-bar-item: ${index}`"
                 class="command-item"
@@ -200,8 +202,11 @@
                     ></i>
                     <p>{{local("Paste")}}</p>
                 </span>
-                <hr>
-                <span @click="openFile(rightMenuItem)">
+                <hr v-if="!isRemote">
+                <span
+                    v-if="!isRemote"
+                    @click="openFile(rightMenuItem)"
+                >
                     <img
                         draggable="false"
                         :src="img.folder"
@@ -269,7 +274,7 @@ export default {
     },
     data() {
         return {
-            path: '',
+            path: this.value,
             treeList: [],
             notebookCmdList: [
                 {
@@ -277,6 +282,7 @@ export default {
                     func: () => this.createFolder(),
                     img: 'newFolder',
                     disabled: () => !this.value,
+                    show: () => true,
                     iconColor: 'rgba(213, 99, 70, 1)'
                 },
                 {
@@ -284,6 +290,7 @@ export default {
                     func: () => this.chooseFolder(),
                     img: 'folder',
                     disabled: () => false,
+                    show: () => !this.isRemote,
                     iconColor: 'rgba(213, 99, 70, 1)'
                 },
                 {
@@ -291,13 +298,15 @@ export default {
                     func: () => this.refreshFolder(),
                     img: 'refresh',
                     disabled: () => !this.value,
+                    show: () => true,
                     iconColor: 'rgba(172, 84, 206, 1)'
                 },
                 {
                     name: () => this.local('Paste to Root'),
                     img: 'paste',
                     func: () => this.rootPaste(),
-                    disabled: () => this.rootPasteDisabled()
+                    disabled: () => this.rootPasteDisabled(),
+                    show: () => true
                 }
             ],
             img: {
@@ -321,6 +330,9 @@ export default {
             rightMenuItem: {},
             show: {
                 rightMenu: false
+            },
+            lock: {
+                loading: true
             }
         };
     },
@@ -342,7 +354,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         computeTreeItem() {
             return (fileObj) => {
                 let item = {
@@ -379,6 +391,7 @@ export default {
             };
         },
         localPathFolderName() {
+            if (this.isRemote) return this.currentDataPathItem.name;
             let pathList = this.value.split(/[\\/]/);
             return pathList[pathList.length - 1];
         },
@@ -388,6 +401,9 @@ export default {
         uri() {
             if (this.currentDataPath) return this.currentDataPath;
             else return 'local';
+        },
+        Auto() {
+            return this.isRemote ? this.$api : this.$local_api;
         }
     },
     mounted() {
@@ -417,7 +433,12 @@ export default {
                             this.comparePath(it.filePath, parentPath.path)
                         );
                         if (parentItem) {
-                            parentItem.children.push(fileItem);
+                            let existsItem = parentItem.children.find((it) =>
+                                this.comparePath(it.filePath, fileItem.filePath)
+                            );
+                            if (!existsItem) {
+                                parentItem.children.push(fileItem);
+                            }
                             this.hotPushFLAT(fileItem);
                         }
                     }
@@ -462,18 +483,24 @@ export default {
                             }
                         }
                     }
+                } else if (event && event.startsWith('lock')) {
+                    let lockItem = event.split('-')[1];
+                    this.lock[lockItem] = false;
+                } else if (event && event.startsWith('unlock')) {
+                    let lockItem = event.split('-')[1];
+                    this.lock[lockItem] = true;
                 }
 
                 this.nw.on('open-notebook', async (event, argv) => {
                     console.log(argv);
                     let id = this.$Guid();
                     let path = argv[argv.length - 1];
-                    let url = `/notebook/${encodeURI(
-                        path.replace(/\//g, '\\')
-                    )}`;
-                    this.$local_api.NotebookController.existsPath(id, path)
+                    let url = `/notebook/${
+                        this.isRemote ? 'remote/' : ''
+                    }${encodeURI(path.replace(/\//g, '\\'))}`;
+                    this.Auto.NotebookController.existsPath(id, path)
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 if (res.data)
                                     setTimeout(() => {
                                         if (this.$route.path === url) return;
@@ -497,7 +524,7 @@ export default {
         async chooseFolder() {
             await this.$local_api.ConfigController.selectLocalDataSourcePath().then(
                 (res) => {
-                    if (res.status === 'success') {
+                    if (res.code === 200) {
                         this.path = res.data;
                     }
                 }
@@ -512,6 +539,7 @@ export default {
                 //     (this.watchAllExtensions ? "" : "/**/*.+(fbn|json|html)");
                 this.nw.send('watch-path', {
                     id: 'localTree',
+                    server: this.$server,
                     path: this.path,
                     target: null
                 });
@@ -547,9 +575,9 @@ export default {
         treeItemClick(item) {
             if (!item.filePath) return;
             if (!item.isDir) {
-                let url = `/notebook/${encodeURI(
-                    item.filePath.replace(/\//g, '\\')
-                )}`;
+                let url = `/notebook/${
+                    this.isRemote ? 'remote/' : ''
+                }${encodeURI(item.filePath.replace(/\//g, '\\'))}`;
                 if (this.$route.path !== url) {
                     if (this.unsave) {
                         this.$infoBox(
@@ -571,6 +599,8 @@ export default {
                     } else this.Go(url);
                 }
                 return;
+            } else {
+                this.nw.send('load-children', item);
             }
         },
         createFile(dir = null) {
@@ -730,13 +760,13 @@ export default {
             };
             fbn.createDate = new Date();
             fbn.updateDate = new Date();
-            this.$local_api.NotebookController.createDocument(
+            this.Auto.NotebookController.createDocument(
                 this.uri,
                 url,
                 JSON.stringify(fbn)
             )
                 .then((res) => {
-                    if (res.status === 'success') {
+                    if (res.code === 200) {
                         this.removeTmp();
                     } else
                         this.$barWarning(this.local(`Create File Failed`), {
@@ -752,12 +782,10 @@ export default {
         },
         newFolderConfirm(target) {
             let url = target.dir.replace(/\\/g, '/') + `/${target.name}`;
-            this.$local_api.NotebookController.createDirectory(
-                this.uri,
-                url
-            )
+            console.log('create', this.Auto);
+            this.Auto.NotebookController.createDirectory(this.uri, url)
                 .then((res) => {
-                    if (res.status === 'success') {
+                    if (res.code === 200) {
                         this.removeTmp();
                     } else
                         this.$barWarning(this.local(`Create Folder Failed`), {
@@ -772,7 +800,7 @@ export default {
                 });
         },
         renameConfirm(target) {
-            this.$local_api.NotebookController.updateDirectoryInfo(
+            this.Auto.NotebookController.updateDirectoryInfo(
                 this.uri,
                 target.filePath,
                 {
@@ -780,7 +808,7 @@ export default {
                 }
             )
                 .then((res) => {
-                    if (res.status !== 'success') {
+                    if (res.code !== 200) {
                         this.$barWarning(this.local(`Rename Failed`), {
                             status: 'warning'
                         });
@@ -796,12 +824,12 @@ export default {
         deleteConfirm(target) {
             if (!target.filePath) return;
             if (target.isDir) {
-                this.$local_api.NotebookController.removeDirectory(
+                this.Auto.NotebookController.removeDirectory(
                     this.uri,
                     target.filePath
                 )
                     .then((res) => {
-                        if (res.status !== 'success') {
+                        if (res.code !== 200) {
                             console.error(res);
                             this.$barWarning(
                                 this.local(`Remove Folder Failed`),
@@ -818,12 +846,12 @@ export default {
                         });
                     });
             } else {
-                this.$local_api.NotebookController.removeDocument(
+                this.Auto.NotebookController.removeDocument(
                     this.uri,
                     target.filePath
                 )
                     .then((res) => {
-                        if (res.status !== 'success') {
+                        if (res.code !== 200) {
                             console.error(res);
                             this.$barWarning(this.local(`Remove File Failed`), {
                                 status: 'warning'
@@ -860,13 +888,13 @@ export default {
             if (!target.isDir) return;
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.NotebookController.copyDirectory(
+                    this.Auto.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
                     )
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 let targetItem = this.FLAT.find((it) =>
                                     this.comparePath(
                                         it.filePath,
@@ -893,13 +921,13 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.NotebookController.moveDirectory(
+                    this.Auto.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
                     )
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 let targetItem = this.FLAT.find((it) =>
                                     this.comparePath(
                                         it.filePath,
@@ -937,13 +965,13 @@ export default {
             };
             for (let item of this.copyList) {
                 if (item.type === 'copy') {
-                    this.$local_api.NotebookController.copyDirectory(
+                    this.Auto.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
                     )
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 let targetItem = this.FLAT.find((it) =>
                                     this.comparePath(
                                         it.filePath,
@@ -970,13 +998,13 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
-                    this.$local_api.NotebookController.moveDirectory(
+                    this.Auto.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
                         target.filePath.replace(/\\/g, '/') + `/${item.name}`
                     )
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 let targetItem = this.FLAT.find((it) =>
                                     this.comparePath(
                                         it.filePath,
@@ -1021,7 +1049,7 @@ export default {
         openFile(item) {
             let url = item.filePath;
             if (!item.isDir) url = this.findParentPath(item).path;
-            this.$local_api.NotebookController.openFile(this.uri, url);
+            this.Auto.NotebookController.openFile(this.uri, url);
         },
         whiteClickClearTmp(event) {
             let x = event.target;
@@ -1052,12 +1080,12 @@ export default {
                 if (process.argv.length >= 2) {
                     let path = process.argv[1];
                     if (path === 'dist_electron') return;
-                    let url = `/notebook/${encodeURI(
-                        path.replace(/\//g, '\\')
-                    )}`;
-                    this.$local_api.NotebookController.existsPath(id, url)
+                    let url = `/notebook/${
+                        this.isRemote ? 'remote/' : ''
+                    }${encodeURI(path.replace(/\//g, '\\'))}`;
+                    this.Auto.NotebookController.existsPath(id, url)
                         .then((res) => {
-                            if (res.status === 'success') {
+                            if (res.code === 200) {
                                 if (res.data)
                                     setTimeout(() => {
                                         this.toggleEditor(false);

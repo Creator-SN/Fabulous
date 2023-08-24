@@ -41,13 +41,15 @@
                     :value="thisPathList"
                     :theme="theme"
                     :rowHeight="60"
-                    :choosen-background="'rgba(255, 255, 255, 0.1)'"
+                    :header-foreground="'rgba(140, 148, 228, 1)'"
+                    :choosen-background="theme === 'dark' ? 'rgba(120, 120, 120, 0.3)' : 'rgba(255, 255, 255, 0.6)'"
+                    :showSlider="true"
+                    ref="listView"
                     style="width: 100%; height: auto; margin-top: 15px;"
                 >
                     <template v-slot:listItem="x">
                         <data-path-item
                             :value="x.item"
-                            :choosen="data_index === x.item.path"
                             :disabled="SourceIndexDisabled(x.item.path)"
                             :local="local"
                             :theme="theme"
@@ -466,7 +468,7 @@ export default {
             themeColorList: (state) => state.config.themeColorList,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         SourceIndexDisabled() {
             return (index) => {
                 if (this.data_path.length == 0) return true;

@@ -132,7 +132,7 @@ export default {
             language: (state) => state.config.language,
             displayMode: (state) => state.editor.displayMode
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         nearCurrentPage() {
             return (
                 Math.abs(this.pageIdx - this.currentPage) <= 2 ||

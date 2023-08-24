@@ -14410,10 +14410,10 @@ vfluentdesign@1.2.9:
     swiper "8.3.2"
     vuedraggable "2.23.2"
 
-vfluentdesign@^1.2.22:
-  version "1.2.22"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.22.tgz#a115d2c0dfb96a86717351efd8cb853731c8e5bc"
-  integrity sha512-q9O64IEnnZ9EMliDnjeL+dLyL+DoV1AnZhpqVjYTihIutgtlhG/5LaxNuvCpLdtKenhf7i3rp6E2UOXEg34uRg==
+vfluentdesign@^1.2.25:
+  version "1.2.25"
+  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.25.tgz#d4879e542f695c4459151711e826616118ad9604"
+  integrity sha512-m23QwwzgXiVILiQiPFPxh1Dc9Rfo4v+E1JKjPt+x4pvQqDat9zcx0JkCDCldMLT6pxVfxA/WgLifxnIlS821eA==
   dependencies:
     core-js "3.31.1"
     gsap "3.1.1"

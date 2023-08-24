@@ -1070,5 +1070,157 @@ export default {
     "Code Exists, Please wait for a while.": {
         "en": "Code Exists, Please wait for a while.",
         "cn": "代码已存在，请稍等。"
+    },
+    "Just Now": {
+        "en": "Just Now",
+        "cn": "刚刚"
+    },
+    "?s": {
+        "en": "?s",
+        "cn": "?秒前"
+    },
+    "? minutes ago": {
+        "en": "? minutes ago",
+        "cn": "?分钟前"
+    },
+    "? hours ago": {
+        "en": "? hours ago",
+        "cn": "?小时前"
+    },
+    "After ?s": {
+        "en": "After ?s",
+        "cn": "?秒后"
+    },
+    "After ? minutes": {
+        "en": "After ? minutes",
+        "cn": "?分钟后"
+    },
+    "After ? hours": {
+        "en": "After ? hours",
+        "cn": "?小时后"
+    },
+    "History": {
+        "en": "History",
+        "cn": "历史"
+    },
+    "Read History Failed": {
+        "en": "Read History Failed",
+        "cn": "读取历史记录失败"
+    },
+    "Diff Preview": {
+        "en": "Diff Preview",
+        "cn": "差异对比预览"
+    },
+    "revised": {
+        "en": "revised",
+        "cn": "修改过"
+    },
+    "Keep": {
+        "en": "Keep",
+        "cn": "保留"
+    },
+    "Current": {
+        "en": "Current",
+        "cn": "当前"
+    },
+    "Remote": {
+        "en": "Remote",
+        "cn": "传入"
+    },
+    "Banner": {
+        "en": "Banner",
+        "cn": "头图"
+    },
+    "Commit and Save": {
+        "en": "Commit and Save",
+        "cn": "提交并保存"
+    },
+    "Commit": {
+        "en": "Commit",
+        "cn": "提交变更"
+    },
+    "Discard Changes": {
+        "en": "Discard Changes",
+        "cn": "放弃变更"
+    },
+    "Local Notebook": {
+        "en": "Local Notebook",
+        "cn": "本地笔记本"
+    },
+    "Remote Notebook": {
+        "en": "Remote Notebook",
+        "cn": "云端笔记本"
+    },
+    "Select to Create at Local or Remote": {
+        "en": "Select to Create at Local or Remote",
+        "cn": "选择在本地或云端创建"
+    },
+    "Create at Remote": {
+        "en": "Create at Remote",
+        "cn": "云端创建"
+    },
+    "Create at Local": {
+        "en": "Create at Local",
+        "cn": "本地创建"
+    },
+    "Profile": {
+        "en": "Profile",
+        "cn": "个人信息"
+    },
+    "Select Picture": {
+        "en": "Select Picture",
+        "cn": "选择图片"
+    },
+    "Nick Name": {
+        "en": "Nick Name",
+        "cn": "昵称"
+    },
+    "Real Name": {
+        "en": "Real Name",
+        "cn": "真实姓名"
+    },
+    "Apply Time": {
+        "en": "Apply Time",
+        "cn": "申请时间"
+    },
+    "Edit": {
+        "en": "Edit",
+        "cn": "编辑"
+    },
+    "Accept Changes": {
+        "en": "Accept Changes",
+        "cn": "提交变更"
+    },
+    "Guest": {
+        "en": "Guest",
+        "cn": "游客"
+    },
+    "Local User": {
+        "en": "Local User",
+        "cn": "本地用户"
+    },
+    "Successfully Revised Information": {
+        "en": "Successfully Revised Information",
+        "cn": "信息修改成功"
+    },
+    "Uploading": {
+        "en": "Uploading",
+        "cn": "上传中"
+    },
+    "No Picture Selected": {
+        "en": "No Picture Selected",
+        "cn": "未选择图片"
+    },
+    "Successfully Revised Avatar": {
+        "en": "Successfully Revised Avatar",
+        "cn": "头像修改成功"
+    },
+    "Logout": {
+        "en": "Logout",
+        "cn": "注销"
+    },
+    "Current notebook version conflicts with remote version.": {
+        "en": "Current notebook version conflicts with remote version.",
+        "cn": "当前笔记本版本与云端版本冲突。"
     }
 }

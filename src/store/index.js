@@ -84,6 +84,16 @@ export default new Vuex.Store({
         },
         toggleEditor(state, status) {
             state.editor.show = status;
+        },
+        refreshAutoAPI(state) {
+            let isLocal = true;
+            if (state.config.data_path[state.config.data_index])
+                isLocal = state.config.data_path[state.config.data_index].local;
+            let dataPathItem = state.config.data_path.find(item => item.path === state.config.data_index);
+            if (dataPathItem)
+                isLocal = dataPathItem.local;
+            if (isLocal) Vue.prototype.$auto = Vue.prototype.$local_api;
+            else Vue.prototype.$auto = Vue.prototype.$api;
         }
     },
     actions: {
@@ -107,25 +117,11 @@ export default new Vuex.Store({
                 return text;
             return result[state.config.language];
         },
-        currentDataPath: state => {
-            if (state.config.data_path.length == 0)
-                return null;
-            if (state.config.data_path[state.config.data_index])
-                return state.config.data_path[state.config.data_index].path;
-            let dataPathItem = state.config.data_path.find(item => item.path === state.config.data_index);
-            if (dataPathItem)
-                return dataPathItem.path;
-            return null;
+        currentDataPathItem: state => {
+            return state.config.dataPathItem;
         },
-        $auto: state => {
-            let isLocal = true;
-            if (state.config.data_path[state.config.data_index])
-                isLocal = state.config.data_path[state.config.data_index].local;
-            let dataPathItem = state.config.data_path.find(item => item.path === state.config.data_index);
-            if (dataPathItem)
-                isLocal = dataPathItem.local;
-            if (isLocal) return Vue.prototype.$local_api;
-            return Vue.prototype.$api;
+        currentDataPath: state => {
+            return state.config.dataPathItem.path;
         }
     },
     modules: {

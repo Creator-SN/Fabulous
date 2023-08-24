@@ -96,6 +96,12 @@
                 >
                     {{ "" }}
                 </fv-button>
+                <history-callout
+                    :value="docInfo"
+                    :theme="theme"
+                    :local="local"
+                    @chooseItem="previewHistory"
+                ></history-callout>
                 <fv-toggle-switch
                     :title="local('Auto Save')"
                     v-model="auto_save"
@@ -259,6 +265,19 @@
             :show.sync="show.saveOptions"
             @save="confirmSaveAs"
         ></save-options>
+        <template-preview
+            :value="currentHistory"
+            :show.sync="show.historyPreview"
+        ></template-preview>
+        <diff-previewer
+            v-model="show.diff"
+            :author="beforeSavingDiff.author"
+            :source="beforeSavingDiff.source"
+            :target="beforeSavingDiff.target"
+            :createdAt="beforeSavingDiff.createdAt"
+            @commit="commitDiff"
+            @save="commitDiffAndSave"
+        ></diff-previewer>
     </div>
 </template>
 
@@ -268,19 +287,30 @@ import * as Diff from 'diff';
 
 import editorNav from '@/components/general/editorContainer/editorNav.vue';
 import saveOptions from '@/components/notebook/saveOptions.vue';
+import historyCallout from '@/components/general/callout/historyCallout.vue';
+import templatePreview from '@/components/templates/templatePreview.vue';
+import diffPreviewer from '../../components/general/editorContainer/diffPreviewer.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
     components: {
         editorNav,
-        saveOptions
+        saveOptions,
+        historyCallout,
+        templatePreview,
+        diffPreviewer
     },
     data() {
         return {
             path: '',
             storeContent: '',
             contentType: '', // json, html, fabulous_notebook
+            docInfo: {
+                id: null,
+                versionId: null
+            },
+            currentHistory: {},
             fabulousNotebook: {
                 title: null,
                 description: null,
@@ -289,6 +319,13 @@ export default {
                 author: [],
                 createDate: null,
                 updateDate: null
+            },
+            beforeSavingDiff: {
+                versionId: null,
+                author: null,
+                source: null,
+                target: null,
+                createdAt: new Date()
             },
             readonly: false,
             fontSize: 16,
@@ -307,7 +344,9 @@ export default {
             },
             show: {
                 bottomControl: false,
-                saveOptions: false
+                saveOptions: false,
+                historyPreview: false,
+                diff: false
             },
             timer: {
                 diff: undefined,
@@ -358,10 +397,16 @@ export default {
             editorShowNav: (state) => state.config.editorShowNav,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentBanner() {
             if (!this.fabulousNotebook.banner) return '';
             return this.fabulousNotebook.banner;
+        },
+        isRemote() {
+            return this.$route.path.startsWith('/notebook/remote');
+        },
+        Auto() {
+            return this.isRemote ? this.$api : this.$local_api;
         }
     },
     mounted() {
@@ -376,7 +421,7 @@ export default {
             reviseEditor: 'reviseEditor'
         }),
         ...mapActions({
-            reviseConfig: 'reviseConfig',
+            reviseConfig: 'reviseConfig'
         }),
         eventInit() {
             this.$el.addEventListener(
@@ -494,14 +539,16 @@ export default {
             if (!this.lock.loading) return;
             this.lock.loading = false;
             this.fabulousNotebook.banner = null;
-            await this.$local_api.NotebookController.getDocumentAsync(
+            await this.Auto.NotebookController.getDocument(
                 this.currentDataPath,
                 this.path
             )
                 .then((res) => {
                     if (res.status === 'success') {
+                        let contentData = res.data.content;
+                        this.docInfo = res.data;
                         try {
-                            let rawJson = JSON.parse(res.data);
+                            let rawJson = JSON.parse(contentData);
                             if (rawJson.fabulous_notebook) {
                                 this.contentType = 'fabulous_notebook';
                                 for (let key in this.fabulousNotebook)
@@ -516,10 +563,12 @@ export default {
                             if (ext === 'md') {
                                 this.contentType = 'md';
                                 this.fabulousNotebook.content =
-                                    this.$refs.editor.insertMarkdown(res.data);
+                                    this.$refs.editor.insertMarkdown(
+                                        contentData
+                                    );
                             } else {
                                 this.contentType = 'html';
-                                this.fabulousNotebook.content = res.data;
+                                this.fabulousNotebook.content = contentData;
                             }
                             this.lock.loading = true;
                         }
@@ -534,6 +583,17 @@ export default {
                     });
                     this.lock.loading = true;
                 });
+        },
+        commitDiff(result) {
+            console.log(result);
+            this.fabulousNotebook.banner = result.banner;
+            this.fabulousNotebook.title = result.title;
+            this.fabulousNotebook.content = result.content;
+            this.docInfo.versionId = this.beforeSavingDiff.versionId;
+        },
+        commitDiffAndSave(result) {
+            this.commitDiff(result);
+            this.saveClick();
         },
         editorContentChange() {
             this.diffContent();
@@ -567,18 +627,47 @@ export default {
             if (!this.lock.save) return;
             this.lock.save = false;
             let saveContent = this.saveContent(obj);
-            await this.$local_api.NotebookController.updateDocumentAsync(
+            await this.Auto.NotebookController.updateDocument(
                 this.currentDataPath,
                 this.path,
+                this.docInfo.versionId,
                 saveContent
             )
                 .then((res) => {
                     if (res.status === 'success') {
+                        if (res.data.versionId)
+                            this.docInfo.versionId = res.data.versionId;
                         this.storeContent = this.getEditor().editor.getJSON();
                         this.toggleUnsave(false);
                     }
                 })
                 .catch((res) => {
+                    if (res.code === 40036) {
+                        let sourceNotebook = res.data.content.content;
+                        try {
+                            sourceNotebook = JSON.parse(sourceNotebook);
+                        } catch (e) {
+                            sourceNotebook = {};
+                        }
+                        this.beforeSavingDiff.versionId =
+                            res.data.content.versionId;
+                        this.beforeSavingDiff.author = res.data.content.author;
+                        this.beforeSavingDiff.source = sourceNotebook;
+                        this.beforeSavingDiff.target = JSON.parse(saveContent);
+                        this.beforeSavingDiff.createdAt = new Date(
+                            res.data.content.createdAt * 1000
+                        );
+                        this.show.diff = true;
+                        this.$barWarning(
+                            this.local(
+                                `Current notebook version conflicts with remote version.`
+                            ),
+                            {
+                                status: 'warning'
+                            }
+                        );
+                        return;
+                    }
                     console.error(res);
                     this.$barWarning(this.local(`Save Content Failed`), {
                         status: 'warning'
@@ -659,6 +748,17 @@ export default {
                 saveContent = this.saveContent(json);
                 this.downloadTxtFile(saveContent, `notebook.${prop}`);
             }
+        },
+        previewHistory(event) {
+            let contentData = event.item.content;
+            try {
+                let rawJson = JSON.parse(contentData);
+                this.currentHistory = rawJson;
+                console.log(rawJson);
+            } catch (e) {
+                this.currentHistory = {};
+            }
+            this.show.historyPreview = true;
         },
         back() {
             let last = this.history[this.history.length - 1];

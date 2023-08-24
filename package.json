@@ -44,7 +44,7 @@
     "pdfjs-dist": "2.2.228",
     "sass-loader": "^8.0.2",
     "translate-platforms": "^0.0.7",
-    "vfluentdesign": "^1.2.22",
+    "vfluentdesign": "^1.2.25",
     "vue": "^2.6.11",
     "vue-axios": "^3.3.7",
     "vue-router": "^3.4.9",

@@ -65,6 +65,13 @@ export default {
         $route() {
             this.pdfImporterInit();
             this.refreshUserInfo();
+        },
+        data_index() {
+            this.refreshAutoAPI();
+            this.refreshDataPathItem();
+        },
+        'userInfo.id' () {
+            this.getConfig();
         }
     },
     computed: {
@@ -79,7 +86,7 @@ export default {
             userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentPath() {
             return this.currentDataPath;
         },
@@ -88,12 +95,11 @@ export default {
         }
     },
     mounted() {
-        this.configInit();
+        this.asyncInit();
         this.pdfImporterInit();
         this.dropFilesInit();
         this.i18nInit();
         this.refreshWindowSizeInit();
-        this.refreshUserInfo();
         if (this.$route.path !== '/') this.$Go('/');
     },
     methods: {
@@ -101,11 +107,12 @@ export default {
             revisePdfImporter: 'revisePdfImporter',
             reviseProgress: 'reviseProgress',
             setWindowSize: 'setWindowSize',
-            reviseI18N: 'reviseI18N'
+            reviseI18N: 'reviseI18N',
+            refreshAutoAPI: 'refreshAutoAPI'
         }),
         ...mapActions('config', {
             getConfig: 'getConfig',
-            reviseConfig: 'reviseConfig'
+            refreshDataPathItem: 'refreshDataPathItem'
         }),
         ...mapMutations('User', {
             setInfo: 'setInfo'
@@ -117,8 +124,10 @@ export default {
         i18nInit() {
             this.reviseI18N(i18n);
         },
-        async configInit() {
+        async asyncInit() {
+            await this.refreshUserInfo();
             await this.getConfig();
+            this.refreshAutoAPI();
         },
         async refreshUserInfo() {
             if (localStorage.getItem('ApiToken')) {

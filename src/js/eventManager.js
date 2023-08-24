@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 export class EventManager {
     constructor() {
         this.events = {};
@@ -58,19 +60,29 @@ export class RemoteNotebookWatcher extends EventManager {
         super();
     }
 
-    eventSourceInit(dataPath) {
+    eventSourceInit($server, dataPath) {
         let token = localStorage.getItem('ApiToken');
         if (!token) return;
         token = token.replace('Bearer ', '');
         if (this.eventSource) this.eventSource.close();
         this.eventSource = new EventSource(
-            `${this.$server}/configs/sources/${dataPath}/chokidar?Authorization=${token}`
+            `${$server}/configs/sources/${dataPath}/chokidar?Authorization=${token}`
         );
+        this.getChildren(dataPath);
     }
 
     callbackEventInit() {
         this.eventSource.addEventListener('message', (event) => {
             let data = JSON.parse(event.data);
+            if (data.event === 'add' || data.event === 'addDir') {
+                let fileObj = {};
+                fileObj.filePath = data.path;
+                fileObj.relativePath = data.relativePath;
+                fileObj.name = data.name ? data.name : data.title;
+                fileObj.isFile = data.file
+                fileObj.isDir = data.dir
+                data.file = fileObj;
+            }
             this.emit("watch-path-localTree", event, {
                 ...data
             });
@@ -81,15 +93,54 @@ export class RemoteNotebookWatcher extends EventManager {
                 status: 500,
                 message: error
             });
-            this.eventSource.close();
+            if (this.eventSource) this.eventSource.close();
+        });
+    }
+
+    getChildren(path) {
+        this.emit('lock-loading', 'lock-loading', {});
+
+        let id = path.split('/').pop();
+
+        Vue.prototype.$api.NotebookController.getDirectoryChildren(id).then(res => {
+            if (res.code === 200) {
+                let children = res.data;
+                children.forEach(item => {
+                    item.event = item.type === 'group' ? 'addDir' : 'add';
+                    item.path = path + '/' + item.id;
+                    item.relativePath = item.id;
+                    item.file = item.type !== 'group';
+                    item.dir = item.type === 'group';
+
+                    let fileObj = {};
+                    fileObj.filePath = item.path;
+                    fileObj.relativePath = item.relativePath;
+                    fileObj.name = item.name ? item.name : item.title;
+                    fileObj.isFile = item.file
+                    fileObj.isDir = item.dir
+
+                    item.file = fileObj;
+                });
+                for (let item of children) {
+                    this.emit("watch-path-localTree", item.event, item);
+                }
+                this.emit('unlock-loading', 'unlock-loading', {});
+            }
+        }).catch(err => {
+            this.emit('unlock-loading', 'unlock-loading', {});
+            console.log(err);
         });
     }
 
     send(eventName, obj) {
-        if (eventName === 'watch-path-localTree') {
-            this.eventSource.close();
-            this.eventSourceInit(obj.path);
+        if (eventName === 'watch-path') {
+            console.log('refresh', obj.path)
+            if (this.eventSource) this.eventSource.close();
+            this.eventSourceInit(obj.server, obj.path);
             this.callbackEventInit();
+        }
+        else if (eventName === 'load-children') {
+            this.getChildren(obj.filePath);
         }
     }
 }

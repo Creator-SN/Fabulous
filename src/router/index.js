@@ -24,6 +24,11 @@ const routes = [
         component: () => AsyncLoad(import("@/views/notebook"))
     },
     {
+        path: "/notebook/remote/:path",
+        name: "NoteBook",
+        component: () => AsyncLoad(import("@/views/notebook"))
+    },
+    {
         path: "/templates",
         name: "Templates",
         component: () => AsyncLoad(import("@/views/templates"))

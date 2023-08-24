@@ -267,7 +267,7 @@ export default {
             pdfNoteInfo: (state) => state.editor.pdfNoteInfo,
             displayMode: (state) => state.editor.displayMode
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         highlightNodes() {
             let content = this.targetContent.content;
             let result = [];

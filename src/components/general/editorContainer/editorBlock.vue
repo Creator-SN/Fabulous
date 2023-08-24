@@ -329,7 +329,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         showNav() {
             return (
                 this.type === 'item' &&
@@ -353,7 +353,7 @@ export default {
     methods: {
         ...mapMutations({
             reviseEditor: 'reviseEditor',
-            toggleEditor: 'toggleEditor'
+            Editor: 'toggleEditor'
         }),
         ...mapActions({
             reviseConfig: 'reviseConfig',

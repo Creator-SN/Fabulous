@@ -40,35 +40,35 @@
                     </fv-pivot>
                 </div>
                 <div
-                    v-if="menuDisplayMode.key != 0 && isLogin"
+                    v-if="menuDisplayMode.key === 1 && isLogin && !currentDataPathItem.local"
                     class="navigation-view-pivot"
                 >
-                    <fv-Pivot
-                        v-model="menuDisplayMode"
-                        :items="notebookPivot"
-                        :tab="true"
+                    <fv-button
+                        theme="dark"
+                        :background="notebookMode === 0 ? 'rgba(0, 153, 204, 1)' : 'rgba(0, 204, 153, 1)'"
                         :font-size="12"
-                        style="width: calc(100% - 20px);"
-                        @change="switchDisplay"
-                    ></fv-Pivot>
+                        style="width: 80%; margin-left: 10%;"
+                        @click="switchNotebookMode"
+                    >{{notebookPivot[notebookMode].name()}}</fv-button>
                 </div>
                 <ds-tree-view
                     v-show="expand && activeSystemMode !== 'notebook' && computeDisplay('ds')"
                     :Go="Go"
                 ></ds-tree-view>
                 <local-tree-view
-                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('local_notebook')"
+                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('notebook') && notebookMode === 0"
                     v-model="localPath"
                     :Go="Go"
                     ref="local_view"
                 ></local-tree-view>
-                <local-tree-view
-                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('remote_notebook')"
-                    v-model="currentDataPath"
+                <remote-tree-view
+                    v-if="currentDataPathItem.local !== true"
+                    v-show="expand && activeSystemMode !== 'ds' && computeDisplay('notebook') && notebookMode === 1"
+                    :value="currentDataPath"
                     :isRemote="true"
                     :Go="Go"
                     ref="remote_view"
-                ></local-tree-view>
+                ></remote-tree-view>
             </div>
         </template>
     </fv-navigation-panel>
@@ -77,6 +77,7 @@
 <script>
 import dsTreeView from '@/components/general/navigationView/dsTreeView.vue';
 import localTreeView from '@/components/general/navigationView/localTreeView.vue';
+import remoteTreeView from '@/components/general/navigationView/localTreeView.vue';
 import { mapActions, mapState, mapGetters } from 'vuex';
 
 import dataSource from '@/assets/nav/dataSource.svg';
@@ -86,7 +87,8 @@ export default {
     name: 'fab-navigation-view',
     components: {
         dsTreeView,
-        localTreeView
+        localTreeView,
+        remoteTreeView // 因为外部如果定义了两个localTreeView, 在销毁组件时, Remote的直接被复用了.
     },
     props: {
         rightMenuWidth: {
@@ -116,24 +118,19 @@ export default {
                     width: '50%'
                 }
             ],
+            notebookMode: 0,
             notebookPivot: [
                 {
-                    key: 2,
+                    key: 0,
                     name: () => {
                         return this.local('Local Notebook');
-                    },
-                    img: notebook,
-                    show: () => this.activeSystemMode !== 'ds',
-                    width: '50%'
+                    }
                 },
                 {
-                    key: 3,
+                    key: 1,
                     name: () => {
                         return this.local('Remote Notebook');
-                    },
-                    img: notebook,
-                    show: () => this.activeSystemMode !== 'ds',
-                    width: '50%'
+                    }
                 }
             ],
             img: {
@@ -142,7 +139,10 @@ export default {
             },
             localPath: '',
             menuDisplayMode: {
-                key: 0
+                key: 0,
+                name: () => {
+                    return this.local('Reference Management System');
+                }
             }
         };
     },
@@ -157,6 +157,10 @@ export default {
         },
         lastLocalPath() {
             this.localPath = this.lastLocalPath;
+        },
+        currentDataPath() {
+            if (this.currentDataPathItem.local && this.notebookMode === 1)
+                this.notebookMode = 0;
         }
     },
     computed: {
@@ -170,7 +174,7 @@ export default {
             userInfo: (state) => state.User.info,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
             return 'rgba(0, 0, 0, 0.8)';
@@ -189,16 +193,10 @@ export default {
                     if (this.activeSystemMode === 'notebook') return false;
                     return this.menuDisplayMode.key === 0;
                 }
-                if (name === 'local_notebook') {
+                if (name === 'notebook') {
                     if (this.activeSystemMode === 'ds') return false;
-                    if (this.activeSystemMode === 'notebook' && !this.isLogin)
-                        return true;
-                    return this.menuDisplayMode.key === 2;
-                }
-                if (name === 'remote_notebook') {
-                    if (this.activeSystemMode === 'ds') return false;
-                    if (!this.isLogin) return false;
-                    return this.menuDisplayMode.key === 3;
+                    if (this.activeSystemMode === 'notebook') return true;
+                    return this.menuDisplayMode.key === 1;
                 }
             };
         }
@@ -211,13 +209,13 @@ export default {
             reviseConfig: 'reviseConfig'
         }),
         switchDisplay(event) {
-            const key = event.key;
-            if (key === 1) {
-                if (!this.isLogin) this.menuDisplayMode = this.notebookPivot[0];
-                else this.menuDisplayMode = this.notebookPivot[1];
-                return;
-            }
             this.menuDisplayMode = event;
+            if (!this.isLogin || this.currentDataPathItem.local)
+                this.notebookMode = 0;
+            else this.notebookMode = 1;
+        },
+        switchNotebookMode() {
+            this.notebookMode = 1 - this.notebookMode;
         },
         Go(path) {
             if (this.$route.path === path) return 0;

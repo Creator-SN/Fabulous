@@ -161,7 +161,7 @@ export default {
             show_editor: (state) => state.editor.show,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         currentChoosen() {
             let result = [];
             for (let i = 0; i < this.templates.length; i++) {

@@ -11,6 +11,18 @@
         :is-central-side="true"
         :is-footer="isFooter"
     >
+        <template v-slot:header>
+            <slot name="header">
+                <p
+                    class="panel-title"
+                    style="font-size: 15px;"
+                >{{title}}</p>
+            </slot>
+            <i
+                class="ms-Icon ms-Icon--Cancel"
+                @click="thisValue = !thisValue"
+            ></i>
+        </template>
         <template v-slot:container>
             <div
                 class="float-window-container"
@@ -34,24 +46,24 @@
 export default {
     props: {
         value: {
-            default: true,
+            default: true
         },
         title: {
-            default: "Title",
+            default: 'Title'
         },
         height: {
-            default: "80%",
+            default: '80%'
         },
         isFooter: {
-            default: true,
+            default: true
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
-            thisValue: this.value,
+            thisValue: this.value
         };
     },
     watch: {
@@ -59,14 +71,14 @@ export default {
             this.thisValue = val;
         },
         thisValue(val) {
-            this.$emit("input", val);
-        },
+            this.$emit('input', val);
+        }
     },
     methods: {
         close() {
             this.thisValue = false;
-        },
-    },
+        }
+    }
 };
 </script>
 

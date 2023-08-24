@@ -2561,7 +2561,11 @@ export class NotebookController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            id: uri + filePath,
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '读取文件成功 (Read file successfully)'
                     });
@@ -2620,15 +2624,17 @@ export class NotebookController {
      * @summary 更新笔记文件 (Update note file)
      * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
      * @param {string} filePath 文件路径 (File path)
+     * @param {string} versionId 版本id (Version id)
      * @param {string} content 文件内容 (File content)
      * @returns {Promise} 保存结果 (Save result)
      * @description 文件内容为PowerEditor json格式
     */
-    static async updateDocument(uri, filePath, content) {
+    static async updateDocument(uri, filePath, versionId, content) {
         return await new Promise((resolve, reject) => {
             ipc.send("output-file", {
                 id: uri + filePath,
                 path: filePath,
+                versionId,
                 data: content,
             });
             ipc.on(`output-file-${uri + filePath}`, (event, arg) => {

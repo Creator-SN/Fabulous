@@ -17,6 +17,8 @@ const config = {
         activeSystemMode: 'both', // ds, notebook, both
         dynamicEffect: true,
         watchAllExtensions: false,
+        dataPathItem: { path: null, local: true },
+        isConfigMounted: false, // 防止加载前覆盖源配置 (prevent overwriting the source configuration before loading)
         themeColorList: [],
         theme: 'light'
     },
@@ -51,7 +53,11 @@ const config = {
                         if (!Object.prototype.hasOwnProperty.call(target, key))
                             // 要用undefined比较好, 因为其他情况也有可能false.
                             continue;
-                        _config[key] = target[key];
+                        else if (key === 'data_path') {
+                            _config[key] = target[key].filter((item) => item.local);
+                        }
+                        else
+                            _config[key] = target[key];
                     }
                 }
             }).catch(res => {
@@ -69,6 +75,9 @@ const config = {
                                 // 要用undefined比较好, 因为其他情况也有可能false.
                                 continue;
                             else if (key === 'data_path') {
+                                for (let i = 0; i < target[key].length; i++) {
+                                    if (!target[key][i].path) target[key][i].path = target[key][i].id;
+                                }
                                 _config[key] = _config[key].concat(target[key]);
                             }
                             else
@@ -84,6 +93,8 @@ const config = {
             for (let key in _config) {
                 Vue.set(context.state, key, _config[key]);
             }
+            Vue.set(context.state, 'isConfigMounted', true);
+            context.dispatch('refreshDataPathItem');
             console.log('finished get config')
         },
         async reviseConfig({ state, rootState }, obj) {
@@ -92,6 +103,7 @@ const config = {
                     continue;
                 Vue.set(state, key, obj[key]);
             }
+            if (!state.isConfigMounted) return;
             await Vue.prototype.$local_api.ConfigController.createOrUpdateConfig(state);
             let id = rootState.User.info.id;
             if (id) {
@@ -100,6 +112,20 @@ const config = {
                 remoteTarget.userId = id;
                 await Vue.prototype.$api.ConfigController.createOrUpdateConfig(remoteTarget);
             }
+        },
+        refreshDataPathItem({ state }) {
+            if (state.data_path.length == 0) {
+                state.dataPathItem = { path: null, local: true };
+                return;
+            }
+            if (state.data_path[state.data_index]) {
+                state.dataPathItem = state.data_path[state.data_index];
+                return;
+            }
+            let dataPathItem = state.data_path.find(item => item.path === state.data_index);
+            if (dataPathItem)
+                state.dataPathItem = dataPathItem;
+            else state.dataPathItem = { path: null, local: true };
         }
     },
     getters: {}

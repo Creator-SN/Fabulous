@@ -139,7 +139,7 @@ export default {
             data_index: (state) => state.config.data_index,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         SourceDisabled() {
             return !this.currentDataPath;
         }

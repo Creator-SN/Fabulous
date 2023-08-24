@@ -1,52 +1,14 @@
-export class NoteBookUpdateDTO {
-  
-    /**
-     *
-     * @param {String} title 
-     * @param {String} banner 
-     * @param {String} description 
-     * @param {String} parent 
-     */ 
-    constructor(title = undefined,banner = undefined,description = undefined,parent = undefined){
-        this.title = title
-        this.banner = banner
-        this.description = description
-        this.parent = parent
-    }
-       
-    /**
-     * 
-     * @type {String}
-     */
-    title=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    banner=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    description=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    parent=undefined
-    
-}
 export class StdResult {
   
     /**
      *
-     * @param {String} message 
+     * @param {String} status 
      * @param {Number} code 
      * @param {undefined} data 
      * @param {Array} errors 
      */ 
-    constructor(message = undefined,code = undefined,data = undefined,errors = undefined){
-        this.message = message
+    constructor(status = undefined,code = undefined,data = undefined,errors = undefined){
+        this.status = status
         this.code = code
         this.data = data
         this.errors = errors
@@ -56,7 +18,7 @@ export class StdResult {
      * 
      * @type {String}
      */
-    message=undefined   
+    status=undefined   
     /**
      * 
      * @type {Number}
@@ -486,113 +448,6 @@ export class AddWebsiteConfigDTO {
      * @type {String}
      */
     permission=undefined
-    
-}
-export class NoteBookContentDTO {
-  
-    /**
-     *
-     * @param {String} content 
-     * @param {String} versionId 
-     */ 
-    constructor(content = undefined,versionId = undefined){
-        this.content = content
-        this.versionId = versionId
-    }
-       
-    /**
-     * 
-     * @type {String}
-     */
-    content=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    versionId=undefined
-    
-}
-export class NoteBookCreateDTO {
-  
-    /**
-     *
-     * @param {String} title 
-     * @param {String} description 
-     * @param {String} banner 
-     * @param {String} parent 
-     * @param {String} sourceId 
-     */ 
-    constructor(title = undefined,description = undefined,banner = undefined,parent = undefined,sourceId = undefined){
-        this.title = title
-        this.description = description
-        this.banner = banner
-        this.parent = parent
-        this.sourceId = sourceId
-    }
-       
-    /**
-     * 
-     * @type {String}
-     */
-    title=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    description=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    banner=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    parent=undefined   
-    /**
-     * 
-     * @type {String}
-     */
-    sourceId=undefined
-    
-}
-export class GroupCreateDTO {
-  
-    /**
-     *
-     * @param {String} name 
-     * @param {String} emoji 图标
-     * @param {String} parent 父节点
-     * @param {String} sourceId 数据源
-     */ 
-    constructor(name = undefined,emoji = undefined,parent = undefined,sourceId = undefined){
-        this.name = name
-        this.emoji = emoji
-        this.parent = parent
-        this.sourceId = sourceId
-    }
-       
-    /**
-     * 
-     * @type {String}
-     */
-    name=undefined   
-    /**
-     * 图标
-     * @type {String}
-     */
-    emoji=undefined   
-    /**
-     * 父节点
-     * @type {String}
-     */
-    parent=undefined   
-    /**
-     * 数据源
-     * @type {String}
-     */
-    sourceId=undefined
     
 }
 export class ConfigCreateOrUpdateDTO {

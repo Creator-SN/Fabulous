@@ -72,7 +72,7 @@ export default {
             counter: (state) => state.pdfImporter.counter,
             theme: (state) => state.config.theme,
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
     },
     mounted () {
 

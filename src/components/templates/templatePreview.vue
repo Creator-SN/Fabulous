@@ -30,25 +30,25 @@
 </template>
 
 <script>
-import floatWindowBase from "../window/floatWindowBase.vue";
+import floatWindowBase from '../window/floatWindowBase.vue';
 
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     components: {
-        floatWindowBase,
+        floatWindowBase
     },
     props: {
         value: {
-            default: null,
+            default: null
         },
         show: {
-            default: false,
-        },
+            default: false
+        }
     },
     data() {
         return {
-            thisShow: this.show,
+            thisShow: this.show
         };
     },
     watch: {
@@ -56,29 +56,30 @@ export default {
             this.thisShow = val;
         },
         thisShow(val) {
-            this.$emit("update:show", val);
-        },
+            this.$emit('update:show', val);
+        }
     },
     computed: {
         ...mapState({
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath', '$auto']),
+        ...mapGetters(['local', 'currentDataPath']),
         computeContent() {
             return (content) => {
+                if (content && content.type == 'doc') return content;
                 try {
                     return JSON.parse(content);
                 } catch (e) {
                     return {
-                        type: "doc",
-                        content: [],
+                        type: 'doc',
+                        content: []
                     };
                 }
             };
-        },
+        }
     },
     mounted() {},
-    methods: {},
+    methods: {}
 };
 </script>
 
