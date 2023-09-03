@@ -38,7 +38,7 @@
                 background="rgba(255, 200, 0, 1)"
                 :is-box-shadow="true"
                 :title="local(`Can't find data_structure.json on this source, shall we init new one ?`)"
-                @click="$emit('show-init-ds', thisValue)"
+                @click="showInitDS"
             >
                 <i class="ms-Icon ms-Icon--StartPresenting"></i>
             </fv-button>
@@ -47,7 +47,7 @@
                 class="control-btn"
                 :is-box-shadow="true"
                 :title="local(`Unlink this source`)"
-                @click="$emit('remove-ds', thisValue)"
+                @click="removeDS"
             >
                 <i class="ms-Icon ms-Icon--RemoveLink"></i>
             </fv-button>
@@ -166,6 +166,14 @@ export default {
             this.reviseConfig({
                 data_index: this.thisValue.path
             });
+        },
+        showInitDS(event) {
+            event.stopPropagation();
+            this.$emit('show-init-ds', this.thisValue);
+        },
+        removeDS(event) {
+            event.stopPropagation();
+            this.$emit('remove-ds', this.thisValue);
         }
     }
 };

@@ -326,6 +326,7 @@ export default {
                 }
 
                 this.revisePdfImporter({
+                    // 触发刷新Items
                     counter: this.counter + 1
                 });
 
@@ -344,6 +345,12 @@ export default {
                         partitionid,
                         ids
                     )
+                    .then(() => {
+                        this.revisePdfImporter({
+                            // 触发刷新Items
+                            counter: this.counter + 1
+                        });
+                    })
                     .catch((res) => {
                         console.warn(res.message);
                     });

@@ -60,7 +60,10 @@
                 </template-grid>
             </div>
         </div>
-        <add-template :show.sync="show.add"></add-template>
+        <add-template
+            :show.sync="show.add"
+            @finished="getTemplates"
+        ></add-template>
         <rename-template
             :value="currentItem"
             :show.sync="show.rename"
@@ -73,69 +76,69 @@
 </template>
 
 <script>
-import addTemplate from "@/components/templates/addTemplate.vue";
-import renameTemplate from "@/components/templates/renameTemplate.vue";
-import templateGrid from "@/components/templates/templateGrid.vue";
-import templatePreview from "@/components/templates/templatePreview.vue";
+import addTemplate from '@/components/templates/addTemplate.vue';
+import renameTemplate from '@/components/templates/renameTemplate.vue';
+import templateGrid from '@/components/templates/templateGrid.vue';
+import templatePreview from '@/components/templates/templatePreview.vue';
 
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
 export default {
     components: {
         addTemplate,
         renameTemplate,
         templateGrid,
-        templatePreview,
+        templatePreview
     },
     data() {
         return {
             cmd: [
                 {
-                    name: () => this.local("Add"),
-                    icon: "Add",
-                    iconColor: "rgba(0, 90, 158, 1)",
+                    name: () => this.local('Add'),
+                    icon: 'Add',
+                    iconColor: 'rgba(0, 90, 158, 1)',
                     disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.show.add = true;
-                    },
+                    }
                 },
                 {
-                    name: () => this.local("Delete"),
-                    icon: "Delete",
-                    iconColor: "rgba(173, 38, 45, 1)",
+                    name: () => this.local('Delete'),
+                    icon: 'Delete',
+                    iconColor: 'rgba(173, 38, 45, 1)',
                     disabled: () =>
                         this.currentChoosen.length === 0 || !this.lock,
-                    func: this.deleteTemplates,
-                },
+                    func: this.deleteTemplates
+                }
             ],
             head: [
-                { content: "No.", width: 120 },
-                { content: "Icon", sortName: "emoji", width: 80 },
-                { content: "Name", sortName: "name", width: 300 },
-                { content: "Create Date", sortName: "createDate", width: 120 },
+                { content: 'No.', width: 120 },
+                { content: 'Icon', sortName: 'emoji', width: 80 },
+                { content: 'Name', sortName: 'name', width: 300 },
+                { content: 'Create Date', sortName: 'createDate', width: 120 }
             ],
             templates: [],
             currentItem: {},
             currentChoosen: [],
-            currentSearch: "",
+            currentSearch: '',
             show: {
                 add: false,
                 rename: false,
-                templatePreview: false,
+                templatePreview: false
             },
-            lock: true,
+            lock: true
         };
     },
     watch: {
         $route() {
             this.getTemplates();
-        },
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
         ...mapGetters(['local', 'currentDataPath']),
         SourceDisabled() {
@@ -147,38 +150,39 @@ export default {
     },
     methods: {
         ...mapMutations({
-            reviseEditor: "reviseEditor",
-            toggleEditor: "toggleEditor",
+            reviseEditor: 'reviseEditor',
+            toggleEditor: 'toggleEditor'
         }),
         async getTemplates() {
             let res = await this.$auto.AcademicController.getTemplateInfo(
                 this.currentDataPath
             );
-            if (res.status === "success") {
+            if (res.status === 'success') {
                 this.templates = res.data;
             } else {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
             }
         },
         deleteTemplate() {
             if (!this.currentItem.id || !this.lock) return;
             this.$infoBox(this.local(`Are you sure to delete this template?`), {
-                status: "error",
-                title: this.local("Delete Template"),
-                confirmTitle: this.local("Confirm"),
-                cancelTitle: this.local("Cancel"),
+                status: 'error',
+                title: this.local('Delete Template'),
+                confirmTitle: this.local('Confirm'),
+                cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
-                    let res = await this.$auto.AcademicController.deleteTemplate(
-                        this.currentDataPath,
-                        this.currentItem.id
-                    );
-                    if (res.status !== "success") {
+                    let res =
+                        await this.$auto.AcademicController.deleteTemplate(
+                            this.currentDataPath,
+                            this.currentItem.id
+                        );
+                    if (res.status !== 'success') {
                         this.$barWarning(res.message, {
-                            status: "error",
+                            status: 'error'
                         });
                         this.lock = true;
                         return;
@@ -186,7 +190,7 @@ export default {
                     this.getTemplates();
                     this.lock = true;
                 },
-                cancel: () => {},
+                cancel: () => {}
             });
         },
         deleteTemplates() {
@@ -194,10 +198,10 @@ export default {
             this.$infoBox(
                 this.local(`Are you sure to delete these templates?`),
                 {
-                    status: "error",
-                    title: this.local("Delete Templates"),
-                    confirmTitle: this.local("Confirm"),
-                    cancelTitle: this.local("Cancel"),
+                    status: 'error',
+                    title: this.local('Delete Templates'),
+                    confirmTitle: this.local('Confirm'),
+                    cancelTitle: this.local('Cancel'),
                     theme: this.theme,
                     confirm: async () => {
                         this.lock = false;
@@ -207,9 +211,9 @@ export default {
                                     this.currentDataPath,
                                     this.currentChoosen[i].id
                                 );
-                            if (res.status !== "success") {
+                            if (res.status !== 'success') {
                                 this.$barWarning(res.message, {
-                                    status: "error",
+                                    status: 'error'
                                 });
                                 this.lock = true;
                                 return;
@@ -218,7 +222,7 @@ export default {
                         this.getTemplates();
                         this.lock = true;
                     },
-                    cancel: () => {},
+                    cancel: () => {}
                 }
             );
         },
@@ -229,14 +233,14 @@ export default {
                 return;
             }
             this.reviseEditor({
-                type: "template",
+                type: 'template',
                 item: {},
                 displayMode: 0,
-                target: template,
+                target: template
             });
             this.toggleEditor(true);
-        },
-    },
+        }
+    }
 };
 </script>
 

@@ -59,24 +59,6 @@
                     <i class="ms-Icon ms-Icon--ButtonMenu"></i>
                 </fv-button>
                 <fv-button
-                    :theme="theme"
-                    :borderRadius="30"
-                    class="control-btn"
-                    :title="local('Save')"
-                    @click="saveClick"
-                >
-                    <i class="ms-Icon ms-Icon--Save"></i>
-                </fv-button>
-                <fv-button
-                    :theme="theme"
-                    :borderRadius="30"
-                    class="control-btn"
-                    :title="local('Save As')"
-                    @click="saveAs"
-                >
-                    <i class="ms-Icon ms-Icon--SaveAs"></i>
-                </fv-button>
-                <fv-button
                     v-show="contentType !== 'fabulous_notebook'"
                     theme="dark"
                     :borderRadius="30"
@@ -124,14 +106,22 @@
         </div>
         <div class="nav-banner">
             <fv-Breadcrumb
-                :value="path"
+                :value="!isRemote ? path : remotePath"
                 :disabled="history.length === 0"
                 :theme="theme"
                 :rootIcon="history.length > 0 ? 'PageLeft' : 'FolderHorizontal'"
+                :separator="'ChevronRightMed'"
                 style="font-size: 12px; white-space: nowrap;"
                 @root-click="back"
             ></fv-Breadcrumb>
         </div>
+        <input
+            v-show="false"
+            type="file"
+            accept=".md"
+            ref="md_input"
+            @change="openMarkdown"
+        />
         <div class="main-display-block">
             <power-editor
                 v-show="lock.loading"
@@ -157,6 +147,38 @@
                 @change="editorContentChange"
                 @content-change="editorSetContentChange"
             >
+                <template v-slot:custom-buttons-front="x">
+                    <fv-button
+                        :theme="theme"
+                        :foreground="theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :class="[x.defaultClass]"
+                        :isBoxShadow="true"
+                        :title="local('Import Markdown')"
+                        @click="$refs.md_input.click()"
+                    >
+                        <img
+                            draggable="false"
+                            :src="img.markdown"
+                            alt=""
+                            style="width: 16px; height: 16px; object-fit: contain;"
+                            :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
+                        >
+                    </fv-button>
+                </template>
+                <template v-slot:custom-buttons-0="x">
+                    <fv-button
+                        :theme="theme"
+                        :foreground="'rgba(147, 79, 125, 1)'"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :class="[x.defaultClass]"
+                        :isBoxShadow="true"
+                        :title="local('Save As')"
+                        @click="saveAs"
+                    >
+                        <i class="ms-Icon ms-Icon--SaveAs"></i>
+                    </fv-button>
+                </template>
                 <template v-slot:front-content>
                     <fv-img
                         v-show="fabulousNotebook.banner"
@@ -307,6 +329,8 @@ import historyCallout from '@/components/general/callout/historyCallout.vue';
 import templatePreview from '@/components/templates/templatePreview.vue';
 import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vue';
 
+import markdown from '@/assets/home/open_md.svg';
+
 import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
@@ -320,6 +344,7 @@ export default {
     data() {
         return {
             path: '',
+            remotePath: '',
             storeContent: '',
             contentType: '', // json, html, fabulous_notebook
             docInfo: {
@@ -353,6 +378,9 @@ export default {
                 scrollTop: 0
             },
             expandContainer: false,
+            img: {
+                markdown
+            },
             lock: {
                 loading: true,
                 diff: true,
@@ -378,6 +406,7 @@ export default {
         },
         path() {
             this.refreshContent();
+            this.getRemotePath();
         },
         auto_save() {
             this.switchAutoSave();
@@ -531,8 +560,32 @@ export default {
                 this.getEditor().editor.commands.insertContent('    ');
             }
         },
+        getRemotePath() {
+            if (!this.isRemote) return;
+            this.$api.NotebookController.transferIdsToNames(this.path).then(
+                (res) => {
+                    if (res.status === 'success') {
+                        this.remotePath = res.data;
+                    }
+                }
+            );
+        },
         getEditor() {
             return this.$refs.editor;
+        },
+        openMarkdown() {
+            let files = this.$refs.md_input.files;
+            if (files.length > 0) {
+                let file = files[0];
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    let mdContent = e.target.result;
+                    let obj = this.$refs.editor.computeMarkdown(mdContent);
+                    this.fabulousNotebook.content = obj;
+                    this.$refs.md_input.value = '';
+                };
+                reader.readAsText(file);
+            }
         },
         toggleUnsave(status = true) {
             this.reviseEditor({

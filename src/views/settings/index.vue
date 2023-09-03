@@ -451,6 +451,9 @@ export default {
         },
         watchAllExtensions() {
             this.syncFromConfig();
+        },
+        data_path() {
+            this.refreshDSList();
         }
     },
     computed: {
@@ -528,7 +531,6 @@ export default {
         refreshDSList() {
             // 此函数初始化数据源的DB //
             // 同时也会初始化ListView列表项目 //
-            if (this.activeSystemMode === 'notebook') return;
             let pathList = this.data_path;
             if (pathList.length === 0) {
                 this.$barWarning(
@@ -615,19 +617,17 @@ export default {
                     theme: this.theme,
                     confirm: async () => {
                         let url = db_item.path;
-                        let index = this.data_path.indexOf(url);
+                        let index = this.data_path.findIndex(
+                            (it) => it.path === url || it === url
+                        );
+                        if (index < 0) return;
                         this.data_path.splice(index, 1);
-                        if (index - 1 > 0 && this.data_path.length > 0)
+                        if (
+                            this.data_index === url &&
+                            this.data_path.length > 0
+                        )
                             await this.reviseConfig({
-                                data_index: index - 1
-                            });
-                        else if (this.data_path.length > 0)
-                            await this.reviseConfig({
-                                data_index: 0
-                            });
-                        else
-                            await this.reviseConfig({
-                                data_index: -1
+                                data_index: this.data_path[0].path
                             });
                         this.refreshDSList();
                     },

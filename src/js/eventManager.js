@@ -1,6 +1,7 @@
 import Vue from "vue";
 
 const isdev = (process.env.NODE_ENV === "development")
+console.log('Dev Env', isdev)
 
 export class EventManager {
     constructor() {
@@ -88,8 +89,8 @@ export class RemoteNotebookWatcher extends EventManager {
             this.emit("watch-path-localTree", event, {
                 ...data
             });
-            if (isdev)
-                console.log(data);
+            // if (isdev)
+            //     console.log(data);
         });
         this.eventSource.addEventListener('error', (error) => {
             // console.log(error);
@@ -126,6 +127,8 @@ export class RemoteNotebookWatcher extends EventManager {
                     item.file = fileObj;
                 });
                 for (let item of children) {
+                    // if (isdev)
+                    //     console.log(item);
                     this.emit("watch-path-localTree", item.event, item);
                 }
                 this.emit('unlock-loading', 'unlock-loading', {});
@@ -146,5 +149,10 @@ export class RemoteNotebookWatcher extends EventManager {
         else if (eventName === 'load-children') {
             this.getChildren(obj.filePath);
         }
+    }
+
+    destroy() {
+        if (this.eventSource) this.eventSource.close();
+        console.log('destroy');
     }
 }

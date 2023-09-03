@@ -1362,10 +1362,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.2.1.tgz#7de13d57911dfea634e19edb376f7acb62d52971"
-  integrity sha512-fGDiRNpPqcqcUzNlAM2AxsIg9mgQOAMJdEOm6tIA4ohpUS3Oj0X83y595wMQpNF7z65RGz9bw2nPTqFsdyQWbg==
+"@creatorsn/powereditor@^2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.2.3.tgz#9ce63d15e4feb9a485949b2fd4241f24d76276eb"
+  integrity sha512-ciBan4wqJTVYq/g4TIiIupfOO6YTGxfvv8ovYvkCh1g1I/4ROEVgPoNnDUtu7LA4Eks0rYmpIh3f52Lx9Fn2Eg==
   dependencies:
     "@tiptap/core" "2.0.3"
     "@tiptap/extension-bubble-menu" "2.0.3"
@@ -1400,7 +1400,7 @@
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
     simplify-js "^1.2.4"
-    vfluentdesign "1.2.9"
+    vfluentdesign "1.2.26"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -5425,11 +5425,6 @@ core-js@3.31.1:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.31.1.tgz#f2b0eea9be9da0def2c5fece71064a7e5d687653"
   integrity sha512-2sKLtfq1eFST7l7v62zaqXacPc7uG8ZAya8ogijLhTtaKNcpzpB4TMoTw2Si+8GYKRwFPMMtUT0263QFWFfqyQ==
 
-core-js@3.4.3:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.3.tgz#09ea102412a368d5f73d24f082e41ac90c633a49"
-  integrity sha512-BVvHidX8uAmLCYPfLpXTEex7jz1uZJ1mW+shhIsBdA716O8Fg6TOwSgenSyO/bvEtnGdOTpKRZPSh4bSVI1k9w==
-
 core-js@^2.4.0:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
@@ -7562,11 +7557,6 @@ flatted@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.2.tgz#4575b21e2bcee7434aa9be662f4b7b5f9c2b5138"
   integrity sha512-r5wGx7YeOwNWNlCA0wQ86zKyDLMQr+/RB8xy74M4hTphfmjlijTSSXGuH8rnvKZnfT9i+75zmd8jcKdMR4O6jA==
-
-fluent-reveal-effect@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/fluent-reveal-effect/-/fluent-reveal-effect-1.1.1.tgz#e2b6a526b4f9f59149c83f61304db930203c0c91"
-  integrity sha512-xULvnzGwSJ+yrEbuWIyr8pVHpOf1XZfbBjvSXrMcKW/Hf5hY3hOu7q+KPlg5xyxT0USHUZ0Yo+imLpXb4fEN/Q==
 
 flush-write-stream@^1.0.0:
   version "1.1.1"
@@ -14397,23 +14387,10 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.2.9:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.9.tgz#163b82620998e68ef23faec70b2d9a63df8cf2e8"
-  integrity sha512-at1LK7yjC0hR1bZoZdSMs0V/CkAQKo7M68ldsBWve4tnCG0RsbvOs7lVCm0oG6y1sl6+k0TlE4KF7QOdALjvAQ==
-  dependencies:
-    core-js "3.4.3"
-    fluent-reveal-effect "1.1.1"
-    gsap "3.1.1"
-    office-ui-fabric-core "11.0.0"
-    onecolor "3.1.0"
-    swiper "8.3.2"
-    vuedraggable "2.23.2"
-
-vfluentdesign@^1.2.25:
-  version "1.2.25"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.25.tgz#d4879e542f695c4459151711e826616118ad9604"
-  integrity sha512-m23QwwzgXiVILiQiPFPxh1Dc9Rfo4v+E1JKjPt+x4pvQqDat9zcx0JkCDCldMLT6pxVfxA/WgLifxnIlS821eA==
+vfluentdesign@1.2.26, vfluentdesign@^1.2.26:
+  version "1.2.26"
+  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.26.tgz#fd6b0cd819a6c76e10ab71d3cf523d66da4e398d"
+  integrity sha512-NahrgdGsQD07hjt5KTbeTehOdCsEuEBo7hBdc4APAcmhK4cMYOJOvmlBrmHhUNp1U5uuxULLxmDsx5FqnKbX9A==
   dependencies:
     core-js "3.31.1"
     gsap "3.1.1"

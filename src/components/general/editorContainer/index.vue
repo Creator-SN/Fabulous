@@ -119,9 +119,9 @@
                         <p>{{page.emoji}}</p>
                         <div class="info-content-block">
                             <p class="highlight">{{page.name}}</p>
-                            <p class="sec date">{{page.id}}</p>
+                            <p class="sec date">{{page.id.split('-').pop()}}</p>
                         </div>
-                        <p class="sec">{{page.createDate}}</p>
+                        <p class="sec">{{$date(page.createDate)}}</p>
                     </div>
                     <div
                         class="item"
@@ -520,13 +520,14 @@ export default {
         height: calc(100% - 85px);
         padding: 5px;
         background: rgba(245, 245, 245, 0.6);
-        border-right: solid rgba(75, 75, 75, 0.1) thin;
+        border: solid rgba(75, 75, 75, 0.1) thin;
         border-radius: 8px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
         overflow: auto;
         z-index: 9;
 
@@ -540,8 +541,8 @@ export default {
 
         .item {
             width: 100%;
-            min-height: 55px;
-            height: 55px;
+            min-height: 65px;
+            height: 65px;
             padding: 0px 15px;
             font-size: 13.8px;
             font-weight: 600;
@@ -554,10 +555,10 @@ export default {
             user-select: none;
 
             &.choosen {
-                background: rgba(200, 200, 200, 0.6);
+                background: rgba(255, 255, 255, 0.8);
 
                 &:hover {
-                    background: rgba(200, 200, 200, 0.6);
+                    background: rgba(255, 255, 255, 0.6);
                 }
             }
 
@@ -573,7 +574,8 @@ export default {
                 @include VcenterC;
 
                 flex: 1;
-                margin: 0px 5px;
+                margin: 0px 0px 0px 15px;
+                line-height: 1.5;
 
                 .date {
                     font-size: 12px;

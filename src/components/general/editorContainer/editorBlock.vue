@@ -44,30 +44,6 @@
                     <i class="ms-Icon ms-Icon--ButtonMenu"></i>
                 </fv-button>
                 <fv-button
-                    :theme="theme"
-                    :borderRadius="30"
-                    class="control-btn"
-                    :title="local('Save As')"
-                    @click="saveAs"
-                >
-                    <i class="ms-Icon ms-Icon--SaveAs"></i>
-                </fv-button>
-                <fv-button
-                    :theme="theme"
-                    :borderRadius="30"
-                    class="control-btn"
-                    :title="local('Export Markdown')"
-                    @click="saveMarkdown"
-                >
-                    <img
-                        draggable="false"
-                        :src="img.markdown"
-                        alt=""
-                        style="width: 16px; height: 16px; object-fit: contain;"
-                        :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
-                    >
-                </fv-button>
-                <fv-button
                     v-show="unsave"
                     :theme="theme"
                     :borderRadius="30"
@@ -77,7 +53,7 @@
                     {{ "" }}
                 </fv-button>
                 <history-callout
-                    v-if="isRemote && item.id"
+                    v-if="isRemote && item"
                     :value="target"
                     :uri="currentDataPath"
                     :itemid="item.id"
@@ -117,6 +93,13 @@
                 @root-click="back"
             ></fv-Breadcrumb>
         </div>
+        <input
+            v-show="false"
+            type="file"
+            accept=".md"
+            ref="md_input"
+            @change="openMarkdown"
+        />
         <div
             v-show="lock.loading"
             class="main-display-block"
@@ -146,6 +129,55 @@
                 @change="editorContentChange"
                 @content-change="editorSetContentChange"
             >
+                <template v-slot:custom-buttons-front="x">
+                    <fv-button
+                        :theme="theme"
+                        :foreground="theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :class="[x.defaultClass]"
+                        :isBoxShadow="true"
+                        :title="local('Import Markdown')"
+                        @click="$refs.md_input.click()"
+                    >
+                        <img
+                            draggable="false"
+                            :src="img.openMarkdown"
+                            alt=""
+                            style="width: 16px; height: 16px; object-fit: contain;"
+                            :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
+                        >
+                    </fv-button>
+                    <fv-button
+                        :theme="theme"
+                        :foreground="'rgba(147, 79, 125, 1)'"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :class="[x.defaultClass]"
+                        :isBoxShadow="true"
+                        :title="local('Export Markdown')"
+                        @click="saveMarkdown"
+                    >
+                        <img
+                            draggable="false"
+                            :src="img.markdown"
+                            alt=""
+                            style="width: 16px; height: 16px; object-fit: contain;"
+                            :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
+                        >
+                    </fv-button>
+                </template>
+                <template v-slot:custom-buttons-0="x">
+                    <fv-button
+                        :theme="theme"
+                        :foreground="'rgba(147, 79, 125, 1)'"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :class="[x.defaultClass]"
+                        :isBoxShadow="true"
+                        :title="local('Save As')"
+                        @click="saveAs"
+                    >
+                        <i class="ms-Icon ms-Icon--SaveAs"></i>
+                    </fv-button>
+                </template>
                 <template v-slot:front-content>
                     <editor-nav
                         v-show="editor_show_nav"
@@ -233,6 +265,7 @@ import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js';
 import pdf from '@/assets/home/pdf.svg';
 import note from '@/assets/home/note.svg';
 import markdown from '@/assets/home/md.svg';
+import openMarkdownImg from '@/assets/home/open_md.svg';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
@@ -303,7 +336,8 @@ export default {
             img: {
                 pdf: pdf,
                 note: note,
-                markdown: markdown
+                markdown: markdown,
+                openMarkdown: openMarkdownImg
             },
             lock: {
                 loading: true,
@@ -500,6 +534,20 @@ export default {
         getEditor() {
             return this.$refs.editor;
         },
+        openMarkdown() {
+            let files = this.$refs.md_input.files;
+            if (files.length > 0) {
+                let file = files[0];
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    let mdContent = e.target.result;
+                    let obj = this.$refs.editor.computeMarkdown(mdContent);
+                    this.content = obj;
+                    this.$refs.md_input.value = '';
+                };
+                reader.readAsText(file);
+            }
+        },
         async refreshContent() {
             if (!this.type || !this.target || !this.target.id) return;
             if (!this.lock.loading) return;
@@ -600,7 +648,7 @@ export default {
                     this.currentDataPath,
                     this.item.id,
                     this.target.id,
-                    this.versionId,
+                    this.docInfo.versionId,
                     JSON.stringify(json)
                 )
                     .then(() => {
@@ -615,7 +663,7 @@ export default {
                 await this.$auto.AcademicController.saveTemplateContent(
                     this.currentDataPath,
                     this.target.id,
-                    this.versionId,
+                    this.docInfo.versionId,
                     JSON.stringify(json)
                 )
                     .then(() => {

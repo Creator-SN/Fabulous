@@ -45,7 +45,7 @@
                             ></time-rounder>
                             <span class="author-block">
                                 <i class="ms-Icon ms-Icon--StatusCircleInner"></i>
-                                <p>{{x.item.author}}</p>
+                                <p>{{x.item.email}}</p>
                             </span>
                         </span>
                     </div>

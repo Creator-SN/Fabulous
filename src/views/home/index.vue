@@ -163,11 +163,26 @@
                                 >{{x.item.id}}.metadata</p>
                                 <p></p>
                                 <fv-button
+                                    v-show="!isRemote"
                                     :theme="theme"
                                     style="width: 35px; height: 35px;"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
                                     @click="openFile(x.item.id)"
+                                >
+                                    <img
+                                        draggable="false"
+                                        :src="img.folder"
+                                        alt=""
+                                        style="width: 18px; height: 18px; object-fit: contain;"
+                                    >
+                                </fv-button>
+                                <fv-button
+                                    :theme="theme"
+                                    style="width: 35px; height: 35px;"
+                                    :title="local('Open Folder')"
+                                    :is-box-shadow="true"
+                                    @click="showMetadata(x.item)"
                                 >
                                     <img
                                         draggable="false"
@@ -192,7 +207,7 @@
                                     class="highlight"
                                     @click="openEditor(x.item, page)"
                                 >{{page.name}}</p>
-                                <p class="sec">{{page.id}}</p>
+                                <p class="sec">{{page.id.split('-').pop()}}</p>
                                 <p class="sec">{{$date(page.createDate)}}</p>
                                 <fv-button
                                     theme="dark"

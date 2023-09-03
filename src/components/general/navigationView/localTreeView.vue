@@ -897,6 +897,10 @@ export default {
                     ? this.computeFileName(item.path)
                     : item.name;
                 if (item.type === 'copy') {
+                    let targetItem = this.FLAT.find((it) =>
+                        this.comparePath(it.filePath, target.filePath)
+                    );
+                    if (targetItem) targetItem.expanded = true; // 要先展开才能给它添加新的项.
                     this.Auto.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
@@ -904,13 +908,6 @@ export default {
                     )
                         .then((res) => {
                             if (res.code === 200) {
-                                let targetItem = this.FLAT.find((it) =>
-                                    this.comparePath(
-                                        it.filePath,
-                                        target.filePath
-                                    )
-                                );
-                                if (targetItem) targetItem.expanded = true;
                                 this.forceUpdate();
                             } else {
                                 console.error(res);
@@ -930,6 +927,10 @@ export default {
                         });
                     this.copyList = [];
                 } else if (item.type === 'move') {
+                    let targetItem = this.FLAT.find((it) =>
+                        this.comparePath(it.filePath, target.filePath)
+                    );
+                    if (targetItem) targetItem.expanded = true; // 要先展开才能给它添加新的项.
                     this.Auto.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
@@ -937,13 +938,6 @@ export default {
                     )
                         .then((res) => {
                             if (res.code === 200) {
-                                let targetItem = this.FLAT.find((it) =>
-                                    this.comparePath(
-                                        it.filePath,
-                                        target.filePath
-                                    )
-                                );
-                                if (targetItem) targetItem.expanded = true;
                                 this.forceUpdate();
                             } else {
                                 console.error(res);
@@ -1120,6 +1114,7 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener('click', this.whiteClickClearTmp);
+        if (this.isRemote) this.nw.destroy();
     }
 };
 </script>

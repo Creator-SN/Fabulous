@@ -44,9 +44,13 @@
                     class="navigation-view-pivot"
                 >
                     <fv-button
-                        theme="dark"
-                        :background="notebookMode === 0 ? 'rgba(0, 153, 204, 1)' : 'rgba(0, 204, 153, 1)'"
+                        :theme="theme"
+                        :foreground="notebookMode === 0 ? '' : 'rgba(250, 250, 250, 1)'"
+                        :background="notebookMode === 0 ? '' : 'rgba(145, 145, 235, 1)'"
                         :font-size="12"
+                        :border-radius="6"
+                        :icon="notebookMode === 0 ? 'ChromeSwitch' : 'Cloud'"
+                        :reveal-border-color="notebookMode === 0 ? ['rgba(145, 145, 235, 1)', 'rgba(255, 139, 216, 1)', 'rgba(255, 188, 105, 1)'] : ['rgba(255, 139, 216, 1)', 'rgba(255, 188, 105, 1)']"
                         style="width: 80%; margin-left: 10%;"
                         @click="switchNotebookMode"
                     >{{notebookPivot[notebookMode].name()}}</fv-button>
