@@ -91,10 +91,10 @@ export default {
             this.treeList = [];
             this.FLAT = [];
             let result = [];
-            let groups = await this.$local_api.AcademicController.getRootGroups(
+            let groups = await this.$auto.AcademicController.getRootGroups(
                 this.currentDataPath
             );
-            let partitions = await this.$local_api.AcademicController.getRootPartitions(
+            let partitions = await this.$auto.AcademicController.getRootPartitions(
                 this.currentDataPath
             );
             groups = groups.data;
@@ -155,7 +155,7 @@ export default {
             item.loading = true;
             let groupList = [];
             let partitionList = [];
-            await this.$local_api.AcademicController.getGroups(
+            await this.$auto.AcademicController.getGroups(
                 this.currentDataPath,
                 item.id
             )
@@ -179,7 +179,7 @@ export default {
                     });
                     item.loading = false;
                 });
-            await this.$local_api.AcademicController.getPartitions(
+            await this.$auto.AcademicController.getPartitions(
                 this.currentDataPath,
                 item.id
             )

@@ -1,3 +1,34 @@
+export class DataTemplateUpdateDTO {
+  
+    /**
+     *
+     * @param {String} id 
+     * @param {String} name 
+     * @param {String} emoji 
+     */ 
+    constructor(id = undefined,name = undefined,emoji = undefined){
+        this.id = id
+        this.name = name
+        this.emoji = emoji
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined
+    
+}
 export class StdResult {
   
     /**
@@ -6,12 +37,14 @@ export class StdResult {
      * @param {Number} code 
      * @param {undefined} data 
      * @param {Array} errors 
+     * @param {String} message 
      */ 
-    constructor(status = undefined,code = undefined,data = undefined,errors = undefined){
+    constructor(status = undefined,code = undefined,data = undefined,errors = undefined,message = undefined){
         this.status = status
         this.code = code
         this.data = data
         this.errors = errors
+        this.message = message
     }
        
     /**
@@ -33,7 +66,255 @@ export class StdResult {
      * 
      * @type {Array}
      */
-    errors=undefined
+    errors=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    message=undefined
+    
+}
+export class DataItemUpdateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     * @param {String} id 
+     * @param {String} pdfId 
+     * @param {Array} labels 
+     */ 
+    constructor(name = undefined,emoji = undefined,id = undefined,pdfId = undefined,labels = undefined){
+        this.name = name
+        this.emoji = emoji
+        this.id = id
+        this.pdfId = pdfId
+        this.labels = labels
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    pdfId=undefined   
+    /**
+     * 
+     * @type {Array}
+     */
+    labels=undefined
+    
+}
+export class ItemLabel {
+  
+    /**
+     *
+     * @param {String} text 
+     * @param {String} background 
+     */ 
+    constructor(text = undefined,background = undefined){
+        this.text = text
+        this.background = background
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    text=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    background=undefined
+    
+}
+export class DataPageUpdateDTO {
+  
+    /**
+     *
+     * @param {String} id 
+     * @param {String} name 
+     * @param {String} emoji 
+     * @param {String} parent 
+     */ 
+    constructor(id = undefined,name = undefined,emoji = undefined,parent = undefined){
+        this.id = id
+        this.name = name
+        this.emoji = emoji
+        this.parent = parent
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    parent=undefined
+    
+}
+export class MetadataUpdateDTO {
+  
+    /**
+     *
+     * @param {String} id 
+     * @param {String} publisher 
+     * @param {String} DOI 
+     * @param {Number} year 
+     * @param {String} createDate 
+     * @param {String} source 
+     * @param {String} title 
+     * @param {String} url 
+     * @param {String} containerTitle 
+     * @param {String} ISSN 
+     * @param {String} language 
+     * @param {String} chapter 
+     * @param {String} pages 
+     * @param {String} school 
+     * @param {String} note 
+     * @param {String} issn 
+     * @param {String} doi 
+     * @param {String} abstract 
+     */ 
+    constructor(id = undefined,publisher = undefined,DOI = undefined,year = undefined,createDate = undefined,source = undefined,title = undefined,url = undefined,containerTitle = undefined,ISSN = undefined,language = undefined,chapter = undefined,pages = undefined,school = undefined,note = undefined,issn = undefined,doi = undefined,abstract = undefined){
+        this.id = id
+        this.publisher = publisher
+        this.DOI = DOI
+        this.year = year
+        this.createDate = createDate
+        this.source = source
+        this.title = title
+        this.url = url
+        this.containerTitle = containerTitle
+        this.ISSN = ISSN
+        this.language = language
+        this.chapter = chapter
+        this.pages = pages
+        this.school = school
+        this.note = note
+        this.issn = issn
+        this.doi = doi
+        this.abstract = abstract
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    publisher=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    DOI=undefined   
+    /**
+     * 
+     * @type {Number}
+     */
+    year=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    createDate=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    source=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    title=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    url=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    containerTitle=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    ISSN=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    language=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    chapter=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    pages=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    school=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    note=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    issn=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    doi=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    abstract=undefined
     
 }
 export class GroupUpdateDTO {
@@ -65,6 +346,37 @@ export class GroupUpdateDTO {
      * @type {String}
      */
     parent=undefined
+    
+}
+export class PartitionUpdateDTO {
+  
+    /**
+     *
+     * @param {String} id 
+     * @param {String} name 
+     * @param {String} emoji 
+     */ 
+    constructor(id = undefined,name = undefined,emoji = undefined){
+        this.id = id
+        this.name = name
+        this.emoji = emoji
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined
     
 }
 export class DataSourceUpdateDTO {
@@ -448,6 +760,140 @@ export class AddWebsiteConfigDTO {
      * @type {String}
      */
     permission=undefined
+    
+}
+export class DataTemplateCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     */ 
+    constructor(name = undefined,emoji = undefined){
+        this.name = name
+        this.emoji = emoji
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined
+    
+}
+export class DataItemCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     * @param {Array} labels 
+     */ 
+    constructor(name = undefined,emoji = undefined,labels = undefined){
+        this.name = name
+        this.emoji = emoji
+        this.labels = labels
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined   
+    /**
+     * 
+     * @type {Array}
+     */
+    labels=undefined
+    
+}
+export class DataPageCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     * @param {String} content 
+     */ 
+    constructor(name = undefined,emoji = undefined,content = undefined){
+        this.name = name
+        this.emoji = emoji
+        this.content = content
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    content=undefined
+    
+}
+export class GroupCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 图标
+     */ 
+    constructor(name = undefined,emoji = undefined){
+        this.name = name
+        this.emoji = emoji
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 图标
+     * @type {String}
+     */
+    emoji=undefined
+    
+}
+export class PartitionCreateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     */ 
+    constructor(name = undefined,emoji = undefined){
+        this.name = name
+        this.emoji = emoji
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined
     
 }
 export class ConfigCreateOrUpdateDTO {

@@ -14,7 +14,9 @@
                     :font-size="18"
                     :font-weight="'bold'"
                     underline
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
                     style="width: 100%; height: 60px; margin-top: 15px;"
                     @keyup.enter="add"
@@ -83,7 +85,7 @@ export default {
             _page.name = this.name;
             _page.emoji = "📑";
             _page.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.AcademicController.createTemplate(
+            let res = await this.$auto.AcademicController.createTemplate(
                 this.currentDataPath,
                 _page
             );

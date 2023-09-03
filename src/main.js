@@ -26,8 +26,6 @@ let PDFJS = require("pdfjs-dist");
 const pdfjsWorker = require('pdfjs-dist/build/pdf.worker.entry');
 PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-import { DBManager } from "@/js/db.js";
-
 const fab_axios = axios.create({
     timeout: 5000
 });
@@ -47,7 +45,6 @@ new Vue({
     render: h => h(App),
     beforeCreate() {
         Vue.prototype.$PDFJS = PDFJS;
-        Vue.prototype.$DBM = new DBManager();
         Vue.prototype.$Go = str => {
             this.$router.push(str);
         };
@@ -61,6 +58,11 @@ new Vue({
             let guid = this.$SUtility.Guid();
             guid = guid.split('-')[0];
             return guid;
+        }
+        Vue.prototype.$date = (str, timezone = 1000) => {
+            if (typeof (str) === 'number') str = str * timezone;
+            let date = new Date(str);
+            return this.$SDate.Format("YYYY-mm-dd HH:MM", date);
         }
         if (isdev) {
             Vue.prototype.$server = "http://59.77.134.155:5080";

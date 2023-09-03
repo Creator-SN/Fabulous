@@ -96,12 +96,6 @@
                 >
                     {{ "" }}
                 </fv-button>
-                <history-callout
-                    :value="docInfo"
-                    :theme="theme"
-                    :local="local"
-                    @chooseItem="previewHistory"
-                ></history-callout>
                 <fv-toggle-switch
                     :title="local('Auto Save')"
                     v-model="auto_save"
@@ -117,6 +111,15 @@
                     style="margin-left: 10px;"
                 >
                 </fv-toggle-switch>
+            </div>
+            <div class="control-right-block">
+                <history-callout
+                    v-if="isRemote"
+                    :value="docInfo"
+                    :theme="theme"
+                    :local="local"
+                    @chooseItem="previewHistory"
+                ></history-callout>
             </div>
         </div>
         <div class="nav-banner">
@@ -266,15 +269,28 @@
             @save="confirmSaveAs"
         ></save-options>
         <template-preview
+            :title="local('History Preview')"
             :value="currentHistory"
             :show.sync="show.historyPreview"
-        ></template-preview>
+            :showBanner="true"
+            :showTitle="true"
+        >
+            <template v-slot:control="x">
+                <fv-button
+                    theme="dark"
+                    background="rgba(140, 148, 228, 1)"
+                    :is-box-shadow="true"
+                    style="width: 120px; margin-right: 5px;"
+                    @click="() => {commitDiff(x.result); show.historyPreview = false;}"
+                >{{local('Rollback version')}}</fv-button>
+            </template>
+        </template-preview>
         <diff-previewer
             v-model="show.diff"
             :author="beforeSavingDiff.author"
             :source="beforeSavingDiff.source"
             :target="beforeSavingDiff.target"
-            :createdAt="beforeSavingDiff.createdAt"
+            :createDate="beforeSavingDiff.createDate"
             @commit="commitDiff"
             @save="commitDiffAndSave"
         ></diff-previewer>
@@ -289,7 +305,7 @@ import editorNav from '@/components/general/editorContainer/editorNav.vue';
 import saveOptions from '@/components/notebook/saveOptions.vue';
 import historyCallout from '@/components/general/callout/historyCallout.vue';
 import templatePreview from '@/components/templates/templatePreview.vue';
-import diffPreviewer from '../../components/general/editorContainer/diffPreviewer.vue';
+import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vue';
 
 import { fabulous_notebook } from '@/js/data_sample.js';
 
@@ -325,7 +341,7 @@ export default {
                 author: null,
                 source: null,
                 target: null,
-                createdAt: new Date()
+                createDate: new Date()
             },
             readonly: false,
             fontSize: 16,
@@ -586,6 +602,7 @@ export default {
         },
         commitDiff(result) {
             console.log(result);
+            this.toggleUnsave(true);
             this.fabulousNotebook.banner = result.banner;
             this.fabulousNotebook.title = result.title;
             this.fabulousNotebook.content = result.content;
@@ -654,8 +671,8 @@ export default {
                         this.beforeSavingDiff.author = res.data.content.author;
                         this.beforeSavingDiff.source = sourceNotebook;
                         this.beforeSavingDiff.target = JSON.parse(saveContent);
-                        this.beforeSavingDiff.createdAt = new Date(
-                            res.data.content.createdAt * 1000
+                        this.beforeSavingDiff.createDate = new Date(
+                            res.data.content.createDate
                         );
                         this.show.diff = true;
                         this.$barWarning(
@@ -749,8 +766,8 @@ export default {
                 this.downloadTxtFile(saveContent, `notebook.${prop}`);
             }
         },
-        previewHistory(event) {
-            let contentData = event.item.content;
+        previewHistory(item) {
+            let contentData = item.content;
             try {
                 let rawJson = JSON.parse(contentData);
                 this.currentHistory = rawJson;

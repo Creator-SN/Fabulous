@@ -35,7 +35,7 @@
                     background="whitesmoke"
                     :border-radius="6"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 45px;"
+                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 45px; flex-shrink: 0;"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-button
@@ -46,7 +46,7 @@
                     fontSize="12"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px;"
+                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="!lock.forgot || !user.id"
                     @click="sendCode"
                 >{{local(`Continue`)}}</fv-button>
@@ -77,7 +77,7 @@
                     :border-radius="6"
                     :theme="theme"
                     :disabled="!lock.forgot"
-                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 15px;"
+                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 15px; flex-shrink: 0;"
                 ></fv-text-box>
                 <fv-VerifyBox
                     v-show="step === 1"
@@ -96,7 +96,7 @@
                     fontSize="12"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px;"
+                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="!lock.sendCode || counter > 0"
                     @click="sendCode"
                 >{{local(`Resend Code`)}}{{counter > 0 ? ` ${counter}s`: ''}}</fv-button>
@@ -108,7 +108,7 @@
                     fontSize="12"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px;"
+                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="verifyCode.length < 6 || !lock.forgot"
                     @click="handlerForgot"
                 >{{local(`Continue`)}}</fv-button>
@@ -243,12 +243,9 @@ export default {
                 .catch((err) => {
                     this.lock.sendCode = true;
                     if (err.code === 40012) {
-                        this.$barWarning(
-                            this.local(`Code Exists.`),
-                            {
-                                status: 'warning'
-                            }
-                        );
+                        this.$barWarning(this.local(`Code Exists.`), {
+                            status: 'warning'
+                        });
                         this.step = 1;
                     } else if (err.message)
                         this.$barWarning(err.message, {
@@ -286,6 +283,7 @@ export default {
 
             flex: 1;
             padding: 25px;
+            overflow: overlay;
 
             .logo-text {
                 width: 80px;

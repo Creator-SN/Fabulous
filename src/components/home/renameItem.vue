@@ -14,7 +14,9 @@
                     :font-size="18"
                     :font-weight="'bold'"
                     underline
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
                     style="width: 100%; height: 60px; margin-top: 15px;"
                     @keyup.enter="confirm"
@@ -140,7 +142,7 @@ export default {
             if (!this.value || this.name === "") return;
             this.value.name = this.name;
             this.value.labels = this.labels;
-            let res = await this.$local_api.AcademicController.updateItem(
+            let res = await this.$auto.AcademicController.updateItem(
                 this.currentDataPath,
                 this.value
             );

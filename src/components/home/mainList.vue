@@ -12,7 +12,7 @@
                 :theme="theme"
                 :key="index"
                 :title="item.name"
-                :content="`${local('Create Time')}: ${item.createDate}`"
+                :content="`${local('Create Time')}: ${$date(item.createDate)}`"
                 :maxHeight="350"
                 :disabled-collapse="edit"
                 style="margin: 5px"
@@ -237,7 +237,7 @@ export default {
             this.$emit('choose-items', this.currentChoosen);
         },
         itemTitleClick($event, item) {
-            if(this.edit) this.itemChooseClick(item);
+            if (this.edit) this.itemChooseClick(item);
         }
     }
 };

@@ -19,7 +19,7 @@
         </div>
         <editor-container></editor-container>
         <pdf-importer ref="pdf_importer"></pdf-importer>
-        <item-carrier @update-progess="updateProgress"></item-carrier>
+        <item-carrier @update-progress="updateProgress"></item-carrier>
         <div
             v-show="show.drop"
             class="file-drop-mask"

@@ -20,7 +20,7 @@
                     </fv-Persona>
                     <p class="diff-author-info">{{authorInfo.email ? authorInfo.email : author}}</p>
                     <time-rounder
-                        :value="createdAt"
+                        :value="createDate"
                         :local="local"
                         icon="History"
                         style="width: auto; color: #999; margin-left: 5px;"
@@ -45,6 +45,7 @@
                     >
                         <fv-check-box
                             v-model="item.choosen"
+                            :theme="theme"
                             background="rgba(140, 148, 228, 1)"
                             @click="checkBanner($event, index)"
                         >{{local('Keep')}} {{item.added ? local('Current') : local('Remote')}} {{local('Banner')}}</fv-check-box>
@@ -65,6 +66,7 @@
                     >
                         <fv-check-box
                             v-model="item.choosen"
+                            :theme="theme"
                             background="rgba(140, 148, 228, 1)"
                             @click="checkTitle($event, index)"
                         >{{local('Keep')}} {{item.added ? local('Current') : local('Remote')}} {{local('Title')}}</fv-check-box>
@@ -85,6 +87,7 @@
                     >
                         <fv-check-box
                             v-model="item.choosen"
+                            :theme="theme"
                             background="rgba(140, 148, 228, 1)"
                         >{{local('Keep')}} {{item.added ? local('Current') : local('Remote')}}</fv-check-box>
                     </div>
@@ -97,9 +100,10 @@
                             :placeholder="local('No content here ...')"
                             :editable="false"
                             :theme="theme"
-                            :editorBackground="item.added ? diffBackground.added : item.removed ? diffBackground.removed : diffBackground.normal"
-                            :editorOutSideBackground="item.added ? diffBackground.added : item.removed ? diffBackground.removed : diffBackground.normal"
+                            :editorBackground="item.added ? diffBackground[theme].added : item.removed ? diffBackground[theme].removed : diffBackground.normal"
+                            :editorOutSideBackground="item.added ? diffBackground[theme].added : item.removed ? diffBackground[theme].removed : diffBackground.normal"
                             :mobileDisplayWidth="0"
+                            :extensions="customExtensions"
                             style="position: relative; width: 100%; height: auto; background: transparent;"
                         ></power-editor>
                     </div>
@@ -142,6 +146,8 @@ import floatWindowBase from '@/components/window/floatWindowBase.vue';
 
 import timeRounder from '@/components/general/timeRounder.vue';
 
+import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js';
+
 import * as Diff from 'diff';
 
 import { mapState, mapGetters } from 'vuex';
@@ -164,7 +170,7 @@ export default {
         author: {
             default: ''
         },
-        createdAt: {
+        createDate: {
             default: new Date()
         }
     },
@@ -174,8 +180,14 @@ export default {
             diffTitleList: [],
             diffContentList: [],
             diffBackground: {
-                added: '#e6ffed',
-                removed: '#ffeef0',
+                light: {
+                    added: '#e6ffed',
+                    removed: '#ffeef0'
+                },
+                dark: {
+                    added: 'rgba(77, 90, 52, 1)',
+                    removed: 'rgba(77, 25, 29, 1)'
+                },
                 normal: 'transparent'
             },
             authorInfo: {
@@ -183,6 +195,7 @@ export default {
                 email: '',
                 avatar: null
             },
+            customExtensions: [pdfNote],
             thisShow: this.value,
             timer: {
                 diff: null

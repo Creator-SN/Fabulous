@@ -1,5 +1,7 @@
 import Vue from "vue";
 
+const isdev = (process.env.NODE_ENV === "development")
+
 export class EventManager {
     constructor() {
         this.events = {};
@@ -86,6 +88,8 @@ export class RemoteNotebookWatcher extends EventManager {
             this.emit("watch-path-localTree", event, {
                 ...data
             });
+            if (isdev)
+                console.log(data);
         });
         this.eventSource.addEventListener('error', (error) => {
             // console.log(error);

@@ -390,6 +390,12 @@ export default {
                 return this.img.file;
             };
         },
+        computeFileName() {
+            return (path) => {
+                let pathList = path.split(/[\\/]/);
+                return pathList[pathList.length - 1];
+            };
+        },
         localPathFolderName() {
             if (this.isRemote) return this.currentDataPathItem.name;
             let pathList = this.value.split(/[\\/]/);
@@ -516,7 +522,7 @@ export default {
                             });
                         });
                 });
-                this.$refs.tree.$forceUpdate();
+                this.forceUpdate();
             });
 
             window.addEventListener('click', this.whiteClickClearTmp);
@@ -712,7 +718,7 @@ export default {
                     i--;
                 }
             }
-            this.$refs.tree.$forceUpdate();
+            this.forceUpdate();
         },
         showRename(item) {
             item.editable = true;
@@ -887,11 +893,14 @@ export default {
         paste(target) {
             if (!target.isDir) return;
             for (let item of this.copyList) {
+                let itemPath = this.isRemote
+                    ? this.computeFileName(item.path)
+                    : item.name;
                 if (item.type === 'copy') {
                     this.Auto.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
-                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                        target.filePath.replace(/\\/g, '/') + `/${itemPath}`
                     )
                         .then((res) => {
                             if (res.code === 200) {
@@ -902,7 +911,7 @@ export default {
                                     )
                                 );
                                 if (targetItem) targetItem.expanded = true;
-                                this.$refs.tree.$forceUpdate();
+                                this.forceUpdate();
                             } else {
                                 console.error(res);
                                 this.$barWarning(
@@ -924,7 +933,7 @@ export default {
                     this.Auto.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
-                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                        target.filePath.replace(/\\/g, '/') + `/${itemPath}`
                     )
                         .then((res) => {
                             if (res.code === 200) {
@@ -935,7 +944,7 @@ export default {
                                     )
                                 );
                                 if (targetItem) targetItem.expanded = true;
-                                this.$refs.tree.$forceUpdate();
+                                this.forceUpdate();
                             } else {
                                 console.error(res);
                                 this.$barWarning(
@@ -964,11 +973,14 @@ export default {
                 filePath: this.path
             };
             for (let item of this.copyList) {
+                let itemPath = this.isRemote
+                    ? this.computeFileName(item.path)
+                    : item.name;
                 if (item.type === 'copy') {
                     this.Auto.NotebookController.copyDirectory(
                         this.uri,
                         item.path,
-                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                        target.filePath.replace(/\\/g, '/') + `/${itemPath}`
                     )
                         .then((res) => {
                             if (res.code === 200) {
@@ -979,7 +991,7 @@ export default {
                                     )
                                 );
                                 if (targetItem) targetItem.expanded = true;
-                                this.$refs.tree.$forceUpdate();
+                                this.forceUpdate();
                             } else {
                                 console.error(res);
                                 this.$barWarning(
@@ -1001,7 +1013,7 @@ export default {
                     this.Auto.NotebookController.moveDirectory(
                         this.uri,
                         item.path,
-                        target.filePath.replace(/\\/g, '/') + `/${item.name}`
+                        target.filePath.replace(/\\/g, '/') + `/${itemPath}`
                     )
                         .then((res) => {
                             if (res.code === 200) {
@@ -1012,7 +1024,7 @@ export default {
                                     )
                                 );
                                 if (targetItem) targetItem.expanded = true;
-                                this.$refs.tree.$forceUpdate();
+                                this.forceUpdate();
                             } else {
                                 console.error(res);
                                 this.$barWarning(
@@ -1037,7 +1049,10 @@ export default {
             for (let item of this.FLAT) {
                 if (item.isDir) item.expanded = false;
             }
-            this.$refs.tree.$forceUpdate();
+            this.forceUpdate();
+        },
+        forceUpdate() {
+            if (this.$refs.tree) this.$refs.tree.$forceUpdate();
         },
         rightClick($event, item) {
             $event.preventDefault();

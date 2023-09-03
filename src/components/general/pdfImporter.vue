@@ -14,16 +14,29 @@
                 @change="getPDFData"
             />
             <div class="line">
+                <img
+                    draggable="false"
+                    :src="img.pdf"
+                    class="fab-pdf-importer-img-icon"
+                    alt=""
+                >
                 <p class="title">{{ local("Processing PDF") }}</p>
             </div>
-            <div class="line">
+            <div
+                class="line"
+                style="margin-top: 15px;"
+            >
                 <p class="path">{{ path_title }}</p>
             </div>
-            <div class="line">
+            <div
+                class="line"
+                style="margin-top: 5px;"
+            >
                 <fv-progress-bar
                     v-model="progress"
                     foreground="white"
                     background="rgba(200, 200, 200, 0.3)"
+                    style="width: 100%; border-radius: 6px;"
                 ></fv-progress-bar>
             </div>
             <div class="line right">
@@ -35,15 +48,23 @@
                     @click="cancel"
                 >{{ local("Cancel") }}</fv-button>
             </div>
+            <img
+                draggable="false"
+                :src="img.pdf"
+                class="fab-pdf-importer-img-icon-bg"
+                alt=""
+            >
         </div>
     </transition>
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
-import { META_API } from "@/js/meta_api.js";
-import { metadata, author, item } from "@/js/data_sample.js";
-import Extractor from "@/js/extractTitle.js";
+import { mapMutations, mapState, mapGetters } from 'vuex';
+import { META_API } from '@/js/meta_api.js';
+import { metadata, author, item } from '@/js/data_sample.js';
+import Extractor from '@/js/extractTitle.js';
+
+import pdfIcon from '@/assets/home/pdf.svg';
 
 export default {
     data() {
@@ -51,15 +72,18 @@ export default {
             extractor: Extractor,
             metaAPI: META_API,
             progress: 0,
-            path_title: "",
+            path_title: '',
+            img: {
+                pdf: pdfIcon
+            },
             stop: false,
-            lock: true,
+            lock: true
         };
     },
     watch: {
         df(val) {
             if (val.length > 0) this.dropFiles();
-        },
+        }
     },
     computed: {
         ...mapState({
@@ -70,19 +94,17 @@ export default {
             mode: (state) => state.pdfImporter.mode,
             df: (state) => state.pdfImporter.df,
             counter: (state) => state.pdfImporter.counter,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath'])
     },
-    mounted () {
-
-    },
+    mounted() {},
     methods: {
         ...mapMutations({
-            revisePdfImporter: "revisePdfImporter",
+            revisePdfImporter: 'revisePdfImporter'
         }),
         inputInspectClick() {
-            if (!this.item && this.mode === "item") return;
+            if (!this.item && this.mode === 'item') return;
             this.$refs.input.click();
         },
         async getPDFData() {
@@ -90,31 +112,31 @@ export default {
             this.lock = false;
             if (this.$refs.input.files.length === 0) return;
             // 为数据项替换PDF文件 (Replace PDF file for data item)
-            if (this.mode === "item") {
+            if (this.mode === 'item') {
                 if (!this.item) return;
                 for (let i = 0; i < this.$refs.input.files.length; i++) {
                     let file = this.$refs.input.files[i];
                     let _metadata = await this.getTitleMetadata(file);
                     this.item.metadata = _metadata;
-                    await this.copyPdf(file.path);
+                    this.item.pdf = await this.copyPdf(file.path);
                     await this.saveMetadata(_metadata);
                 }
                 this.lock = true;
-                this.$barWarning(this.local("Successfully update PDF file."), {
-                    status: "correct",
+                this.$barWarning(this.local('Successfully update PDF file.'), {
+                    status: 'correct'
                 });
                 return;
-            // 在当前数据源导入PDF文件 (Import PDF file in current data source)
-            } else if (this.mode === "import") {
+                // 在当前数据源导入PDF文件 (Import PDF file in current data source)
+            } else if (this.mode === 'import') {
                 this.revisePdfImporter({
-                    value: true,
+                    value: true
                 });
                 for (let i = 0; i < this.$refs.input.files.length; i++) {
                     if (this.stop) {
                         this.stop = false;
                         this.lock = true;
                         this.revisePdfImporter({
-                            value: false,
+                            value: false
                         });
                         return;
                     }
@@ -127,23 +149,23 @@ export default {
                     let _item = JSON.parse(JSON.stringify(item));
                     _item.id = this.$Guid();
                     _item.name = _metadata.title;
-                    _item.emoji = "📦";
+                    _item.emoji = '📦';
                     _item.createDate = this.$SDate.DateToString(new Date());
                     _item.pdf = `${_item.id}`;
                     _item.metadata = _metadata;
                     console.log('metadata:', _metadata);
-                    let res = await this.$local_api.AcademicController.createItem(
+                    let res = await this.$auto.AcademicController.createItem(
                         this.currentDataPath,
                         _item
                     );
                     if (res.code !== 200) {
                         this.$barWarning(res.message, {
-                            status: "error",
+                            status: 'error'
                         });
                         this.stop = false;
                         this.lock = true;
                         this.revisePdfImporter({
-                            value: false,
+                            value: false
                         });
                         return;
                     }
@@ -155,24 +177,24 @@ export default {
                 this.lock = true;
                 this.revisePdfImporter({
                     value: false,
-                    counter: this.counter + 1,
+                    counter: this.counter + 1
                 });
                 this.progress = 0;
-                this.path_title = "";
+                this.path_title = '';
             }
         },
         async dropFiles() {
             if (!this.lock) return;
             this.lock = false;
             this.revisePdfImporter({
-                value: true,
+                value: true
             });
             for (let i = 0; i < this.df.length; i++) {
                 if (this.stop) {
                     this.stop = false;
                     this.lock = true;
                     this.revisePdfImporter({
-                        value: false,
+                        value: false
                     });
                     return;
                 }
@@ -184,17 +206,17 @@ export default {
                 let _item = JSON.parse(JSON.stringify(item));
                 _item.id = this.$Guid();
                 _item.name = _metadata.title;
-                _item.emoji = "📦";
+                _item.emoji = '📦';
                 _item.createDate = this.$SDate.DateToString(new Date());
                 _item.pdf = `${_item.id}`;
                 _item.metadata = _metadata;
-                let res = await this.$local_api.AcademicController.createItem(
+                let res = await this.$auto.AcademicController.createItem(
                     this.currentDataPath,
                     _item
                 );
                 if (res.code !== 200) {
                     this.$barWarning(res.message, {
-                        status: "error",
+                        status: 'error'
                     });
                     this.stop = false;
                     this.lock = true;
@@ -209,23 +231,23 @@ export default {
             this.revisePdfImporter({
                 value: false,
                 df: [],
-                counter: this.counter + 1,
+                counter: this.counter + 1
             });
             this.progress = 0;
-            this.path_title = "";
+            this.path_title = '';
         },
         async copyToPartition(itemid) {
             let id = this.$route.params.id;
             if (!id) return;
             let res = null;
-            res = await this.$local_api.AcademicController.addItemsToPartition(
+            res = await this.$auto.AcademicController.addItemsToPartition(
                 this.currentDataPath,
                 id,
                 [itemid]
             );
             if (res.code !== 200) {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
                 return;
             }
@@ -233,27 +255,33 @@ export default {
         async copyPdf(objURL, id = null) {
             if (!id) id = this.item.id;
             let blob = await fetch(objURL).then((r) => r.blob());
-            this.$local_api.AcademicController.updateItemPDF(
+            let pdfid = id;
+            await this.$auto.AcademicController.updateItemPDF(
                 this.currentDataPath,
                 id,
                 id,
                 blob
-            ).catch((res) => {
-                this.$barWarning(res.message, {
-                    status: "warning",
+            )
+                .then((res) => {
+                    if (res.code === 200) pdfid = res.data;
+                })
+                .catch((res) => {
+                    this.$barWarning(res.message, {
+                        status: 'warning'
+                    });
                 });
-            });
+            return pdfid;
         },
         async saveMetadata(_metadata, id = null) {
             if (!id) id = this.item.id;
-            let res = await this.$local_api.AcademicController.updateItemMetadata(
+            let res = await this.$auto.AcademicController.updateItemMetadata(
                 this.currentDataPath,
                 id,
                 _metadata
             );
-            if (res.status !== "success")
+            if (res.status !== 'success')
                 this.$barWarning(res.message, {
-                    status: "warning",
+                    status: 'warning'
                 });
         },
         async getTitleMetadata(file) {
@@ -264,21 +292,21 @@ export default {
             let pdfMetadata = await this.extractor.getMetadata(
                 URL.createObjectURL(file)
             );
-            if (pdfMetadata.title && pdfMetadata.title != "")
+            if (pdfMetadata.title && pdfMetadata.title != '')
                 title = pdfMetadata.title;
-            else if (pdfMetadata.Title && pdfMetadata.Title != "")
+            else if (pdfMetadata.Title && pdfMetadata.Title != '')
                 title = pdfMetadata.Title;
             let crefInfo = await this.getMetaInfo(title);
             let _metadata = JSON.parse(JSON.stringify(metadata));
             _metadata.title = title;
-            if (pdfMetadata.Author && pdfMetadata.Author.indexOf(" ; ") > -1) {
+            if (pdfMetadata.Author && pdfMetadata.Author.indexOf(' ; ') > -1) {
                 let authors = [];
-                let authors_str = pdfMetadata.Author.split(" ; ");
+                let authors_str = pdfMetadata.Author.split(' ; ');
                 authors_str.forEach((el, idx) => {
                     let _author = JSON.parse(JSON.stringify(author));
-                    _author.first = el.split(" ")[0];
+                    _author.first = el.split(' ')[0];
                     _author.last =
-                        el.split(" ").length > 1 ? el.split(" ")[1] : "";
+                        el.split(' ').length > 1 ? el.split(' ')[1] : '';
                     _author.sequence = idx;
                     authors.push(_author);
                 });
@@ -297,7 +325,7 @@ export default {
             let fn = [
                 this.metaAPI.cref_getInfoByTitle,
                 this.metaAPI.semanticScholar_getInfoByTitle,
-                this.metaAPI.dataCite_getInfoByTitle,
+                this.metaAPI.dataCite_getInfoByTitle
             ];
             for (let f of fn) {
                 p.push(f(title, this.axios));
@@ -312,8 +340,8 @@ export default {
         },
         cancel() {
             this.stop = true;
-        },
-    },
+        }
+    }
 };
 </script>
 
@@ -324,15 +352,15 @@ export default {
     height: auto;
     top: 60px;
     right: 15px;
-    padding: 15px 5px;
-    background: rgba(32, 102, 156, 0.9);
+    padding: 15px 0px;
+    background: rgba(250, 250, 250, 0.9);
     border: rgba(36, 36, 36, 0.1) solid thin;
     border-radius: 6px;
-    color: whitesmoke;
+    color: rgba(50, 49, 48, 1);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-shadow: 10px 3px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 6px 12px rgba(120, 120, 120, 0.1);
     transition: all 0.3s;
     user-select: none;
     backdrop-filter: blur(50px);
@@ -340,6 +368,16 @@ export default {
     z-index: 2;
 
     &.dark {
+        background: rgba(50, 49, 48, 0.9);
+        color: rgba(250, 250, 250, 1);
+        border: rgba(90, 90, 90, 0.1) solid thin;
+        box-shadow: 0px 6px 12px rgba(36, 36, 36, 0.1);
+
+        .line {
+            .path {
+                color: rgba(200, 200, 200, 1);
+            }
+        }
     }
 
     .line {
@@ -361,12 +399,31 @@ export default {
             @include nowrap;
 
             font-size: 12px;
-            color: rgba(230, 230, 230, 1);
+            color: rgba(90, 90, 90, 1);
         }
 
         &.right {
             justify-content: flex-end;
         }
+    }
+
+    .fab-pdf-importer-img-icon {
+        position: relative;
+        width: 25px;
+        height: auto;
+        margin-right: 15px;
+        object-fit: cover;
+        user-select: none;
+    }
+
+    .fab-pdf-importer-img-icon-bg {
+        position: absolute;
+        width: 100%;
+        height: 50px;
+        object-fit: cover;
+        user-select: none;
+        filter: blur(25px);
+        opacity: 0.8;
     }
 }
 </style>

@@ -16,6 +16,8 @@ console.log(STORE_PATH)
 const { ipcRenderer: ipc } = require("electron");
 const { dialog } = require("@electron/remote");
 
+const { microsoft } = require('translate-platforms');
+
 class DBManager {
     getDB(path) {
         let dbAdapter = new FileSync(path);
@@ -1664,7 +1666,7 @@ export class AcademicController {
      * @param {string} templateContent 笔记模板内容 (Note template content)
      * @returns {Promise} 笔记信息 (Note information)
     */
-    static async createItemPage(uri, itemid, page, templateContent = '') {
+    static async createItemPage(uri, itemid, page) {
         return await new Promise((resolve, reject) => {
             let dataDB = this.ensureDataDB(uri);
             try {
@@ -1679,6 +1681,7 @@ export class AcademicController {
                     return;
                 }
                 let _page = JSON.parse(JSON.stringify(Page));
+                let templateContent = page.content;
                 for (let key in _page) {
                     if (Object.prototype.hasOwnProperty.call(page, key))
                         _page[key] = page[key];
@@ -2036,7 +2039,7 @@ export class AcademicController {
      * @summary 获取模板信息 (Update item note)
      * @param {string} uri 数据源路径 (Data source path)
     */
-    static async getTemplatesInfo(uri) {
+    static async getTemplateInfo(uri) {
         return await new Promise((resolve, reject) => {
             let dataDB = this.ensureDataDB(uri);
             try {
@@ -2104,11 +2107,12 @@ export class AcademicController {
      * @summary 保存模板内容 (Save template content)
      * @param {string} uri 数据源路径 (Data source path)
      * @param {string} id 模板id (Template id)
+     * @param {string} versionId 模板版本id (Template version id)
      * @param {string} content 模板内容 (Template content)
      * @returns {Promise} 模板内容 (Template content)
      * @description 模板内容为PowerEditor json格式
     */
-    static async saveTemplateContent(uri, id, content) {
+    static async saveTemplateContent(uri, id, versionId, content) {
         return await new Promise((resolve, reject) => {
             let url = path.join(
                 uri,
@@ -2118,6 +2122,7 @@ export class AcademicController {
             ipc.send("output-file", {
                 id: url,
                 path: url,
+                versionId,
                 data: content,
             });
             ipc.on(`output-file-${url}`, (event, arg) => {
@@ -2336,7 +2341,10 @@ export class AcademicController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '获取模板内容成功 (Get template content successfully)'
                     });
@@ -2358,11 +2366,12 @@ export class AcademicController {
      * @param {string} uri 数据源路径 (Data source path)
      * @param {string} itemid 数据项id (Data item id)
      * @param {string} pageid 数据项笔记id (Data item note id)
+     * @param {number} versionId 数据项笔记版本id (Data item note version id)
      * @param {string} content 笔记内容 (Note content)
      * @returns {Promise} 笔记内容 (Note content)
      * @description 笔记内容为PowerEditor json格式
     */
-    static async saveItemPageContent(uri, itemid, pageid, content) {
+    static async saveItemPageContent(uri, itemid, pageid, versionId, content) {
         return await new Promise((resolve, reject) => {
             let url = path.join(
                 uri,
@@ -2373,6 +2382,7 @@ export class AcademicController {
             ipc.send("output-file", {
                 id: url,
                 path: url,
+                versionId,
                 data: content,
             });
             ipc.on(`output-file-${url}`, (event, arg) => {
@@ -2487,6 +2497,7 @@ export class AcademicController {
                     resolve({
                         status: 'success',
                         code: 200,
+                        data: pdfid,
                         message: '成功更新PDF (Successfully updated PDF)'
                     });
                 }
@@ -2510,33 +2521,22 @@ export class AcademicController {
     */
     static async getTranslation(text, from, to) {
         return await new Promise((resolve, reject) => {
-            let guid = Tools.$Guid();
-            ipc.send("translate", {
-                id: guid,
-                text: text,
-                from,
-                to,
+            console.log(from, to)
+            microsoft(text, { to: microsoft.zh }).then(res => {
+                resolve({
+                    status: 'success',
+                    data: res,
+                    code: 200,
+                    message: '翻译成功 (Translation successfully)'
+                });
+            }).catch(res => {
+                reject({
+                    status: 'error',
+                    data: res,
+                    code: 500,
+                    message: res
+                });
             });
-
-            ipc.on(`translate-callback-${guid}`, (event, arg) => {
-                if (arg.status == 200) {
-                    resolve({
-                        status: 'success',
-                        data: arg.data,
-                        code: 200,
-                        message: '翻译成功 (Translation successfully)'
-                    });
-                }
-                else {
-                    reject({
-                        status: 'error',
-                        data: arg.data,
-                        code: 500,
-                        message: arg.message
-                    });
-                }
-            }
-            );
         });
     }
 }

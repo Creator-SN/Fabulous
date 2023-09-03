@@ -107,11 +107,13 @@
                                     @click="openPDF(x.item, 'inside')"
                                 >PDF</p>
                                 <p
+                                    v-show="!isRemote"
                                     class="sec highlight"
                                     @click="openFile(x.item.id, x.item.pdf, `.pdf`)"
                                 >{{x.item.pdf}}.pdf</p>
                                 <p></p>
                                 <fv-button
+                                    v-show="!isRemote"
                                     :theme="theme"
                                     style="width: 35px; height: 35px;"
                                     :title="local('Open Folder')"
@@ -155,6 +157,7 @@
                                     @click="showMetadata(x.item)"
                                 >Metadata</p>
                                 <p
+                                    v-show="!isRemote"
                                     class="sec highlight"
                                     @click="showMetadata(x.item)"
                                 >{{x.item.id}}.metadata</p>
@@ -190,7 +193,7 @@
                                     @click="openEditor(x.item, page)"
                                 >{{page.name}}</p>
                                 <p class="sec">{{page.id}}</p>
-                                <p class="sec">{{page.createDate}}</p>
+                                <p class="sec">{{$date(page.createDate)}}</p>
                                 <fv-button
                                     theme="dark"
                                     :background="theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(0, 98, 158, 1)'"
@@ -554,13 +557,16 @@ export default {
             mode: (state) => state.pdfImporter.mode,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         pid() {
             if (!this.$route.params.id) return null;
             return this.$route.params.id;
         },
         SourceDisabled() {
             return !this.currentDataPath;
+        },
+        isRemote() {
+            return this.currentDataPathItem && !this.currentDataPathItem.local;
         }
     },
     mounted() {
@@ -582,7 +588,7 @@ export default {
                 };
                 return;
             }
-            this.$local_api.AcademicController.getPartition(
+            this.$auto.AcademicController.getPartition(
                 this.currentDataPath,
                 this.pid
             )
@@ -603,14 +609,18 @@ export default {
         },
         getItems() {
             if (this.SourceDisabled) return;
+            let pid = this.pid;
+            if (this.isRemote && !pid) pid = this.currentDataPath;
+            let sortDesc = this.sortDesc;
+            if (this.isRemote && sortDesc === -1) sortDesc = false;
             if (!this.currentSearch.debounce) {
-                this.$local_api.AcademicController.getItems(
+                this.$auto.AcademicController.getItems(
                     this.currentDataPath,
-                    this.pid,
+                    pid,
                     -1,
                     0,
                     this.sortKey.key,
-                    this.sortDesc
+                    sortDesc
                 )
                     .then((res) => {
                         if (res.status === 'success') {
@@ -630,14 +640,14 @@ export default {
                         });
                     });
             } else
-                this.$local_api.AcademicController.getSearchItems(
+                this.$auto.AcademicController.getSearchItems(
                     this.currentDataPath,
                     this.pid,
                     this.currentSearch.debounce,
                     50,
                     0,
                     this.sortKey.key,
-                    this.sortDesc
+                    sortDesc
                 )
                     .then((res) => {
                         if (res.status === 'success') {
@@ -667,7 +677,7 @@ export default {
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
-                    await this.$local_api.AcademicController.deleteItem(
+                    await this.$auto.AcademicController.deleteItem(
                         this.currentDataPath,
                         this.currentItem.id
                     ).then((res) => {
@@ -692,7 +702,7 @@ export default {
                 confirm: async () => {
                     this.lock = false;
                     let ids = this.currentChoosen.map((el) => el.id);
-                    let res = await this.$local_api.AcademicController.deleteItems(
+                    let res = await this.$auto.AcademicController.deleteItems(
                         this.currentDataPath,
                         ids
                     );
@@ -736,12 +746,32 @@ export default {
             this.toggleEditor(true);
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.AcademicController.openItemFile(
-                this.currentDataPath,
-                itemid,
-                fileid,
-                type
-            );
+            if (this.isRemote) {
+                if (type !== 'pdf') return;
+                if (
+                    !fileid &&
+                    itemid.indexOf('/') > -1 &&
+                    itemid.indexOf('.') > -1
+                ) {
+                    fileid = itemid.split('/')[1];
+                    fileid = fileid.split('.')[0];
+                    itemid = itemid.split('/')[0];
+                }
+                this.$api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid
+                ).then((res) => {
+                    window.open(this.$server + res.data);
+                });
+            } else {
+                this.$local_api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid,
+                    type
+                );
+            }
         },
         openPDF(item, mode = 'outside') {
             if (mode === 'inside') {
@@ -759,22 +789,22 @@ export default {
             }
         },
         async copyItemsToPartitions(partitions) {
-            let choosen = this.currentChoosen;
+            let choosen = [].concat(this.currentChoosen);
             if (
-                this.currentChoosen.find(
-                    (it) => it.id === this.currentItem.id
-                ) === undefined
+                this.currentItem.id &&
+                !this.currentChoosen.find((it) => it.id === this.currentItem.id)
             )
                 choosen.push(this.currentItem);
             if (choosen.length === 0) return;
             let ids = choosen.map((el) => el.id);
             for (let partition of partitions) {
                 let partitionid = partition.id;
-                let res = await this.$local_api.AcademicController.addItemsToPartition(
-                    this.currentDataPath,
-                    partitionid,
-                    ids
-                );
+                let res =
+                    await this.$auto.AcademicController.addItemsToPartition(
+                        this.currentDataPath,
+                        partitionid,
+                        ids
+                    );
                 if (res.status !== 'success') {
                     this.$barWarning(res.message, {
                         status: 'warning'
@@ -813,16 +843,15 @@ export default {
         },
         removeItemsFromPartition() {
             if (this.pid === false) return;
-            let choosen = this.currentChoosen;
+            let choosen = [].concat(this.currentChoosen);
             if (
-                this.currentChoosen.find(
-                    (it) => it.id === this.currentItem.id
-                ) === undefined
+                this.currentItem.id &&
+                !this.currentChoosen.find((it) => it.id === this.currentItem.id)
             )
                 choosen.push(this.currentItem);
             if (choosen.length === 0) return;
             let ids = choosen.map((el) => el.id);
-            this.$local_api.AcademicController.removeItemsFromPartition(
+            this.$auto.AcademicController.removeItemsFromPartition(
                 this.currentDataPath,
                 this.pid,
                 ids
@@ -855,7 +884,7 @@ export default {
         },
         async reviseItemEmoji(item, emoji) {
             item.emoji = emoji;
-            let res = await this.$local_api.AcademicController.updateItem(
+            let res = await this.$auto.AcademicController.updateItem(
                 this.currentDataPath,
                 item
             );
@@ -866,9 +895,9 @@ export default {
             }
         },
         async revisePageEmoji(item, page, emoji) {
-            if (!this.items) return;
+            if (!item) return;
             page.emoji = emoji;
-            let res = await this.$local_api.AcademicController.updateItemPage(
+            let res = await this.$auto.AcademicController.updateItemPage(
                 this.currentDataPath,
                 item.id,
                 page
@@ -880,8 +909,8 @@ export default {
             }
         },
         async duplicateItemPage(item, page) {
-            if (!this.items) return;
-            let res = await this.$local_api.AcademicController.duplicateItemPage(
+            if (!item) return;
+            let res = await this.$auto.AcademicController.duplicateItemPage(
                 this.currentDataPath,
                 item.id,
                 page.id
@@ -902,16 +931,26 @@ export default {
                 cancelTitle: this.local('Cancel'),
                 theme: this.theme,
                 confirm: async () => {
-                    let res = await this.$local_api.AcademicController.deleteItemPage(
+                    await this.$auto.AcademicController.deleteItemPage(
                         this.currentDataPath,
                         itemId,
                         pageId
-                    );
-                    if (res.status !== 'success') {
-                        this.$barWarning(res.message, {
-                            status: 'error'
+                    )
+                        .then(() => {
+                            let item = this.itemList.find(
+                                (el) => el.id === itemId
+                            );
+                            item.pages = item.pages.filter(
+                                (el) => el.id !== pageId
+                            );
+                        })
+                        .catch((res) => {
+                            if (res.message) {
+                                this.$barWarning(res.message, {
+                                    status: 'error'
+                                });
+                            }
                         });
-                    }
                 },
                 cancel: () => {}
             });

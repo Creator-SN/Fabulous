@@ -201,7 +201,7 @@ export default {
                 template.updateDate = el.updateDate;
                 template.choosen = false;
                 template.show = true;
-                let res = await this.$local_api.AcademicController.getTemplateContent(
+                let res = await this.$auto.AcademicController.getTemplateContent(
                     this.currentDataPath,
                     el.id
                 );

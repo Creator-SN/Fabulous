@@ -14,7 +14,9 @@
                     :font-size="18"
                     :font-weight="'bold'"
                     underline
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
                     style="width: 100%; height: 60px; margin-top: 15px;"
                     @keyup.enter="add"
@@ -48,30 +50,30 @@
 </template>
 
 <script>
-import floatWindowBase from "../window/floatWindowBase.vue";
-import templateGrid from "@/components/templates/templateGrid.vue";
-import { page } from "@/js/data_sample.js";
-import { mapMutations, mapState, mapGetters } from "vuex";
+import floatWindowBase from '../window/floatWindowBase.vue';
+import templateGrid from '@/components/templates/templateGrid.vue';
+import { page } from '@/js/data_sample.js';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
 export default {
     components: {
         floatWindowBase,
-        templateGrid,
+        templateGrid
     },
     props: {
         show: {
-            default: false,
+            default: false
         },
         item: {
-            default: null,
-        },
+            default: null
+        }
     },
     data() {
         return {
             thisShow: this.show,
-            name: "",
+            name: '',
             currentChoosen: [],
-            templates: [],
+            templates: []
         };
     },
     watch: {
@@ -82,71 +84,77 @@ export default {
             }
         },
         thisShow(val) {
-            this.$emit("update:show", val);
-            this.name = "";
-        },
+            this.$emit('update:show', val);
+            this.name = '';
+        }
     },
     computed: {
         ...mapState({
             data_index: (state) => state.config.data_index,
             data_path: (state) => state.config.data_path,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath'])
     },
     mounted() {},
     methods: {
         ...mapMutations({
-            reviseEditor: "reviseEditor",
-            toggleEditor: "toggleEditor",
+            reviseEditor: 'reviseEditor',
+            toggleEditor: 'toggleEditor'
         }),
         async add() {
             if (
                 !this.item ||
-                this.name === "" ||
+                this.name === '' ||
                 this.currentChoosen.length > 1
             )
                 return;
+            let templateContent = JSON.stringify({
+                type: 'doc',
+                content: []
+            });
+            if (this.currentChoosen.length === 1) {
+                templateContent = this.currentChoosen[0].content;
+            }
             let _page = JSON.parse(JSON.stringify(page));
             _page.id = this.$Guid();
             _page.name = this.name;
-            _page.emoji = "📑";
+            _page.emoji = '📑';
             _page.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.AcademicController.createItemPage(
+            let res = await this.$auto.AcademicController.createItemPage(
                 this.currentDataPath,
                 this.item.id,
-                _page,
-                this.currentChoosen[0].content
+                { ..._page, content: templateContent }
             );
-            if (res.status === "success") {
+            if (res.status === 'success') {
                 this.item.pages.push(res.data);
                 this.thisShow = false;
             } else {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
             }
         },
         async getTemplates() {
-            let res = await this.$local_api.AcademicController.getTemplatesInfo(
+            let res = await this.$auto.AcademicController.getTemplateInfo(
                 this.currentDataPath
             );
-            if (res.status === "success") {
+            if (res.status === 'success') {
                 this.templates = res.data;
             } else {
                 this.$barWarning(res.message, {
-                    status: "error",
+                    status: 'error'
                 });
             }
         },
         openEditor(template) {
             this.reviseEditor({
-                type: "template",
-                target: template,
+                type: 'template',
+                target: template
             });
             this.toggleEditor(true);
-        },
-    },
+        }
+    }
 };
 </script>
 

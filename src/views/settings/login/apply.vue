@@ -22,7 +22,7 @@
                     background="whitesmoke"
                     :border-radius="6"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px;"
+                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px; flex-shrink: 0;"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-text-box
@@ -34,7 +34,7 @@
                     background="whitesmoke"
                     :border-radius="6"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px;"
+                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px; flex-shrink: 0;"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-button
@@ -44,7 +44,7 @@
                     fontSize="16"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 50px; height: 50px; margin-top: 20px;"
+                    style="width: 50px; height: 50px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="Apply.Lock"
                     @click="handleApply"
                 >
@@ -150,6 +150,7 @@ export default {
     @include HcenterVcenterC;
 
     flex: 1;
+    overflow: overlay;
 
     .d-1 {
         @include HcenterVcenterC;

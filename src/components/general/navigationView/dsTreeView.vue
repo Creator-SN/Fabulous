@@ -173,7 +173,7 @@
                     >
                     <p>{{local("New Group")}}</p>
                 </span>
-                <hr>
+                <hr v-show="rightMenuItem.type === 'group'">
                 <span @click="showRename(rightMenuItem)">
                     <i
                         class="ms-Icon ms-Icon--Rename"
@@ -293,9 +293,19 @@ export default {
             language: (state) => state.config.language,
             theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         SourceDisabled() {
             return !this.currentDataPath;
+        },
+        isRemote() {
+            return this.currentDataPathItem && !this.currentDataPathItem.local;
+        },
+        computeItemParent() {
+            return (item) => {
+                if (!item.parent)
+                    return this.isRemote ? this.currentDataPath : null;
+                return item.parent;
+            };
         }
     },
     mounted() {
@@ -306,7 +316,7 @@ export default {
     methods: {
         getDSInfo() {
             if (this.SourceDisabled) return;
-            this.$local_api.AcademicController.getDataSourceInfo(
+            this.$auto.AcademicController.getDataSourceInfo(
                 this.currentDataPath
             )
                 .then((res) => {
@@ -330,12 +340,13 @@ export default {
             this.treeList = [];
             this.FLAT = [];
             let result = [];
-            let groups = await this.$local_api.AcademicController.getRootGroups(
+            let groups = await this.$auto.AcademicController.getRootGroups(
                 this.currentDataPath
             );
-            let partitions = await this.$local_api.AcademicController.getRootPartitions(
-                this.currentDataPath
-            );
+            let partitions =
+                await this.$auto.AcademicController.getRootPartitions(
+                    this.currentDataPath
+                );
             groups = groups.data;
             partitions = partitions.data;
             groups.forEach((el) => {
@@ -395,7 +406,7 @@ export default {
             item.loading = true;
             let groupList = [];
             let partitionList = [];
-            await this.$local_api.AcademicController.getGroups(
+            await this.$auto.AcademicController.getGroups(
                 this.currentDataPath,
                 item.id
             )
@@ -419,7 +430,7 @@ export default {
                     });
                     item.loading = false;
                 });
-            await this.$local_api.AcademicController.getPartitions(
+            await this.$auto.AcademicController.getPartitions(
                 this.currentDataPath,
                 item.id
             )
@@ -545,28 +556,28 @@ export default {
             let mode = null;
             if (item.isTmp) {
                 if (item.type === 'group') {
-                    res = await this.$local_api.AcademicController.createGroup(
+                    res = await this.$auto.AcademicController.createGroup(
                         this.currentDataPath,
-                        item.parent,
+                        this.computeItemParent(item),
                         item
                     );
                 } else
-                    res = await this.$local_api.AcademicController.createPartition(
+                    res = await this.$auto.AcademicController.createPartition(
                         this.currentDataPath,
-                        item.parent,
+                        this.computeItemParent(item),
                         item
                     );
                 mode = 'add';
             } else {
                 if (item.type === 'group') {
-                    res = await this.$local_api.AcademicController.updateGroup(
+                    res = await this.$auto.AcademicController.updateGroup(
                         this.currentDataPath,
                         item
                     );
                 } else
-                    res = await this.$local_api.AcademicController.updatePartition(
+                    res = await this.$auto.AcademicController.updatePartition(
                         this.currentDataPath,
-                        item.parent,
+                        this.computeItemParent(item),
                         item
                     );
                 mode = 'update';
@@ -594,14 +605,14 @@ export default {
             item.loading = true;
             let res = null;
             if (item.type === 'group') {
-                res = await this.$local_api.AcademicController.updateGroup(
+                res = await this.$auto.AcademicController.updateGroup(
                     this.currentDataPath,
                     item
                 );
             } else
-                res = await this.$local_api.AcademicController.updatePartition(
+                res = await this.$auto.AcademicController.updatePartition(
                     this.currentDataPath,
-                    item.parent,
+                    this.computeItemParent(item),
                     item
                 );
             item.loading = false;
@@ -635,14 +646,14 @@ export default {
             item.loading = true;
             let res = null;
             if (item.type === 'group') {
-                res = await this.$local_api.AcademicController.deleteGroup(
+                res = await this.$auto.AcademicController.deleteGroup(
                     this.currentDataPath,
                     item.id
                 );
             } else
-                res = await this.$local_api.AcademicController.deletePartition(
+                res = await this.$auto.AcademicController.deletePartition(
                     this.currentDataPath,
-                    item.parent,
+                    this.computeItemParent(item),
                     item.id
                 );
             item.loading = false;

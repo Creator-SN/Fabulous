@@ -14,7 +14,9 @@
                     :font-size="18"
                     :font-weight="'bold'"
                     underline
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
                     style="width: 100%; height: 60px; margin-top: 15px;"
                     @keyup.enter="add"
@@ -55,6 +57,7 @@
                         :border-color="item.color"
                         :focus-border-color="item.color"
                         :is-box-shadow="true"
+                        underline
                         style="margin: 5px 0px;"
                         @keyup.enter="addLabel(item)"
                     ></fv-text-box>
@@ -144,7 +147,7 @@ export default {
             _item.emoji = "📦";
             _item.labels = this.labels;
             _item.createDate = this.$SDate.DateToString(new Date());
-            let res = await this.$local_api.AcademicController.createItem(
+            let res = await this.$auto.AcademicController.createItem(
                 this.currentDataPath,
                 _item
             );
@@ -156,7 +159,7 @@ export default {
             }
             if (this.partitionId) {
                 let itemid = res.data.id;
-                res = await this.$local_api.AcademicController.addItemsToPartition(
+                res = await this.$auto.AcademicController.addItemsToPartition(
                     this.currentDataPath,
                     this.partitionId,
                     [itemid]

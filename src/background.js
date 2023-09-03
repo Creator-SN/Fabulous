@@ -9,8 +9,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 import * as remote from "@electron/remote/main"
 remote.initialize()
 
-const { microsoft } = require('translate-platforms');
-
 var fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
@@ -26,7 +24,7 @@ async function createWindow() {
     win = new BrowserWindow({
         frame: false,
         width: 1600,
-        height: 600,
+        height: 1200,
         minWidth: 800,
         minHeight: 500,
         webPreferences: {

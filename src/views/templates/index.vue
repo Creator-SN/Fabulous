@@ -20,8 +20,6 @@
                     borderWidth="1"
                     :border-radius="30"
                     :revealBorder="true"
-                    :is-box-shadow="true"
-                    style="box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1)"
                 ></fv-text-box>
             </div>
             <div class="row command-bar">
@@ -153,7 +151,7 @@ export default {
             toggleEditor: "toggleEditor",
         }),
         async getTemplates() {
-            let res = await this.$local_api.AcademicController.getTemplatesInfo(
+            let res = await this.$auto.AcademicController.getTemplateInfo(
                 this.currentDataPath
             );
             if (res.status === "success") {
@@ -174,7 +172,7 @@ export default {
                 theme: this.theme,
                 confirm: async () => {
                     this.lock = false;
-                    let res = await this.$local_api.AcademicController.deleteTemplate(
+                    let res = await this.$auto.AcademicController.deleteTemplate(
                         this.currentDataPath,
                         this.currentItem.id
                     );
@@ -185,6 +183,7 @@ export default {
                         this.lock = true;
                         return;
                     }
+                    this.getTemplates();
                     this.lock = true;
                 },
                 cancel: () => {},
@@ -204,7 +203,7 @@ export default {
                         this.lock = false;
                         for (let i = 0; i < this.currentChoosen.length; i++) {
                             let res =
-                                await this.$local_api.AcademicController.deleteTemplate(
+                                await this.$auto.AcademicController.deleteTemplate(
                                     this.currentDataPath,
                                     this.currentChoosen[i].id
                                 );
@@ -216,6 +215,7 @@ export default {
                                 return;
                             }
                         }
+                        this.getTemplates();
                         this.lock = true;
                     },
                     cancel: () => {},

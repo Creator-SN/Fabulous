@@ -148,6 +148,10 @@ export default {
             if (!this.lock.raf) return;
             this.lock.raf = false;
             window.requestAnimationFrame(() => {
+                if (!this.el()) {
+                    this.lock.raf = true;
+                    return;
+                }
                 let editorContainer = this.el().$refs.container;
                 let contentContainer = this.el().$refs.editor.$el;
                 let editorWidth = editorContainer.offsetWidth;

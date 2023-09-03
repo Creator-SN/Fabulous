@@ -2,6 +2,7 @@
     <div
         class="fabulous-callout-base-container"
         :class="[{ dark: theme === 'dark' }]"
+        @click="$event.stopPropagation()"
     >
         <fv-callout
             v-if="!mobileMode"

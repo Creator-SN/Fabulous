@@ -145,6 +145,13 @@ export default {
                     result.push(this.itemCarrier.itemsX[i]);
             }
             return result;
+        },
+        Auto() {
+            return (path) => {
+                let item = this.data_path.find((item) => item.path === path);
+                if (item.local) return this.$local_api;
+                return this.$api;
+            };
         }
     },
     methods: {
@@ -182,14 +189,15 @@ export default {
                 if (!Array.isArray(item.pages)) item.pages = [];
 
                 for (let page of item.pages) {
-                    await this.$local_api.AcademicController.getItemPageContent(
-                        uri,
-                        item.id,
-                        page.id
-                    )
+                    await this.Auto(uri)
+                        .AcademicController.getItemPageContent(
+                            uri,
+                            item.id,
+                            page.id
+                        )
                         .then((res) => {
                             if (res.status === 'success') {
-                                page.content = res.data;
+                                page.content = res.data.content;
                             }
                         })
                         .catch((res) => {
@@ -200,15 +208,13 @@ export default {
 
                 // 迁移PDF (Migrate PDF)
                 if (item.pdf) {
-                    await this.$local_api.AcademicController.getItemPDF(
-                        uri,
-                        item.id,
-                        item.pdf
-                    )
+                    await this.Auto(uri)
+                        .AcademicController.getItemPDF(uri, item.id, item.pdf)
                         .then((res) => {
-                            if (res.status === 'success') {
-                                item.pdfFile = res.data;
-                            }
+                            let blob = null;
+                            if (!res.code) blob = res;
+                            else blob = res.data;
+                            item.pdfFile = blob;
                         })
                         .catch((res) => {
                             console.warn(res.message);
@@ -218,7 +224,7 @@ export default {
                 dataList.push(itemX);
 
                 this.$emit(
-                    'update-progess',
+                    'update-progress',
                     (((i + 1) / this.currentChoosen.length) * 50).toFixed(2)
                 );
             }
@@ -234,11 +240,15 @@ export default {
                 pureItem.pdfFile = null;
                 pureItem.pages = [];
 
+                // let item_ = JSON.parse(JSON.stringify(Item));
+                // for (let key in item_) {
+                //     item_[key] = pureItem[key];
+                // }
+
                 // 创建新数据项 (Create New Item)
-                let res = await this.$local_api.AcademicController.createItem(
-                    targetUri,
-                    pureItem
-                );
+                let res = await this.Auto(
+                    targetUri
+                ).AcademicController.createItem(targetUri, pureItem);
 
                 if (res.status !== 'success') {
                     this.$barWarning(res.message, {
@@ -252,14 +262,16 @@ export default {
 
                 // 创建新PDF (Create New PDF)
                 if (item.pdfFile) {
-                    let res = await this.$local_api.AcademicController.updateItemPDF(
-                        targetUri,
-                        newItem.id,
-                        newItem.id,
-                        item.pdfFile
-                    ).catch((res) => {
-                        console.warn('aaa', res.message);
-                    });
+                    let res = await this.Auto(targetUri)
+                        .AcademicController.updateItemPDF(
+                            targetUri,
+                            newItem.id,
+                            newItem.id,
+                            item.pdfFile
+                        )
+                        .catch((res) => {
+                            console.warn('aaa', res.message);
+                        });
 
                     if (res.status !== 'success') {
                         this.$barWarning(res.message, {
@@ -276,13 +288,15 @@ export default {
                         _metadata[key] = item.metadata[key];
                 }
 
-                res = await this.$local_api.AcademicController.updateItemMetadata(
-                    targetUri,
-                    newItem.id,
-                    _metadata
-                ).catch((res) => {
-                    console.warn(res.message);
-                });
+                res = await this.Auto(targetUri)
+                    .AcademicController.updateItemMetadata(
+                        targetUri,
+                        newItem.id,
+                        _metadata
+                    )
+                    .catch((res) => {
+                        console.warn(res.message);
+                    });
 
                 if (res.status !== 'success') {
                     this.$barWarning(res.message, {
@@ -293,14 +307,15 @@ export default {
 
                 // 创建新Pages (Create New Pages)
                 for (let page of item.pages) {
-                    let res = await this.$local_api.AcademicController.createItemPage(
-                        targetUri,
-                        newItem.id,
-                        page,
-                        page.content
-                    ).catch((res) => {
-                        console.warn(res.message);
-                    });
+                    let res = await this.Auto(targetUri)
+                        .AcademicController.createItemPage(
+                            targetUri,
+                            newItem.id,
+                            page
+                        )
+                        .catch((res) => {
+                            console.warn(res.message);
+                        });
 
                     if (res.status !== 'success') {
                         this.$barWarning(res.message, {
@@ -315,7 +330,7 @@ export default {
                 });
 
                 this.$emit(
-                    'update-progess',
+                    'update-progress',
                     (50 + ((i + 1) / dataList.length) * 50).toFixed(2)
                 );
             }
@@ -323,16 +338,18 @@ export default {
             if (this.$route.params.id) {
                 let partitionid = this.$route.params.id;
                 let ids = newItemsCollection.map((item) => item.id);
-                await this.$local_api.AcademicController.addItemsToPartition(
-                    this.currentDataPath,
-                    partitionid,
-                    ids
-                ).catch((res) => {
-                    console.warn(res.message);
-                });
+                await this.Auto(this.currentDataPath)
+                    .AcademicController.addItemsToPartition(
+                        this.currentDataPath,
+                        partitionid,
+                        ids
+                    )
+                    .catch((res) => {
+                        console.warn(res.message);
+                    });
             }
 
-            this.$emit('update-progess', 110);
+            this.$emit('update-progress', 110);
             this.reviseItemCarrier({
                 itemsX: []
             });

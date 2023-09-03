@@ -18,7 +18,9 @@
                     :font-size="18"
                     underline
                     :border-radius="6"
+                    :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
+                    :border-width="2"
                     :is-box-shadow="true"
                     style="width: 100%; height: 50px; margin-top: 15px;"
                     @keyup.enter="initDs"

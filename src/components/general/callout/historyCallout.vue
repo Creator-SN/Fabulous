@@ -26,27 +26,62 @@
             <fv-list-view
                 :value="docHistory"
                 :theme="theme"
+                :row-height="60"
+                :showSlider="true"
+                :header-foreground="'rgba(140, 148, 228, 1)'"
+                :choosen-background="theme === 'dark' ? '#333' : '#fff'"
                 style="width: 100%; height: 100%;"
-                @chooseItem="$emit('chooseItem', $event)"
+                @chooseItem="getNotebookHistoryContent($event)"
             >
+                <template v-slot:listItem="x">
+                    <div class="list-view-custom-content">
+                        <p class="main-title">{{x.item.name}}</p>
+                        <span class="info-block">
+                            <time-rounder
+                                :value="new Date(x.item.createDate)"
+                                icon="DevUpdate"
+                                class="max-len"
+                                style="width: auto;"
+                            ></time-rounder>
+                            <span class="author-block">
+                                <i class="ms-Icon ms-Icon--StatusCircleInner"></i>
+                                <p>{{x.item.author}}</p>
+                            </span>
+                        </span>
+                    </div>
+                </template>
             </fv-list-view>
+            <fake-progress :progressCount="progressCount"></fake-progress>
         </template>
     </callout-base>
 </template>
 
 <script>
 import calloutBase from './calloutBase.vue';
+import timeRounder from '@/components/general/timeRounder.vue';
+import fakeProgress from '@/components/general/fakeProgress.vue';
 
 export default {
     components: {
-        calloutBase
+        calloutBase,
+        timeRounder,
+        fakeProgress
     },
     props: {
         value: {
             default: ''
         },
+        uri: {
+            default: ''
+        },
+        itemid: {
+            default: ''
+        },
         mobileMode: {
             default: false
+        },
+        mode: {
+            default: 'notebook'
         },
         local: {
             default: () => {}
@@ -58,7 +93,11 @@ export default {
     data() {
         return {
             show: false,
-            docHistory: []
+            docHistory: [],
+            progressCount: 0,
+            lock: {
+                content: true
+            }
         };
     },
     watch: {
@@ -71,23 +110,93 @@ export default {
     methods: {
         getNotebookHistory() {
             if (!this.value.id) return;
-            this.$api.NotebookController.getDocumentContentHistory(
-                this.value.id,
-                10000
-            )
-                .then((res) => {
-                    res.data.forEach((el) => {
-                        el.key = el.versionId;
-                        el.name = el.versionId.split('-').pop();
-                    });
-                    this.docHistory = res.data;
-                })
-                .catch((res) => {
-                    console.error(res);
-                    this.$barWarning(this.local(`Read History Failed`), {
-                        status: 'warning'
-                    });
+            let computeRes = (res) => {
+                res.data.forEach((el) => {
+                    el.key = el.versionId;
+                    el.name = el.versionId.split('-').pop();
+                    el.disabled = () => !this.lock.content;
                 });
+                this.docHistory = res.data;
+            };
+            if (this.mode === 'notebook')
+                this.$api.NotebookController.getDocumentContentHistoryVersionIds(
+                    this.value.id
+                )
+                    .then((res) => {
+                        computeRes(res);
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(this.local(`Read History Failed`), {
+                            status: 'warning'
+                        });
+                    });
+            else
+                this.$api.AcademicController.listItemPageVersions(
+                    this.uri,
+                    this.itemid,
+                    this.value.id
+                )
+                    .then((res) => {
+                        computeRes(res);
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(this.local(`Read History Failed`), {
+                            status: 'warning'
+                        });
+                    });
+        },
+        getNotebookHistoryContent(event) {
+            if (!this.lock.content) return;
+            this.lock.content = false;
+            const item = event.item;
+            if (this.mode === 'notebook')
+                this.$api.NotebookController.getDocumentContentHistoryByVersionIds(
+                    this.value.id,
+                    item.versionId,
+                    null,
+                    null,
+                    () => {
+                        this.progressCount++;
+                    }
+                )
+                    .then((res) => {
+                        this.$emit('chooseItem', res.data[0]);
+                        this.progressCount = 0;
+                        this.lock.content = true;
+                    })
+                    .catch((res) => {
+                        this.lock.content = true;
+                        this.progressCount = 0;
+                        console.error(res);
+                        this.$barWarning(this.local(`Read History Failed`), {
+                            status: 'warning'
+                        });
+                    });
+            else
+                this.$api.NotebookController.getDocumentContentHistoryByVersionIds(
+                    this.value.id,
+                    item.versionId,
+                    null,
+                    null,
+                    () => {
+                        this.progressCount++;
+                    }
+                )
+                    .then((res) => {
+                        this.$emit('chooseItem', res.data[0]);
+                        this.progressCount = 0;
+                        this.lock.content = true;
+                    })
+                    .catch((res) => {
+                        this.lock.content = true;
+                        this.progressCount = 0;
+                        console.error(res);
+                        this.$barWarning(this.local(`Read History Failed`), {
+                            status: 'warning'
+                        });
+                    });
         }
     }
 };
@@ -136,39 +245,37 @@ export default {
         align-items: center;
         overflow: auto;
 
-        .fabulous-history-list {
+        .list-view-custom-content {
             position: relative;
             width: 100%;
-            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
 
-            .title {
-                font-size: 12px;
+            .main-title {
+                font-size: 13.8px;
+                font-weight: bold;
             }
 
-            .fabulous-history-group {
-                position: relative;
-                width: 100%;
-                height: auto;
-                display: flex;
-                flex-wrap: wrap;
+            .info-block {
+                @include HbetweenVcenter;
 
-                .emoji-item {
-                    position: relative;
-                    width: 35px;
-                    height: 35px;
-                    padding: 1px;
-                    border-radius: 3px;
-                    font-size: 20px;
-                    font-style: normal;
-                    box-sizing: border-box;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    user-select: none;
-                    cursor: default;
+                .max-len {
+                    font-size: 12px;
+                    color: rgba(90, 90, 90, 1);
+                    transform: scale(0.8);
+                    transform-origin: 0% 50%;
+                }
 
-                    &:hover {
-                        background: rgba(200, 200, 200, 0.6);
+                .author-block {
+                    @include Vcenter;
+
+                    font-size: 12px;
+                    color: rgba(90, 90, 90, 1);
+                    transform: scale(0.8);
+
+                    i {
+                        color: rgba(0, 204, 153, 1);
                     }
                 }
             }

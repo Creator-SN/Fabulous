@@ -35,6 +35,149 @@ axios.interceptors.request.use(
 export class AcademicController {
  
   /**
+  * @summary 获取模版的信息
+  * @param {String} [pathuri] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getTemplateInfo(pathuri,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/templates',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 更新模版
+  * @param {String} [pathuri] 
+  * @param {UserModel.DataTemplateUpdateDTO} [datatemplateupdatedto] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateTemplate(pathuri,datatemplateupdatedto,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'put',
+        url:'/sources/'+pathuri+'/templates',
+        data:datatemplateupdatedto,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 创建模版
+  * @param {String} [pathuri] 
+  * @param {UserModel.DataTemplateCreateDTO} [datatemplatecreatedto] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async createTemplate(pathuri,datatemplatecreatedto,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/templates',
+        data:datatemplatecreatedto,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
   * @summary 获取当前数据源下的所有数据项信息
   * @param {String} [pathuri] 
   * @param {Number} [length] 
@@ -88,18 +231,18 @@ export class AcademicController {
   /**
   * @summary 更新数据项
   * @param {String} [pathuri] 
-  * @param {object} [object] 
+  * @param {UserModel.DataItemUpdateDTO} [dataitemupdatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updateItem(pathuri,object,cancelSource,uploadProgress,downloadProgress){
+  static async updateItem(pathuri,dataitemupdatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'put',
         url:'/sources/'+pathuri+'/items',
-        data:object,
+        data:dataitemupdatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -136,18 +279,18 @@ export class AcademicController {
   /**
   * @summary 创建数据项
   * @param {String} [pathuri] 
-  * @param {object} [object] 
+  * @param {UserModel.DataItemCreateDTO} [dataitemcreatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async createItem(pathuri,object,cancelSource,uploadProgress,downloadProgress){
+  static async createItem(pathuri,dataitemcreatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/items',
-        data:object,
+        data:dataitemcreatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -185,18 +328,18 @@ export class AcademicController {
   * @summary 更新数据项笔记信息
   * @param {String} [pathuri] 
   * @param {String} [pathitemid] 
-  * @param {object} [object] 
+  * @param {UserModel.DataPageUpdateDTO} [datapageupdatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updateItemPage(pathuri,pathitemid,object,cancelSource,uploadProgress,downloadProgress){
+  static async updateItemPage(pathuri,pathitemid,datapageupdatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'put',
         url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages',
-        data:object,
+        data:datapageupdatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -234,18 +377,67 @@ export class AcademicController {
   * @summary 创建数据项的笔记
   * @param {String} [pathuri] 
   * @param {String} [pathitemid] 
-  * @param {object} [object] 
+  * @param {UserModel.DataPageCreateDTO} [datapagecreatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async createItemPage(pathuri,pathitemid,object,cancelSource,uploadProgress,downloadProgress){
+  static async createItemPage(pathuri,pathitemid,datapagecreatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages',
-        data:object,
+        data:datapagecreatedto,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 更新数据项的元信息
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {UserModel.MetadataUpdateDTO} [metadataupdatedto] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateItemMetadata(pathuri,pathitemid,metadataupdatedto,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'put',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/metadata',
+        data:metadataupdatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -329,18 +521,18 @@ export class AcademicController {
   /**
   * @summary 更新区组
   * @param {String} [pathuri] 
-  * @param {object} [object] 
+  * @param {UserModel.GroupUpdateDTO} [groupupdatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updateGroup(pathuri,object,cancelSource,uploadProgress,downloadProgress){
+  static async updateGroup(pathuri,groupupdatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'put',
         url:'/sources/'+pathuri+'/groups',
-        data:object,
+        data:groupupdatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -378,18 +570,18 @@ export class AcademicController {
   * @summary 更新分区
   * @param {String} [pathuri] 
   * @param {String} [pathgroupid] 
-  * @param {object} [object] 
+  * @param {UserModel.PartitionUpdateDTO} [partitionupdatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updatePartition(pathuri,pathgroupid,object,cancelSource,uploadProgress,downloadProgress){
+  static async updatePartition(pathuri,pathgroupid,partitionupdatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'put',
         url:'/sources/'+pathuri+'/groups/'+pathgroupid+'/partitions',
-        data:object,
+        data:partitionupdatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -427,18 +619,68 @@ export class AcademicController {
   * @summary 创建分区
   * @param {String} [pathuri] 
   * @param {String} [pathgroupid] 
-  * @param {object} [object] 
+  * @param {UserModel.PartitionCreateDTO} [partitioncreatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async createPartition(pathuri,pathgroupid,object,cancelSource,uploadProgress,downloadProgress){
+  static async createPartition(pathuri,pathgroupid,partitioncreatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/groups/'+pathgroupid+'/partitions',
-        data:object,
+        data:partitioncreatedto,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 保存模版的内容
+  * @param {String} [pathuri] 
+  * @param {String} [pathid] 
+  * @param {String} [pathversionid] 
+  * @param {string} [string] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async saveTemplateContent(pathuri,pathid,pathversionid,string,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/templates/'+pathid+'/versions/'+pathversionid+'',
+        data:string,
         params:{},
         headers:{
           "Content-Type":"application/json"
@@ -476,17 +718,165 @@ export class AcademicController {
   * @summary 将数据项添加到指定分区
   * @param {String} [pathuri] 
   * @param {String} [pathpartitionid] 
-  * @param {String} [pathitems] 
+  * @param {array} [array] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async addItemsToPartition(pathuri,pathpartitionid,pathitems,cancelSource,uploadProgress,downloadProgress){
+  static async addItemsToPartition(pathuri,pathpartitionid,array,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
-        url:'/sources/'+pathuri+'/partitions/'+pathpartitionid+'/items/batched/'+pathitems+'',
+        url:'/sources/'+pathuri+'/partitions/'+pathpartitionid+'/items/batched',
+        data:array,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 从分区移除数据项
+  * @param {String} [pathuri] 
+  * @param {String} [pathpartitionid] 
+  * @param {array} [array] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async removeItemsFromPartition(pathuri,pathpartitionid,array,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/partitions/'+pathpartitionid+'/items/batched/deleted',
+        data:array,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 保存Pdf文件
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pdfid] 
+  * @param {String} [file] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateItemPDF(pathuri,pathitemid,pdfid,file,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pdfs',
+        data:{pdfid,file},
+        params:{},
+        headers:{
+          "Content-Type":"multipart/form-data"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 复制数据项笔记
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async duplicateItemPage(pathuri,pathitemid,pathpageid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'/duplicate',
         data:{},
         params:{},
         headers:{
@@ -522,24 +912,74 @@ export class AcademicController {
   }
  
   /**
-  * @summary 从分区移除数据项
+  * @summary 保存笔记的内容
   * @param {String} [pathuri] 
-  * @param {String} [pathpartitionid] 
-  * @param {String} [pathitems] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {String} [pathversionid] 
+  * @param {string} [string] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async removeItemsFromPartition(pathuri,pathpartitionid,pathitems,cancelSource,uploadProgress,downloadProgress){
+  static async saveItemPageContent(pathuri,pathitemid,pathpageid,pathversionid,string,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
-        method:'delete',
-        url:'/sources/'+pathuri+'/partitions/'+pathpartitionid+'/items/batched/'+pathitems+'',
-        data:{},
+        method:'post',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'/content/versions/'+pathversionid+'',
+        data:string,
         params:{},
         headers:{
-          "Content-Type":""
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 删除多个数据项
+  * @param {String} [pathuri] 
+  * @param {array} [array] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async deleteItems(pathuri,array,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/'+pathuri+'/items/batched/deleted',
+        data:array,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
         },
         onUploadProgress:uploadProgress,
         onDownloadProgress:downloadProgress
@@ -622,21 +1062,117 @@ export class AcademicController {
   * @summary 创建区组
   * @param {String} [pathuri] 
   * @param {String} [pathid] 
-  * @param {object} [object] 
+  * @param {UserModel.GroupCreateDTO} [groupcreatedto] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async createGroup(pathuri,pathid,object,cancelSource,uploadProgress,downloadProgress){
+  static async createGroup(pathuri,pathid,groupcreatedto,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/groups/'+pathid+'/subgroups',
-        data:object,
+        data:groupcreatedto,
         params:{},
         headers:{
           "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取模版的内容
+  * @param {String} [pathuri] 
+  * @param {String} [pathid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getTemplateContent(pathuri,pathid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/templates/'+pathid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 删除模版
+  * @param {String} [pathuri] 
+  * @param {String} [pathid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async deleteTemplate(pathuri,pathid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'delete',
+        url:'/sources/'+pathuri+'/templates/'+pathid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
         },
         onUploadProgress:uploadProgress,
         onDownloadProgress:downloadProgress
@@ -767,59 +1303,6 @@ export class AcademicController {
   }
  
   /**
-  * @summary 搜索获取数据项信息
-  * @param {String} [pathuri] 
-  * @param {String} [pathpartitionid] 
-  * @param {String} [keyword] 
-  * @param {Number} [length] 
-  * @param {Number} [offset] 
-  * @param {String} [sort] 
-  * @param {undefined} [desc] 
-  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
-  * @param {Function} [uploadProgress] 上传回调函数
-  * @param {Function} [downloadProgress] 下载回调函数
-  */
-  static async getSearchItems(pathuri,pathpartitionid,keyword,length,offset,sort,desc,cancelSource,uploadProgress,downloadProgress){
-    return await new Promise((resolve,reject)=>{
-      let responseType = "json";
-      let options = {
-        method:'get',
-        url:'/sources/'+pathuri+'/partitions/'+pathpartitionid+'/items/matches',
-        data:{},
-        params:{keyword,length,offset,sort,desc},
-        headers:{
-          "Content-Type":""
-        },
-        onUploadProgress:uploadProgress,
-        onDownloadProgress:downloadProgress
-      }
-      // support wechat mini program
-      if (cancelSource!=undefined){
-        options.cancelToken = cancelSource.token
-      }
-      if (responseType != "json"){
-        options.responseType = responseType;
-      }
-      axios(options)
-      .then(res=>{
-        if (res.config.responseType=="blob"){
-          resolve(new Blob([res.data],{
-            type: res.headers["content-type"].split(";")[0]
-          }))
-        }else{
-          resolve(res.data);
-          return res.data
-        }
-      }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
-      })
-    })
-  }
- 
-  /**
   * @summary 获取指定分区下的所有数据项数量
   * @param {String} [pathuri] 
   * @param {String} [pathpartitionid] 
@@ -916,19 +1399,220 @@ export class AcademicController {
   }
  
   /**
-  * @summary 获取指定区组下的所有分区信息
+  * @summary 搜索获取数据项信息
   * @param {String} [pathuri] 
-  * @param {String} [pathid] 
+  * @param {String} [partitionid] 
+  * @param {String} [keyword] 
+  * @param {Number} [length] 
+  * @param {Number} [offset] 
+  * @param {String} [sort] 
+  * @param {undefined} [desc] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async getPartitions(pathuri,pathid,cancelSource,uploadProgress,downloadProgress){
+  static async getSearchItems(pathuri,partitionid,keyword,length,offset,sort,desc,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'get',
-        url:'/sources/'+pathuri+'/partitions/'+pathid+'/subpartitions',
+        url:'/sources/'+pathuri+'/partitions/items/matches',
+        data:{},
+        params:{partitionid,keyword,length,offset,sort,desc},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取数据项的Pdf文件
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpdfid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getItemPDF(pathuri,pathitemid,pathpdfid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "blob";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pdfs/'+pathpdfid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取数据源的临时链接
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathfileid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async openItemFile(pathuri,pathitemid,pathfileid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pdfs/'+pathfileid+'/link',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取文献笔记的历史
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listItemPageVersions(pathuri,pathitemid,pathpageid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'/versions',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取笔记的内容
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getItemPageContent(pathuri,pathitemid,pathpageid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'/content',
         data:{},
         params:{},
         headers:{
@@ -1107,20 +1791,18 @@ export class AcademicController {
   }
  
   /**
-  * @summary 删除数据项笔记
+  * @summary 获取数据源的信息
   * @param {String} [pathuri] 
-  * @param {String} [pathitemid] 
-  * @param {String} [pathpageid] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async deleteItemPage(pathuri,pathitemid,pathpageid,cancelSource,uploadProgress,downloadProgress){
+  static async getDataSourceInfo(pathuri,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
-        method:'delete',
-        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'',
+        method:'get',
+        url:'/sources/'+pathuri+'/info',
         data:{},
         params:{},
         headers:{
@@ -1156,19 +1838,68 @@ export class AcademicController {
   }
  
   /**
-  * @summary 删除多个数据项
+  * @summary 获取指定区组下的所有分区信息
   * @param {String} [pathuri] 
-  * @param {String} [pathitems] 
+  * @param {String} [pathid] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async deleteItems(pathuri,pathitems,cancelSource,uploadProgress,downloadProgress){
+  static async getPartitions(pathuri,pathid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/groups/'+pathid+'/subpartitions',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 删除数据项笔记
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async deleteItemPage(pathuri,pathitemid,pathpageid,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'delete',
-        url:'/sources/'+pathuri+'/items/batched/'+pathitems+'',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'',
         data:{},
         params:{},
         headers:{
@@ -1303,6 +2034,30 @@ export class AcademicController {
 
 // class AcademicController static method properties bind
 /**
+* @description getTemplateInfo url链接，包含baseURL
+*/
+AcademicController.getTemplateInfo.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates`
+/**
+* @description getTemplateInfo url链接，不包含baseURL
+*/
+AcademicController.getTemplateInfo.path=`/sources/{uri}/templates`
+/**
+* @description updateTemplate url链接，包含baseURL
+*/
+AcademicController.updateTemplate.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates`
+/**
+* @description updateTemplate url链接，不包含baseURL
+*/
+AcademicController.updateTemplate.path=`/sources/{uri}/templates`
+/**
+* @description createTemplate url链接，包含baseURL
+*/
+AcademicController.createTemplate.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates`
+/**
+* @description createTemplate url链接，不包含baseURL
+*/
+AcademicController.createTemplate.path=`/sources/{uri}/templates`
+/**
 * @description getAllItems url链接，包含baseURL
 */
 AcademicController.getAllItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items`
@@ -1343,6 +2098,14 @@ AcademicController.createItemPage.fullPath=`${axios.defaults.baseURL}/sources/{u
 */
 AcademicController.createItemPage.path=`/sources/{uri}/items/{itemId}/pages`
 /**
+* @description updateItemMetadata url链接，包含baseURL
+*/
+AcademicController.updateItemMetadata.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/metadata`
+/**
+* @description updateItemMetadata url链接，不包含baseURL
+*/
+AcademicController.updateItemMetadata.path=`/sources/{uri}/items/{itemId}/metadata`
+/**
 * @description getRootGroups url链接，包含baseURL
 */
 AcademicController.getRootGroups.fullPath=`${axios.defaults.baseURL}/sources/{uri}/groups`
@@ -1375,21 +2138,61 @@ AcademicController.createPartition.fullPath=`${axios.defaults.baseURL}/sources/{
 */
 AcademicController.createPartition.path=`/sources/{uri}/groups/{groupId}/partitions`
 /**
+* @description saveTemplateContent url链接，包含baseURL
+*/
+AcademicController.saveTemplateContent.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates/{id}/versions/{versionId}`
+/**
+* @description saveTemplateContent url链接，不包含baseURL
+*/
+AcademicController.saveTemplateContent.path=`/sources/{uri}/templates/{id}/versions/{versionId}`
+/**
 * @description addItemsToPartition url链接，包含baseURL
 */
-AcademicController.addItemsToPartition.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{partitionId}/items/batched/{items}`
+AcademicController.addItemsToPartition.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{partitionId}/items/batched`
 /**
 * @description addItemsToPartition url链接，不包含baseURL
 */
-AcademicController.addItemsToPartition.path=`/sources/{uri}/partitions/{partitionId}/items/batched/{items}`
+AcademicController.addItemsToPartition.path=`/sources/{uri}/partitions/{partitionId}/items/batched`
 /**
 * @description removeItemsFromPartition url链接，包含baseURL
 */
-AcademicController.removeItemsFromPartition.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{partitionId}/items/batched/{items}`
+AcademicController.removeItemsFromPartition.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{partitionId}/items/batched/deleted`
 /**
 * @description removeItemsFromPartition url链接，不包含baseURL
 */
-AcademicController.removeItemsFromPartition.path=`/sources/{uri}/partitions/{partitionId}/items/batched/{items}`
+AcademicController.removeItemsFromPartition.path=`/sources/{uri}/partitions/{partitionId}/items/batched/deleted`
+/**
+* @description updateItemPDF url链接，包含baseURL
+*/
+AcademicController.updateItemPDF.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pdfs`
+/**
+* @description updateItemPDF url链接，不包含baseURL
+*/
+AcademicController.updateItemPDF.path=`/sources/{uri}/items/{itemId}/pdfs`
+/**
+* @description duplicateItemPage url链接，包含baseURL
+*/
+AcademicController.duplicateItemPage.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}/duplicate`
+/**
+* @description duplicateItemPage url链接，不包含baseURL
+*/
+AcademicController.duplicateItemPage.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/duplicate`
+/**
+* @description saveItemPageContent url链接，包含baseURL
+*/
+AcademicController.saveItemPageContent.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}/content/versions/{versionId}`
+/**
+* @description saveItemPageContent url链接，不包含baseURL
+*/
+AcademicController.saveItemPageContent.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/content/versions/{versionId}`
+/**
+* @description deleteItems url链接，包含baseURL
+*/
+AcademicController.deleteItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/batched/deleted`
+/**
+* @description deleteItems url链接，不包含baseURL
+*/
+AcademicController.deleteItems.path=`/sources/{uri}/items/batched/deleted`
 /**
 * @description getGroups url链接，包含baseURL
 */
@@ -1407,6 +2210,22 @@ AcademicController.createGroup.fullPath=`${axios.defaults.baseURL}/sources/{uri}
 */
 AcademicController.createGroup.path=`/sources/{uri}/groups/{id}/subgroups`
 /**
+* @description getTemplateContent url链接，包含baseURL
+*/
+AcademicController.getTemplateContent.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates/{id}`
+/**
+* @description getTemplateContent url链接，不包含baseURL
+*/
+AcademicController.getTemplateContent.path=`/sources/{uri}/templates/{id}`
+/**
+* @description deleteTemplate url链接，包含baseURL
+*/
+AcademicController.deleteTemplate.fullPath=`${axios.defaults.baseURL}/sources/{uri}/templates/{id}`
+/**
+* @description deleteTemplate url链接，不包含baseURL
+*/
+AcademicController.deleteTemplate.path=`/sources/{uri}/templates/{id}`
+/**
 * @description getRootPartitions url链接，包含baseURL
 */
 AcademicController.getRootPartitions.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions`
@@ -1422,14 +2241,6 @@ AcademicController.getItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/pa
 * @description getItems url链接，不包含baseURL
 */
 AcademicController.getItems.path=`/sources/{uri}/partitions/{partitionId}/items`
-/**
-* @description getSearchItems url链接，包含baseURL
-*/
-AcademicController.getSearchItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{partitionId}/items/matches`
-/**
-* @description getSearchItems url链接，不包含baseURL
-*/
-AcademicController.getSearchItems.path=`/sources/{uri}/partitions/{partitionId}/items/matches`
 /**
 * @description getItemsCount url链接，包含baseURL
 */
@@ -1447,13 +2258,45 @@ AcademicController.getPartition.fullPath=`${axios.defaults.baseURL}/sources/{uri
 */
 AcademicController.getPartition.path=`/sources/{uri}/partitions/{id}`
 /**
-* @description getPartitions url链接，包含baseURL
+* @description getSearchItems url链接，包含baseURL
 */
-AcademicController.getPartitions.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/{id}/subpartitions`
+AcademicController.getSearchItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/partitions/items/matches`
 /**
-* @description getPartitions url链接，不包含baseURL
+* @description getSearchItems url链接，不包含baseURL
 */
-AcademicController.getPartitions.path=`/sources/{uri}/partitions/{id}/subpartitions`
+AcademicController.getSearchItems.path=`/sources/{uri}/partitions/items/matches`
+/**
+* @description getItemPDF url链接，包含baseURL
+*/
+AcademicController.getItemPDF.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pdfs/{pdfId}`
+/**
+* @description getItemPDF url链接，不包含baseURL
+*/
+AcademicController.getItemPDF.path=`/sources/{uri}/items/{itemId}/pdfs/{pdfId}`
+/**
+* @description openItemFile url链接，包含baseURL
+*/
+AcademicController.openItemFile.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pdfs/{fileId}/link`
+/**
+* @description openItemFile url链接，不包含baseURL
+*/
+AcademicController.openItemFile.path=`/sources/{uri}/items/{itemId}/pdfs/{fileId}/link`
+/**
+* @description listItemPageVersions url链接，包含baseURL
+*/
+AcademicController.listItemPageVersions.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}/versions`
+/**
+* @description listItemPageVersions url链接，不包含baseURL
+*/
+AcademicController.listItemPageVersions.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/versions`
+/**
+* @description getItemPageContent url链接，包含baseURL
+*/
+AcademicController.getItemPageContent.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}/content`
+/**
+* @description getItemPageContent url链接，不包含baseURL
+*/
+AcademicController.getItemPageContent.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/content`
 /**
 * @description getItem url链接，包含baseURL
 */
@@ -1479,6 +2322,22 @@ AcademicController.getAllItemsCount.fullPath=`${axios.defaults.baseURL}/sources/
 */
 AcademicController.getAllItemsCount.path=`/sources/{uri}/items/count`
 /**
+* @description getDataSourceInfo url链接，包含baseURL
+*/
+AcademicController.getDataSourceInfo.fullPath=`${axios.defaults.baseURL}/sources/{uri}/info`
+/**
+* @description getDataSourceInfo url链接，不包含baseURL
+*/
+AcademicController.getDataSourceInfo.path=`/sources/{uri}/info`
+/**
+* @description getPartitions url链接，包含baseURL
+*/
+AcademicController.getPartitions.fullPath=`${axios.defaults.baseURL}/sources/{uri}/groups/{id}/subpartitions`
+/**
+* @description getPartitions url链接，不包含baseURL
+*/
+AcademicController.getPartitions.path=`/sources/{uri}/groups/{id}/subpartitions`
+/**
 * @description deleteItemPage url链接，包含baseURL
 */
 AcademicController.deleteItemPage.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}`
@@ -1486,14 +2345,6 @@ AcademicController.deleteItemPage.fullPath=`${axios.defaults.baseURL}/sources/{u
 * @description deleteItemPage url链接，不包含baseURL
 */
 AcademicController.deleteItemPage.path=`/sources/{uri}/items/{itemId}/pages/{pageId}`
-/**
-* @description deleteItems url链接，包含baseURL
-*/
-AcademicController.deleteItems.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/batched/{items}`
-/**
-* @description deleteItems url链接，不包含baseURL
-*/
-AcademicController.deleteItems.path=`/sources/{uri}/items/batched/{items}`
 /**
 * @description deleteGroup url链接，包含baseURL
 */
@@ -1806,7 +2657,7 @@ export class NotebookController {
   }
  
   /**
-  * @summary 删除指定的目录
+  * @summary 删除指定的目录或笔记
   * @param {String} [pathuri] 
   * @param {String} [filepath] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
@@ -1855,21 +2706,21 @@ export class NotebookController {
  
   /**
   * @summary 移动目录或文件
-  * @param {String} [uri] 
+  * @param {String} [pathuri] 
   * @param {String} [filepath] 
   * @param {String} [newpath] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async moveDirectory(uri,filepath,newpath,cancelSource,uploadProgress,downloadProgress){
+  static async moveDirectory(pathuri,filepath,newpath,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
-        url:'/sources/'+uri+'/directories/move',
+        url:'/sources/'+pathuri+'/directories/move',
         data:{},
-        params:{uri,filepath,newpath},
+        params:{filepath,newpath},
         headers:{
           "Content-Type":""
         },
@@ -1904,21 +2755,21 @@ export class NotebookController {
  
   /**
   * @summary 复制目录或文件
-  * @param {String} [uri] 
+  * @param {String} [pathuri] 
   * @param {String} [filepath] 
   * @param {String} [newpath] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async copyDirectory(uri,filepath,newpath,cancelSource,uploadProgress,downloadProgress){
+  static async copyDirectory(pathuri,filepath,newpath,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
-        url:'/sources/'+uri+'/directories/copy',
+        url:'/sources/'+pathuri+'/directories/copy',
         data:{},
-        params:{uri,filepath,newpath},
+        params:{filepath,newpath},
         headers:{
           "Content-Type":""
         },
@@ -1967,6 +2818,53 @@ export class NotebookController {
         url:'/sources/'+pathuri+'/path',
         data:{},
         params:{filepath},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取路径对应的名称路径
+  * @param {String} [path] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async transferIdsToNames(path,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/notebooks/names',
+        data:{},
+        params:{path},
         headers:{
           "Content-Type":""
         },
@@ -2319,6 +3217,14 @@ NotebookController.existsPath.fullPath=`${axios.defaults.baseURL}/sources/{uri}/
 * @description existsPath url链接，不包含baseURL
 */
 NotebookController.existsPath.path=`/sources/{uri}/path`
+/**
+* @description transferIdsToNames url链接，包含baseURL
+*/
+NotebookController.transferIdsToNames.fullPath=`${axios.defaults.baseURL}/sources/notebooks/names`
+/**
+* @description transferIdsToNames url链接，不包含baseURL
+*/
+NotebookController.transferIdsToNames.path=`/sources/notebooks/names`
 /**
 * @description getDocumentContentHistoryByVersionIds url链接，包含baseURL
 */

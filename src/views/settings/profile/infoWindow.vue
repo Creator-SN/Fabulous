@@ -6,16 +6,16 @@
         :theme="theme"
         :isFooter="false"
     >
-        <template v-slot:container>
+        <template v-slot:content>
             <div class="panel-container">
-                <profile :refresh="show"></profile>
+                <profile-info-block :refresh="show"></profile-info-block>
             </div>
         </template>
     </float-window-base>
 </template>
 
 <script>
-import profile from './profileInfoBlock.vue';
+import profileInfoBlock from './profileInfoBlock.vue';
 import floatWindowBase from '@/components/window/floatWindowBase.vue';
 
 import { mapGetters, mapMutations, mapState } from 'vuex';
@@ -23,7 +23,7 @@ import { mapGetters, mapMutations, mapState } from 'vuex';
 export default {
     name: 'Profile',
     components: {
-        profile,
+        profileInfoBlock,
         floatWindowBase
     },
     props: {

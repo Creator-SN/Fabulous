@@ -456,33 +456,41 @@ export default {
             // 获取PDF文件并执行PDF.js读取获取PDF文档对象 (Get the PDF file and execute the PDF.js reading to get the PDF document object)
             if (!this.lock.init) return;
             this.lock.init = false;
-            let res = null;
-            res = await this.$local_api.AcademicController.getItemPDF(
+            await this.$auto.AcademicController.getItemPDF(
                 this.currentDataPath,
                 this.item.id,
                 this.item.pdf
-            );
-            if (res.code !== 200) return;
-            let blob = res.data;
-            let url = URL.createObjectURL(blob);
-            this.$PDFJS.getDocument(url).promise.then((pdf) => {
-                // 文档对象
-                this.pdfDoc = pdf;
-                // 总页数
-                this.totalPages = pdf.numPages;
-                this.lock.init = true;
-                // 渲染页面
-                for (let i = 1; i <= this.totalPages; i++) {
-                    this.pdfDoc.getPage(i).then((page) => {
-                        this.pdfPages.push({
-                            num: i,
-                            page,
-                            lock: true,
-                            version: -1
-                        });
+            )
+                .then(async (res) => {
+                    let blob = null;
+                    if (!res.code) blob = res;
+                    else blob = res.data;
+                    let url = URL.createObjectURL(blob);
+                    this.$PDFJS.getDocument(url).promise.then((pdf) => {
+                        // 文档对象
+                        this.pdfDoc = pdf;
+                        // 总页数
+                        this.totalPages = pdf.numPages;
+                        this.lock.init = true;
+                        // 渲染页面
+                        for (let i = 1; i <= this.totalPages; i++) {
+                            this.pdfDoc.getPage(i).then((page) => {
+                                this.pdfPages.push({
+                                    num: i,
+                                    page,
+                                    lock: true,
+                                    version: -1
+                                });
+                            });
+                        }
                     });
-                }
-            });
+                })
+                .catch((res) => {
+                    console.error(res);
+                    this.$barWarning(this.local(`Read PDF Failed`), {
+                        status: 'warning'
+                    });
+                });
         },
         refreshCurrentPage() {
             // 刷新获取当前页码 (Refresh to get the current page number)

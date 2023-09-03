@@ -76,6 +76,16 @@
                 >
                     {{ "" }}
                 </fv-button>
+                <history-callout
+                    v-if="isRemote && item.id"
+                    :value="target"
+                    :uri="currentDataPath"
+                    :itemid="item.id"
+                    :mode="'page'"
+                    :theme="theme"
+                    :local="local"
+                    @chooseItem="previewHistory"
+                ></history-callout>
                 <fv-toggle-switch
                     :title="local('Auto Save')"
                     v-model="auto_save"
@@ -180,6 +190,32 @@
                 </template>
             </fv-slider>
         </div>
+        <template-preview
+            :title="local('History Preview')"
+            :value="currentHistory"
+            :show.sync="show.historyPreview"
+            :showBanner="true"
+            :showTitle="true"
+        >
+            <template v-slot:control="x">
+                <fv-button
+                    theme="dark"
+                    background="rgba(140, 148, 228, 1)"
+                    :is-box-shadow="true"
+                    style="width: 120px; margin-right: 5px;"
+                    @click="() => {commitDiff(x.result); show.historyPreview = false;}"
+                >{{local('Rollback version')}}</fv-button>
+            </template>
+        </template-preview>
+        <diff-previewer
+            v-model="show.diff"
+            :author="beforeSavingDiff.author"
+            :source="beforeSavingDiff.source"
+            :target="beforeSavingDiff.target"
+            :createDate="beforeSavingDiff.createDate"
+            @commit="commitDiff"
+            @save="commitDiffAndSave"
+        ></diff-previewer>
     </div>
 </template>
 
@@ -188,6 +224,9 @@ import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 import * as Diff from 'diff';
 
 import editorNav from '@/components/general/editorContainer/editorNav.vue';
+import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vue';
+import historyCallout from '@/components/general/callout/historyCallout.vue';
+import templatePreview from '@/components/templates/templatePreview.vue';
 
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js';
 
@@ -199,7 +238,10 @@ import { fabulous_notebook } from '@/js/data_sample.js';
 
 export default {
     components: {
-        editorNav
+        editorNav,
+        diffPreviewer,
+        historyCallout,
+        templatePreview
     },
     data() {
         return {
@@ -209,6 +251,17 @@ export default {
             expandContent: false,
             editor_show_nav: false,
             auto_save: false,
+            docInfo: {
+                versionId: null
+            },
+            beforeSavingDiff: {
+                versionId: null,
+                author: null,
+                source: null,
+                target: null,
+                createDate: new Date()
+            },
+            currentHistory: {},
             editorMentionItemAttr: {
                 mentionList: this.mentionList,
                 filterFunc: () => {
@@ -260,7 +313,9 @@ export default {
             show: {
                 quickNav: false,
                 addItemPage: false,
-                bottomControl: false
+                bottomControl: false,
+                diff: false,
+                historyPreview: false
             },
             timer: {
                 diff: undefined,
@@ -329,7 +384,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         showNav() {
             return (
                 this.type === 'item' &&
@@ -343,6 +398,9 @@ export default {
             if (!this.item) return false;
             if (!this.item.pdf) return false;
             return true;
+        },
+        isRemote() {
+            return this.currentDataPathItem && !this.currentDataPathItem.local;
         }
     },
     mounted() {
@@ -356,7 +414,7 @@ export default {
             Editor: 'toggleEditor'
         }),
         ...mapActions({
-            reviseConfig: 'reviseConfig',
+            reviseConfig: 'reviseConfig'
         }),
         configInit() {
             this.auto_save = this.autoSave;
@@ -448,19 +506,20 @@ export default {
             this.lock.loading = false;
             let res = null;
             if (this.type === 'item') {
-                res = await this.$local_api.AcademicController.getItemPageContent(
+                res = await this.$auto.AcademicController.getItemPageContent(
                     this.currentDataPath,
                     this.item.id,
                     this.target.id
                 );
             } else {
-                res = await this.$local_api.AcademicController.getTemplateContent(
+                res = await this.$auto.AcademicController.getTemplateContent(
                     this.currentDataPath,
                     this.target.id
                 );
             }
+            this.docInfo = res.data;
             if (res.code === 200) {
-                let content = res.data;
+                let content = res.data.content;
                 try {
                     this.content = JSON.parse(content);
                     this.reviseEditor({
@@ -498,11 +557,50 @@ export default {
             if (!this.type || !this.target.id || this.displayMode === 1) return;
             if (!this.lock.save) return;
             this.lock.save = false;
+            let onerror = (res) => {
+                if (res.code === 40036) {
+                    let sourceNotebook = res.data.content;
+                    try {
+                        sourceNotebook = JSON.parse(sourceNotebook);
+                    } catch (e) {
+                        sourceNotebook = {};
+                    }
+                    this.beforeSavingDiff.versionId = res.data.versionId;
+                    this.beforeSavingDiff.author = res.data.author;
+                    this.beforeSavingDiff.source = {
+                        banner: null,
+                        title: '',
+                        content: sourceNotebook
+                    };
+                    this.beforeSavingDiff.target = {
+                        banner: null,
+                        title: '',
+                        content: json
+                    };
+                    this.beforeSavingDiff.createDate = new Date(
+                        res.data.createDate
+                    );
+                    this.show.diff = true;
+                    this.$barWarning(
+                        this.local(
+                            `Current notebook version conflicts with remote version.`
+                        ),
+                        {
+                            status: 'warning'
+                        }
+                    );
+                    return;
+                }
+                this.$barWarning(res.message, {
+                    status: 'error'
+                });
+            };
             if (this.type === 'item') {
-                await this.$local_api.AcademicController.saveItemPageContent(
+                await this.$auto.AcademicController.saveItemPageContent(
                     this.currentDataPath,
                     this.item.id,
                     this.target.id,
+                    this.versionId,
                     JSON.stringify(json)
                 )
                     .then(() => {
@@ -511,14 +609,13 @@ export default {
                         });
                     })
                     .catch((res) => {
-                        this.$barWarning(res.message, {
-                            status: 'error'
-                        });
+                        onerror(res);
                     });
             } else {
-                await this.$local_api.AcademicController.saveTemplateContent(
+                await this.$auto.AcademicController.saveTemplateContent(
                     this.currentDataPath,
                     this.target.id,
+                    this.versionId,
                     JSON.stringify(json)
                 )
                     .then(() => {
@@ -527,12 +624,25 @@ export default {
                         });
                     })
                     .catch((res) => {
-                        this.$barWarning(res.message, {
-                            status: 'error'
-                        });
+                        onerror(res);
                     });
             }
             this.lock.save = true;
+        },
+        commitDiff(result) {
+            console.log(result);
+            this.toggleUnsave(true);
+            this.content = result.content;
+            this.reviseEditor({
+                targetContent: this.content
+            });
+            this.docInfo.versionId = this.beforeSavingDiff.versionId;
+        },
+        commitDiffAndSave(result) {
+            this.commitDiff(result);
+            let editor = this.getEditor();
+            editor.save();
+            this.toggleUnsave(false);
         },
         downloadTxtFile(text, filename) {
             // 创建一个新的 Blob 对象，用于存储文本内容
@@ -563,7 +673,7 @@ export default {
             let saveContent = this.$refs.editor.saveMarkdown();
             this.downloadTxtFile(saveContent, 'note.md');
         },
-        editorSetContentChange () {
+        editorSetContentChange() {
             this.$refs.editor_nav.getEditorNavList();
         },
         editorContentChange() {
@@ -590,7 +700,7 @@ export default {
             });
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.AcademicController.openItemFile(
+            this.$auto.AcademicController.openItemFile(
                 this.currentDataPath,
                 itemid,
                 fileid,
@@ -611,7 +721,7 @@ export default {
                 value.split('/').length > 1 ? value.split('/')[1] : '';
 
             let res = null;
-            res = await this.$local_api.AcademicController.getSearchItems(
+            res = await this.$auto.AcademicController.getSearchItems(
                 this.currentDataPath,
                 null,
                 value.split('/')[0],
@@ -673,6 +783,17 @@ export default {
             result = result.concat(rList);
 
             return result;
+        },
+        previewHistory(item) {
+            let contentData = item.content;
+            try {
+                let rawJson = JSON.parse(contentData);
+                this.currentHistory = rawJson;
+                console.log(rawJson);
+            } catch (e) {
+                this.currentHistory = {};
+            }
+            this.show.historyPreview = true;
         },
         back() {
             let last = this.history[this.history.length - 1];

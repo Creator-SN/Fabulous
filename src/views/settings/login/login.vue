@@ -31,7 +31,7 @@
                     background="whitesmoke"
                     :border-radius="6"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 45px;"
+                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 45px; flex-shrink: 0;"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-text-box
@@ -44,7 +44,7 @@
                     background="whitesmoke"
                     :border-radius="6"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 15px;"
+                    style="width: 100%; max-width: 375px; height: 40px; margin-top: 15px; flex-shrink: 0;"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-button
@@ -55,7 +55,7 @@
                     fontSize="12"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px;"
+                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="!lock.login || !user.id || !user.password"
                     @click="handleLogin()"
                 >{{local(`Continue`)}}</fv-button>
@@ -81,7 +81,7 @@
                     :length="6"
                     :disabled="!lock.login"
                     :theme="theme"
-                    style="width: 100%;"
+                    style="width: 100%; flex-shrink: 0;"
                     @confirm="handleLogin"
                 ></fv-VerifyBox>
                 <fv-button
@@ -92,7 +92,7 @@
                     fontSize="12"
                     fontWeight="600"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px;"
+                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0;"
                     :disabled="!lock.sendCode || counter > 0"
                     @click="sendCode"
                 >{{local(`Resend Code`)}}{{counter > 0 ? ` ${counter}s`: ''}}</fv-button>
@@ -278,6 +278,7 @@ export default {
 
             flex: 1;
             padding: 25px;
+            overflow: overlay;
 
             .logo-text {
                 width: 80px;
