@@ -2086,7 +2086,10 @@ export class AcademicController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '获取模板内容成功 (Get template content successfully)'
                     });
@@ -2129,7 +2132,10 @@ export class AcademicController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '保存模板内容成功 (Save template content successfully)'
                     });
@@ -2389,7 +2395,10 @@ export class AcademicController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '保存笔记内容成功 (Save note content successfully)'
                     });
@@ -2641,7 +2650,10 @@ export class NotebookController {
                 if (arg.status == 200) {
                     resolve({
                         status: 'success',
-                        data: arg.data,
+                        data: {
+                            versionId: 0,
+                            content: arg.data
+                        },
                         code: 200,
                         message: '保存文件成功 (Save file successfully)'
                     });

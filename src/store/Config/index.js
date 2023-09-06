@@ -89,6 +89,14 @@ const config = {
                     console.log(err);
                 });
             }
+            // 如果data_index不存在, 则默认选中第一个 //
+            if (!_config['data_path'].find(it => it.path === _config['data_index'] || it === _config['data_index'])) {
+                if (_config['data_path'].length > 0) {
+                    _config['data_index'] = _config['data_path'][0].path;
+                }
+                else
+                    _config['data_index'] = -1;
+            }
             // 配置赋予state //
             for (let key in _config) {
                 Vue.set(context.state, key, _config[key]);

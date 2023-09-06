@@ -200,11 +200,11 @@ export class MetadataUpdateDTO {
      * @param {String} pages 
      * @param {String} school 
      * @param {String} note 
-     * @param {String} issn 
      * @param {String} doi 
+     * @param {String} issn 
      * @param {String} abstract 
      */ 
-    constructor(id = undefined,publisher = undefined,DOI = undefined,year = undefined,createDate = undefined,source = undefined,title = undefined,url = undefined,containerTitle = undefined,ISSN = undefined,language = undefined,chapter = undefined,pages = undefined,school = undefined,note = undefined,issn = undefined,doi = undefined,abstract = undefined){
+    constructor(id = undefined,publisher = undefined,DOI = undefined,year = undefined,createDate = undefined,source = undefined,title = undefined,url = undefined,containerTitle = undefined,ISSN = undefined,language = undefined,chapter = undefined,pages = undefined,school = undefined,note = undefined,doi = undefined,issn = undefined,abstract = undefined){
         this.id = id
         this.publisher = publisher
         this.DOI = DOI
@@ -220,8 +220,8 @@ export class MetadataUpdateDTO {
         this.pages = pages
         this.school = school
         this.note = note
-        this.issn = issn
         this.doi = doi
+        this.issn = issn
         this.abstract = abstract
     }
        
@@ -304,12 +304,12 @@ export class MetadataUpdateDTO {
      * 
      * @type {String}
      */
-    issn=undefined   
+    doi=undefined   
     /**
      * 
      * @type {String}
      */
-    doi=undefined   
+    issn=undefined   
     /**
      * 
      * @type {String}

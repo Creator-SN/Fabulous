@@ -513,10 +513,12 @@ export default {
             if (!this.show_editor) return;
             let ctrl = event.ctrlKey || event.metaKey;
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
+                event.preventDefault();
                 let editor = this.getEditor();
                 editor.save();
                 this.toggleUnsave(false);
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
+                event.preventDefault();
                 this.saveAs();
             }
 
@@ -651,7 +653,9 @@ export default {
                     this.docInfo.versionId,
                     JSON.stringify(json)
                 )
-                    .then(() => {
+                    .then((res) => {
+                        if (res.data.versionId)
+                            this.docInfo.versionId = res.data.versionId;
                         this.reviseEditor({
                             targetContent: json
                         });
@@ -666,7 +670,9 @@ export default {
                     this.docInfo.versionId,
                     JSON.stringify(json)
                 )
-                    .then(() => {
+                    .then((res) => {
+                        if (res.data.versionId)
+                            this.docInfo.versionId = res.data.versionId;
                         this.reviseEditor({
                             targetContent: json
                         });
@@ -836,11 +842,14 @@ export default {
             let contentData = item.content;
             try {
                 let rawJson = JSON.parse(contentData);
-                this.currentHistory = rawJson;
+                this.currentHistory = {
+                    content: rawJson
+                };
                 console.log(rawJson);
             } catch (e) {
                 this.currentHistory = {};
             }
+            this.beforeSavingDiff.versionId = this.docInfo.versionId;
             this.show.historyPreview = true;
         },
         back() {

@@ -828,6 +828,7 @@ export default {
             } catch (e) {
                 this.currentHistory = {};
             }
+            this.beforeSavingDiff.versionId = this.docInfo.versionId;
             this.show.historyPreview = true;
         },
         back() {

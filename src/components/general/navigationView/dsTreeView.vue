@@ -340,15 +340,22 @@ export default {
             this.treeList = [];
             this.FLAT = [];
             let result = [];
-            let groups = await this.$auto.AcademicController.getRootGroups(
+            let groups = [];
+            await this.$auto.AcademicController.getRootGroups(
                 this.currentDataPath
-            );
-            let partitions =
-                await this.$auto.AcademicController.getRootPartitions(
-                    this.currentDataPath
-                );
-            groups = groups.data;
-            partitions = partitions.data;
+            )
+                .then((res) => {
+                    groups = res.data;
+                })
+                .catch(() => {});
+            let partitions = [];
+            await this.$auto.AcademicController.getRootPartitions(
+                this.currentDataPath
+            )
+                .then((res) => {
+                    partitions = res.data;
+                })
+                .catch(() => {});
             groups.forEach((el) => {
                 result.push(this.itemFormat(el));
             });

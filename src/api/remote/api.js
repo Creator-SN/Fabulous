@@ -1599,6 +1599,56 @@ export class AcademicController {
   }
  
   /**
+  * @summary 获取笔记的指定版本的内容
+  * @param {String} [pathuri] 
+  * @param {String} [pathitemid] 
+  * @param {String} [pathpageid] 
+  * @param {String} [pathversionid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getItemPageContentByVersionId(pathuri,pathitemid,pathpageid,pathversionid,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/sources/'+pathuri+'/items/'+pathitemid+'/pages/'+pathpageid+'/versions/'+pathversionid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
   * @summary 获取笔记的内容
   * @param {String} [pathuri] 
   * @param {String} [pathitemid] 
@@ -2289,6 +2339,14 @@ AcademicController.listItemPageVersions.fullPath=`${axios.defaults.baseURL}/sour
 * @description listItemPageVersions url链接，不包含baseURL
 */
 AcademicController.listItemPageVersions.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/versions`
+/**
+* @description getItemPageContentByVersionId url链接，包含baseURL
+*/
+AcademicController.getItemPageContentByVersionId.fullPath=`${axios.defaults.baseURL}/sources/{uri}/items/{itemId}/pages/{pageId}/versions/{versionId}`
+/**
+* @description getItemPageContentByVersionId url链接，不包含baseURL
+*/
+AcademicController.getItemPageContentByVersionId.path=`/sources/{uri}/items/{itemId}/pages/{pageId}/versions/{versionId}`
 /**
 * @description getItemPageContent url链接，包含baseURL
 */

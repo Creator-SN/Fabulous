@@ -175,7 +175,9 @@ export default {
                         });
                     });
             else
-                this.$api.NotebookController.getDocumentContentHistoryByVersionIds(
+                this.$api.AcademicController.getItemPageContentByVersionId(
+                    this.uri,
+                    this.itemid,
                     this.value.id,
                     item.versionId,
                     null,
@@ -185,7 +187,7 @@ export default {
                     }
                 )
                     .then((res) => {
-                        this.$emit('chooseItem', res.data[0]);
+                        this.$emit('chooseItem', res.data);
                         this.progressCount = 0;
                         this.lock.content = true;
                     })

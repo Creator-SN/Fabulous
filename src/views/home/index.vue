@@ -695,12 +695,16 @@ export default {
                     await this.$auto.AcademicController.deleteItem(
                         this.currentDataPath,
                         this.currentItem.id
-                    ).then((res) => {
-                        if (res.code !== 200)
-                            this.$barWarning(res.message, {
-                                status: 'warning'
-                            });
-                    });
+                    )
+                        .then(() => {
+                            this.getItems();
+                        })
+                        .catch((res) => {
+                            if (res.message)
+                                this.$barWarning(res.message, {
+                                    status: 'warning'
+                                });
+                        });
                     this.lock = true;
                 },
                 cancel: () => {}
@@ -717,16 +721,20 @@ export default {
                 confirm: async () => {
                     this.lock = false;
                     let ids = this.currentChoosen.map((el) => el.id);
-                    let res = await this.$auto.AcademicController.deleteItems(
+                    await this.$auto.AcademicController.deleteItems(
                         this.currentDataPath,
                         ids
-                    );
-                    if (res.code !== 200)
-                        this.$barWarning(res.message, {
-                            status: 'warning'
+                    )
+                        .then(() => {
+                            this.getItems();
+                            this.currentChoosen = [];
+                        })
+                        .catch((res) => {
+                            if (res.message)
+                                this.$barWarning(res.message, {
+                                    status: 'warning'
+                                });
                         });
-                    this.getItems();
-                    this.currentChoosen = [];
                     this.lock = true;
                 },
                 cancel: () => {}

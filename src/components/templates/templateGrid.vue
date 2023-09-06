@@ -201,23 +201,23 @@ export default {
                 template.updateDate = el.updateDate;
                 template.choosen = false;
                 template.show = true;
-                let res = await this.$auto.AcademicController.getTemplateContent(
-                    this.currentDataPath,
-                    el.id
-                );
-                if (res.code !== 200) {
-                    this.$barWarning(res.message, {
-                        status: 'error'
+                let res =
+                    await this.$auto.AcademicController.getTemplateContent(
+                        this.currentDataPath,
+                        el.id
+                    ).catch((res) => {
+                        this.$barWarning(res.message, {
+                            status: 'error'
+                        });
                     });
-                    return;
-                }
                 try {
-                    template.content = res.data;
+                    template.content = res.data.content;
                     let contentObj = JSON.parse(template.content);
                     let minContent = {
                         type: 'doc',
                         content: []
                     };
+                    console.log(minContent);
                     minContent.content = contentObj.content.slice(0, 10);
                     template.minContent = JSON.stringify(minContent);
                 } catch (e) {
