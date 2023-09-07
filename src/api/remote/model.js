@@ -321,16 +321,23 @@ export class GroupUpdateDTO {
   
     /**
      *
+     * @param {String} id 
      * @param {String} name 
      * @param {String} emoji 
      * @param {String} parent 
      */ 
-    constructor(name = undefined,emoji = undefined,parent = undefined){
+    constructor(id = undefined,name = undefined,emoji = undefined,parent = undefined){
+        this.id = id
         this.name = name
         this.emoji = emoji
         this.parent = parent
     }
        
+    /**
+     * 
+     * @type {String}
+     */
+    id=undefined   
     /**
      * 
      * @type {String}
@@ -367,6 +374,30 @@ export class PartitionUpdateDTO {
      * @type {String}
      */
     id=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    emoji=undefined
+    
+}
+export class NotebookUpdateDTO {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} emoji 
+     */ 
+    constructor(name = undefined,emoji = undefined){
+        this.name = name
+        this.emoji = emoji
+    }
+       
     /**
      * 
      * @type {String}

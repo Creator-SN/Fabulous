@@ -2423,7 +2423,56 @@ AcademicController.deletePartition.path=`/sources/{uri}/groups/{groupId}/partiti
 export class NotebookController {
  
   /**
-  * @summary 更新笔记本
+  * @summary 更新笔记本的信息
+  * @param {String} [pathuri] 
+  * @param {String} [filepath] 
+  * @param {UserModel.NotebookUpdateDTO} [notebookupdatedto] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateDocumentInfo(pathuri,filepath,notebookupdatedto,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'put',
+        url:'/sources/'+pathuri+'/documents/info',
+        data:notebookupdatedto,
+        params:{filepath},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response.data)
+          reject(err.response.data)
+        else
+          reject(err.response);
+      })
+    })
+  }
+ 
+  /**
+  * @summary 更新笔记本的内容
   * @param {String} [pathuri] 
   * @param {String} [filepath] 
   * @param {String} [versionid] 
@@ -3195,6 +3244,14 @@ export class NotebookController {
 }
 
 // class NotebookController static method properties bind
+/**
+* @description updateDocumentInfo url链接，包含baseURL
+*/
+NotebookController.updateDocumentInfo.fullPath=`${axios.defaults.baseURL}/sources/{uri}/documents/info`
+/**
+* @description updateDocumentInfo url链接，不包含baseURL
+*/
+NotebookController.updateDocumentInfo.path=`/sources/{uri}/documents/info`
 /**
 * @description updateDocument url链接，包含baseURL
 */

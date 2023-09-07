@@ -90,7 +90,7 @@
                         <fv-text-box
                             disabled="true"
                             :theme="theme"
-                            :value="$SDate.Format('YYYY-mm-dd HH:MM', new Date(obj.createdAt * 1000))"
+                            :value="$SDate.Format('YYYY-mm-dd HH:MM', new Date(obj.createDate))"
                         ></fv-text-box>
                     </div>
                 </div>

@@ -2809,6 +2809,42 @@ export class NotebookController {
     }
 
     /**
+     * @summary 更新笔记信息 (Update directory information)
+     * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
+     * @param {string} filePath 笔记路径 (Directory path)
+     * @param {object} info 笔记信息 (Directory information)
+     * @returns {Promise} 是否更新成功 (Whether it is updated successfully)
+    */
+    static async updateDocumentInfo(uri, filePath, info) {
+        return await new Promise((resolve, reject) => {
+            ipc.send("rename", {
+                id: uri + filePath,
+                path: filePath,
+                newPath: path.join(path.dirname(filePath), info.name),
+            });
+            ipc.on(`update-folder-info-${uri + filePath}`, (event, arg) => {
+                if (arg.status == 200) {
+                    resolve({
+                        status: 'success',
+                        data: arg.data,
+                        code: 200,
+                        message: '更新笔记信息成功 (Update directory information successfully)'
+                    });
+                }
+                else {
+                    reject({
+                        status: 'error',
+                        data: null,
+                        code: 500,
+                        message: arg.message
+                    });
+                }
+            }
+            );
+        });
+    }
+
+    /**
      * @summary 删除目录 (Delete directory)
      * @param {string} uri 数据源路径, 在本地访问只作为占位符 (Data source path, only as a placeholder for local access)
      * @param {string} filePath 目录路径 (Directory path)

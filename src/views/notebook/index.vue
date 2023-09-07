@@ -544,8 +544,10 @@ export default {
             if (this.$route.name !== 'NoteBook') return;
             let ctrl = event.ctrlKey || event.metaKey;
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
+                event.preventDefault();
                 this.getEditor().save();
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
+                event.preventDefault();
                 this.saveAs();
             }
 

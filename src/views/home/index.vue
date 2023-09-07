@@ -907,44 +907,49 @@ export default {
         },
         async reviseItemEmoji(item, emoji) {
             item.emoji = emoji;
-            let res = await this.$auto.AcademicController.updateItem(
+            await this.$auto.AcademicController.updateItem(
                 this.currentDataPath,
                 item
-            );
-            if (res.status !== 'success') {
-                this.$barWarning(res.message, {
-                    status: 'warning'
-                });
-            }
+            ).catch((res) => {
+                if (res.message) {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                }
+            });
         },
         async revisePageEmoji(item, page, emoji) {
             if (!item) return;
             page.emoji = emoji;
-            let res = await this.$auto.AcademicController.updateItemPage(
+            await this.$auto.AcademicController.updateItemPage(
                 this.currentDataPath,
                 item.id,
                 page
-            );
-            if (res.status !== 'success') {
-                this.$barWarning(res.message, {
-                    status: 'error'
-                });
-            }
+            ).catch((res) => {
+                if (res.message) {
+                    this.$barWarning(res.message, {
+                        status: 'error'
+                    });
+                }
+            });
         },
         async duplicateItemPage(item, page) {
             if (!item) return;
-            let res = await this.$auto.AcademicController.duplicateItemPage(
+            await this.$auto.AcademicController.duplicateItemPage(
                 this.currentDataPath,
                 item.id,
                 page.id
-            );
-            if (res.status !== 'success') {
-                this.$barWarning(res.message, {
-                    status: 'error'
+            )
+                .then((res) => {
+                    item.pages.push(res.data);
+                })
+                .catch((res) => {
+                    if (res.message) {
+                        this.$barWarning(res.message, {
+                            status: 'error'
+                        });
+                    }
                 });
-            } else {
-                item.pages.push(res.data);
-            }
         },
         async deleteItemPage(itemId, pageId) {
             this.$infoBox(this.local(`Are you sure to delete this page?`), {

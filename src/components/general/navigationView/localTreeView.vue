@@ -806,26 +806,48 @@ export default {
                 });
         },
         renameConfirm(target) {
-            this.Auto.NotebookController.updateDirectoryInfo(
-                this.uri,
-                target.filePath,
-                {
-                    name: target.name
-                }
-            )
-                .then((res) => {
-                    if (res.code !== 200) {
+            if (target.isDir)
+                this.Auto.NotebookController.updateDirectoryInfo(
+                    this.uri,
+                    target.filePath,
+                    {
+                        name: target.name
+                    }
+                )
+                    .then((res) => {
+                        if (res.code !== 200) {
+                            this.$barWarning(this.local(`Rename Failed`), {
+                                status: 'warning'
+                            });
+                        }
+                    })
+                    .catch((res) => {
+                        console.error(res);
                         this.$barWarning(this.local(`Rename Failed`), {
                             status: 'warning'
                         });
-                    }
-                })
-                .catch((res) => {
-                    console.error(res);
-                    this.$barWarning(this.local(`Rename Failed`), {
-                        status: 'warning'
                     });
-                });
+            else
+                this.Auto.NotebookController.updateDocumentInfo(
+                    this.uri,
+                    target.filePath,
+                    {
+                        name: target.name
+                    }
+                )
+                    .then((res) => {
+                        if (res.code !== 200) {
+                            this.$barWarning(this.local(`Rename Failed`), {
+                                status: 'warning'
+                            });
+                        }
+                    })
+                    .catch((res) => {
+                        console.error(res);
+                        this.$barWarning(this.local(`Rename Failed`), {
+                            status: 'warning'
+                        });
+                    });
         },
         deleteConfirm(target) {
             if (!target.filePath) return;

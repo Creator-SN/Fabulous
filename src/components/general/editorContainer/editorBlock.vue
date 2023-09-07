@@ -53,7 +53,7 @@
                     {{ "" }}
                 </fv-button>
                 <history-callout
-                    v-if="isRemote && item"
+                    v-if="isRemote && item && type === 'item'"
                     :value="target"
                     :uri="currentDataPath"
                     :itemid="item.id"
