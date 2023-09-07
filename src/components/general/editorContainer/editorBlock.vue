@@ -694,9 +694,12 @@ export default {
         },
         commitDiffAndSave(result) {
             this.commitDiff(result);
-            let editor = this.getEditor();
-            editor.save();
-            this.toggleUnsave(false);
+            this.commitDiff(result);
+            setTimeout(() => {
+                let editor = this.getEditor();
+                editor.save();
+                this.toggleUnsave(false);
+            }, 300);
         },
         downloadTxtFile(text, filename) {
             // 创建一个新的 Blob 对象，用于存储文本内容

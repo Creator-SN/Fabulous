@@ -665,7 +665,9 @@ export default {
         },
         commitDiffAndSave(result) {
             this.commitDiff(result);
-            this.saveClick();
+            setTimeout(() => {
+                this.saveClick();
+            }, 300);
         },
         editorContentChange() {
             this.diffContent();
