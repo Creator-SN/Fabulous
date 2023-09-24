@@ -67,7 +67,7 @@ new Vue({
         if (isdev) {
             Vue.prototype.$server = "http://59.77.134.18:5083";
         } else {
-            Vue.prototype.$server = `http://59.77.134.18:5083`;
+            Vue.prototype.$server = `https://fb.creatorsn.com/api`;
         }
     }
 }).$mount('#app')
