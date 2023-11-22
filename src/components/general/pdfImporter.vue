@@ -254,6 +254,17 @@ export default {
         },
         async copyPdf(objURL, id = null) {
             if (!id) id = this.item.id;
+            // 2023/11/26
+            // fix macos app:// schema.
+            // /Users/Username -> Production app://./Users/Username
+            // so remove app://.
+            console.log(objURL)
+            if (objURL.startsWith("app://")){
+                objURL = objURL.replace("app://","")
+                if (objURL.startsWith(".")){
+                    objURL = objURL.substring(1)
+                }
+            }
             let blob = await fetch(objURL).then((r) => r.blob());
             let pdfid = id;
             await this.$auto.AcademicController.updateItemPDF(
