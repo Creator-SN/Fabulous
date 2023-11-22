@@ -1362,10 +1362,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.2.3.tgz#9ce63d15e4feb9a485949b2fd4241f24d76276eb"
-  integrity sha512-ciBan4wqJTVYq/g4TIiIupfOO6YTGxfvv8ovYvkCh1g1I/4ROEVgPoNnDUtu7LA4Eks0rYmpIh3f52Lx9Fn2Eg==
+"@creatorsn/powereditor@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.3.1.tgz#34f40c7eb00349ab377cddea7753fb0e8489fbf4"
+  integrity sha512-jckJ4/98fi9FseXLbq8YyawcN43rmcdQjwSG4HVB8/KYO3A9w6uV64lIu5gFLBwTyFdjBatPaTIzqEeJU/knNw==
   dependencies:
     "@tiptap/core" "2.0.3"
     "@tiptap/extension-bubble-menu" "2.0.3"
@@ -1400,7 +1400,7 @@
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
     simplify-js "^1.2.4"
-    vfluentdesign "1.2.26"
+    vfluentdesign "1.2.29"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -14387,10 +14387,10 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.2.26, vfluentdesign@^1.2.26:
-  version "1.2.26"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.26.tgz#fd6b0cd819a6c76e10ab71d3cf523d66da4e398d"
-  integrity sha512-NahrgdGsQD07hjt5KTbeTehOdCsEuEBo7hBdc4APAcmhK4cMYOJOvmlBrmHhUNp1U5uuxULLxmDsx5FqnKbX9A==
+vfluentdesign@1.2.29, vfluentdesign@^1.2.29:
+  version "1.2.29"
+  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.29.tgz#abf9fa2bb9d9aab5fe344da1dab632b033cf43e9"
+  integrity sha512-l5ZTQwaUaU1C1OREY2HcjdEAt07GkXkMAj7nL0xzR88uuEXbgHzVrHKRF8bkR+5hT+tJ3P0dtZvTCG62LptXMg==
   dependencies:
     core-js "3.31.1"
     gsap "3.1.1"

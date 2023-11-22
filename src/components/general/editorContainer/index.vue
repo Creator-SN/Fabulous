@@ -202,7 +202,7 @@ export default {
             unsave: (state) => state.editor.unsave,
             target: (state) => state.editor.target
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         disabledEditor() {
             return (
                 this.type === 'item' &&
@@ -216,6 +216,9 @@ export default {
             if (!this.item) return false;
             if (!this.item.pdf) return false;
             return true;
+        },
+        isRemote() {
+            return this.currentDataPathItem && !this.currentDataPathItem.local;
         }
     },
     mounted() {},
@@ -255,12 +258,36 @@ export default {
             });
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$local_api.AcademicController.openItemFile(
-                this.currentDataPath,
-                itemid,
-                fileid,
-                type
-            );
+            if (this.isRemote) {
+                if (type !== 'pdf') return;
+                if (
+                    !fileid &&
+                    itemid.indexOf('/') > -1 &&
+                    itemid.indexOf('.') > -1
+                ) {
+                    fileid = itemid.split('/')[1];
+                    fileid = fileid.split('.')[0];
+                    itemid = itemid.split('/')[0];
+                }
+                this.$api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid
+                ).then((res) => {
+                    window.open(
+                        this.$server + res.data,
+                        this.item.name,
+                        'width=1200,height=640'
+                    );
+                });
+            } else {
+                this.$local_api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid,
+                    type
+                );
+            }
         },
         addPDFNote(event) {
             let { pos, rangeNodes, content } = event;
