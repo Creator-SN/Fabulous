@@ -1362,10 +1362,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@creatorsn/powereditor@^2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.3.1.tgz#34f40c7eb00349ab377cddea7753fb0e8489fbf4"
-  integrity sha512-jckJ4/98fi9FseXLbq8YyawcN43rmcdQjwSG4HVB8/KYO3A9w6uV64lIu5gFLBwTyFdjBatPaTIzqEeJU/knNw==
+"@creatorsn/powereditor@^2.3.3":
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.3.3.tgz#da9878a5e0fef492e488e738feb236d5ecf2b270"
+  integrity sha512-n1lO6dl8dyc4lc7LpFKKoOReGBdMiZytmu2aglmhjqAOMUXVtDzyN4wBA0qggeBmm3RVUrrP1nAy6ReHPaF1zQ==
   dependencies:
     "@tiptap/core" "2.0.3"
     "@tiptap/extension-bubble-menu" "2.0.3"

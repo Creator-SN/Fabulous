@@ -67,28 +67,28 @@
 export default {
     props: {
         value: {
-            default: false,
+            default: false
         },
         local: {
             type: Function,
-            default: () => {},
+            default: () => {}
         },
         translateObj: {
             type: Object,
-            default: () => {},
+            default: () => {}
         },
         ctrlEnterTranslate: {
             type: Function,
-            default: () => {},
+            default: () => {}
         },
         theme: {
             type: String,
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
-            thisValue: this.value,
+            thisValue: this.value
         };
     },
     watch: {
@@ -96,8 +96,8 @@ export default {
             this.thisValue = this.value;
         },
         thisValue() {
-            this.$emit("input", this.thisValue);
-        },
+            this.$emit('input', this.thisValue);
+        }
     },
     mounted() {
         this.globalAppendInit();
@@ -105,15 +105,19 @@ export default {
     methods: {
         globalAppendInit() {
             this.$nextTick(() => {
-                const body = document.querySelector("body");
+                const body = document.querySelector('body');
                 if (body.append) {
                     body.append(this.$el);
                 } else {
                     body.appendChild(this.$el);
                 }
             });
-        },
+        }
     },
+    beforeDestroy() {
+        const body = document.querySelector('body');
+        body.removeChild(this.$el);
+    }
 };
 </script>
 

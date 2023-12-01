@@ -33,6 +33,8 @@ export default {
     },
     mounted() {
         this.Init();
+        if (this.leftRatio < 0.1) this.$emit('only-right');
+        else if (this.leftRatio > 0.9) this.$emit('only-left');
     },
     methods: {
         Init() {
