@@ -13,9 +13,8 @@
                     :item-height="35"
                     expand-click-mode="normal"
                     expandedIconPosition="right"
-                    background="transparent"
                     ref="tree"
-                    style="width: 100%; height: 100%; box-sizing: border-box;"
+                    style="width: 100%; height: 100%;"
                     @click="treeItemClick"
                 >
                     <template v-slot:default="x">

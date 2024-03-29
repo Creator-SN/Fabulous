@@ -40,11 +40,9 @@
                 v-show="treeList.length > 0"
                 v-model="treeList"
                 :theme="theme"
-                :backgroundColorHover="theme == 'dark' ? 'rgba(36, 36, 36, 0.3)' : 'rgba(255, 255, 255, 0.3)'"
-                :backgroundColorActive="theme == 'dark' ? 'rgba(36, 36, 36, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
-                :leftIconForeground="'rgba(255, 180, 0, 0.8)'"
+                :foreground="'rgba(255, 180, 0, 0.8)'"
                 :expandClickMode="'normal'"
-                style="width: 100%; height: 100%; overflow: overlay;"
+                style="width: 100%; height: 100%; padding-left: 5px; overflow: overlay;"
                 ref="tree"
                 @click="treeItemClick"
             >
