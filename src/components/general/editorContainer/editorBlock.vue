@@ -133,7 +133,7 @@
                     <fv-button
                         :theme="theme"
                         :foreground="theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
                         :class="[x.defaultClass]"
                         :isBoxShadow="true"
                         :title="local('Import Markdown')"
@@ -150,7 +150,7 @@
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
                         :class="[x.defaultClass]"
                         :isBoxShadow="true"
                         :title="local('Export Markdown')"
@@ -169,7 +169,7 @@
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
                         :class="[x.defaultClass]"
                         :isBoxShadow="true"
                         :title="local('Save As')"
@@ -330,7 +330,7 @@ export default {
                         } else this.openEditor(item.parent, item._page);
                     }
                 },
-                headerForeground: 'rgba(0, 120, 212, 1)'
+                headerForeground: () => 'rgba(0, 120, 212, 1)'
             },
             customExtensions: [pdfNote],
             img: {

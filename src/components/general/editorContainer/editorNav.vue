@@ -1,41 +1,48 @@
 <template>
-    <div
+    <fv-affix
         v-show="navList.length > 0"
-        class="editor-nav-wrapper"
-        :class="[{dark: theme === 'dark'}, {fixed}, {expand: editorExpandContent}]"
-        :style="{width: fixed ? width + 'px' : ''}"
+        :target="getTarget"
+        :mode="fixed ? 'fixed' : 'relative'"
+        :left="0"
+        :top="marginTop"
     >
-        <div class="editor-nav-container">
-            <div
-                class="editor-nav-item"
-                :class="[{choosen: isChoosen(index)}]"
-                v-for="(item, index) in navList"
-                :key="index"
-                @click="jumpTo(item)"
-            >
-                <div class="left-ul-block">
-                    <i
-                        class="up-line"
-                        :class="[{hidden: index === 0}]"
-                    ></i>
-                    <i
-                        class="mid-ring"
-                        :class="[{mini: item.level > 0}]"
-                    ></i>
-                    <i
-                        class="down-line"
-                        :class="[{hidden: index === navList.length - 1}]"
-                    ></i>
-                </div>
+        <div
+            class="editor-nav-wrapper"
+            :class="[{dark: theme === 'dark'}, {fixed}, {expand: editorExpandContent}]"
+            :style="{width: fixed ? width + 'px' : '', height: fixed ? height + 'px' : ''}"
+        >
+            <div class="editor-nav-container">
                 <div
-                    class="right-content-block"
-                    :style="{padding: `0px ${10 + item.level * 5}px`}"
+                    class="editor-nav-item"
+                    :class="[{choosen: isChoosen(index)}]"
+                    v-for="(item, index) in navList"
+                    :key="index"
+                    @click="jumpTo(item)"
                 >
-                    <p>{{item.text}}</p>
+                    <div class="left-ul-block">
+                        <i
+                            class="up-line"
+                            :class="[{hidden: index === 0}]"
+                        ></i>
+                        <i
+                            class="mid-ring"
+                            :class="[{mini: item.level > 0}]"
+                        ></i>
+                        <i
+                            class="down-line"
+                            :class="[{hidden: index === navList.length - 1}]"
+                        ></i>
+                    </div>
+                    <div
+                        class="right-content-block"
+                        :style="{padding: `0px ${10 + item.level * 5}px`}"
+                    >
+                        <p>{{item.text}}</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </fv-affix>
 </template>
 
 <script>
@@ -52,7 +59,9 @@ export default {
         return {
             fixed: false,
             width: 0,
+            height: 0,
             scrollTop: 0,
+            marginTop: 0,
             navList: [],
             timer: {
                 nav: null
@@ -89,14 +98,13 @@ export default {
             let contentContainer = this.el().$refs.editor.$el;
             editorContainer.addEventListener('scroll', this.layoutFormat);
             const resizeObserver = new ResizeObserver(() => {
-                // for (const entry of entries) {
-                //     const { contentRect, target } = entry;
-                //     const { width } = contentRect;
-                // }
                 this.layoutFormat();
             });
             resizeObserver.observe(editorContainer);
             resizeObserver.observe(contentContainer);
+        },
+        getTarget() {
+            return this.el().$refs.container;
         },
         jumpTo(item) {
             let editorContainer = this.el().$refs.container;
@@ -104,11 +112,7 @@ export default {
                 gsap.to(editorContainer, {
                     scrollTop: this.getTop(item.el),
                     duration: 0.3,
-                    onUpdate: () => {
-                        this.$el.style.top = this.fixed
-                            ? editorContainer.scrollTop + 'px'
-                            : '';
-                    }
+                    onUpdate: () => {}
                 });
             } catch (e) {
                 console.log(e);
@@ -156,15 +160,19 @@ export default {
                 let contentContainer = this.el().$refs.editor.$el;
                 let editorWidth = editorContainer.offsetWidth;
                 let contentWidth = contentContainer.offsetWidth;
+                let editorHeight = editorContainer.offsetHeight;
+                let editorPaddingTop = parseInt(
+                    window.getComputedStyle(editorContainer).paddingTop
+                );
                 let top = editorContainer.scrollTop;
                 let width = (editorWidth - contentWidth) / 2;
                 this.width = width - 30;
+                this.height = editorHeight - editorPaddingTop;
+                this.marginTop = editorPaddingTop;
                 this.scrollTop = top;
                 if (editorWidth - contentWidth > 460) {
-                    this.$el.style.top = top + 'px';
                     this.fixed = true;
                 } else {
-                    this.$el.style.top = '';
                     this.fixed = false;
                 }
                 this.lock.raf = true;
@@ -194,8 +202,6 @@ export default {
     }
 
     &.fixed {
-        position: absolute;
-        left: 0px;
         height: 100%;
         padding: 0px 25px;
 
