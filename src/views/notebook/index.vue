@@ -232,7 +232,7 @@
                             :border-radius="0"
                             underline
                             :readonly="readonly != false"
-                            @keydown="toggleUnsave(true)"
+                            @keydown="toggleUnsave(true); titleBlockTab($event)"
                             style="height: 60px;"
                             :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
                         ></fv-text-box>
@@ -494,10 +494,10 @@ export default {
         timerInit() {
             clearInterval(this.timer.autoSave);
             this.timer.autoSave = setInterval(() => {
-                if (this.auto_save && this.unsave) {
+                if (this.auto_save && this.unsave && !this.show.diff) {
                     this.$refs.editor.save();
                 }
-            }, 300);
+            }, 3000);
         },
         diffContent() {
             let nodeDirtyAttrRemove = (obj) => {
@@ -670,7 +670,8 @@ export default {
             }, 300);
         },
         editorContentChange() {
-            this.diffContent();
+            this.timerInit(); // 重新初始化自动保存定时器
+            this.diffContent(); // 比较内容是否有变化
             this.$refs.editor_nav.getEditorNavList();
         },
         editorSetContentChange() {
@@ -757,6 +758,14 @@ export default {
                 } else if (this.fontSize < 72) {
                     this.fontSize += 1;
                 }
+            }
+        },
+        titleBlockTab(event) {
+            if (event.keyCode === 9) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.$refs.editor.editor.commands.focus();
+                this.$refs.editor.editor.commands.setTextSelection(0);
             }
         },
         upgrade() {

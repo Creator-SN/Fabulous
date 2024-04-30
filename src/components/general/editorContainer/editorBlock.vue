@@ -458,12 +458,12 @@ export default {
         timerInit() {
             clearInterval(this.timer.autoSave);
             this.timer.autoSave = setInterval(() => {
-                if (this.show_editor && this.auto_save && this.unsave) {
+                if (this.show_editor && this.auto_save && this.unsave && !this.show.diff) {
                     let editor = this.getEditor();
                     editor.save();
                     this.toggleUnsave(false);
                 }
-            }, 300);
+            }, 3000);
         },
         diffContent() {
             let nodeDirtyAttrRemove = (obj) => {
@@ -734,7 +734,8 @@ export default {
             this.$refs.editor_nav.getEditorNavList();
         },
         editorContentChange() {
-            this.diffContent();
+            this.timerInit(); // 重新初始化自动保存
+            this.diffContent(); // 比较内容是否有变化
             this.$refs.editor_nav.getEditorNavList();
         },
         openEditor(item, page) {

@@ -1064,10 +1064,10 @@
     "@types/conventional-commits-parser" "^5.0.0"
     chalk "^5.3.0"
 
-"@creatorsn/powereditor@^2.4.5":
-  version "2.4.5"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.5.tgz#528b8218275e6e09dac9d279996a18b90c94a24e"
-  integrity sha512-me60DbbvQu3j9dXdJuMuotEbh+zL4wRXAAybcFeTdzKLt9wqB3Cwf8CFNS5vCl2uEArFsFl/pc7gKJk/AlcG2g==
+"@creatorsn/powereditor@^2.4.6":
+  version "2.4.6"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.6.tgz#2b9db6c66f3c58208c1d7f062010ec0590de3d0c"
+  integrity sha512-5jGUoqhUnWDiSkEc6kM7k4js+5YgGi3xPQ2kuODqu5XUM1/DmjEf7RQRXlr+hARUhX2J4sqUj7FLZjpItogwhQ==
   dependencies:
     "@tiptap/core" "2.3.0"
     "@tiptap/extension-bubble-menu" "2.3.0"
@@ -1102,7 +1102,7 @@
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
     simplify-js "^1.2.4"
-    vfluentdesign "1.2.43"
+    vfluentdesign "1.2.45"
 
 "@develar/schema-utils@~2.6.5":
   version "2.6.5"
@@ -14201,19 +14201,7 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.2.43:
-  version "1.2.43"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.43.tgz#f29bc1c709d1d13e8210668303b5f9ee8c403183"
-  integrity sha512-ANJHht3QBXwIK+qPQa7uc3KZloEsvjkrW1Drenq04VOJrmtlkUcTmlWqaD5BArfYixfKLJ77WJGHQPT3OoBqRA==
-  dependencies:
-    core-js "3.31.1"
-    gsap "3.1.1"
-    office-ui-fabric-core "11.0.0"
-    onecolor "3.1.0"
-    swiper "8.3.2"
-    vuedraggable "2.23.2"
-
-vfluentdesign@^1.2.45:
+vfluentdesign@1.2.45, vfluentdesign@^1.2.45:
   version "1.2.45"
   resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.45.tgz#f59facfaa71e46f3d5814e0821637e257d537284"
   integrity sha512-a08PHwqkg5S/fjpRfMBm2IH/JLm0sCszd763hSr5xXdXGGaPpudcieqyIn7wLVvyB2jbmJyws2IgPn9PRY/ZhA==
