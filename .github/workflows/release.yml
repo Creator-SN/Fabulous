@@ -17,7 +17,7 @@ jobs:
   # This workflow contains a single job called "build"
   window:
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,7 +27,7 @@ jobs:
       # Uses NodeJs Environment
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
@@ -69,21 +69,24 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   macos:
-    runs-on: macos-latest
+    runs-on: macos-14
     env:
       USE_HARD_LINKS: false
       CSC_LINK: ~/app.p12
       P12: ${{ secrets.APP_P12 }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APP_ID: ${{ secrets.APP_ID }}
+      TEAM_ID: ${{ secrets.TEAM_ID }}
 
     steps:
       - uses: actions/checkout@v2
 
       # Uses NodeJs Environment
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
@@ -92,7 +95,7 @@ jobs:
           cat > ~/app.p12.base64 << EOF
           $P12
           EOF
-          base64 -d ~/app.p12.base64 -o ~/app.p12
+          base64 -D -i ~/app.p12.base64 -o ~/app.p12
 
       - name: install dependencies
         run: yarn install --frozen-lockfile
@@ -106,13 +109,14 @@ jobs:
 
       - name: Rename
         run: |
+          ls -alh ./dist_electron/
           v=${{steps.tag.outputs.tag}}
           v=${v:1}
-          mv ./dist_electron/Fabulous-$v.dmg ./Fabulous-$v.dmg
-          mv ./dist_electron/Fabulous-$v.dmg.blockmap ./Fabulous-$v.dmg.blockmap
+          mv ./dist_electron/Fabulous-$v-arm64.dmg ./Fabulous-$v-arm64.dmg
+          mv ./dist_electron/Fabulous-$v-arm64.dmg.blockmap ./Fabulous-$v-arm64.dmg.blockmap
           mv ./dist_electron/latest-mac.yml ./latest-mac.yml
-          mv ./dist_electron/Fabulous-$v-mac.zip ./Fabulous-$v-mac.zip
-          mv ./dist_electron/Fabulous-$v-mac.zip.blockmap ./Fabulous-$v-mac.zip.blockmap
+          mv ./dist_electron/Fabulous-$v-arm64-mac.zip ./Fabulous-$v-arm64-mac.zip
+          mv ./dist_electron/Fabulous-$v-arm64-mac.zip.blockmap ./Fabulous-$v-arm64-mac.zip.blockmap
 
       - name: Upload Prerelease
         uses: ncipollo/release-action@v1

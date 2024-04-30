@@ -3,12 +3,12 @@ import axios from 'axios'
 let ax = axios.create();
 
 // config here
-const isdev = (process.env.NODE_ENV === "development")
-if (isdev) {
-    ax.defaults.baseURL = "http://59.77.134.18:5083";
-} else {
+// const isdev = (process.env.NODE_ENV === "development")
+// if (isdev) {
+//     ax.defaults.baseURL = "http://59.77.134.18:5083";
+// } else {
     ax.defaults.baseURL = "https://fb.creatorsn.com/api"
-}
+// }
 
 ax.interceptors.request.use(config => {
     let token = localStorage.getItem("ApiToken");

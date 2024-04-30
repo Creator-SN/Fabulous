@@ -1,3 +1,4 @@
+const { app } = require("electron");
 var path = require("path");
 
 const resolve = url => {
@@ -41,9 +42,12 @@ module.exports = {
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true
                 },
+                dmg:{
+                    sign: false
+                },
                 mac: {
                     icon: './logo.icns',
-                   
+                    executableName: "Fabulous",
                     fileAssociations: [
                         {
                             name: "Fabulous Notebook File",
@@ -53,9 +57,9 @@ module.exports = {
                         }
                     ],
                     hardenedRuntime: true,
-                    entitlements: "./dist_electron/bundled/entitlements.mac.plist",
-                    entitlementsInherit: "./dist_electron/bundled/entitlements.mac.plist",
-                    gatekeeperAssess: false,
+                    entitlements: "./build/entitlements.mac.plist",
+                    entitlementsInherit: "./build/entitlements.mac.plist",
+                    gatekeeperAssess: false
                 },
                 fileAssociations: [
                     {
