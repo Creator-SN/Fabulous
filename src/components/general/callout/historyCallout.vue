@@ -2,7 +2,7 @@
     <callout-base
         :show.sync="show"
         :mobileMode="mobileMode"
-        :title="'Emoji'"
+        :title="local('History')"
         :theme="theme"
         :popperClass="['fabulous-history-callout']"
     >

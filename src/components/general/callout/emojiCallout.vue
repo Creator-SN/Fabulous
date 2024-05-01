@@ -2,7 +2,7 @@
     <callout-base
         :show.sync="show"
         :mobileMode="mobileMode"
-        :title="'Emoji'"
+        :title="local('Emoji')"
         :theme="theme"
         :popperClass="['fabulous-emoji-callout']"
     >
@@ -16,7 +16,7 @@
                 <fv-button
                     :theme="theme"
                     @click="insertRandom"
-                >Random</fv-button>
+                >{{local('Random')}}</fv-button>
             </div>
         </template>
         <template v-slot:content>
@@ -31,7 +31,7 @@
                         v-for="(group, index) in x.dynamicValue"
                         :key="`type:${index}`"
                     >
-                        <p class="title">{{ group.name }}</p>
+                        <p class="title">{{ local(group.name) }}</p>
                         <div class="fabulous-emoji-group">
                             <i
                                 v-for="(item, i) in group.emojis"
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import emoji_list from '@/js/emojiList.js';
 import calloutBase from './calloutBase.vue';
 
@@ -73,11 +74,11 @@ export default {
             show: false
         };
     },
+    computed: {
+        ...mapGetters(['local'])
+    },
     watch: {},
     methods: {
-        getTitle(name) {
-            return name;
-        },
         insertEmoji(emoji) {
             this.$emit('insert-emoji', emoji);
         },

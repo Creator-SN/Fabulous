@@ -1222,5 +1222,45 @@ export default {
     "Current notebook version conflicts with remote version.": {
         "en": "Current notebook version conflicts with remote version.",
         "cn": "当前笔记本版本与云端版本冲突。"
+    },
+    'People and Fantasy': {
+        en: 'People and Fantasy',
+        cn: '人物与幻想'
+    },
+    'Animals & Nature': {
+        en: 'Animals & Nature',
+        cn: '动物与自然'
+    },
+    'Food & Drink': {
+        en: 'Food & Drink',
+        cn: '食物与饮料'
+    },
+    'Activity and Sports': {
+        en: 'Activity and Sports',
+        cn: '活动与运动'
+    },
+    'Travel & Places': {
+        en: 'Travel & Places',
+        cn: '旅行与地点'
+    },
+    'Objects': {
+        en: 'Objects',
+        cn: '物品'
+    },
+    'Symbols': {
+        en: 'Symbols',
+        cn: '符号'
+    },
+    'Flags': {
+        en: 'Flags',
+        cn: '旗帜'
+    },
+    Emoji: {
+        en: 'Emoji',
+        cn: '表情符号'
+    },
+    Random: {
+        en: 'Random',
+        cn: '随机'
     }
 }
