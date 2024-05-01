@@ -247,6 +247,10 @@ export default {
         align-items: center;
         overflow: auto;
 
+        .list-view-container {
+            @include narrow-scroll-bar;
+        }
+
         .list-view-custom-content {
             position: relative;
             width: 100%;

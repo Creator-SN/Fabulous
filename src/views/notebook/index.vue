@@ -862,7 +862,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 1);
+    background: rgba(255, 255, 255, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;

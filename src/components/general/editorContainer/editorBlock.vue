@@ -305,7 +305,8 @@ export default {
                 },
                 mentionClickCallback: (item) => {
                     if (item.type === 'item') {
-                        this.openFile(item.id, item.pdf);
+                        console.log(item);
+                        if (item.pdf) this.openFile(item.id, item.pdf);
                     } else if (item.type === 'page') {
                         if (this.unsave) {
                             this.$infoBox(
@@ -458,7 +459,12 @@ export default {
         timerInit() {
             clearInterval(this.timer.autoSave);
             this.timer.autoSave = setInterval(() => {
-                if (this.show_editor && this.auto_save && this.unsave && !this.show.diff) {
+                if (
+                    this.show_editor &&
+                    this.auto_save &&
+                    this.unsave &&
+                    !this.show.diff
+                ) {
                     let editor = this.getEditor();
                     editor.save();
                     this.toggleUnsave(false);
@@ -758,12 +764,36 @@ export default {
             });
         },
         openFile(itemid, fileid, type = 'pdf') {
-            this.$auto.AcademicController.openItemFile(
-                this.currentDataPath,
-                itemid,
-                fileid,
-                type
-            );
+            if (this.isRemote) {
+                if (type !== 'pdf') return;
+                if (
+                    !fileid &&
+                    itemid.indexOf('/') > -1 &&
+                    itemid.indexOf('.') > -1
+                ) {
+                    fileid = itemid.split('/')[1];
+                    fileid = fileid.split('.')[0];
+                    itemid = itemid.split('/')[0];
+                }
+                this.$api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid
+                ).then((res) => {
+                    window.open(
+                        this.$server + res.data,
+                        this.item.name,
+                        'width=1200,height=640'
+                    );
+                });
+            } else {
+                this.$local_api.AcademicController.openItemFile(
+                    this.currentDataPath,
+                    itemid,
+                    fileid,
+                    type
+                );
+            }
         },
         async mentionList(value) {
             let result = [];
@@ -1000,7 +1030,7 @@ export default {
         position: absolute;
         width: 100%;
         height: 100%;
-        background: rgba(250, 250, 250, 0.8);
+        background: rgba(255, 255, 255, 1);
         overflow: hidden;
         z-index: 1;
 

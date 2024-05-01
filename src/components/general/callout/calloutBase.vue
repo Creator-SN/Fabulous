@@ -40,7 +40,11 @@
                 name="trigger"
                 :show="triggerShow"
             ></slot>
-            <fv-drawer v-model="thisShow" class="fabulous-callout-base-mobile-container" length="calc(100% - 50px)">
+            <fv-drawer
+                v-model="thisShow"
+                class="fabulous-callout-base-mobile-container"
+                length="calc(100% - 50px)"
+            >
                 <div class="fabulous-c-b-m-banner">
                     <slot
                         name="header"
@@ -77,24 +81,24 @@
 export default {
     props: {
         popperClass: {
-            default: [],
+            default: []
         },
         title: {
-            default: 'Title',
+            default: 'Title'
         },
         show: {
-            default: false,
+            default: false
         },
         mobileMode: {
-            default: false,
+            default: false
         },
         theme: {
-            default: 'light',
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
-            thisShow: false,
+            thisShow: false
         };
     },
     watch: {
@@ -103,13 +107,13 @@ export default {
         },
         thisShow(val) {
             this.$emit('update:show', val);
-        },
+        }
     },
     methods: {
         triggerShow() {
             this.thisShow = true;
-        },
-    },
+        }
+    }
 };
 </script>
 
@@ -123,8 +127,7 @@ export default {
                 background: rgba(47, 52, 55, 0.95);
                 color: whitesmoke;
 
-                .fabulous-c-b-m-close
-                {
+                .fabulous-c-b-m-close {
                     color: rgba(46, 170, 220, 1);
                 }
             }

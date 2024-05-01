@@ -49,28 +49,28 @@
 </template>
 
 <script>
-import emoji_list from "@/js/emojiList.js";
-import calloutBase from "./calloutBase.vue";
+import emoji_list from '@/js/emojiList.js';
+import calloutBase from './calloutBase.vue';
 
 export default {
     components: {
-        calloutBase,
+        calloutBase
     },
     props: {
         value: {
-            default: "",
+            default: ''
         },
         mobileMode: {
-            default: false,
+            default: false
         },
         theme: {
-            default: "light",
-        },
+            default: 'light'
+        }
     },
     data() {
         return {
             emoji_list: emoji_list,
-            show: false,
+            show: false
         };
     },
     watch: {},
@@ -79,7 +79,7 @@ export default {
             return name;
         },
         insertEmoji(emoji) {
-            this.$emit("insert-emoji", emoji);
+            this.$emit('insert-emoji', emoji);
         },
         insertRandom() {
             let i = (Math.random() * (this.emoji_list.length - 1)).toFixed(0);
@@ -87,9 +87,9 @@ export default {
                 Math.random() *
                 (this.emoji_list[i].emojis.length - 1)
             ).toFixed(0);
-            this.$emit("insert-emoji", this.emoji_list[i].emojis[j]);
-        },
-    },
+            this.$emit('insert-emoji', this.emoji_list[i].emojis[j]);
+        }
+    }
 };
 </script>
 
@@ -114,6 +114,15 @@ export default {
 }
 
 .fabulous-emoji-callout {
+    .main {
+        .fv-light-InfiniteScrollView {
+            @include narrow-scroll-bar;
+        }
+        .fv-dark-InfiniteScrollView {
+            @include narrow-scroll-bar;
+        }
+    }
+
     .fabulous-emoji-banner {
         position: relative;
         width: 100%;
@@ -134,7 +143,7 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        overflow: auto;
+        overflow: overlay;
 
         .fabulous-emoji-list {
             position: relative;

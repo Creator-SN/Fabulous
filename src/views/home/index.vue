@@ -80,6 +80,7 @@
                                     v-if="x.item.labels.length > 0"
                                     :value="x.item.labels"
                                     :theme="theme"
+                                    :size="'xsmall'"
                                     style="width: 100%;"
                                 ></fv-tag>
                                 <i

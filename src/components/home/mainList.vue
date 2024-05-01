@@ -71,6 +71,7 @@
                         :value="item.labels"
                         :theme="theme"
                         class="tag-block"
+                        :size="'xsmall'"
                         style="max-width: 120px; overflow: overlay;"
                         @click.native="$emit('label-click', item)"
                     ></fv-tag>
@@ -254,7 +255,7 @@ export default {
         @include HcenterVcenter;
 
         width: 90px;
-        font-size: 18px;
+        font-size: 15px;
 
         .index {
             margin-right: 10px;
@@ -272,7 +273,7 @@ export default {
             @include nowrap;
 
             flex: 1;
-            font-size: 16px;
+            font-size: 13.8px;
             font-weight: bold;
 
             &.h {

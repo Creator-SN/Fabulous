@@ -104,7 +104,7 @@ export default {
             resizeObserver.observe(contentContainer);
         },
         getTarget() {
-            return this.el().$refs.container;
+            if (this.el()) return this.el().$refs.container;
         },
         jumpTo(item) {
             let editorContainer = this.el().$refs.container;
