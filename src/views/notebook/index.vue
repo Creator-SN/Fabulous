@@ -271,20 +271,30 @@
                 style="flex: 1;"
                 @click="show.bottomControl ^= true"
             ></i>
-            <fv-slider
+            <div
                 v-show="show.bottomControl"
-                v-model="fontSize"
-                :mininum="12"
-                :maxinum="72"
-                icon="RadioBullet"
-                color="rgba(87, 156, 193, 1)"
-                :showLabel="true"
-                style="width: 150px; margin-right: 15px;"
+                class="right-block"
             >
-                <template slot-scope="prop">
-                    <p style="margin: 5px;">{{prop.value}}px</p>
-                </template>
-            </fv-slider>
+                <i
+                    class="ms-Icon ms-Icon--FontSize"
+                    style="margin: 0px 5px;"
+                ></i>
+                <fv-slider
+                    v-show="show.bottomControl"
+                    v-model="fontSize"
+                    :theme="theme"
+                    :mininum="12"
+                    :maxinum="72"
+                    color="rgba(145, 145, 235, 1)"
+                    :background="theme === 'dark' ? 'rgba(20, 20, 20, 0.6)' : 'rgba(255, 255, 255, 1)'"
+                    :showLabel="true"
+                    style="width: 150px; margin-right: 15px;"
+                >
+                    <template slot-scope="prop">
+                        <p style="margin: 5px;">{{prop.value}}px</p>
+                    </template>
+                </fv-slider>
+            </div>
         </div>
         <save-options
             :show.sync="show.saveOptions"
@@ -756,7 +766,7 @@ export default {
                 if (event.deltaY > 0 && this.fontSize > 12) {
                     this.fontSize -= 1;
                 } else if (this.fontSize < 72) {
-                    this.fontSize += 1;
+                    this.fontSize = this.fontSize / 1 + 1;
                 }
             }
         },
@@ -1050,6 +1060,10 @@ export default {
             &:active {
                 background: rgba(200, 200, 200, 0.3);
             }
+        }
+
+        .right-block {
+            @include Vcenter;
         }
     }
 
