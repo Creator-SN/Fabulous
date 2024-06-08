@@ -181,7 +181,7 @@ export default {
         ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
-            return 'rgba(0, 0, 0, 0.8)';
+            return 'rgba(0, 0, 0, 0.9)';
         },
         localPathFolderName() {
             let pathList = this.localPath.split(/[\\/]/);

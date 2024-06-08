@@ -262,7 +262,7 @@ export default {
     transition: all 0.3s;
 
     &.dark {
-        background: rgba(36, 36, 36, 1);
+        background: rgba(36, 36, 36, 0);
     }
 
     ::-webkit-scrollbar {

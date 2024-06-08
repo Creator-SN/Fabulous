@@ -27,6 +27,7 @@ async function createWindow() {
         height: 640,
         minWidth: 800,
         minHeight: 500,
+        backgroundMaterial: "acrylic",
         webPreferences: {
             enableRemoteModule: true,
             enableSmoothScrolling: true,

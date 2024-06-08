@@ -993,7 +993,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 0.9);
+    background: rgba(255, 255, 255, 0.9);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1001,7 +1001,7 @@ export default {
     z-index: 1;
 
     &.dark {
-        background: rgba(36, 36, 36, 0.9);
+        background: rgba(20, 20, 20, 0.9);
 
         .s-title {
             color: whitesmoke;
@@ -1010,7 +1010,7 @@ export default {
         .m-home-block {
             .row {
                 &.main-table {
-                    background: rgba(0, 0, 0, 0.6);
+                    background: rgba(20, 20, 20, 0.6);
                 }
 
                 .row-item-info {

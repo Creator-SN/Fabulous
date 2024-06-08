@@ -1,6 +1,6 @@
 <template>
     <div
-        class="fabulous-home-container"
+        class="fabulous-notebook-container"
         :class="[{ dark: theme === 'dark', 'full-screen': expandContainer }]"
         @mousewheel="onMouseWheel"
     >
@@ -1021,7 +1021,7 @@ export default {
 </script>
 
 <style lang="scss">
-.fabulous-home-container {
+.fabulous-notebook-container {
     position: relative;
     width: 100%;
     height: 100%;
