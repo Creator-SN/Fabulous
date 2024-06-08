@@ -24,10 +24,10 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@creatorsn/powereditor": "^2.4.8",
+    "@creatorsn/powereditor": "^2.4.9",
     "@electron/remote": "^2.0.8",
     "axios": "^0.21.4",
-    "axios-swagger-helper": "^0.0.53",
+    "axios-swagger-helper": "^0.0.56",
     "chokidar": "^3.5.3",
     "core-js": "^3.6.5",
     "cropperjs": "^1.5.13",

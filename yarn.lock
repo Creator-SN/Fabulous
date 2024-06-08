@@ -1064,10 +1064,10 @@
     "@types/conventional-commits-parser" "^5.0.0"
     chalk "^5.3.0"
 
-"@creatorsn/powereditor@^2.4.8":
-  version "2.4.8"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.8.tgz#127e5484606be1513999a8d77a499a5ee66eed37"
-  integrity sha512-wPqagaOvQvQ/2B84pcxbh3fHyj7vF3SQl+s4FEEx/HLxehQb7izgafvl4BhB+ADYupctcvA74hniFxQzdNoFkQ==
+"@creatorsn/powereditor@^2.4.9":
+  version "2.4.9"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.9.tgz#fd39f82bd200ebf63a88438ddb4ff81494aa2bb3"
+  integrity sha512-QJ3yg92PC4HiwIe0u24C91AY8Mu34jl/gWLk3YBler/Vs5GTbvM1CVdAuZa1wOtgbqmICc8YHNO2qGMXsln7kA==
   dependencies:
     "@tiptap/core" "2.3.0"
     "@tiptap/extension-bubble-menu" "2.3.0"
@@ -1102,7 +1102,7 @@
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
     simplify-js "^1.2.4"
-    vfluentdesign "1.2.47"
+    vfluentdesign "1.2.51"
 
 "@develar/schema-utils@~2.6.5":
   version "2.6.5"
@@ -3214,10 +3214,10 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.12.0.tgz#ce1c9d143389679e253b314241ea9aa5cec980d3"
   integrity sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==
 
-axios-swagger-helper@^0.0.53:
-  version "0.0.53"
-  resolved "https://registry.yarnpkg.com/axios-swagger-helper/-/axios-swagger-helper-0.0.53.tgz#198c17944e3482cc25220c5712ae3e538122a9ae"
-  integrity sha512-kU/zYyt63Miy7M+b+BcQLT6ru3lqsMR6BEaB53/aNg9SrpcDkWTH22tRwocbxJaMLi2C2HYZqbEwOGdQrcC/lQ==
+axios-swagger-helper@^0.0.56:
+  version "0.0.56"
+  resolved "https://registry.yarnpkg.com/axios-swagger-helper/-/axios-swagger-helper-0.0.56.tgz#58b16901f13bdbd15e224648659e2d1a87f27d92"
+  integrity sha512-pUS60WyuuJKp/m4b7EBODbiu60z1LkM0QHjYgftLqTxOnpFK8izdRqXBpQgj2w/lN1X2/ofL6B7muhQ9+oryKw==
   dependencies:
     "@babel/core" "^7.7.5"
     axios "^0.21.1"
@@ -14201,10 +14201,10 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vfluentdesign@1.2.47:
-  version "1.2.47"
-  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.47.tgz#10e8418b5a67e99fa2168638b78e9176ba17e526"
-  integrity sha512-qkDkUWwhZl1+973ieiRlmriV0QuXmDt9CcpXEY+uh40bQq9fZ1uxfKdqsOIVojCrpj5RBYgRterNWnpLPT0b6A==
+vfluentdesign@1.2.51:
+  version "1.2.51"
+  resolved "https://registry.yarnpkg.com/vfluentdesign/-/vfluentdesign-1.2.51.tgz#58138bcf929e8a152988db096f8e9dd2fd00b784"
+  integrity sha512-hvqNRejZHXF3u/D9Tm0DDvAzi1GqQLx63S1uwyYIOOsXKYP0FTUiqyv2ke2B14UQSJR4eIoZmTER189ige9Z3Q==
   dependencies:
     core-js "3.31.1"
     gsap "3.1.1"

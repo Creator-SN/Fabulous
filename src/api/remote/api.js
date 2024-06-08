@@ -1,37 +1,13 @@
 /* eslint-disable */
 // More information: https://github.com/minskiter/openapijs
 import axios from './config.js'
-import {CancelTokenSource} from 'axios'
+import * as Axios from 'axios'
 import * as UserModel from './model.js'
 
-axios.interceptors.request.use(
-  config => {
-    if (
-      config.headers["Content-Type"].includes("x-www-form-urlencoded") ||
-      config.headers["Content-Type"].includes("multipart/form-data")
-    ) {
-      let formData = new FormData();
-      for (let item in config.data) {
-        if (config.data[item])
-        if (
-          typeof config.data[item] == "object" &&
-          Array.isArray(config.data[item])
-        ){  
-          for (let index in config.data[item]){
-              let i = config.data[item][index];
-              formData.append(item,i);
-          }
-        }
-        else formData.append(item, config.data[item]);
-      }
-      config.data = formData;
-    }
-    return config;
-  },
-  error=>{
-    return Promise.reject(error)
-  }
-)
+// fix vite error.
+const CancelTokenSource = Axios.CancelTokenSource;
+
+
 export class AcademicController {
  
   /**
@@ -73,10 +49,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -121,10 +101,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -169,10 +153,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -220,10 +208,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -268,10 +260,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -316,10 +312,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -365,10 +365,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -414,10 +418,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -463,10 +471,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -510,10 +522,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -558,10 +574,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -607,10 +627,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -656,10 +680,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -706,10 +734,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -755,10 +787,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -804,10 +840,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -816,19 +856,18 @@ export class AcademicController {
   * @summary 保存Pdf文件
   * @param {String} [pathuri] 
   * @param {String} [pathitemid] 
-  * @param {String} [pdfid] 
-  * @param {String} [file] 
+  * @param {UserModel.FormFileUpload} [formfileupload] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updateItemPDF(pathuri,pathitemid,pdfid,file,cancelSource,uploadProgress,downloadProgress){
+  static async updateItemPDF(pathuri,pathitemid,formfileupload,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/items/'+pathitemid+'/pdfs',
-        data:{pdfid,file},
+        data:formfileupload,
         params:{},
         headers:{
           "Content-Type":"multipart/form-data"
@@ -854,10 +893,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -903,10 +946,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -954,10 +1001,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1002,10 +1053,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1050,10 +1105,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1099,10 +1158,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1147,10 +1210,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1195,10 +1262,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1242,10 +1313,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1294,10 +1369,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1342,10 +1421,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1390,10 +1473,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1443,10 +1530,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1492,10 +1583,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1541,10 +1636,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1590,10 +1689,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1640,10 +1743,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1689,10 +1796,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1737,10 +1848,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1785,10 +1900,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1832,10 +1951,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1879,10 +2002,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1927,10 +2054,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -1976,10 +2107,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2024,10 +2159,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2073,10 +2212,14 @@ export class AcademicController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2463,10 +2606,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2513,10 +2660,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2562,10 +2713,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2610,10 +2765,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2659,10 +2818,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2707,10 +2870,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2755,10 +2922,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2803,10 +2974,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2852,10 +3027,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2901,10 +3080,116 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 上传图片信息
+  * @param {UserModel.FormFileUpload} [formfileupload] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async uploadBinaryImage(formfileupload,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/image',
+        data:formfileupload,
+        params:{},
+        headers:{
+          "Content-Type":"multipart/form-data"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 上传图片信息
+  * @param {UserModel.Base64ImageRequest} [base64imagerequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async uploadImage(base64imagerequest,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/sources/image/base64',
+        data:base64imagerequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2949,10 +3234,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -2996,10 +3285,67 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 下载对应的图片
+  * @param {String} [pathimageid] 
+  * @param {Number} [height] 
+  * @param {Number} [width] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async downloadImage(pathimageid,height,width,cancelSource,uploadProgress,downloadProgress){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "blob";
+      let options = {
+        method:'get',
+        url:'/sources/image/'+pathimageid+'',
+        data:{},
+        params:{height,width},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3044,10 +3390,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3093,10 +3443,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3140,10 +3494,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3187,10 +3545,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3234,10 +3596,14 @@ export class NotebookController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3325,6 +3691,22 @@ NotebookController.copyDirectory.fullPath=`${axios.defaults.baseURL}/sources/{ur
 */
 NotebookController.copyDirectory.path=`/sources/{uri}/directories/copy`
 /**
+* @description uploadBinaryImage url链接，包含baseURL
+*/
+NotebookController.uploadBinaryImage.fullPath=`${axios.defaults.baseURL}/sources/image`
+/**
+* @description uploadBinaryImage url链接，不包含baseURL
+*/
+NotebookController.uploadBinaryImage.path=`/sources/image`
+/**
+* @description uploadImage url链接，包含baseURL
+*/
+NotebookController.uploadImage.fullPath=`${axios.defaults.baseURL}/sources/image/base64`
+/**
+* @description uploadImage url链接，不包含baseURL
+*/
+NotebookController.uploadImage.path=`/sources/image/base64`
+/**
 * @description existsPath url链接，包含baseURL
 */
 NotebookController.existsPath.fullPath=`${axios.defaults.baseURL}/sources/{uri}/path`
@@ -3340,6 +3722,14 @@ NotebookController.transferIdsToNames.fullPath=`${axios.defaults.baseURL}/source
 * @description transferIdsToNames url链接，不包含baseURL
 */
 NotebookController.transferIdsToNames.path=`/sources/notebooks/names`
+/**
+* @description downloadImage url链接，包含baseURL
+*/
+NotebookController.downloadImage.fullPath=`${axios.defaults.baseURL}/sources/image/{imageId}`
+/**
+* @description downloadImage url链接，不包含baseURL
+*/
+NotebookController.downloadImage.path=`/sources/image/{imageId}`
 /**
 * @description getDocumentContentHistoryByVersionIds url链接，包含baseURL
 */
@@ -3423,10 +3813,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3470,10 +3864,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3517,10 +3915,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3564,10 +3966,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3610,10 +4016,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3657,10 +4067,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3704,10 +4118,14 @@ export class ConfigController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3812,10 +4230,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3860,10 +4282,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3908,10 +4334,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -3956,10 +4386,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4003,10 +4437,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4050,10 +4488,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4097,10 +4539,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4146,10 +4592,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4193,10 +4643,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4239,10 +4693,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4286,10 +4744,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4332,10 +4794,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4379,10 +4845,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4426,10 +4896,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4473,10 +4947,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4520,10 +4998,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4566,10 +5048,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4617,10 +5103,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4664,10 +5154,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4711,10 +5205,14 @@ export class UserController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4926,10 +5424,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -4973,10 +5475,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5022,10 +5528,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5069,10 +5579,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5117,10 +5631,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5164,10 +5682,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5210,10 +5732,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5257,10 +5783,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5304,10 +5834,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5351,10 +5885,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }
@@ -5398,10 +5936,14 @@ export class SystemController {
           return res.data
         }
       }).catch(err=>{
-        if (err.response.data)
-          reject(err.response.data)
-        else
-          reject(err.response);
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
       })
     })
   }

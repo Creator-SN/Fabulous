@@ -64,10 +64,14 @@ new Vue({
             let date = new Date(str);
             return this.$SDate.Format("YYYY-mm-dd HH:MM", date);
         }
+        const dev_server = "http://59.77.134.18:5083";
+        const remote_server = `https://fb.creatorsn.com/api`;
         if (isdev) {
-            Vue.prototype.$server = "http://59.77.134.18:5083";
+            Vue.prototype.$server = dev_server;
         } else {
-            Vue.prototype.$server = `https://fb.creatorsn.com/api`;
+            Vue.prototype.$server = remote_server;
         }
+        Vue.prototype.$dev_server = dev_server;
+        Vue.prototype.$remote_server = remote_server;
     }
 }).$mount('#app')

@@ -1,7 +1,7 @@
 <template>
     <div
         class="fabulous-home-container"
-        :class="[{dark: theme === 'dark', 'full-screen': expandContainer}]"
+        :class="[{ dark: theme === 'dark', 'full-screen': expandContainer }]"
         @mousewheel="onMouseWheel"
     >
         <div class="control-banner">
@@ -15,7 +15,11 @@
                 >
                     <i
                         class="ms-Icon"
-                        :class="[`ms-Icon--${expandContainer ? 'BackToWindow' : 'FullScreen'}`]"
+                        :class="[
+                            `ms-Icon--${
+                                expandContainer ? 'BackToWindow' : 'FullScreen'
+                            }`
+                        ]"
                     ></i>
                 </fv-button>
                 <fv-button
@@ -29,7 +33,7 @@
                         :class="[
                             `ms-Icon--${
                                 readonly === true ? 'Edit' : 'ReadingMode'
-                            }`,
+                            }`
                         ]"
                     ></i>
                 </fv-button>
@@ -43,8 +47,10 @@
                         class="ms-Icon"
                         :class="[
                             `ms-Icon--${
-                                expandContent === true ? 'StaplingPortraitBookBinding' : 'StaplingLandscapeTwoTop'
-                            }`,
+                                expandContent === true
+                                    ? 'StaplingPortraitBookBinding'
+                                    : 'StaplingLandscapeTwoTop'
+                            }`
                         ]"
                     ></i>
                 </fv-button>
@@ -76,7 +82,7 @@
                     class="control-btn"
                     background="rgba(0, 204, 153, 1)"
                 >
-                    {{ "" }}
+                    {{ '' }}
                 </fv-button>
                 <fv-toggle-switch
                     :title="local('Auto Save')"
@@ -88,9 +94,11 @@
                     :off="local('Auto Save')"
                     :onForeground="theme === 'dark' ? '#fff' : '#000'"
                     :offForeground="theme === 'dark' ? '#fff' : '#000'"
-                    :switch-on-background="theme === 'dark' ? '#000' : 'rgba(140, 148, 228, 1)'"
+                    :switch-on-background="
+                        theme === 'dark' ? '#000' : 'rgba(140, 148, 228, 1)'
+                    "
                     :insideContent="true"
-                    style="margin-left: 10px;"
+                    style="margin-left: 10px"
                 >
                 </fv-toggle-switch>
             </div>
@@ -111,7 +119,7 @@
                 :theme="theme"
                 :rootIcon="history.length > 0 ? 'PageLeft' : 'FolderHorizontal'"
                 :separator="'ChevronRightMed'"
-                style="font-size: 12px; white-space: nowrap;"
+                style="font-size: 12px; white-space: nowrap"
                 @root-click="back"
             ></fv-Breadcrumb>
         </div>
@@ -131,17 +139,27 @@
                 :theme="theme"
                 :language="language"
                 :editorBackground="
-                    theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
+                    theme == 'dark'
+                        ? 'rgba(47, 52, 55, 0)'
+                        : 'rgba(250, 250, 250, 0)'
+                "
                 :editorOutSideBackground="
-                    theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
+                    theme == 'dark'
+                        ? 'rgba(47, 52, 55, 0)'
+                        : 'rgba(250, 250, 250, 0)'
+                "
                 :toolbarHeight="160"
                 :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
                 :mobileDisplayWidth="0"
+                :imgInterceptor="imgIntercept"
                 ref="editor"
-                :style="{background: 'transparent', 'font-size': `${fontSize}px`}"
-                style="position: relative; width: 100%; height: 100%; flex: 1;"
+                :style="{
+                    background: 'transparent',
+                    'font-size': `${fontSize}px`
+                }"
+                style="position: relative; width: 100%; height: 100%; flex: 1"
                 @save-json="saveConfirm"
                 @click.native="show.quickNav = false"
                 @change="editorContentChange"
@@ -150,8 +168,14 @@
                 <template v-slot:custom-buttons-front="x">
                     <fv-button
                         :theme="theme"
-                        :foreground="theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
+                        :foreground="
+                            theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''
+                        "
+                        :background="
+                            theme === 'dark'
+                                ? 'rgba(36, 36, 36, 1)'
+                                : 'rgba(255, 255, 255, 1)'
+                        "
                         :class="[x.defaultClass]"
                         :isBoxShadow="true"
                         :title="local('Import Markdown')"
@@ -161,16 +185,26 @@
                             draggable="false"
                             :src="img.markdown"
                             alt=""
-                            style="width: 16px; height: 16px; object-fit: contain;"
-                            :style="{filter: theme == 'dark' ? 'invert(1)' : ''}"
-                        >
+                            style="
+                                width: 16px;
+                                height: 16px;
+                                object-fit: contain;
+                            "
+                            :style="{
+                                filter: theme == 'dark' ? 'invert(1)' : ''
+                            }"
+                        />
                     </fv-button>
                 </template>
                 <template v-slot:custom-buttons-0="x">
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
+                        :background="
+                            theme === 'dark'
+                                ? 'rgba(36, 36, 36, 1)'
+                                : 'rgba(255, 255, 255, 1)'
+                        "
                         :class="[x.defaultClass]"
                         :isBoxShadow="true"
                         :title="local('Save As')"
@@ -187,7 +221,9 @@
                         @click.native="$refs.input.click()"
                     ></fv-img>
                     <div
-                        v-show="!readonly && contentType === 'fabulous_notebook'"
+                        v-show="
+                            !readonly && contentType === 'fabulous_notebook'
+                        "
                         class="fabulous-notebook-info-block"
                     >
                         <fv-button
@@ -197,18 +233,33 @@
                             background="rgba(255, 255, 255, 0.6)"
                             :border-radius="6"
                             foreground="rgba(120, 120, 120, 1)"
-                            style="min-width: 120px; width: 50%; max-width: 300px;"
+                            style="
+                                min-width: 120px;
+                                width: 50%;
+                                max-width: 300px;
+                            "
                             @click="$refs.input.click()"
-                        >{{local('Add Banner')}}</fv-button>
+                            >{{ local('Add Banner') }}</fv-button
+                        >
                         <fv-button
                             v-show="fabulousNotebook.banner"
                             theme="dark"
                             icon="Picture"
                             background="rgba(220, 62, 72, 0.9)"
                             :border-radius="6"
-                            style="min-width: 120px; width: 50%; max-width: 300px;"
-                            @click="() => { fabulousNotebook.banner = ''; toggleUnsave(true); }"
-                        >{{local('Delete Banner')}}</fv-button>
+                            style="
+                                min-width: 120px;
+                                width: 50%;
+                                max-width: 300px;
+                            "
+                            @click="
+                                () => {
+                                    fabulousNotebook.banner = '';
+                                    toggleUnsave(true);
+                                }
+                            "
+                            >{{ local('Delete Banner') }}</fv-button
+                        >
                         <input
                             v-show="false"
                             type="file"
@@ -219,7 +270,9 @@
                     </div>
                     <div class="fabulous-notebook-title-block">
                         <fv-text-box
-                            v-show="!readonly && contentType == 'fabulous_notebook'"
+                            v-show="
+                                !readonly && contentType == 'fabulous_notebook'
+                            "
                             :placeholder="local('Input title here ...')"
                             v-model="fabulousNotebook.title"
                             :theme="theme"
@@ -232,16 +285,27 @@
                             :border-radius="0"
                             underline
                             :readonly="readonly != false"
-                            @keydown="toggleUnsave(true); titleBlockTab($event)"
-                            style="height: 60px;"
-                            :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
+                            @keydown="
+                                toggleUnsave(true);
+                                titleBlockTab($event);
+                            "
+                            style="height: 60px"
+                            :style="{
+                                width: '100%',
+                                'max-width': expandContent ? '99999px' : '900px'
+                            }"
                         ></fv-text-box>
                         <p
                             v-show="readonly && fabulousNotebook.title"
                             class="fabulous-notebook-title"
-                            :class="[{dark: theme === 'dark'}]"
-                            :style="{width: '100%', 'max-width': expandContent ? '99999px' : '900px'}"
-                        >{{fabulousNotebook.title}}</p>
+                            :class="[{ dark: theme === 'dark' }]"
+                            :style="{
+                                width: '100%',
+                                'max-width': expandContent ? '99999px' : '900px'
+                            }"
+                        >
+                            {{ fabulousNotebook.title }}
+                        </p>
                     </div>
                     <editor-nav
                         v-show="showNav"
@@ -251,10 +315,7 @@
                 </template>
             </power-editor>
         </div>
-        <div
-            v-show="!lock.loading"
-            class="loading-block"
-        >
+        <div v-show="!lock.loading" class="loading-block">
             <fv-progress-ring
                 loading="true"
                 r="20"
@@ -263,21 +324,24 @@
         </div>
         <div
             class="bottom-control"
-            :class="[{dark: theme == 'dark'}, {close: !show.bottomControl}]"
+            :class="[{ dark: theme == 'dark' }, { close: !show.bottomControl }]"
         >
             <i
                 class="ms-Icon trigger"
-                :class="[`ms-Icon--${show.bottomControl ? 'ChevronRightMed' : 'ChevronLeftMed'}`]"
-                style="flex: 1;"
+                :class="[
+                    `ms-Icon--${
+                        show.bottomControl
+                            ? 'ChevronRightMed'
+                            : 'ChevronLeftMed'
+                    }`
+                ]"
+                style="flex: 1"
                 @click="show.bottomControl ^= true"
             ></i>
-            <div
-                v-show="show.bottomControl"
-                class="right-block"
-            >
+            <div v-show="show.bottomControl" class="right-block">
                 <i
                     class="ms-Icon ms-Icon--FontSize"
-                    style="margin: 0px 5px;"
+                    style="margin: 0px 5px"
                 ></i>
                 <fv-slider
                     v-show="show.bottomControl"
@@ -286,12 +350,16 @@
                     :mininum="12"
                     :maxinum="72"
                     color="rgba(145, 145, 235, 1)"
-                    :background="theme === 'dark' ? 'rgba(20, 20, 20, 0.6)' : 'rgba(255, 255, 255, 1)'"
+                    :background="
+                        theme === 'dark'
+                            ? 'rgba(20, 20, 20, 0.6)'
+                            : 'rgba(255, 255, 255, 1)'
+                    "
                     :showLabel="true"
-                    style="width: 150px; margin-right: 15px;"
+                    style="width: 150px; margin-right: 15px"
                 >
                     <template slot-scope="prop">
-                        <p style="margin: 5px;">{{prop.value}}px</p>
+                        <p style="margin: 5px">{{ prop.value }}px</p>
                     </template>
                 </fv-slider>
             </div>
@@ -312,9 +380,15 @@
                     theme="dark"
                     background="rgba(140, 148, 228, 1)"
                     :is-box-shadow="true"
-                    style="width: 120px; margin-right: 5px;"
-                    @click="() => {commitDiff(x.result); show.historyPreview = false;}"
-                >{{local('Rollback version')}}</fv-button>
+                    style="width: 120px; margin-right: 5px"
+                    @click="
+                        () => {
+                            commitDiff(x.result);
+                            show.historyPreview = false;
+                        }
+                    "
+                    >{{ local('Rollback version') }}</fv-button
+                >
             </template>
         </template-preview>
         <diff-previewer
@@ -678,6 +752,85 @@ export default {
             setTimeout(() => {
                 this.saveClick();
             }, 300);
+        },
+        base64ToBlob(base64, mimeType) {
+            // 去掉base64的头部信息
+            let byteCharacters = atob(base64.split(',')[1]);
+
+            let byteArrays = [];
+            for (
+                let offset = 0;
+                offset < byteCharacters.length;
+                offset += 512
+            ) {
+                let slice = byteCharacters.slice(offset, offset + 512);
+
+                let byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                let byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            return new Blob(byteArrays, { type: mimeType });
+        },
+        // imgIntercept () {},
+        async imgIntercept({
+            getImage,
+            interceptImage,
+            showStatus,
+            updateStatus,
+            updateImage
+        }) {
+            if (!this.isRemote) return;
+            setTimeout(async () => {
+                let src = getImage();
+                let blob = false;
+                if (src.startsWith('data:image')) {
+                    let mimeType = src.split(';')[0].split(':')[1];
+                    blob = this.base64ToBlob(src, mimeType);
+                } else if (src.startsWith('file:///')) {
+                    const response = await fetch(src);
+                    blob = await response.blob();
+                }
+                if (!blob) return;
+                let oriUrl = interceptImage('');
+                showStatus(true);
+                this.Auto.NotebookController.uploadBinaryImage(
+                    {
+                        file: blob
+                    },
+                    null,
+                    (progress) => {
+                        const { loaded, total } = progress;
+                        let percent = Math.floor((loaded / total) * 100);
+                        updateStatus(
+                            percent < 100,
+                            percent,
+                            this.local('Uploading Image...')
+                        );
+                    }
+                )
+                    .then((res) => {
+                        showStatus(false);
+                        if (res.code === 200) {
+                            let id = res.data;
+                            let targetUrl =
+                                this.$remote_server + '/sources/image/' + id;
+                            updateImage(targetUrl);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        showStatus(false);
+                        updateImage(oriUrl);
+                        this.$barWarning(this.local('Upload Image Failed'), {
+                            status: 'warning'
+                        });
+                    });
+            }, 3000);
         },
         editorContentChange() {
             this.timerInit(); // 重新初始化自动保存定时器

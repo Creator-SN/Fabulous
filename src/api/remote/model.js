@@ -848,6 +848,23 @@ export class DataItemCreateDTO {
     labels=undefined
     
 }
+export class FormFileUpload {
+  
+    /**
+     *
+     * @param {String} file 
+     */ 
+    constructor(file = undefined){
+        this.file = file
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    file=undefined
+    
+}
 export class DataPageCreateDTO {
   
     /**
@@ -925,6 +942,23 @@ export class PartitionCreateDTO {
      * @type {String}
      */
     emoji=undefined
+    
+}
+export class Base64ImageRequest {
+  
+    /**
+     *
+     * @param {String} base64 要上传的Base64图片
+     */ 
+    constructor(base64 = undefined){
+        this.base64 = base64
+    }
+       
+    /**
+     * 要上传的Base64图片
+     * @type {String}
+     */
+    base64=undefined
     
 }
 export class ConfigCreateOrUpdateDTO {
