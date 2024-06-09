@@ -1064,10 +1064,10 @@
     "@types/conventional-commits-parser" "^5.0.0"
     chalk "^5.3.0"
 
-"@creatorsn/powereditor@^2.4.9":
-  version "2.4.9"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.9.tgz#fd39f82bd200ebf63a88438ddb4ff81494aa2bb3"
-  integrity sha512-QJ3yg92PC4HiwIe0u24C91AY8Mu34jl/gWLk3YBler/Vs5GTbvM1CVdAuZa1wOtgbqmICc8YHNO2qGMXsln7kA==
+"@creatorsn/powereditor@^2.4.10":
+  version "2.4.10"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.10.tgz#a21aebcae8f58c4cda133cd0b1384506b0e3752f"
+  integrity sha512-nPr8A3bR88JZQmB8vW/JSQnCII8+P3ggrE0mjy8MaiAO/cisInBwtkrDg4MABqU790HsKmyoIV2YwcpWJZ+oAw==
   dependencies:
     "@tiptap/core" "2.3.0"
     "@tiptap/extension-bubble-menu" "2.3.0"
@@ -6377,10 +6377,10 @@ electron-updater@^5.0.1:
     semver "^7.3.5"
     typed-emitter "^2.1.0"
 
-electron@^30.1.0:
-  version "30.1.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-30.1.0.tgz#0db25bf5907140bd1b2d8d75b656977f1f8fe404"
-  integrity sha512-9O8m7kinjwMH5Df0hpXbwUaqI6pk3aJm1sKQUkQGCF7NDbNkGhu2BXgqaicPU6oe26zQPc5vtwWnHmiKlh1hYA==
+electron@^29.4.2:
+  version "29.4.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-29.4.2.tgz#5d236955fb229e10f1532a0e4a0685a4676547c8"
+  integrity sha512-XyIkuWQguwY8hGtLg0j5Q4Fqphdbh0ctBsKCSVzJ/R7Z2+2WN/oQ1M+zYwchmfiDgiuL3EKkrBrfPdxXYdMr+A==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^20.9.0"
