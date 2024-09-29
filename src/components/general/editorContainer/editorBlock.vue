@@ -121,6 +121,7 @@
                 :mobileDisplayWidth="0"
                 :mentionItemAttr="editorMentionItemAttr"
                 :extensions="customExtensions"
+                :imgInterceptor="imgIntercept"
                 ref="editor"
                 :style="{background: 'transparent', 'font-size': `${fontSize}px`}"
                 style="position: relative; width: 100%; height: 100%; flex: 1;"
@@ -744,6 +745,85 @@ export default {
         saveMarkdown() {
             let saveContent = this.$refs.editor.saveMarkdown();
             this.downloadTxtFile(saveContent, 'note.md');
+        },
+        base64ToBlob(base64, mimeType) {
+            // 去掉base64的头部信息
+            let byteCharacters = atob(base64.split(',')[1]);
+
+            let byteArrays = [];
+            for (
+                let offset = 0;
+                offset < byteCharacters.length;
+                offset += 512
+            ) {
+                let slice = byteCharacters.slice(offset, offset + 512);
+
+                let byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                let byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            return new Blob(byteArrays, { type: mimeType });
+        },
+        // imgIntercept () {},
+        async imgIntercept({
+            getImage,
+            interceptImage,
+            showStatus,
+            updateStatus,
+            updateImage
+        }) {
+            if (!this.isRemote) return;
+            setTimeout(async () => {
+                let src = getImage();
+                let blob = false;
+                if (src.startsWith('data:image')) {
+                    let mimeType = src.split(';')[0].split(':')[1];
+                    blob = this.base64ToBlob(src, mimeType);
+                } else if (src.startsWith('file:///')) {
+                    const response = await fetch(src);
+                    blob = await response.blob();
+                }
+                if (!blob) return;
+                let oriUrl = interceptImage('');
+                showStatus(true);
+                this.$auto.NotebookController.uploadBinaryImage(
+                    {
+                        file: blob
+                    },
+                    null,
+                    (progress) => {
+                        const { loaded, total } = progress;
+                        let percent = Math.floor((loaded / total) * 100);
+                        updateStatus(
+                            percent < 100,
+                            percent,
+                            this.local('Uploading Image...')
+                        );
+                    }
+                )
+                    .then((res) => {
+                        showStatus(false);
+                        if (res.code === 200) {
+                            let id = res.data;
+                            let targetUrl =
+                                this.$remote_server + '/sources/image/' + id;
+                            updateImage(targetUrl);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        showStatus(false);
+                        updateImage(oriUrl);
+                        this.$barWarning(this.local('Upload Image Failed'), {
+                            status: 'warning'
+                        });
+                    });
+            }, 3000);
         },
         editorSetContentChange() {
             this.$refs.editor_nav.getEditorNavList();
