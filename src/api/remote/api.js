@@ -856,19 +856,20 @@ export class AcademicController {
   * @summary 保存Pdf文件
   * @param {String} [pathuri] 
   * @param {String} [pathitemid] 
+  * @param {String} [pdfid] 
   * @param {UserModel.FormFileUpload} [formfileupload] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async updateItemPDF(pathuri,pathitemid,formfileupload,cancelSource,uploadProgress,downloadProgress){
+  static async updateItemPDF(pathuri,pathitemid,pdfid,formfileupload,cancelSource,uploadProgress,downloadProgress){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'post',
         url:'/sources/'+pathuri+'/items/'+pathitemid+'/pdfs',
         data:formfileupload,
-        params:{},
+        params:{pdfid},
         headers:{
           "Content-Type":"multipart/form-data"
         },
