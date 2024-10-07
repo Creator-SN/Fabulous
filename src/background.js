@@ -41,6 +41,11 @@ async function createWindow() {
     })
     remote.enable(win.webContents)
 
+    // 阻止Electron默认new window
+    win.webContents.setWindowOpenHandler(({url}) => {
+        shell.openExternal(url);
+    });
+
     ipcMain.on("min", () => {
         win.minimize();
     });
