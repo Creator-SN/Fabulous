@@ -3,7 +3,7 @@
         v-model="thisValue"
         :title="title"
         :theme="theme"
-        width="600px"
+        width="800px"
         :height="height"
         :background="theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)'"
         :title-size="15"

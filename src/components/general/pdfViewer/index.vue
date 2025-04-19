@@ -101,7 +101,7 @@
                         <fv-button
                             :theme="show.toolbar.translate ? 'dark' : theme"
                             class="control-btn"
-                            :background="show.toolbar.translate ? 'rgba(0, 98, 158, 1)' : theme === 'dark' ? 'rgba(36, 36, 36, 1)': 'rgba(247, 247, 247, 1)'"
+                            :background="show.toolbar.translate ? 'rgba(140, 148, 228, 1)' : theme === 'dark' ? 'rgba(36, 36, 36, 1)': 'rgba(247, 247, 247, 1)'"
                             :title="local(`Toggle Translator`)"
                             style="margin-left: 2px;"
                             @click="show.toolbar.translate ^= true"

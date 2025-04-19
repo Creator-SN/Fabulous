@@ -29,7 +29,7 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 98, 158, 1)"
+                background="rgba(140, 148, 228, 1)"
                 @click="confirm"
             >{{local('Confirm')}}</fv-button>
             <fv-button

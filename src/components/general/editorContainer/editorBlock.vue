@@ -36,7 +36,7 @@
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
-                    :background="editor_show_nav ? 'rgba(0, 98, 158, 1)' : ''"
+                    :background="editor_show_nav ? 'rgba(140, 148, 228, 1)' : ''"
                     :foreground="editor_show_nav ? '#fff' : ''"
                     class="control-btn"
                     @click="editor_show_nav = editor_show_nav ? false : true"
@@ -114,7 +114,7 @@
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
                 :editorOutSideBackground="
                     theme == 'dark' ? 'rgba(47, 52, 55, 0)' : 'rgba(250, 250, 250, 0)'"
-                :toolbarHeight="150"
+                :toolbarHeight="160"
                 :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
@@ -134,9 +134,9 @@
                     <fv-button
                         :theme="theme"
                         :foreground="theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
+                        :background="'transparent'"
+                        border-color="transparent"
                         :class="[x.defaultClass]"
-                        :isBoxShadow="true"
                         :title="local('Import Markdown')"
                         @click="$refs.md_input.click()"
                     >
@@ -151,9 +151,9 @@
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
+                        :background="'transparent'"
+                        border-color="transparent"
                         :class="[x.defaultClass]"
-                        :isBoxShadow="true"
                         :title="local('Export Markdown')"
                         @click="saveMarkdown"
                     >
@@ -170,9 +170,9 @@
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
+                        :background="'transparent'"
+                        border-color="transparent"
                         :class="[x.defaultClass]"
-                        :isBoxShadow="true"
                         :title="local('Save As')"
                         @click="saveAs"
                     >
@@ -1188,96 +1188,6 @@ export default {
 
         .right-block {
             @include Vcenter;
-        }
-    }
-
-    .quick-nav-block {
-        position: absolute;
-        left: 5px;
-        top: 80px;
-        width: 350px;
-        height: calc(100% - 85px);
-        padding: 5px;
-        background: rgba(245, 245, 245, 0.6);
-        border-right: solid rgba(75, 75, 75, 0.1) thin;
-        border-radius: 8px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        overflow: auto;
-        z-index: 9;
-
-        &.dark {
-            background: rgba(36, 36, 36, 0.6);
-
-            .item {
-                color: whitesmoke;
-            }
-        }
-
-        .item {
-            width: 100%;
-            min-height: 55px;
-            height: 55px;
-            padding: 0px 15px;
-            font-size: 13.8px;
-            font-weight: 600;
-            border: rgba(200, 200, 200, 0.1) solid thin;
-            border-radius: 8px;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-
-            &.choosen {
-                background: rgba(200, 200, 200, 0.6);
-
-                &:hover {
-                    background: rgba(200, 200, 200, 0.6);
-                }
-            }
-
-            &:hover {
-                background: rgba(200, 200, 200, 0.1);
-            }
-
-            &:active {
-                background: rgba(200, 200, 200, 0.3);
-            }
-
-            .info-content-block {
-                @include VcenterC;
-
-                flex: 1;
-                margin: 0px 5px;
-
-                .date {
-                    font-size: 12px;
-                    opacity: 0.6;
-                }
-            }
-
-            p {
-                @include nowrap;
-
-                &.sec {
-                    font-size: 12px;
-                    font-weight: normal;
-                }
-
-                &.highlight {
-                    text-align: left;
-                    cursor: pointer;
-
-                    &:hover {
-                        color: rgba(0, 120, 212, 1);
-                        text-decoration: underline;
-                    }
-                }
-            }
         }
     }
 

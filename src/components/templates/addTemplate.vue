@@ -11,14 +11,14 @@
                     v-model="name"
                     :placeholder="local('Input template name...')"
                     :theme="theme"
-                    :font-size="18"
+                    :font-size="13"
                     :font-weight="'bold'"
                     underline
                     :border-color="'rgba(123, 139, 209, 0.3)'"
                     :focus-border-color="'rgba(123, 139, 209, 1)'"
                     :border-width="2"
                     :is-box-shadow="true"
-                    style="width: 100%; height: 60px; margin-top: 15px;"
+                    style="width: calc(100% - 10px); height: 40px; margin-left: 5px; margin-top: 15px;"
                     @keyup.enter="add"
                 ></fv-text-box>
             </div>
@@ -26,7 +26,7 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 98, 158, 1)"
+                background="rgba(140, 148, 228, 1)"
                 :disabled="name === ''"
                 @click="add"
             >{{local('Confirm')}}</fv-button>

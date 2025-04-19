@@ -40,6 +40,7 @@
                                     <p class="index">{{index + 1}}</p>
                                     <fv-check-box
                                         v-model="itemX.choosen"
+                                        background="rgba(140, 148, 228, 1)"
                                         :borderColor="theme == 'dark' ? 'whitesmoke' : ''"
                                         @click="itemChooseClick(itemX.item)"
                                     ></fv-check-box>

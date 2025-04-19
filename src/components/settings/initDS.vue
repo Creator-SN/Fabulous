@@ -15,7 +15,7 @@
                     v-model="name"
                     :placeholder="local('Input data source name...')"
                     :theme="theme"
-                    :font-size="18"
+                    :font-size="13"
                     underline
                     :border-radius="6"
                     :border-color="'rgba(123, 139, 209, 0.3)'"
@@ -30,7 +30,7 @@
         <template v-slot:control>
             <fv-button
                 theme="dark"
-                background="rgba(0, 98, 158, 1)"
+                background="rgba(140, 148, 228, 1)"
                 :disabled="db_index < 0 || name === ''"
                 @click="initDs"
             >{{local('Confirm')}}</fv-button>

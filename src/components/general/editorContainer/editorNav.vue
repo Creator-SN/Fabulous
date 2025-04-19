@@ -207,6 +207,9 @@ export default {
 
         .editor-nav-container {
             max-width: 270px;
+            max-height: 100%;
+            justify-content: flex-start;
+            overflow-y: overlay;
         }
     }
 
@@ -245,6 +248,7 @@ export default {
 
             width: 100%;
             height: 30px;
+            flex-shrink: 0;
 
             &.choosen {
                 .left-ul-block {

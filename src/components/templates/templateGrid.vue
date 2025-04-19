@@ -81,6 +81,7 @@
             >
                 <fv-check-box
                     v-model="item.choosen"
+                    background="rgba(140, 148, 228, 1)"
                     @click.native="chooseCurrent($event, item)"
                 ></fv-check-box>
             </span>
@@ -402,7 +403,7 @@ export default {
         }
 
         &.choosen {
-            border-color: rgba(255, 180, 0, 0.6);
+            border-color: rgba(140, 148, 228, 0.6);
         }
 
         .content-preview {

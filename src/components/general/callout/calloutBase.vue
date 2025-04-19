@@ -163,7 +163,7 @@ export default {
 
             .fabulous-c-b-m-close {
                 width: 60px;
-                color: rgba(0, 90, 158, 1);
+                color: rgba(140, 148, 228, 1);
                 text-align: center;
                 user-select: none;
                 cursor: pointer;

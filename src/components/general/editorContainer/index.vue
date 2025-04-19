@@ -118,7 +118,7 @@
                     >
                         <p>{{page.emoji}}</p>
                         <div class="info-content-block">
-                            <p class="highlight">{{page.name}}</p>
+                            <p class="highlight" :title="page.name">{{page.name}}</p>
                             <p class="sec date">{{page.id.split('-').pop()}}</p>
                         </div>
                         <p class="sec">{{$date(page.createDate)}}</p>
@@ -542,10 +542,11 @@ export default {
     .quick-nav-block {
         position: absolute;
         left: 5px;
-        top: 80px;
+        top: 5px;
         width: 350px;
-        height: calc(100% - 85px);
+        height: calc(100% - 10px);
         padding: 5px;
+        padding-top: 80px;
         background: rgba(245, 245, 245, 0.6);
         border: solid rgba(75, 75, 75, 0.1) thin;
         border-radius: 8px;
@@ -556,7 +557,7 @@ export default {
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
         overflow: auto;
-        z-index: 9;
+        z-index: 1;
 
         &.dark {
             background: rgba(36, 36, 36, 0.6);
@@ -570,6 +571,7 @@ export default {
             width: 100%;
             min-height: 65px;
             height: 65px;
+            margin-bottom: 3px;
             padding: 0px 15px;
             font-size: 13.8px;
             font-weight: 600;
@@ -619,6 +621,7 @@ export default {
                 }
 
                 &.highlight {
+                    max-width: 160px;
                     text-align: left;
                     cursor: pointer;
 

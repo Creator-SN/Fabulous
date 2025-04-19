@@ -44,7 +44,7 @@
                             <span @click="show.rename = true">
                                 <i
                                     class="ms-Icon ms-Icon--Rename"
-                                    style="color: rgba(0, 153, 204, 1);"
+                                    style="color: rgba(140, 148, 228, 1);"
                                 ></i>
                                 <p>{{local("Rename Template")}}</p>
                             </span>
@@ -96,7 +96,7 @@ export default {
                 {
                     name: () => this.local('Add'),
                     icon: 'Add',
-                    iconColor: 'rgba(0, 90, 158, 1)',
+                    iconColor: 'rgba(140, 148, 228, 1)',
                     disabled: () => this.SourceDisabled || !this.lock,
                     func: () => {
                         this.show.add = true;

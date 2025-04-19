@@ -172,7 +172,7 @@
                 >
                     <i
                         class="ms-Icon ms-Icon--NewFolder"
-                        style="color: rgba(0, 153, 204, 1);"
+                        style="color: rgba(140, 148, 228, 1);"
                     ></i>
                     <p>{{local("New Folder")}}</p>
                 </span>
@@ -180,14 +180,14 @@
                 <span @click="copy(rightMenuItem)">
                     <i
                         class="ms-Icon ms-Icon--Copy"
-                        style="color: rgba(0, 98, 158, 1);"
+                        style="color: rgba(140, 148, 228, 1);"
                     ></i>
                     <p>{{local("Copy")}}</p>
                 </span>
                 <span @click="move(rightMenuItem)">
                     <i
                         class="ms-Icon ms-Icon--Cut"
-                        style="color: rgba(0, 98, 158, 1);"
+                        style="color: rgba(140, 148, 228, 1);"
                     ></i>
                     <p>{{local("Cut")}}</p>
                 </span>
@@ -197,7 +197,7 @@
                 >
                     <i
                         class="ms-Icon ms-Icon--Paste"
-                        style="color: rgba(0, 98, 158, 1);"
+                        style="color: rgba(140, 148, 228, 1);"
                     ></i>
                     <p>{{local("Paste")}}</p>
                 </span>

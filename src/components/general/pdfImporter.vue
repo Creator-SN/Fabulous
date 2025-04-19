@@ -43,7 +43,7 @@
                 <fv-button
                     theme="dark"
                     :disabled="stop"
-                    background="rgba(0, 98, 158, 1)"
+                    background="rgba(140, 148, 228, 1)"
                     style="margin-top: 15px"
                     @click="cancel"
                 >{{ local("Cancel") }}</fv-button>

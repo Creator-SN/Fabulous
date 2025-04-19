@@ -57,7 +57,7 @@
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
-                    :background="showNav ? 'rgba(0, 98, 158, 1)' : ''"
+                    :background="showNav ? 'rgba(140, 148, 228, 1)' : ''"
                     :foreground="showNav ? '#fff' : ''"
                     class="control-btn"
                     @click="showNav = showNav ? false : true"
@@ -148,7 +148,7 @@
                         ? 'rgba(47, 52, 55, 0)'
                         : 'rgba(250, 250, 250, 0)'
                 "
-                :toolbarHeight="160"
+                :toolbarHeight="170"
                 :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
                 :contentMaxWidth="expandContent ? '99999px' : '900px'"
@@ -171,13 +171,9 @@
                         :foreground="
                             theme === 'dark' ? 'rgba(200, 200, 200, 1)' : ''
                         "
-                        :background="
-                            theme === 'dark'
-                                ? 'rgba(36, 36, 36, 1)'
-                                : 'rgba(255, 255, 255, 1)'
-                        "
+                        :background="'transparent'"
+                        border-color="transparent"
                         :class="[x.defaultClass]"
-                        :isBoxShadow="true"
                         :title="local('Import Markdown')"
                         @click="$refs.md_input.click()"
                     >
@@ -200,13 +196,9 @@
                     <fv-button
                         :theme="theme"
                         :foreground="'rgba(147, 79, 125, 1)'"
-                        :background="
-                            theme === 'dark'
-                                ? 'rgba(36, 36, 36, 1)'
-                                : 'rgba(255, 255, 255, 1)'
-                        "
+                        :background="'transparent'"
+                        border-color="transparent"
                         :class="[x.defaultClass]"
-                        :isBoxShadow="true"
                         :title="local('Save As')"
                         @click="saveAs"
                     >
@@ -279,8 +271,8 @@
                             :font-size="28"
                             :font-weight="600"
                             :background="`transparent`"
-                            :border-color="`rgba(245, 78, 162, 0.3)`"
-                            :focus-border-color="`rgba(245, 78, 162, 0.8)`"
+                            :border-color="`rgba(217, 204, 237, 0.1)`"
+                            :focus-border-color="`rgba(217, 204, 237, 0.8)`"
                             :border-width="3"
                             :border-radius="0"
                             underline

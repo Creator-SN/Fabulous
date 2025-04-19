@@ -143,7 +143,7 @@
                 >
                     <i
                         class="ms-Icon ms-Icon--Add"
-                        style="color: rgba(0, 153, 204, 1);"
+                        style="color: rgba(140, 148, 228, 1);"
                     ></i>
                     <p>{{local("New Item (Not Useful)")}}</p>
                 </span>

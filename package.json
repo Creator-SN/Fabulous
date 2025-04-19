@@ -24,7 +24,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@creatorsn/powereditor": "^2.4.10",
+    "@creatorsn/powereditor": "^2.5.0",
     "@electron/remote": "^2.1.2",
     "axios": "^0.21.4",
     "axios-swagger-helper": "^0.0.56",
@@ -60,7 +60,7 @@
     "babel-eslint": "^10.1.0",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "3.3.0",
-    "electron": "^35.0.0",
+    "electron": "^35.2.0",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
     "eslint": "^6.7.2",

@@ -74,14 +74,14 @@
             <fv-button
                 v-if="!isLogin || !remote"
                 theme="dark"
-                background="rgba(0, 98, 158, 1)"
+                background="rgba(140, 148, 228, 1)"
                 :disabled="name === '' || path === ''"
                 @click="addDS"
             >{{local('Confirm')}}</fv-button>
             <fv-button
                 v-else
                 theme="dark"
-                background="rgba(0, 98, 158, 1)"
+                background="rgba(140, 148, 228, 1)"
                 :disabled="name === ''"
                 @click="addDSRemote"
             >{{local('Confirm')}}</fv-button>

@@ -184,7 +184,7 @@ export default {
     position: relative;
     width: 100%;
     padding-left: 5px;
-    border-left: rgba(0, 98, 158, 0) solid 5px;
+    border-left: rgba(140, 148, 228, 0) solid 5px;
     border-radius: 3px;
     display: flex;
     align-items: center;
@@ -194,7 +194,7 @@ export default {
     }
 
     &.choosen {
-        border-color: rgba(0, 98, 158, 0.6);
+        border-color: rgba(140, 148, 228, 0.6);
     }
 
     &.missing {

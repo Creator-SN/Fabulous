@@ -1064,10 +1064,10 @@
     "@types/conventional-commits-parser" "^5.0.0"
     chalk "^5.3.0"
 
-"@creatorsn/powereditor@^2.4.10":
-  version "2.4.10"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.4.10.tgz#a21aebcae8f58c4cda133cd0b1384506b0e3752f"
-  integrity sha512-nPr8A3bR88JZQmB8vW/JSQnCII8+P3ggrE0mjy8MaiAO/cisInBwtkrDg4MABqU790HsKmyoIV2YwcpWJZ+oAw==
+"@creatorsn/powereditor@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.5.0.tgz#012ccb5d9fde90c76d413da4ceca83297387d7a4"
+  integrity sha512-NRtdqlZbGISNtoE+bU/mADEZnggGaK9Cp8UxEV76hMhmzTw/usSgs+YKPlLiVYZIH/5XUAk9HW0QZ6NUwjbpJg==
   dependencies:
     "@tiptap/core" "2.3.0"
     "@tiptap/extension-bubble-menu" "2.3.0"
@@ -1101,6 +1101,7 @@
     markdown-it-mark "^3.0.1"
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
+    onecolor "^4.1.0"
     simplify-js "^1.2.4"
     vfluentdesign "1.2.51"
 
@@ -6377,10 +6378,10 @@ electron-updater@^5.0.1:
     semver "^7.3.5"
     typed-emitter "^2.1.0"
 
-electron@^35.0.0:
-  version "35.0.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-35.0.0.tgz#a9182cf6005abcbe782d29385ede74b1c76d3181"
-  integrity sha512-mwNQNktYLPnUWZVR8iNkfWCBjmM5e2/CmB1rhACwE9ASDbVU7CYPgp/jLUB3bj/LyQsfSuubD82OUite6SN8Uw==
+electron@^35.2.0:
+  version "35.2.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-35.2.0.tgz#4701f455a2bc41c992cc529b42203c530223dcd8"
+  integrity sha512-GHda7oCkN0pA23qzah735DEbRa06IPwlzP3uvjAmf9af8gxdj5i93JEHeQVGVmSVpd7sSb1pfecs9nz7B1q5ag==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
@@ -10518,7 +10519,7 @@ onecolor@3.1.0:
   resolved "https://registry.yarnpkg.com/onecolor/-/onecolor-3.1.0.tgz#b72522270a49569ac20d244b3cd40fe157fda4d2"
   integrity sha512-YZSypViXzu3ul5LMu/m6XjJ9ol8qAy9S2VjHl5E6UlhUH1KGKWabyEJifn0Jjpw23bYDzC2ucKMPGiH5kfwSGQ==
 
-onecolor@^4.0.0:
+onecolor@^4.0.0, onecolor@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/onecolor/-/onecolor-4.1.0.tgz#289da70189ba6afd389d9eeccea80623d879333a"
   integrity sha512-kDUtnWdWlt5iWx85wrGZxMh8tB4058Bk1YyVpb+Zjl+2wLH/OvqIacbchJma0gjGXocwUTueLwMDVYKrbI+0zA==
