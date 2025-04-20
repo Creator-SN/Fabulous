@@ -769,7 +769,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(245, 245, 245, 0.9);
+    background: rgba(246, 246, 246, 0.7);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -811,7 +811,7 @@ export default {
         width: 100%;
         flex: 1;
         padding-left: 15px;
-        padding-bottom: 5px;
+        padding-bottom: 15px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;

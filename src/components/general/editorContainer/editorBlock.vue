@@ -341,7 +341,7 @@ export default {
                         } else this.openEditor(item.parent, item._page);
                     }
                 },
-                headerForeground: () => 'rgba(0, 120, 212, 1)'
+                headerForeground: () => 'rgba(149, 141, 241, 1)'
             },
             customExtensions: [pdfNote],
             img: {

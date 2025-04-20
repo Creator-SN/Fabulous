@@ -162,7 +162,7 @@
                 >
                     <i
                         class="ms-Icon ms-Icon--SubscriptionAdd"
-                        style="color: rgba(0, 120, 212, 1);"
+                        style="color: rgba(149, 141, 241, 1);"
                     ></i>
                     <p>{{local("New Note")}}</p>
                 </span>
@@ -218,7 +218,7 @@
                 <span @click="showRename(rightMenuItem)">
                     <i
                         class="ms-Icon ms-Icon--Rename"
-                        style="color: rgba(0, 120, 212, 1);"
+                        style="color: rgba(149, 141, 241, 1);"
                     ></i>
                     <p>{{local("Rename")}}</p>
                 </span>

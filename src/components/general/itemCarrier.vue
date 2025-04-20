@@ -392,7 +392,7 @@ export default {
     z-index: 2;
 
     &:hover {
-        background: rgba(250, 250, 250, 0.6);
+        background: rgba(246, 246, 246, 0.7);
     }
 
     &:active {

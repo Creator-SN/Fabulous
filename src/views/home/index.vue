@@ -101,7 +101,7 @@
                                     draggable="false"
                                     :src="img.pdf"
                                     alt=""
-                                    style="width: 18px; height: 18px; object-fit: contain;"
+                                    style="width: 18px; height: 18px; margin-right: 25px; object-fit: contain;"
                                 >
                                 <p
                                     class="highlight"
@@ -151,7 +151,7 @@
                                     draggable="false"
                                     :src="img.metadata"
                                     alt=""
-                                    style="width: 18px; height: 18px; object-fit: contain;"
+                                    style="width: 18px; height: 18px; margin-right: 25px; object-fit: contain;"
                                 >
                                 <p
                                     class="highlight"
@@ -201,7 +201,7 @@
                                 <emoji-callout
                                     :value="page.emoji"
                                     :theme="theme"
-                                    style="width: 25px;"
+                                    style="width: 25px; flex-shrink: 0; margin-right: 18px;"
                                     @insert-emoji="revisePageEmoji(x.item, page, $event)"
                                 ></emoji-callout>
                                 <p
@@ -993,7 +993,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(246, 246, 246, 0.7);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1073,9 +1073,10 @@ export default {
                 flex: 1;
                 margin: 8px 12px;
                 padding: 0px;
-                background: rgba(255, 255, 255, 0.6);
+                padding-top: 3px;
+                background: rgba(255, 255, 255, 0.7);
                 border-radius: 5px;
-                box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1) inset;
                 overflow: hidden;
 
                 p.highlight {
@@ -1083,7 +1084,7 @@ export default {
                     cursor: pointer;
 
                     &:hover {
-                        color: rgba(0, 120, 212, 1);
+                        color: rgba(149, 141, 241, 1);
                         text-decoration: underline;
                     }
                 }
@@ -1109,8 +1110,9 @@ export default {
 
                     .item {
                         width: 100%;
-                        min-height: 55px;
-                        height: 55px;
+                        min-height: 50px;
+                        height: 50px;
+                        margin-bottom: 3px;
                         padding: 0px 15px;
                         font-size: 13.8px;
                         font-weight: 600;
@@ -1118,7 +1120,7 @@ export default {
                         border-radius: 8px;
                         box-sizing: border-box;
                         grid-template-columns: 50px 160px 90px 150px 50px 50px 1fr;
-                        display: grid;
+                        display: flex;
                         align-items: center;
                         cursor: pointer;
                         user-select: none;
@@ -1142,6 +1144,8 @@ export default {
                         p {
                             @include nowrap;
 
+                            flex: 1;
+
                             &.sec {
                                 font-size: 12px;
                                 font-weight: normal;
@@ -1152,7 +1156,7 @@ export default {
                                 cursor: pointer;
 
                                 &:hover {
-                                    color: rgba(0, 120, 212, 1);
+                                    color: rgba(149, 141, 241, 1);
                                     text-decoration: underline;
                                 }
                             }

@@ -801,7 +801,7 @@ export default {
                     cursor: pointer;
 
                     &:hover {
-                        color: rgba(0, 120, 212, 1);
+                        color: rgba(149, 141, 241, 1);
                         text-decoration: underline;
                     }
                 }

@@ -180,7 +180,7 @@ export default {
         }),
         ...mapGetters(['local', 'currentDataPath', 'currentDataPathItem']),
         navigationViewBackground() {
-            if (this.theme == 'light') return 'rgba(242, 242, 242, 0.8)';
+            if (this.theme == 'light') return 'rgba(246, 246, 246, 0.7)';
             return 'rgba(0, 0, 0, 0.9)';
         },
         localPathFolderName() {

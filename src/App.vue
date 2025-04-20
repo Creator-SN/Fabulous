@@ -281,7 +281,7 @@ export default {
     /*定义滑块
  内阴影+圆角*/
     ::-webkit-scrollbar-thumb {
-        border-right: rgba(191, 190, 189, 0.2) solid 5px;
+        border-right: rgba(161, 160, 159, 0.2) solid 5px;
         background-color: rgba(191, 190, 189, 0);
         transition: background-color 0.3s;
         cursor: pointer;
@@ -289,16 +289,16 @@ export default {
         &:hover {
             border-radius: 10px;
             border-color: transparent;
-            background-color: rgba(191, 190, 189, 0.6);
+            background-color: rgba(161, 160, 159, 0.25);
         }
 
         &:active {
-            background-color: rgba(191, 190, 189, 0.5);
+            background-color: rgba(161, 160, 159, 0.35);
         }
 
         &:horizontal {
             border-right: none;
-            border-bottom: rgba(191, 190, 189, 0.2) solid 5px;
+            border-bottom: rgba(161, 160, 159, 0.2) solid 5px;
         }
     }
 

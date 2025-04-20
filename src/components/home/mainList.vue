@@ -13,9 +13,10 @@
                 :key="index"
                 :title="item.name"
                 :content="`${local('Create Time')}: ${$date(item.createDate)}`"
+                :default-height="60"
                 :maxHeight="350"
                 :disabled-collapse="edit"
-                style="margin: 5px"
+                style="margin: 1.5px 3px;"
                 @contextmenu.native="rightClick($event, item)"
             >
                 <template v-slot:icon>
@@ -47,6 +48,7 @@
                     <div class="custom-collapse-title">
                         <p
                             class="title-content h"
+                            :title="x.title"
                             @click="itemTitleClick($event, item)"
                             @dblclick="item.pdf ? $emit('open-file', `${item.id}/${item.pdf}.pdf`) : $emit('open-file', `${item.id}`)"
                         >{{ x.title }}</p>
@@ -63,7 +65,9 @@
                             theme="dark"
                             background="rgba(0, 204, 153, 1)"
                             fontSize="12"
-                            style="width: 50px; height: 25px; margin: 0px 15px;"
+                            font-weight="bold"
+                            :border-radius="16"
+                            style="width: 50px; height: 23px; flex-shrink: 0; margin: 0px 5px;"
                         >{{item.metadata.year}}</fv-button>
                     </div>
                 </template>
@@ -73,7 +77,7 @@
                         :theme="theme"
                         class="tag-block"
                         :size="'xsmall'"
-                        style="max-width: 120px; overflow: overlay;"
+                        style="max-width: 120px; font-weight: bold; overflow: overlay;"
                         @click.native="$emit('label-click', item)"
                     ></fv-tag>
                 </template>
@@ -116,14 +120,14 @@
                     </div>
                 </div>
             </fv-shimmer>
-            <right-menu
+            <fv-right-menu
                 ref="rightMenu"
                 :rightMenuWidth="rightMenuWidth"
                 :theme="theme"
             >
                 <slot name="menu">
                 </slot>
-            </right-menu>
+            </fv-right-menu>
         </template>
     </fv-infinite-scroll-view>
 </template>
@@ -131,13 +135,11 @@
 <script>
 import { mapGetters } from 'vuex';
 import emojiCallout from '@/components/general/callout/emojiCallout.vue';
-import rightMenu from '@/components/general/rightMenu.vue';
 
 export default {
     name: 'mainList',
     components: {
-        emojiCallout,
-        rightMenu
+        emojiCallout
     },
     props: {
         value: {
@@ -274,7 +276,7 @@ export default {
             @include nowrap;
 
             flex: 1;
-            font-size: 13.8px;
+            font-size: 12.8px;
             font-weight: bold;
 
             &.h {
