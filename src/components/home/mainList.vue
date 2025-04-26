@@ -16,26 +16,25 @@
                 :default-height="60"
                 :maxHeight="350"
                 :disabled-collapse="edit"
-                style="margin: 1.5px 3px;"
+                style="margin: 1.5px 3px"
                 @contextmenu.native="rightClick($event, item)"
             >
                 <template v-slot:icon>
-                    <div
-                        v-show="!edit"
-                        class="icon-block"
-                    >
-                        <p class="index">{{index + 1}}</p>
+                    <div v-show="!edit" class="icon-block">
+                        <p class="index">{{ index + 1 }}</p>
                         <emoji-callout
                             :value="item.emoji"
                             :theme="theme"
-                            @insert-emoji="$emit('insert-emoji', {item: item, emoji: $event})"
+                            @insert-emoji="
+                                $emit('insert-emoji', {
+                                    item: item,
+                                    emoji: $event
+                                })
+                            "
                         ></emoji-callout>
                     </div>
-                    <div
-                        v-show="edit"
-                        class="icon-block"
-                    >
-                        <p class="index">{{index + 1}}</p>
+                    <div v-show="edit" class="icon-block">
+                        <p class="index">{{ index + 1 }}</p>
                         <fv-check-box
                             v-model="item.choosen"
                             background="rgba(140, 148, 228, 1)"
@@ -50,16 +49,22 @@
                             class="title-content h"
                             :title="x.title"
                             @click="itemTitleClick($event, item)"
-                            @dblclick="item.pdf ? $emit('open-file', `${item.id}/${item.pdf}.pdf`) : $emit('open-file', `${item.id}`)"
-                        >{{ x.title }}</p>
+                            @dblclick="
+                                item.pdf
+                                    ? $emit(
+                                          'open-file',
+                                          `${item.id}/${item.pdf}.pdf`
+                                      )
+                                    : $emit('open-file', `${item.id}`)
+                            "
+                        >
+                            {{ x.title }}
+                        </p>
                     </div>
                 </template>
                 <template v-slot:content="x">
-                    <div
-                        class="collapse-info"
-                        style="display: flex;"
-                    >
-                        <p style="width: 180px;">{{ x.content }}</p>
+                    <div class="collapse-info" style="display: flex">
+                        <p style="width: 180px">{{ x.content }}</p>
                         <fv-button
                             v-if="item.metadata && item.metadata.year"
                             theme="dark"
@@ -67,8 +72,14 @@
                             fontSize="12"
                             font-weight="bold"
                             :border-radius="16"
-                            style="width: 50px; height: 23px; flex-shrink: 0; margin: 0px 5px;"
-                        >{{item.metadata.year}}</fv-button>
+                            style="
+                                width: 50px;
+                                height: 23px;
+                                flex-shrink: 0;
+                                margin: 0px 2px 0px 5px;
+                            "
+                            >{{ item.metadata.year }}</fv-button
+                        >
                     </div>
                 </template>
                 <template v-slot:extension>
@@ -77,45 +88,104 @@
                         :theme="theme"
                         class="tag-block"
                         :size="'xsmall'"
-                        style="max-width: 120px; font-weight: bold; overflow: overlay;"
+                        style="
+                            max-width: 120px;
+                            font-weight: bold;
+                            overflow: overlay;
+                        "
                         @click.native="$emit('label-click', item)"
                     ></fv-tag>
+                    <fv-button
+                        v-if="item.metadata && item.metadata.bibtex"
+                        :theme="theme"
+                        :background="theme === 'dark' ? 'rgba(255, 180, 0, 1)' : 'rgba(255, 203, 136, 1)'"
+                        fontSize="12"
+                        font-weight="bold"
+                        :border-radius="50"
+                        :is-box-shadow="true"
+                        :title="local('Copy BibTex')"
+                        style="
+                            width: 23px;
+                            height: 23px;
+                            flex-shrink: 0;
+                            margin: 0px 2px;
+                        "
+                        @click="copyBibtex($event, item)"
+                    >
+                        <i class="ms-Icon ms-Icon--SemiboldWeight"></i>
+                    </fv-button>
+                    <fv-button
+                        v-if="item.metadata && item.metadata.url"
+                        :theme="theme"
+                        background="rgba(147, 162, 225, 0.8)"
+                        fontSize="12"
+                        font-weight="bold"
+                        :border-radius="50"
+                        :is-box-shadow="true"
+                        :title="local('Open Url')"
+                        style="
+                            width: 23px;
+                            height: 23px;
+                            flex-shrink: 0;
+                            margin: 0px 2px;
+                        "
+                        @click="
+                            ($event) => {
+                                $event.stopPropagation();
+                                $Jump(item.metadata.url);
+                            }
+                        "
+                    >
+                        <i class="ms-Icon ms-Icon--Link"></i>
+                    </fv-button>
                 </template>
-                <slot
-                    name="row_expand"
-                    :item="item"
-                >
-                </slot>
+                <slot name="row_expand" :item="item"> </slot>
             </fv-collapse>
             <fv-shimmer
                 v-if="loading"
                 :theme="theme"
-                style="position: relative; width: 100%; height: auto;"
+                style="position: relative; width: 100%; height: auto"
             >
                 <div
                     v-for="(item, index) in 2"
                     :key="index"
-                    style="margin-top: 5px; display: flex; align-items: center;"
+                    style="margin-top: 5px; display: flex; align-items: center"
                 >
                     <div
                         class="sample"
-                        style="width: 30px; height: 30px; margin: 5px; border-radius: 50%;"
+                        style="
+                            width: 30px;
+                            height: 30px;
+                            margin: 5px;
+                            border-radius: 50%;
+                        "
                     ></div>
                     <div
                         class="sample"
-                        style="width: 80%; flex: 1; margin: 5px;"
+                        style="width: 80%; flex: 1; margin: 5px"
                     ></div>
                 </div>
-                <div style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+                <div
+                    style="
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    "
+                >
                     <div
                         v-for="(item, index) in 1"
                         :key="index"
-                        style="margin-top: 5px; display: flex; align-items: center;"
+                        style="
+                            margin-top: 5px;
+                            display: flex;
+                            align-items: center;
+                        "
                     >
                         <div
                             class="sample"
-                            style="width: 80%; height: 15px; margin: 5px;"
-                            :style="{width: `${100 - index * 10}%`}"
+                            style="width: 80%; height: 15px; margin: 5px"
+                            :style="{ width: `${100 - index * 10}%` }"
                         ></div>
                     </div>
                 </div>
@@ -125,8 +195,7 @@
                 :rightMenuWidth="rightMenuWidth"
                 :theme="theme"
             >
-                <slot name="menu">
-                </slot>
+                <slot name="menu"> </slot>
             </fv-right-menu>
         </template>
     </fv-infinite-scroll-view>
@@ -242,6 +311,40 @@ export default {
         },
         itemTitleClick($event, item) {
             if (this.edit) this.itemChooseClick(item);
+        },
+        copyBibtex($event, item) {
+            $event.stopPropagation();
+            if (!item.metadata.bibtex) {
+                this.$barWarning(this.local('No BibTex Infomation'), {
+                    status: 'warning'
+                });
+                return;
+            }
+            if (navigator.clipboard) {
+                navigator.clipboard
+                    .writeText(item.metadata.bibtex)
+                    .then(() => {
+                        this.$barWarning(this.local('Successfully Copied'), {
+                            status: 'correct'
+                        });
+                    })
+                    .catch((err) => {
+                        this.$barWarning(err, {
+                            status: 'error'
+                        });
+                    });
+            } else {
+                // 回退到 document.execCommand
+                const input = document.createElement('input');
+                input.value = item.metadata.bibtex;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                this.$barWarning(this.local('Successfully Copied'), {
+                    status: 'correct'
+                });
+            }
         }
     }
 };

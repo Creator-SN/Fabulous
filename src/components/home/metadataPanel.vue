@@ -9,7 +9,7 @@
         :isFooter="true"
     >
         <template v-slot:container>
-            <div class="metadata-container">
+            <div class="metadata-container" :class="{ dark: theme == 'dark' }">
                 <div class="metadata-item">
                     <p class="title">Title</p>
                     <div class="row-block">
@@ -18,33 +18,37 @@
                             :theme="theme"
                             :placeholder="local(`Please Input title...`)"
                             :underline="true"
-                            style="height: 45px; font-size: 20px; flex: 1;"
+                            :border-width="2"
+                            :border-color="'rgba(200, 200, 200, 0.1)'"
+                            :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                            :is-box-shadow="true"
+                            style="height: 45px; font-size: 20px; flex: 1"
                             @keyup.enter="getMetaInfo"
                         ></fv-text-box>
                         <fv-button
-                            :theme="theme"
-                            style="width: 35px; height: 35px; margin-left: 15px;"
+                            theme="dark"
+                            style="width: 35px; height: 35px; margin-left: 15px"
                             :title="local('Retrieve Metadata')"
+                            background="rgba(140, 148, 228, 1)"
+                            :is-box-shadow="true"
                             @click="getMetaInfo"
                         >
                             <i
                                 class="ms-Icon ms-Icon--Sync"
-                                :class="[{circle: !lock.metaInfo}]"
+                                :class="[{ circle: !lock.metaInfo }]"
                             ></i>
                         </fv-button>
                     </div>
                 </div>
-                <div
-                    v-show="metaInfoList.length > 0"
-                    class="metadata-item"
-                >
+                <div v-show="metaInfoList.length > 0" class="metadata-item">
                     <div class="row-block between">
-                        <p class="title">{{local('Searching Metadata')}}</p>
+                        <p class="title">{{ local('Searching Metadata') }}</p>
                         <fv-button
                             theme="dark"
-                            borderRadius="35"
+                            borderRadius="6"
+                            :font-size="12"
                             background="rgba(220, 62, 72, 1)"
-                            style="width: 30px; height: 30px;"
+                            style="width: 35px; height: 20px"
                             @click="metaInfoList = []"
                         >
                             <i class="ms-Icon ms-Icon--Cancel"></i>
@@ -53,7 +57,7 @@
                     <transition-group
                         tag="div"
                         name="move-left-to-right"
-                        style="position:relative; width: 100%;"
+                        style="position: relative; width: 100%"
                     >
                         <div
                             v-for="(item, index) in metaInfoList"
@@ -61,51 +65,80 @@
                             :key="`${item.title}-${index}`"
                         >
                             <div class="title-block">
-                                <i class="ms-Icon ms-Icon--RightDoubleQuote"></i>
+                                <i
+                                    class="ms-Icon ms-Icon--RightDoubleQuote"
+                                ></i>
                                 <p
                                     class="highlight"
                                     :title="item.title"
                                     @click="updateMetadata(item)"
-                                >{{item.title}}</p>
+                                    @dblclick="metaInfoList = []"
+                                >
+                                    {{ item.title }}
+                                </p>
                             </div>
                             <div class="label-block">
                                 <fv-button
                                     theme="dark"
                                     background="rgba(145, 145, 235, 1)"
-                                    style="flex-shrink: 0;"
-                                >{{item.year}}</fv-button>
+                                    :border-radius="12"
+                                    style="
+                                        width: 80px;
+                                        height: 25px;
+                                        flex-shrink: 0;
+                                    "
+                                    >{{ item.year }}</fv-button
+                                >
                                 <fv-button
                                     v-show="item.publisher"
                                     theme="dark"
                                     background="rgba(0, 145, 235, 1)"
-                                    style="width: auto; margin: 0px 5px;"
+                                    :border-radius="12"
+                                    style="
+                                        width: auto;
+                                        height: 25px;
+                                        margin: 0px 5px;
+                                    "
                                     :title="item.publisher"
                                 >
-                                    <p style="padding: 0px 15px;">{{item.publisher}}</p>
+                                    <p style="padding: 0px 15px">
+                                        {{ item.publisher }}
+                                    </p>
                                 </fv-button>
                             </div>
                             <div class="extension-block">
-                                <p>{{item.from}}</p>
+                                <p>{{ item.from }}</p>
                                 <fv-button
                                     theme="dark"
-                                    borderRadius="35"
+                                    borderRadius="12"
+                                    background="rgba(255, 180, 0, 1)"
                                     fontSize="12"
-                                    style="width: 30px; height: 30px;"
-                                    @click="() => {
-                                    item.expand ^= true;
-                                    $set(metaInfoList, index, item);
-                                }"
-                                ><i
+                                    :is-box-shadow="true"
+                                    style="width: 30px; height: 20px"
+                                    @click="
+                                        () => {
+                                            item.expand ^= true;
+                                            $set(metaInfoList, index, item);
+                                        }
+                                    "
+                                    ><i
                                         class="ms-Icon"
-                                        :class="[`ms-Icon--${item.expand ? 'DoubleChevronUp' : 'DoubleChevronDown'}`]"
-                                    ></i></fv-button>
+                                        :class="[
+                                            `ms-Icon--${
+                                                item.expand
+                                                    ? 'ChevronUp'
+                                                    : 'ChevronDown'
+                                            }`
+                                        ]"
+                                    ></i
+                                ></fv-button>
                             </div>
-                            <transition :name="item.expand ? 'move-top-to-bottom' : 'move-bottom-to-top'">
+                            <transition :name="'abstract-move'">
                                 <div
                                     v-show="item.expand"
                                     class="abstract-block"
                                 >
-                                    <span>{{item.abstract}}</span>
+                                    <span>{{ item.abstract }}</span>
                                 </div>
                             </transition>
                         </div>
@@ -113,33 +146,33 @@
                 </div>
                 <div class="metadata-item">
                     <p class="title">BibTex Tools</p>
+                    <fv-text-field
+                        v-model="metadata.bibtex"
+                        class="metadata-text-area"
+                        :class="{ dark: theme == 'dark' }"
+                        :placeholder="local(`BibTex Content`)"
+                        underline
+                        :border-width="2"
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        :is-box-shadow="true"
+                        style="width: 100%; margin: 5px 0px; font-size: 12px"
+                    ></fv-text-field>
                     <div class="row-block">
-                        <fv-combobox
-                            v-model="bibTexValue"
-                            :theme="theme"
-                            :placeholder="local(`Select Type`)"
-                            :options="bibTexOptions"
-                            style="width: 200px;"
-                        ></fv-combobox>
                         <fv-button
                             :theme="theme"
-                            :disabled="!bibTexValue.key"
+                            :disabled="!metadata.bibtex"
+                            background="rgba(255, 180, 0, 1)"
+                            :font-weight="'bold'"
+                            :border-radius="6"
                             :isBoxShadow="true"
                             icon="SemiboldWeight"
-                            style="width: 135px; height: 35px; margin-left: 15px;"
-                            @click="generateBibTex"
+                            style="width: 135px; height: 35px"
+                            @click="copyBibtex"
                         >
-                            {{local('Generate BibTex')}}
+                            {{ local('Copy BibTex') }}
                         </fv-button>
                     </div>
-                    <textarea
-                        v-show="bibTexContent"
-                        v-model="bibTexContent"
-                        class="text-area"
-                        :class="{dark: theme == 'dark'}"
-                        :placeholder="local(`BibTex Content`)"
-                        style="width: 100%; margin: 5px 0px; font-size: 12px;"
-                    ></textarea>
                 </div>
                 <div class="metadata-item">
                     <p class="title">Publisher</p>
@@ -147,6 +180,12 @@
                         v-model="metadata.publisher"
                         :theme="theme"
                         :placeholder="local(`Please Input publisher...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -155,6 +194,12 @@
                         v-model="metadata.year"
                         :theme="theme"
                         :placeholder="local(`Please Input year...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -163,6 +208,12 @@
                         v-model="metadata.DOI"
                         :theme="theme"
                         :placeholder="local(`Please Input DOI...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -171,6 +222,12 @@
                         v-model="metadata.createDate"
                         :theme="theme"
                         :placeholder="local(`Please Input createDate...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -179,6 +236,12 @@
                         v-model="metadata.source"
                         :theme="theme"
                         :placeholder="local(`Please Input source...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -187,6 +250,12 @@
                         v-model="metadata.url"
                         :theme="theme"
                         :placeholder="local(`Please Input url...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -195,16 +264,32 @@
                         v-model="metadata.containerTitle"
                         :theme="theme"
                         :placeholder="local(`Please Input containerTitle...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
                     <p class="title">Abstract</p>
-                    <textarea
+                    <fv-text-field
                         v-model="metadata.abstract"
-                        class="text-area"
-                        :class="{dark: theme == 'dark'}"
+                        class="metadata-text-area"
+                        :class="{ dark: theme == 'dark' }"
                         :placeholder="local(`Please Input abstract...`)"
-                    ></textarea>
+                        underline
+                        :border-width="2"
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        :is-box-shadow="true"
+                        style="
+                            width: 100%;
+                            height: 300px;
+                            font-family: 'Times New Roman';
+                        "
+                    ></fv-text-field>
                 </div>
                 <div class="metadata-item">
                     <p class="title">ISSN</p>
@@ -212,6 +297,12 @@
                         v-model="metadata.ISSN"
                         :theme="theme"
                         :placeholder="local(`Please Input ISSN...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -220,6 +311,12 @@
                         v-model="metadata.language"
                         :theme="theme"
                         :placeholder="local(`Please Input language...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -228,6 +325,12 @@
                         v-model="metadata.chapter"
                         :theme="theme"
                         :placeholder="local(`Please Input chapter...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -236,6 +339,12 @@
                         v-model="metadata.pages"
                         :theme="theme"
                         :placeholder="local(`Please Input pages...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -244,6 +353,12 @@
                         v-model="metadata.note"
                         :theme="theme"
                         :placeholder="local(`Please Input note...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -252,6 +367,12 @@
                         v-model="metadata.school"
                         :theme="theme"
                         :placeholder="local(`Please Input school...`)"
+                        :border-width="2"
+                        :is-box-shadow="true"
+                        underline
+                        :border-color="'rgba(200, 200, 200, 0.1)'"
+                        :focus-border-color="'rgba(140, 148, 228, 0.8)'"
+                        style="width: 100%; height: 35px"
                     ></fv-text-box>
                 </div>
                 <div class="metadata-item">
@@ -261,6 +382,8 @@
                         theme="dark"
                         background="rgba(0, 204, 153, 1)"
                         borderRadius="50"
+                        :font-size="12"
+                        style="height: 25px"
                         @click="addAuthor(0)"
                     >
                         <i class="ms-Icon ms-Icon--Add"></i>
@@ -272,8 +395,9 @@
                     >
                         <fv-button
                             theme="dark"
-                            background="rgba(173, 38, 45, 1)"
+                            background="rgba(220, 62, 72, 1)"
                             borderRadius="50"
+                            :font-size="12"
                             class="control-btn"
                             @click="delAuthor(index)"
                         >
@@ -283,24 +407,25 @@
                             v-model="author.first"
                             :placeholder="local('First Name')"
                             :theme="theme"
-                            style="margin: 0px 3px;"
+                            style="margin: 0px 3px"
                         ></fv-text-box>
                         <fv-text-box
                             v-model="author.last"
                             :placeholder="local('Last Name')"
                             :theme="theme"
-                            style="margin: 0px 3px;"
+                            style="margin: 0px 3px"
                         ></fv-text-box>
                         <fv-text-box
                             v-model="author.sequence"
                             :placeholder="local('Sequence')"
                             :theme="theme"
-                            style="margin: 0px 3px;"
+                            style="margin: 0px 3px"
                         ></fv-text-box>
                         <fv-button
                             theme="dark"
                             background="rgba(0, 204, 153, 1)"
                             borderRadius="50"
+                            :font-size="12"
                             class="control-btn"
                             @click="addAuthor(index)"
                         >
@@ -314,30 +439,34 @@
             <fv-button
                 theme="dark"
                 background="rgba(140, 148, 228, 1)"
+                :is-box-shadow="true"
                 @click="save"
-            >{{local('Confirm')}}</fv-button>
+                >{{ local('Confirm') }}</fv-button
+            >
             <fv-button
                 :theme="theme"
-                style="margin-left: 5px;"
+                :is-box-shadow="true"
+                style="margin-left: 5px"
                 @click="thisValue = false"
-            >{{local('Cancel')}}</fv-button>
+                >{{ local('Cancel') }}</fv-button
+            >
         </template>
     </fv-panel>
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
-import { META_API } from "@/js/meta_api.js";
-import { author } from "@/js/data_sample.js";
+import { mapState, mapGetters } from 'vuex';
+import { META_API } from '@/js/meta_api.js';
+import { author } from '@/js/data_sample.js';
 
 export default {
     props: {
         value: {
-            default: false,
+            default: false
         },
         item: {
-            default: null,
-        },
+            default: null
+        }
     },
     data() {
         return {
@@ -345,163 +474,164 @@ export default {
             metaAPI: META_API,
             metaInfoList: [],
             metadata: {
-                publisher: "",
-                DOI: "",
-                year: "",
-                createDate: "",
-                source: "",
-                title: "",
-                url: "",
-                containerTitle: "", //一般是会议名称
-                abstract: "",
-                ISSN: "",
-                language: "",
-                chapter: "",
-                pages: "",
-                school: "",
-                note: "",
-                authors: [],
+                publisher: '',
+                DOI: '',
+                year: '',
+                createDate: '',
+                source: '',
+                title: '',
+                url: '',
+                containerTitle: '', //一般是会议名称
+                abstract: '',
+                ISSN: '',
+                language: '',
+                chapter: '',
+                pages: '',
+                school: '',
+                note: '',
+                bibtex: '',
+                authors: []
             },
             bibTexValue: {},
             bibTexOptions: [
                 {
-                    key: "article",
-                    text: "Article",
+                    key: 'article',
+                    text: 'Article',
                     required: {
-                        author: "author",
-                        title: "title",
-                        journal: "publisher",
-                        year: "year",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        journal: 'publisher',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "book",
-                    text: "Book",
+                    key: 'book',
+                    text: 'Book',
                     required: {
-                        author: "author",
-                        title: "title",
-                        publisher: "publisher",
-                        year: "year",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        publisher: 'publisher',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "booklet",
-                    text: "Booklet",
+                    key: 'booklet',
+                    text: 'Booklet',
                     required: {
-                        title: "title",
-                    },
+                        title: 'title'
+                    }
                 },
                 {
-                    key: "inbook",
-                    text: "Inbook",
+                    key: 'inbook',
+                    text: 'Inbook',
                     required: {
-                        author: "author",
-                        title: "title",
-                        publisher: "publisher",
-                        year: "year",
-                        chapter: "chapter",
-                        pages: "pages",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        publisher: 'publisher',
+                        year: 'year',
+                        chapter: 'chapter',
+                        pages: 'pages'
+                    }
                 },
                 {
-                    key: "incollection",
-                    text: "Incollection",
+                    key: 'incollection',
+                    text: 'Incollection',
                     required: {
-                        author: "author",
-                        title: "title",
-                        publisher: "publisher",
-                        year: "year",
-                        booktitle: "containerTitle",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        publisher: 'publisher',
+                        year: 'year',
+                        booktitle: 'containerTitle'
+                    }
                 },
                 {
-                    key: "conference",
-                    text: "Conference",
+                    key: 'conference',
+                    text: 'Conference',
                     required: {
-                        author: "author",
-                        title: "title",
-                        publisher: "publisher",
-                        year: "year",
-                        booktitle: "containerTitle",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        publisher: 'publisher',
+                        year: 'year',
+                        booktitle: 'containerTitle'
+                    }
                 },
                 {
-                    key: "inproceedings",
-                    text: "Inproceedings",
+                    key: 'inproceedings',
+                    text: 'Inproceedings',
                     required: {
-                        author: "author",
-                        title: "title",
-                        publisher: "publisher",
-                        year: "year",
-                        booktitle: "containerTitle",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        publisher: 'publisher',
+                        year: 'year',
+                        booktitle: 'containerTitle'
+                    }
                 },
                 {
-                    key: "manual",
-                    text: "Manual",
+                    key: 'manual',
+                    text: 'Manual',
                     required: {
-                        title: "title",
-                    },
+                        title: 'title'
+                    }
                 },
                 {
-                    key: "mastersthesis",
-                    text: "Mastersthesis",
+                    key: 'mastersthesis',
+                    text: 'Mastersthesis',
                     required: {
-                        author: "author",
-                        title: "title",
-                        school: "school",
-                        year: "year",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        school: 'school',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "misc",
-                    text: "Misc",
+                    key: 'misc',
+                    text: 'Misc',
                     required: {
-                        title: "title",
-                    },
+                        title: 'title'
+                    }
                 },
                 {
-                    key: "phdthesis",
-                    text: "Phdthesis",
+                    key: 'phdthesis',
+                    text: 'Phdthesis',
                     required: {
-                        author: "author",
-                        title: "title",
-                        school: "school",
-                        year: "year",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        school: 'school',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "proceedings",
-                    text: "Proceedings",
+                    key: 'proceedings',
+                    text: 'Proceedings',
                     required: {
-                        title: "title",
-                        year: "year",
-                    },
+                        title: 'title',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "techreport",
-                    text: "Techreport",
+                    key: 'techreport',
+                    text: 'Techreport',
                     required: {
-                        author: "author",
-                        title: "title",
-                        institution: "publisher",
-                        year: "year",
-                    },
+                        author: 'author',
+                        title: 'title',
+                        institution: 'publisher',
+                        year: 'year'
+                    }
                 },
                 {
-                    key: "unpublished",
-                    text: "Unpublished",
+                    key: 'unpublished',
+                    text: 'Unpublished',
                     required: {
-                        author: "author",
-                        title: "title",
-                        note: "note",
-                    },
-                },
+                        author: 'author',
+                        title: 'title',
+                        note: 'note'
+                    }
+                }
             ],
-            bibTexContent: "",
+            bibTexContent: '',
             lock: {
-                metaInfo: true,
-            },
+                metaInfo: true
+            }
         };
     },
     watch: {
@@ -509,23 +639,23 @@ export default {
             this.thisValue = val;
         },
         thisValue(val) {
-            this.$emit("input", val);
+            this.$emit('input', val);
         },
         item() {
             // console.log(this.item)
             this.metadataInit();
             this.metaInfoList = [];
             this.lock.metaInfo = true;
-            this.bibTexContent = "";
-        },
+            this.bibTexContent = '';
+        }
     },
     computed: {
         ...mapState({
             data_path: (state) => state.config.data_path,
             data_index: (state) => state.config.data_index,
-            theme: (state) => state.config.theme,
+            theme: (state) => state.config.theme
         }),
-        ...mapGetters(['local', 'currentDataPath']),
+        ...mapGetters(['local', 'currentDataPath'])
     },
     mounted() {
         this.metadataInit();
@@ -538,12 +668,12 @@ export default {
                     if (
                         Object.prototype.toString.call(
                             this.item.metadata[key]
-                        ) === "[object Object]"
+                        ) === '[object Object]'
                     )
                         this.metadata[key] = this.item.metadata[key];
                     else
                         this.metadata[key] = this.item.metadata[key].toString();
-                } else this.metadata[key] = "";
+                } else this.metadata[key] = '';
             }
             if (!this.item.metadata.authors) this.metadata.authors = [];
         },
@@ -565,9 +695,10 @@ export default {
 
             let p = [];
             let fn = [
+                this.metaAPI.dblp_getInfoByTitle,
                 this.metaAPI.cref_getInfoByTitle,
                 this.metaAPI.semanticScholar_getInfoByTitle,
-                this.metaAPI.dataCite_getInfoByTitle,
+                this.metaAPI.dataCite_getInfoByTitle
             ];
             for (let f of fn) {
                 p.push(f(this.metadata.title, this.axios));
@@ -580,9 +711,13 @@ export default {
             });
 
             result.sort((a, b) => {
+                let additionA = a.from === 'DBLP' ? 0.2 : 0;
+                let additionB = b.from === 'DBLP' ? 0.2 : 0;
                 return (
-                    this.metaAPI.titleSimilar(b.title, this.metadata.title) -
-                    this.metaAPI.titleSimilar(a.title, this.metadata.title)
+                    this.metaAPI.titleSimilar(b.title, this.metadata.title) +
+                    additionB -
+                    this.metaAPI.titleSimilar(a.title, this.metadata.title) -
+                    additionA
                 );
             });
 
@@ -604,21 +739,21 @@ export default {
                 id,
                 _metadata
             );
-            if (res.status !== "success")
+            if (res.status !== 'success')
                 this.$barWarning(res.message, {
-                    status: "warning",
+                    status: 'warning'
                 });
         },
         generateBibTex() {
             let required = this.bibTexValue.required;
             let result = {};
             for (let key in required) {
-                if (key == "author") {
+                if (key == 'author') {
                     if (!this.metadata.authors.length > 0) {
                         this.$barWarning(
-                            `'${key}' ${this.local("is required")}`,
+                            `'${key}' ${this.local('is required')}`,
                             {
-                                status: "warning",
+                                status: 'warning'
                             }
                         );
                         return;
@@ -631,9 +766,9 @@ export default {
                 } else {
                     if (!this.metadata[required[key]]) {
                         this.$barWarning(
-                            `'${required[key]}' ${this.local("is required")}`,
+                            `'${required[key]}' ${this.local('is required')}`,
                             {
-                                status: "warning",
+                                status: 'warning'
                             }
                         );
                         return;
@@ -643,7 +778,7 @@ export default {
             }
 
             let midContent = () => {
-                let r = "";
+                let r = '';
                 for (let key in result) {
                     r += `${key} = {${result[key]}},\n`;
                 }
@@ -656,11 +791,44 @@ export default {
             this.bibTexContent = bib;
 
             navigator.clipboard.writeText(bib);
-            this.$barWarning(this.local("Successfully copied to clipboard"), {
-                status: "correct",
+            this.$barWarning(this.local('Successfully copied to clipboard'), {
+                status: 'correct'
             });
         },
-    },
+        copyBibtex() {
+            if (!this.metadata.bibtex) {
+                this.$barWarning(this.local('No BibTex Infomation'), {
+                    status: 'warning'
+                });
+                return;
+            }
+            if (navigator.clipboard) {
+                navigator.clipboard
+                    .writeText(this.metadata.bibtex)
+                    .then(() => {
+                        this.$barWarning(this.local('Successfully Copied'), {
+                            status: 'correct'
+                        });
+                    })
+                    .catch((err) => {
+                        this.$barWarning(err, {
+                            status: 'error'
+                        });
+                    });
+            } else {
+                // 回退到 document.execCommand
+                const input = document.createElement('input');
+                input.value = this.metadata.bibtex;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                this.$barWarning(this.local('Successfully Copied'), {
+                    status: 'correct'
+                });
+            }
+        }
+    }
 };
 </script>
 
@@ -670,6 +838,30 @@ export default {
     width: 100%;
     height: 100%;
     overflow: auto;
+
+    &.dark {
+        .metadata-item {
+            .meta-item {
+                background: rgba(20, 20, 20, 0.8);
+
+                &.choosen {
+                    background: rgba(36, 36, 36, 0.6);
+
+                    &:hover {
+                        background: rgba(36, 36, 36, 0.5);
+                    }
+                }
+
+                &:hover {
+                    background: rgba(36, 36, 36, 0.6);
+                }
+
+                &:active {
+                    background: rgba(36, 36, 36, 0.5);
+                }
+            }
+        }
+    }
 
     .metadata-item {
         @include HstartC;
@@ -713,6 +905,7 @@ export default {
             width: 100%;
             min-height: 55px;
             height: auto;
+            margin-bottom: 1.5px;
             padding: 0px 15px;
             font-size: 13.8px;
             font-weight: 600;
@@ -720,25 +913,26 @@ export default {
             border-radius: 8px;
             box-sizing: border-box;
             display: flex;
+            transition: all 0.3s;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
             user-select: none;
 
             &.choosen {
-                background: rgba(200, 200, 200, 0.6);
+                background: rgba(255, 255, 255, 0.6);
 
                 &:hover {
-                    background: rgba(200, 200, 200, 0.6);
+                    background: rgba(255, 255, 255, 0.8);
                 }
             }
 
             &:hover {
-                background: rgba(200, 200, 200, 0.1);
+                background: rgba(250, 250, 250, 0.6);
             }
 
             &:active {
-                background: rgba(200, 200, 200, 0.3);
+                background: rgba(255, 255, 255, 0.8);
             }
 
             .title-block {
@@ -786,8 +980,10 @@ export default {
             .abstract-block {
                 width: 100%;
                 margin: 8px 0px;
-                font-size: 16px;
-                font-family: "Times New Roman", Times, serif;
+                font-size: 12px;
+                font-family: 'Times New Roman', Times, serif;
+                font-weight: normal;
+                text-align: justify;
             }
 
             p {
@@ -808,23 +1004,23 @@ export default {
             }
         }
 
-        .text-area {
+        .metadata-text-area {
             position: relative;
             width: 300px;
             height: 250px;
-            padding: 5px;
             font-size: 16px;
-            font-family: "Times New Roman", Times, serif;
-            box-sizing: border-box;
-            border: 1px solid rgba(36, 36, 36, 0.1);
-            border-radius: 5px;
+            font-family: 'Times New Roman', Times, serif;
             resize: none;
             outline: none;
             line-height: 1.5;
 
+            * {
+                font-family: 'Times New Roman', Times, serif;
+                line-height: 1.5;
+            }
+
             &.dark {
                 background: transparent;
-                border: 1px solid rgba(75, 75, 75, 0.8);
             }
         }
 
@@ -836,11 +1032,28 @@ export default {
             margin: 5px 0px;
 
             .control-btn {
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
                 flex-shrink: 0;
             }
         }
+    }
+
+    .abstract-move-enter-active,
+    .abstract-move-leave-active {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .abstract-move-enter,
+    .abstract-move-leave-to {
+        max-height: 0px;
+        opacity: 0;
+    }
+
+    .abstract-move-enter-to,
+    .abstract-move-leave {
+        max-height: 800px;
+        opacity: 1;
     }
 }
 </style>

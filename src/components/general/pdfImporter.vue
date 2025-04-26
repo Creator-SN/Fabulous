@@ -328,6 +328,7 @@ export default {
             for (let it of crefInfo) {
                 if (it.title.toLowerCase() === title.toLowerCase()) {
                     Object.assign(_metadata, it);
+                    break;
                 }
             }
             return _metadata;
@@ -335,6 +336,7 @@ export default {
         async getMetaInfo(title) {
             let p = [];
             let fn = [
+                this.metaAPI.dblp_getInfoByTitle,
                 this.metaAPI.cref_getInfoByTitle,
                 this.metaAPI.semanticScholar_getInfoByTitle,
                 this.metaAPI.dataCite_getInfoByTitle
@@ -348,6 +350,18 @@ export default {
                     result = result.concat(it);
                 });
             });
+
+            result.sort((a, b) => {
+                let additionA = a.from === 'DBLP' ? 0.2 : 0;
+                let additionB = b.from === 'DBLP' ? 0.2 : 0;
+                return (
+                    this.metaAPI.titleSimilar(b.title, title) +
+                    additionB -
+                    this.metaAPI.titleSimilar(a.title, title) -
+                    additionA
+                );
+            });
+
             return result;
         },
         cancel() {

@@ -51,7 +51,7 @@
                             <span @click="deleteTemplate">
                                 <i
                                     class="ms-Icon ms-Icon--Delete"
-                                    style="color: rgba(173, 38, 45, 1);"
+                                    style="color: rgba(220, 62, 72, 1);"
                                 ></i>
                                 <p>{{local("Delete Template")}}</p>
                             </span>
@@ -105,7 +105,7 @@ export default {
                 {
                     name: () => this.local('Delete'),
                     icon: 'Delete',
-                    iconColor: 'rgba(173, 38, 45, 1)',
+                    iconColor: 'rgba(220, 62, 72, 1)',
                     disabled: () =>
                         this.currentChoosen.length === 0 || !this.lock,
                     func: this.deleteTemplates

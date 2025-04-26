@@ -1,14 +1,7 @@
 <template>
-    <div
-        class="fabulous-home-container"
-        :class="[{dark: theme === 'dark'}]"
-    >
-        <div
-            :draggable="false"
-            class="s-row"
-            style="margin-top: 45px;"
-        >
-            <p class="s-title">{{partitionInfo.name}}</p>
+    <div class="fabulous-home-container" :class="[{ dark: theme === 'dark' }]">
+        <div :draggable="false" class="s-row" style="margin-top: 45px">
+            <p class="s-title">{{ partitionInfo.name }}</p>
         </div>
         <div class="m-home-block">
             <div class="row between">
@@ -16,7 +9,11 @@
                     v-model="currentSearch.value"
                     :placeholder="` ` + local('Filtering from current content')"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'rgba(75, 75, 75, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                    :background="
+                        theme === 'dark'
+                            ? 'rgba(75, 75, 75, 0.6)'
+                            : 'rgba(255, 255, 255, 0.6)'
+                    "
                     icon="Filter"
                     borderWidth="1"
                     :border-radius="30"
@@ -28,24 +25,36 @@
                         v-model="sortKey"
                         :options="sortOptions"
                         :placeholder="local('Sort by')"
-                        :inputBackground="theme === 'dark' ? 'rgba(75, 75, 75, 1)' : 'rgba(255, 255, 255, 0.6)'"
+                        :inputBackground="
+                            theme === 'dark'
+                                ? 'rgba(75, 75, 75, 1)'
+                                : 'rgba(255, 255, 255, 0.6)'
+                        "
                         :borderRadius="3"
                         :theme="theme"
-                        style="width: 120px;"
+                        style="width: 120px"
                     ></fv-combobox>
                     <fv-button
                         :theme="theme"
                         :disabled="sortKey.key == undefined"
                         :background="theme === 'light' ? 'white' : ''"
-                        style="width: 35px; height: 35px; margin-left: 5px;"
-                        :title="sortDesc == 1 ? local('Switch to Descending') : local('Switch to Ascending')"
+                        style="width: 35px; height: 35px; margin-left: 5px"
+                        :title="
+                            sortDesc == 1
+                                ? local('Switch to Descending')
+                                : local('Switch to Ascending')
+                        "
                         :is-box-shadow="true"
                         @click="sortDesc = -sortDesc"
                     >
                         <i
                             class="ms-Icon"
-                            :class="[`ms-Icon--${sortDesc == 1 ? 'Ascending' : 'Descending'}`]"
-                            style="font-size: 18px;"
+                            :class="[
+                                `ms-Icon--${
+                                    sortDesc == 1 ? 'Ascending' : 'Descending'
+                                }`
+                            ]"
+                            style="font-size: 18px"
                         ></i>
                     </fv-button>
                 </div>
@@ -54,8 +63,12 @@
                 <fv-command-bar
                     :options="cmd"
                     :theme="theme"
-                    :background="theme === 'dark' ? 'transparent' : 'rgba(245, 245, 245, 0)'"
-                    style="flex: 1; background: transparent;"
+                    :background="
+                        theme === 'dark'
+                            ? 'transparent'
+                            : 'rgba(245, 245, 245, 0)'
+                    "
+                    style="flex: 1; background: transparent"
                 ></fv-command-bar>
             </div>
             <div class="row main-table">
@@ -64,7 +77,12 @@
                     :edit="editable"
                     :theme="theme"
                     @open-file="openFile"
-                    @label-click="($event) => {currentItem = $event; show.rename = true}"
+                    @label-click="
+                        ($event) => {
+                            currentItem = $event;
+                            show.rename = true;
+                        }
+                    "
                     @rightclick="currentItem = $event"
                     @choose-items="currentChoosen = $event"
                     @insert-emoji="reviseItemEmoji($event.item, $event.emoji)"
@@ -73,15 +91,20 @@
                         <div class="main-row-item-info">
                             <div
                                 class="item"
-                                style="display: flex;"
-                                @click="($event) => {currentItem = x.item; show.rename = true}"
+                                style="display: flex"
+                                @click="
+                                    ($event) => {
+                                        currentItem = x.item;
+                                        show.rename = true;
+                                    }
+                                "
                             >
                                 <fv-tag
                                     v-if="x.item.labels.length > 0"
                                     :value="x.item.labels"
                                     :theme="theme"
                                     :size="'xsmall'"
-                                    style="width: 100%;"
+                                    style="width: 100%"
                                 ></fv-tag>
                                 <i
                                     v-if="x.item.labels.length <= 0"
@@ -89,34 +112,49 @@
                                 ></i>
                                 <p
                                     v-if="x.item.labels.length <= 0"
-                                    style="margin-left: 15px;"
-                                >{{local("Add Labels")}}</p>
+                                    style="margin-left: 15px"
+                                >
+                                    {{ local('Add Labels') }}
+                                </p>
                             </div>
                             <div
                                 v-show="x.item.pdf"
                                 class="item"
-                                @dblclick="openFile(x.item.id, x.item.pdf, `.pdf`)"
+                                @dblclick="
+                                    openFile(x.item.id, x.item.pdf, `.pdf`)
+                                "
                             >
                                 <img
                                     draggable="false"
                                     :src="img.pdf"
                                     alt=""
-                                    style="width: 18px; height: 18px; margin-right: 25px; object-fit: contain;"
-                                >
+                                    style="
+                                        width: 18px;
+                                        height: 18px;
+                                        margin-right: 25px;
+                                        object-fit: contain;
+                                    "
+                                />
                                 <p
                                     class="highlight"
                                     @click="openPDF(x.item, 'inside')"
-                                >PDF</p>
+                                >
+                                    PDF
+                                </p>
                                 <p
                                     v-show="!isRemote"
                                     class="sec highlight"
-                                    @click="openFile(x.item.id, x.item.pdf, `.pdf`)"
-                                >{{x.item.pdf}}.pdf</p>
+                                    @click="
+                                        openFile(x.item.id, x.item.pdf, `.pdf`)
+                                    "
+                                >
+                                    {{ x.item.pdf }}.pdf
+                                </p>
                                 <p></p>
                                 <fv-button
                                     v-show="!isRemote"
                                     :theme="theme"
-                                    style="width: 35px; height: 35px;"
+                                    style="width: 35px; height: 35px"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
                                     @click="openFile(x.item.id)"
@@ -125,12 +163,16 @@
                                         draggable="false"
                                         :src="img.folder"
                                         alt=""
-                                        style="width: 18px; height: 18px; object-fit: contain;"
-                                    >
+                                        style="
+                                            width: 18px;
+                                            height: 18px;
+                                            object-fit: contain;
+                                        "
+                                    />
                                 </fv-button>
                                 <fv-button
                                     :theme="theme"
-                                    style="width: 35px; height: 35px;"
+                                    style="width: 35px; height: 35px"
                                     :title="local('Open in Browser')"
                                     :is-box-shadow="true"
                                     @click="openPDF(x.item, 'outside')"
@@ -139,34 +181,44 @@
                                         draggable="false"
                                         :src="img.viewer"
                                         alt=""
-                                        style="width: 18px; height: 18px; object-fit: contain;"
-                                    >
+                                        style="
+                                            width: 18px;
+                                            height: 18px;
+                                            object-fit: contain;
+                                        "
+                                    />
                                 </fv-button>
                             </div>
-                            <div
-                                v-show="x.item.metadata"
-                                class="item"
-                            >
+                            <div v-show="x.item.metadata" class="item">
                                 <img
                                     draggable="false"
                                     :src="img.metadata"
                                     alt=""
-                                    style="width: 18px; height: 18px; margin-right: 25px; object-fit: contain;"
-                                >
+                                    style="
+                                        width: 18px;
+                                        height: 18px;
+                                        margin-right: 25px;
+                                        object-fit: contain;
+                                    "
+                                />
                                 <p
                                     class="highlight"
                                     @click="showMetadata(x.item)"
-                                >Metadata</p>
+                                >
+                                    Metadata
+                                </p>
                                 <p
                                     v-show="!isRemote"
                                     class="sec highlight"
                                     @click="showMetadata(x.item)"
-                                >{{x.item.id}}.metadata</p>
+                                >
+                                    {{ x.item.id }}.metadata
+                                </p>
                                 <p></p>
                                 <fv-button
                                     v-show="!isRemote"
                                     :theme="theme"
-                                    style="width: 35px; height: 35px;"
+                                    style="width: 35px; height: 35px"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
                                     @click="openFile(x.item.id)"
@@ -175,12 +227,16 @@
                                         draggable="false"
                                         :src="img.folder"
                                         alt=""
-                                        style="width: 18px; height: 18px; object-fit: contain;"
-                                    >
+                                        style="
+                                            width: 18px;
+                                            height: 18px;
+                                            object-fit: contain;
+                                        "
+                                    />
                                 </fv-button>
                                 <fv-button
                                     :theme="theme"
-                                    style="width: 35px; height: 35px;"
+                                    style="width: 35px; height: 35px"
                                     :title="local('Open Folder')"
                                     :is-box-shadow="true"
                                     @click="showMetadata(x.item)"
@@ -189,8 +245,12 @@
                                         draggable="false"
                                         :src="img.folder"
                                         alt=""
-                                        style="width: 18px; height: 18px; object-fit: contain;"
-                                    >
+                                        style="
+                                            width: 18px;
+                                            height: 18px;
+                                            object-fit: contain;
+                                        "
+                                    />
                                 </fv-button>
                             </div>
                             <div
@@ -201,19 +261,33 @@
                                 <emoji-callout
                                     :value="page.emoji"
                                     :theme="theme"
-                                    style="width: 25px; flex-shrink: 0; margin-right: 18px;"
-                                    @insert-emoji="revisePageEmoji(x.item, page, $event)"
+                                    style="
+                                        width: 25px;
+                                        flex-shrink: 0;
+                                        margin-right: 18px;
+                                    "
+                                    @insert-emoji="
+                                        revisePageEmoji(x.item, page, $event)
+                                    "
                                 ></emoji-callout>
                                 <p
                                     class="highlight"
                                     @click="openEditor(x.item, page)"
-                                >{{page.name}}</p>
-                                <p class="sec">{{page.id.split('-').pop()}}</p>
-                                <p class="sec">{{$date(page.createDate)}}</p>
+                                >
+                                    {{ page.name }}
+                                </p>
+                                <p class="sec">
+                                    {{ page.id.split('-').pop() }}
+                                </p>
+                                <p class="sec">{{ $date(page.createDate) }}</p>
                                 <fv-button
                                     theme="dark"
-                                    :background="theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(140, 148, 228, 1)'"
-                                    style="width: 35px; height: 35px;"
+                                    :background="
+                                        theme === 'dark'
+                                            ? 'rgba(118, 185, 237, 1)'
+                                            : 'rgba(140, 148, 228, 1)'
+                                    "
+                                    style="width: 35px; height: 35px; margin-left: 1.5px;"
                                     :title="local('Rename')"
                                     :is-box-shadow="true"
                                     @click="showRenameItemPage(x.item, page)"
@@ -222,8 +296,12 @@
                                 </fv-button>
                                 <fv-button
                                     theme="dark"
-                                    :background="theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(140, 148, 228, 1)'"
-                                    style="width: 35px; height: 35px;"
+                                    :background="
+                                        theme === 'dark'
+                                            ? 'rgba(118, 185, 237, 1)'
+                                            : 'rgba(140, 148, 228, 1)'
+                                    "
+                                    style="width: 35px; height: 35px; margin-left: 1.5px;"
                                     :title="local('Duplicate')"
                                     :is-box-shadow="true"
                                     @click="duplicateItemPage(x.item, page)"
@@ -233,7 +311,7 @@
                                 <fv-button
                                     theme="dark"
                                     background="rgba(220, 62, 72, 1)"
-                                    style="width: 35px; height: 35px;"
+                                    style="width: 35px; height: 35px; margin-left: 1.5px;"
                                     :title="local('Delete')"
                                     :is-box-shadow="true"
                                     @click="deleteItemPage(x.item.id, page.id)"
@@ -243,11 +321,18 @@
                             </div>
                             <div
                                 class="item"
-                                style="display: flex;"
-                                @click="($event) => {currentItem = x.item; show.addItemPage = true}"
+                                style="display: flex"
+                                @click="
+                                    ($event) => {
+                                        currentItem = x.item;
+                                        show.addItemPage = true;
+                                    }
+                                "
                             >
                                 <i class="ms-Icon ms-Icon--Add"></i>
-                                <p style="margin-left: 15px;">{{local("Add Page")}}</p>
+                                <p style="margin-left: 15px">
+                                    {{ local('Add Page') }}
+                                </p>
                             </div>
                         </div>
                     </template>
@@ -256,58 +341,80 @@
                             <span @click="show.addItemPage = true">
                                 <i
                                     class="ms-Icon ms-Icon--PageAdd"
-                                    style="color: rgba(38, 188, 140, 1);"
+                                    style="color: rgba(38, 188, 140, 1)"
                                 ></i>
-                                <p>{{local("Add Page")}}</p>
+                                <p>{{ local('Add Page') }}</p>
                             </span>
                             <span @click="reviseItemPdf">
                                 <img
                                     draggable="false"
                                     :src="img.pdf"
                                     alt=""
-                                    style="width: 13px; height: 13px; object-fit: contain;"
-                                >
-                                <p>{{local("Revise PDF")}}</p>
+                                    style="
+                                        width: 13px;
+                                        height: 13px;
+                                        object-fit: contain;
+                                    "
+                                />
+                                <p>{{ local('Revise PDF') }}</p>
                             </span>
                             <span @click="show.metadata = true">
                                 <img
                                     draggable="false"
                                     :src="img.metadata"
                                     alt=""
-                                    style="width: 13px; height: 13px; object-fit: contain;"
-                                >
-                                <p>{{local("Revise Metadata")}}</p>
+                                    style="
+                                        width: 13px;
+                                        height: 13px;
+                                        object-fit: contain;
+                                    "
+                                />
+                                <p>{{ local('Revise Metadata') }}</p>
                             </span>
                             <span @click="openFile(currentItem.id)">
                                 <img
                                     draggable="false"
                                     :src="img.folder"
                                     alt=""
-                                    style="width: 13px; height: 13px; object-fit: contain;"
-                                >
-                                <p>{{local("Open Folder")}}</p>
+                                    style="
+                                        width: 13px;
+                                        height: 13px;
+                                        object-fit: contain;
+                                    "
+                                />
+                                <p>{{ local('Open Folder') }}</p>
                             </span>
-                            <hr>
+                            <hr />
                             <span @click="show.folder = true">
                                 <i
                                     class="ms-Icon ms-Icon--FabricMovetoFolder"
-                                    :style="{color: theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(140, 148, 228, 1)'}"
+                                    :style="{
+                                        color:
+                                            theme === 'dark'
+                                                ? 'rgba(118, 185, 237, 1)'
+                                                : 'rgba(140, 148, 228, 1)'
+                                    }"
                                 ></i>
-                                <p>{{local("Induce to Partitions")}}</p>
+                                <p>{{ local('Induce to Partitions') }}</p>
                             </span>
                             <span @click="addToTransferCarrier">
                                 <i
                                     class="ms-Icon ms-Icon--Send"
-                                    style="color: rgba(229, 173, 70, 1);"
+                                    style="color: rgba(229, 173, 70, 1)"
                                 ></i>
-                                <p>{{local("Add to Transfer Carrier")}}</p>
+                                <p>{{ local('Add to Transfer Carrier') }}</p>
                             </span>
                             <span @click="show.rename = true">
                                 <i
                                     class="ms-Icon ms-Icon--Rename"
-                                    :style="{color: theme === 'dark' ? 'rgba(118, 185, 237, 1)' : 'rgba(140, 148, 228, 1)'}"
+                                    :style="{
+                                        color:
+                                            theme === 'dark'
+                                                ? 'rgba(118, 185, 237, 1)'
+                                                : 'rgba(140, 148, 228, 1)'
+                                    }"
                                 ></i>
-                                <p>{{local("Rename Item")}}</p>
+                                <p>{{ local('Rename Item') }}</p>
                             </span>
                             <span
                                 v-show="pid"
@@ -315,19 +422,16 @@
                             >
                                 <i
                                     class="ms-Icon ms-Icon--RemoveFrom"
-                                    style="color: rgba(220, 62, 72, 1);"
+                                    style="color: rgba(220, 62, 72, 1)"
                                 ></i>
-                                <p>{{local("Remove From Partition")}}</p>
+                                <p>{{ local('Remove From Partition') }}</p>
                             </span>
-                            <span
-                                v-show="!pid"
-                                @click="deleteItem"
-                            >
+                            <span v-show="!pid" @click="deleteItem">
                                 <i
                                     class="ms-Icon ms-Icon--Delete"
-                                    style="color: rgba(220, 62, 72, 1);"
+                                    style="color: rgba(220, 62, 72, 1)"
                                 ></i>
-                                <p>{{local("Delete Item")}}</p>
+                                <p>{{ local('Delete Item') }}</p>
                             </span>
                         </div>
                     </template>
@@ -1183,6 +1287,24 @@ export default {
 
             .fv-rightMenu {
                 z-index: 3;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .fabulous-home-container {
+        .m-home-block {
+            .row {
+                &.main-table {
+                    .main-row-item-info {
+                        .item {
+                            .sec {
+                                display: none;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

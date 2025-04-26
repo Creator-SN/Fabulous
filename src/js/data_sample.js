@@ -88,6 +88,7 @@ export const metadata = {
     pages: null,
     school: null,
     note: null,
+    bibtex: null,
     authors: []
 }
 

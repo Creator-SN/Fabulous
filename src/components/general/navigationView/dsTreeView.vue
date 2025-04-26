@@ -182,7 +182,7 @@
                 <span @click="deleteConfirm(rightMenuItem)">
                     <i
                         class="ms-Icon ms-Icon--Delete"
-                        style="color: rgba(173, 38, 45, 1);"
+                        style="color: rgba(220, 62, 72, 1);"
                     ></i>
                     <p>{{local("Delete")}}</p>
                 </span>

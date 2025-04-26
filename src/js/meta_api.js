@@ -1,6 +1,93 @@
 import { metadata, author } from "@/js/data_sample.js";
+var parse = require("bibtex-parser");
 
 export class META_API {
+
+    static async dblp_getInfoByTitle(title, axios) {
+        let baseUrl = "https://dblp.org/search/publ/api";
+        title = title.replace(/ +/g, "+");
+        return await new Promise((resolve) => {
+            try {
+                axios
+                    .get(
+                        baseUrl,
+                        {
+                            params: {
+                                "q": title,
+                                "format": "bib",
+                                "h": 5,
+                            },
+                        },
+                        {
+                            timeout: 10000,
+                        }
+                    )
+                    .then((response) => {
+                        resolve(META_API.formatDblp(response.data));
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        resolve([]);
+                    });
+            } catch (e) {
+                resolve([]);
+            }
+        });
+    }
+
+    static formatDblp(data) {
+        data = data.split('\n\n');
+        let result = [];
+        for (let item of data) {
+            try {
+                let parseContent = parse(item);
+                for (let key in parseContent) {
+                    result.push(parseContent[key]);
+                    break;
+                }
+            }
+            catch (e) {
+                result.push({});
+            }
+        }
+        let metadataList = [];
+        for (let i = 0; i < result.length; i++) {
+            let _metadata = JSON.parse(JSON.stringify(metadata));
+            let authors = [];
+            // remove {xxx} from title
+            _metadata.title = result[i].TITLE.replace(/\{|\}/g, '');
+            _metadata.abstract = "";
+            _metadata.year = result[i].YEAR.toString();
+            if (result[i].JOURNAL)
+                _metadata.publisher = result[i].JOURNAL;
+            else if (result[i].PUBLISHER)
+                _metadata.publisher = result[i].PUBLISHER;
+            if (result[i].BOOKTITLE)
+                _metadata.containerTitle = result[i].BOOKTITLE;
+            _metadata.url = result[i].URL ? result[i].URL : "";
+            _metadata.DOI = result[i].DOI ? result[i].DOI : "";
+            _metadata.pages = result[i].PAGES ? result[i].PAGES : "";
+            _metadata.chapter = result[i].VOLUME ? result[i].VOLUME : "";
+            _metadata.source = 'DBLP';
+            _metadata.bibtex = data[i];
+            _metadata.from = 'DBLP';
+            if (result[i].AUTHOR) {
+                let AUTHORs = result[i].AUTHOR.replace(/\n/g, ' ');
+                // split by comma or and
+                AUTHORs = AUTHORs.split(/,|\band\b/);
+                for (let j = 0; j < AUTHORs.length; j++) {
+                    let _author = JSON.parse(JSON.stringify(author));
+                    _author.first = AUTHORs[j].replace(/\{|\}/g, '').trim();
+                    _author.last = "";
+                    _author.sequence = j == 0 ? 'first' : 'additional';
+                    authors.push(_author);
+                }
+            }
+            _metadata.authors = authors;
+            metadataList.push(_metadata);
+        }
+        return metadataList;
+    }
 
     static async cref_getInfoByTitle(title, axios) {
         let baseUrl = "https://api.crossref.org/works";
@@ -112,6 +199,7 @@ export class META_API {
             _metadata.year = it.year.toString();
             _metadata.publisher = it.venue;
             _metadata.url = it.url;
+            _metadata.source = 'Semantic Scholar';
             it.authors.forEach((el, idx) => {
                 let _author = JSON.parse(JSON.stringify(author));
                 let name = el['name'].split(" ");
@@ -170,6 +258,7 @@ export class META_API {
             _metadata.abstract = it.attributes.descriptions[0] ? it.attributes.descriptions[0].description : "";
             _metadata.year = it.attributes.publicationYear.toString();
             _metadata.publisher = it.attributes.publisher;
+            _metadata.source = 'DataCite';
             _metadata.url = it.url;
             it.attributes.creators.forEach((el, idx) => {
                 let _author = JSON.parse(JSON.stringify(author));
