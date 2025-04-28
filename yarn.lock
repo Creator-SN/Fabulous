@@ -1064,10 +1064,10 @@
     "@types/conventional-commits-parser" "^5.0.0"
     chalk "^5.3.0"
 
-"@creatorsn/powereditor@^2.5.2":
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.5.2.tgz#e70cb4426d3bea9aa4422c72abf43dd5ac41fa62"
-  integrity sha512-9AOtf1jL+1a5hZ3YdfhHS40Z58MYxZFVlbTmW5WOxHiYwtSfmrKCLlBrv1aYfVRE7V+Y4v04EhQBJJHMzIhsUA==
+"@creatorsn/powereditor@^2.5.3":
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor/-/powereditor-2.5.3.tgz#9992c71a4ff98082c106eb2b92517afcd6caf509"
+  integrity sha512-aaETYHGHt5VR4m8MAhd2tFQZg1EA7LxFghU1OSa1oQaOeKamS1CCToSAQVPK4Z0FRVecjZCnts4ysyBgYraEDA==
   dependencies:
     "@tiptap/core" "2.3.0"
     "@tiptap/extension-bubble-menu" "2.3.0"

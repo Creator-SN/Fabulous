@@ -25,7 +25,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@creatorsn/powereditor": "^2.5.2",
+    "@creatorsn/powereditor": "^2.5.3",
     "@electron/remote": "^2.1.2",
     "axios": "^0.21.4",
     "axios-swagger-helper": "^0.0.56",
