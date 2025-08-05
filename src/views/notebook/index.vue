@@ -792,7 +792,7 @@ export default {
                 if (src.startsWith('data:image')) {
                     let mimeType = src.split(';')[0].split(':')[1];
                     blob = this.base64ToBlob(src, mimeType);
-                } else if (src.startsWith('file:///')) {
+                } else if (src.startsWith('file:///') || src.startsWith('blob:')) {
                     const response = await fetch(src);
                     blob = await response.blob();
                 }
