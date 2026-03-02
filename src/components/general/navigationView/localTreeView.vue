@@ -89,6 +89,7 @@
                             background="rgba(255, 255, 255, 0.3)"
                             border-color="rgba(250, 176, 70, 0.3)"
                             focus-border-color="rgba(250, 176, 70, 1)"
+                            font-size="12"
                             underline
                             @click.native="$event.stopPropagation()"
                             @keyup.native.enter="rename(x.item)"
@@ -1184,6 +1185,7 @@ export default {
                 width: 90%;
                 margin-left: 5px;
                 flex: 1;
+                font-size: 12px;
                 user-select: none;
                 overflow: hidden;
                 cursor: default;
