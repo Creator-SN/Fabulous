@@ -390,6 +390,7 @@ function createWindow() {
     height: 900,
     transparent: false,
     backgroundMaterial: 'acrylic',
+    icon: join(process.cwd(), 'build/icon.ico'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
