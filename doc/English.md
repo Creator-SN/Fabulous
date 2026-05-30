@@ -1,7 +1,7 @@
 <div align="center">
     <img src="../src/renderer/src/assets/logo.png" width="180" />
     <p>Fabulous</p>
-    <p>A cross-platform notebook and literature workspace for focused research.</p>
+    <p>A cross-platform desktop workspace for reading, writing, and organizing research notes.</p>
 </div>
 
 <p align="center">
@@ -13,14 +13,19 @@
 
 Fabulous Desktop is the local Electron edition of the Fabulous ecosystem.
 
-It brings together notebook writing, research material organization, local file workflows, and desktop-native interactions in one place.
+It combines local notebook editing, research material organization, file-based workflows, and desktop-native interactions in one place.
+
+## Documents
+
+- [中文说明](./Chinese.md)
+- [Developer Guide](./README.dev.md)
 
 ## What can Fabulous do?
 
 Fabulous provides:
 
 - local notebook editing with `.fbn`, Markdown, HTML, and JSON support
-- quick note creation with a WYSIWYG editor
+- quick WYSIWYG note writing
 - local folder browsing and file management
 - PDF-centered reading and literature workflows
 - desktop file association so `.fbn` files can be opened directly from the system
@@ -34,15 +39,15 @@ Fabulous provides:
 
 **Install**
 
-Download the latest release from the GitHub Releases page:
+Download the latest release from:
 
 - <https://github.com/Creator-SN/Fabulous/releases>
 
 **First Launch**
 
-After opening the app for the first time, you can start from the notebook area directly, or continue into the wider literature-management workflow if needed.
+After opening the app for the first time, you can start directly from the local notebook area.
 
-If you mainly use Fabulous as a local notebook workspace, the local notebook view is enough to get started.
+If you also need the wider literature-management workflow, Fabulous can continue to serve as a richer desktop workspace beyond note editing alone.
 
 ![Preview 1](./assets/f1.png)
 
@@ -59,31 +64,26 @@ Fabulous Desktop supports a local-first notebook workflow:
 
 ## Reading and Writing Experience
 
-The editor supports a rich WYSIWYG writing workflow and keeps Markdown-friendly behavior where appropriate.
+The editor provides a rich WYSIWYG writing experience while keeping Markdown-friendly behavior where appropriate.
 
 Typical capabilities include:
 
-- headings, lists, checklists, block quotes
-- inline formatting such as bold, italic, underline, strike
-- links, images, embeds, code blocks
+- headings, lists, checklists, and block quotes
+- inline formatting such as bold, italic, underline, and strike
+- links, images, embeds, and code blocks
 - local notebook content refresh and save
 
 ![Preview 3](./assets/f6.png)
 
 ## Desktop Features
 
-Compared with the web frontend, the desktop edition additionally supports:
+Compared with the pure web frontend, the desktop edition additionally supports:
 
 - local file and folder access
 - desktop title bar and window controls
 - single-instance behavior
-- desktop file association for `.fbn`
+- `.fbn` file association
 - automatic update integration
-
-## Related Documents
-
-- [Developer Guide](./README.dev.md)
-- [中文说明](./Chinese.md)
 
 ## License
 

@@ -1,7 +1,7 @@
 <div align="center">
     <img src="../src/renderer/src/assets/logo.png" width="180" />
     <p>Fabulous</p>
-    <p>一个面向阅读、写作与研究整理的跨平台桌面笔记工作区。</p>
+    <p>一个面向阅读、写作与研究整理的跨平台桌面工作区。</p>
 </div>
 
 <p align="center">
@@ -11,9 +11,14 @@
 
 # Fabulous Desktop
 
-Fabulous Desktop 是 Fabulous 生态的本地桌面版。
+Fabulous Desktop 是 Fabulous 生态的本地 Electron 桌面版。
 
-它将本地笔记、研究资料整理、文件系统操作和桌面端交互整合到同一个应用中，适合把笔记和资料都放在自己电脑上管理的使用方式。
+它把本地笔记编辑、研究资料整理、文件路径工作流和桌面端交互整合在同一个应用里。
+
+## 文档
+
+- [English Guide](./English.md)
+- [开发说明](./README.dev.md)
 
 ## Fabulous 能做什么？
 
@@ -34,15 +39,15 @@ Fabulous 提供：
 
 **下载安装**
 
-请从 GitHub Releases 页面下载最新版本：
+请从这里下载最新版本：
 
 - <https://github.com/Creator-SN/Fabulous/releases>
 
-**首次使用**
+**首次启动**
 
-第一次启动后，你可以直接从本地笔记区域开始使用；如果你还需要更完整的文献管理能力，也可以继续进入更完整的 Fabulous 工作流。
+第一次打开应用后，你可以直接从本地笔记区域开始使用。
 
-如果你当前主要把它当作本地笔记应用来使用，那么本地笔记视图就已经足够开始。
+如果你还需要更完整的文献整理流程，Fabulous 也可以继续承担更完整的桌面研究工作区角色，而不只是一个笔记编辑器。
 
 ![预览 1](./assets/Chinese-f1.png)
 
@@ -59,13 +64,13 @@ Fabulous Desktop 支持偏本地优先的笔记方式：
 
 ## 阅读与写作体验
 
-编辑器提供了较完整的富文本写作能力，同时保留了适合 Markdown 使用者的操作习惯。
+编辑器提供较完整的富文本写作能力，同时保留适合 Markdown 使用者的操作习惯。
 
 常见能力包括：
 
-- 标题、列表、任务列表、引用块
+- 标题、列表、任务列表与引用块
 - 加粗、斜体、下划线、删除线等行内格式
-- 链接、图片、嵌入、代码块
+- 链接、图片、嵌入与代码块
 - 本地笔记内容刷新与保存
 
 ![预览 3](./assets/Chinese-f6.png)
@@ -79,11 +84,6 @@ Fabulous Desktop 支持偏本地优先的笔记方式：
 - 单实例运行
 - `.fbn` 文件关联
 - 自动更新集成
-
-## 相关文档
-
-- [English Guide](./English.md)
-- [开发说明](./README.dev.md)
 
 ## License
 
