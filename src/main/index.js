@@ -7,6 +7,13 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 
 remoteMain.initialize()
 
+function getWindowState(win) {
+  return {
+    platform: process.platform,
+    isMaximized: process.platform === 'darwin' ? win.isFullScreen() : win.isMaximized()
+  }
+}
+
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -37,11 +44,21 @@ function createWindow() {
   })
 
   ipcMain.on('max', () => {
+    if (process.platform === 'darwin') {
+      win.setFullScreen(!win.isFullScreen())
+      return
+    }
+
     if (win.isMaximized()) win.restore()
     else win.maximize()
   })
 
   ipcMain.on('close', () => {
+    if (process.platform === 'darwin') {
+      app.hide()
+      return
+    }
+
     win.close()
   })
 
@@ -76,9 +93,9 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  ipcMain.handle('is-window-maximized', (event) => {
+  ipcMain.handle('get-window-state', (event) => {
     const win = BrowserWindow.fromWebContents(event.sender)
-    return win.isMaximized()
+    return getWindowState(win)
   })
 
   createWindow()

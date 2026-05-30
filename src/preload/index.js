@@ -3,7 +3,10 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  isMaximized: () => ipcRenderer.invoke('is-window-maximized')
+  getWindowState: () => ipcRenderer.invoke('get-window-state'),
+  minimizeWindow: () => ipcRenderer.send('min'),
+  maximizeWindow: () => ipcRenderer.send('max'),
+  closeWindow: () => ipcRenderer.send('close')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

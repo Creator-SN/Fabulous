@@ -29,9 +29,98 @@
     </div>
 </template>
 
+<script>
+import { mapState } from 'pinia'
+import { useAppConfig } from '@/stores/appConfig'
+import { useDataStore } from '@/stores/data'
+import { closeWindow, getWindowState, maximizeWindow, minimizeWindow } from '@/js/windowControls'
+
+export default {
+    props: {
+        background: {
+            default: ''
+        },
+        leftOffset: {
+            default: 0
+        },
+        rightOffset: {
+            default: 0
+        },
+        theme: {
+            default: 'light'
+        }
+    },
+    data() {
+        return {
+            isMaximized: false,
+            timer: {
+                windowStatus: {}
+            }
+        }
+    },
+    computed: {
+        ...mapState(useAppConfig, {
+            editorMap: (state) => state.editor,
+            local: (state) => state.local
+        }),
+        ...mapState(useDataStore, {
+            currentDataPath: (state) => state.currentDataPath,
+            currentDataPathItem: (state) => state.currentDataPathItem
+        })
+    },
+    mounted() {
+        this.timerInit()
+    },
+    methods: {
+        async refreshWindowState() {
+            const state = await getWindowState()
+            this.isMaximized = state.isMaximized
+        },
+        timerInit() {
+            this.timer.windowStatus = setInterval(() => {
+                this.refreshWindowState()
+            }, 50)
+            this.refreshWindowState()
+        },
+        minimize() {
+            minimizeWindow()
+        },
+        maximize() {
+            maximizeWindow()
+        },
+        close() {
+            let unsave = false
+            for (let key in this.editorMap) {
+                if (this.editorMap[key].unsave) {
+                    unsave = true
+                }
+            }
+            if (unsave) {
+                this.$infoBox(this.local(`Are you sure to quit without saved?`), {
+                    status: 'warning',
+                    title: this.local('Confirm'),
+                    confirmTitle: this.local('Confirm'),
+                    cancelTitle: this.local('Cancel'),
+                    theme: this.theme,
+                    confirm: () => {
+                        closeWindow()
+                    },
+                    cancel: () => {}
+                })
+            } else closeWindow()
+        }
+    },
+    beforeUnmount() {
+        for (let key in this.timer) {
+            clearInterval(this.timer[key])
+        }
+    }
+}
+</script>
+
 <style lang="scss" scoped>
 .title-bar {
-    position: relative;
+    position: absolute;
     width: 100%;
     min-height: 32px;
     height: 32px;
@@ -42,6 +131,7 @@
     transition: margin 0.3s;
     user-select: none;
     -webkit-app-region: drag;
+    z-index: 2;
 
     &.dark {
         background: black;
@@ -131,82 +221,3 @@
     }
 }
 </style>
-
-<script>
-import { mapState } from 'pinia'
-import { useAppConfig } from '@/stores/appConfig'
-import { useDataStore } from '@/stores/data'
-import * as remote from '@electron/remote'
-const { ipcRenderer: ipc } = require('electron')
-
-export default {
-    props: {
-        background: {
-            default: ''
-        },
-        leftOffset: {
-            default: 0
-        },
-        rightOffset: {
-            default: 0
-        },
-        theme: {
-            default: 'light'
-        }
-    },
-    data() {
-        return {
-            isMaximized: remote.getCurrentWindow().isMaximized(),
-            timer: {
-                windowStatus: {}
-            }
-        }
-    },
-    computed: {
-        ...mapState(useAppConfig, {
-            unsave: (state) => state.editor.unsave,
-            local: (state) => state.local
-        }),
-        ...mapState(useDataStore, {
-            currentDataPath: (state) => state.currentDataPath,
-            currentDataPathItem: (state) => state.currentDataPathItem
-        })
-    },
-    mounted() {
-        this.timerInit()
-    },
-    methods: {
-        timerInit() {
-            this.timer.windowStatus = setInterval(() => {
-                this.isMaximized = remote.getCurrentWindow().isMaximized()
-            }, 50)
-        },
-        minimize() {
-            ipc.send('min')
-        },
-        maximize() {
-            ipc.send('max')
-        },
-        close() {
-            if (this.unsave) {
-                this.$infoBox(this.local(`Are you sure to quit without saved?`), {
-                    status: 'warning',
-                    title: this.local('Confirm'),
-                    confirmTitle: this.local('Confirm'),
-                    cancelTitle: this.local('Cancel'),
-                    theme: this.theme,
-                    confirm: () => {
-                        ipc.send('close')
-                    },
-                    cancel: () => {}
-                })
-            } else ipc.send('close')
-        }
-    },
-    beforeUnmount() {
-        for (let key in this.timer) {
-            clearInterval(this.timer[key])
-        }
-    }
-}
-</script>

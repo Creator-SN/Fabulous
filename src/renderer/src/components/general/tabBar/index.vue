@@ -6,7 +6,7 @@
         :class="{ dark: theme == 'dark' }"
         :style="{
             width: `calc(100% - ${leftOffset + rightOffset}px)`,
-            margin: `0 ${rightOffset}px 0 ${leftOffset}px`,
+            left: `${leftOffset}px`,
             background: background
         }"
         @dragstart="setDraggingEl($el)"
@@ -19,7 +19,7 @@
                 :theme="theme"
                 :itemWidth="160"
                 :item-height="30"
-                list-padding="8px 2px"
+                list-padding="0px 2px"
                 background="transparent"
                 overflowMode="scroll"
                 class="tab-view"
@@ -196,12 +196,14 @@ export default {
 <style lang="scss">
 .tab-bar {
     position: relative;
+    top: 8px;
     width: 100%;
-    min-height: 45px;
-    height: 45px;
+    min-height: 35px;
+    height: 35px;
     background: white;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     align-items: center;
     user-select: none;
     overflow: visible;
@@ -252,7 +254,12 @@ export default {
         align-items: center;
         padding-left: 10px;
         font-size: 13px;
-        -webkit-app-region: no-drag;
+        -webkit-app-region: drag;
+
+        .tab-view-item
+        {
+            -webkit-app-region: no-drag;
+        }
     }
 
     .tab-view {

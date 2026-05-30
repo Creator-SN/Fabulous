@@ -1,10 +1,16 @@
 <template>
     <div id="app" :class="{ dark: theme == 'dark' }">
         <navigation-view v-show="show.nav"></navigation-view>
+        <title-bar
+            v-if="clientMode !== 'web'"
+            :theme="theme"
+            style="background: transparent"
+        ></title-bar>
         <tab-bar
-            class="title-bar"
+            class="tab-bar"
             :theme="theme"
             :left-offset="titleBarOffset"
+            :right-offset="150"
             style="background: transparent"
         ></tab-bar>
         <div class="addition-container">
@@ -35,6 +41,7 @@ setProxy(instance.proxy)
 import i18n from '@/js/i18n.js'
 import progressBar from '@/components/general/progressbar.vue'
 import navigationView from '@/components/general/navigationView/index.vue'
+import titleBar from '@/components/general/titleBar.vue'
 import tabBar from '@/components/general/tabBar/index.vue'
 import pdfImporter from '@/components/general/pdfImporter.vue'
 import itemCarrier from '@/components/general/itemCarrier.vue'
@@ -80,6 +87,7 @@ export default {
         }),
         ...mapState(useAppConfig, {
             local: (state) => state.local,
+            clientMode: (state) => state.clientMode,
             draggingEl: (state) => state.draggingEl,
             fullScreen: (state) => state.fullScreen,
             windowWidth: (state) => state.window.width,
@@ -309,7 +317,7 @@ export default {
         }
     }
 
-    .title-bar {
+    .tab-bar {
         position: absolute;
         z-index: 10;
     }
