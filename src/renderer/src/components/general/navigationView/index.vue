@@ -90,7 +90,8 @@
                         :Go="Go"
                     ></ds-tree-view>
                     <local-tree-view
-                        v-show="expand && computeDisplay('local') && clientMode !== 'local'"
+                        v-if="clientMode === 'electron'"
+                        v-show="expand && computeDisplay('local')"
                         v-model="localPath"
                         :Go="Go"
                         ref="local_view"
