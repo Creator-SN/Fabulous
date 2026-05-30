@@ -218,6 +218,11 @@ For macOS signing and notarization, the workflow expects:
 
 If these secrets are missing, Windows builds can still succeed, but macOS signing/notarization will likely fail.
 
+Current workflow note:
+
+- GitHub Actions currently skips macOS notarization by default so release artifacts can still be produced while the Apple Developer membership is unavailable.
+- To restore notarized builds later, use [scripts/release/build-mac-notarized.sh](C:/Users/Alever/source/repos/Fabulous3/scripts/release/build-mac-notarized.sh) with valid Apple signing and notarization environment variables.
+
 ## Notes
 
 - Automatic update version detection works in development, but real download/install behavior should be verified with packaged app builds.

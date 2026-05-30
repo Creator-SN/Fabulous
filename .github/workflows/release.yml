@@ -75,6 +75,7 @@ jobs:
   macos:
     runs-on: macos-14
     env:
+      SKIP_MAC_NOTARIZE: 'true'
       USE_HARD_LINKS: false
       CSC_LINK: ~/app.p12
       P12: ${{ secrets.APP_P12 }}
@@ -115,7 +116,14 @@ jobs:
       - name: Build macOS package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: yarn build:mac
+        run: |
+          if [ "$SKIP_MAC_NOTARIZE" = "true" ]; then
+            unset APPLE_ID
+            unset APPLE_PASSWORD
+            unset APPLE_APP_SPECIFIC_PASSWORD
+            unset APPLE_TEAM_ID
+          fi
+          yarn build:mac
 
       - name: Read tag
         id: tag
