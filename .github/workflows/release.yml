@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Windows package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn build:win
+
+      - name: Read tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
+      - name: Collect Windows artifacts
+        shell: pwsh
+        run: |
+          $version = "${{ steps.tag.outputs.tag }}".Substring(1)
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item "dist\latest.yml" "release\latest.yml"
+          Get-ChildItem "dist" -File | Where-Object {
+            $_.Extension -in @('.exe', '.blockmap')
+          } | ForEach-Object {
+            $targetName = $_.Name.Replace("Fabulous Setup $version", "Fabulous-Setup-$version")
+            Copy-Item $_.FullName (Join-Path "release" $targetName)
+          }
+
+      - name: Upload prerelease
+        if: contains(steps.tag.outputs.tag, 'beta')
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'release/*.exe,release/*.blockmap,release/*.yml'
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release
+        if: ${{ !contains(steps.tag.outputs.tag, 'beta') }}
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'release/*.exe,release/*.blockmap,release/*.yml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  macos:
+    runs-on: macos-14
+    env:
+      USE_HARD_LINKS: false
+      CSC_LINK: ~/app.p12
+      P12: ${{ secrets.APP_P12 }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APP_ID: ${{ secrets.APP_ID }}
+      TEAM_ID: ${{ secrets.TEAM_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Create app certificate
+        if: env.P12 != ''
+        run: |
+          cat > ~/app.p12.base64 << EOF
+          $P12
+          EOF
+          base64 -D -i ~/app.p12.base64 -o ~/app.p12
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build macOS package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn build:mac
+
+      - name: Read tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
+      - name: Collect macOS artifacts
+        run: |
+          mkdir -p release
+          cp dist/latest-mac.yml release/latest-mac.yml
+          find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.blockmap" \) -exec cp {} release/ \;
+
+      - name: Upload prerelease
+        if: contains(steps.tag.outputs.tag, 'beta')
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'release/*.dmg,release/*.zip,release/*.blockmap,release/*.yml'
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release
+        if: ${{ !contains(steps.tag.outputs.tag, 'beta') }}
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'release/*.dmg,release/*.zip,release/*.blockmap,release/*.yml'
+          token: ${{ secrets.GITHUB_TOKEN }}
