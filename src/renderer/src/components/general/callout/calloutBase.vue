@@ -1,0 +1,169 @@
+<template>
+    <div
+        class="fabulous-callout-base-container"
+        :class="[{ dark: theme === 'dark' }]"
+        @click="$event.stopPropagation()"
+    >
+        <fv-callout
+            v-if="!mobileMode"
+            v-model="thisShow"
+            :lockScroll="true"
+            :position="'bottomCenter'"
+            :disabled="mobileMode"
+            :beak="12"
+            :space="8"
+            :theme="theme"
+            :popperClass="popperClass"
+            :calloutBg="background"
+            :borderRadius="12"
+        >
+            <slot name="trigger" :show="false"></slot>
+            <template v-slot:header>
+                <slot name="header" :title="title">
+                    <p style="font-size: 13.8px">{{ title }}</p>
+                </slot>
+            </template>
+            <template v-slot:main>
+                <slot name="content" index="1"></slot>
+            </template>
+        </fv-callout>
+
+        <div v-if="mobileMode">
+            <slot name="trigger" :show="triggerShow"></slot>
+            <fv-drawer
+                v-model="thisShow"
+                class="fabulous-callout-base-mobile-container"
+                length="calc(100% - 50px)"
+                :background="background"
+            >
+                <div class="fabulous-c-b-m-banner">
+                    <slot name="header" :title="title">
+                        <p style="width: 50px"></p>
+                        <p class="fabulous-c-b-m-title">{{ title }}</p>
+                    </slot>
+                    <p class="fabulous-c-b-m-close" @click="thisShow = false">Cancel</p>
+                </div>
+                <div class="fabulous-c-b-m-content-block" :class="popperClass">
+                    <div class="main" style="width: 100%; height: 100%">
+                        <slot name="content" index="2"></slot>
+                    </div>
+                </div>
+            </fv-drawer>
+        </div>
+    </div>
+</template>
+
+<script setup>
+defineEmits(['update:show'])
+</script>
+
+<script>
+export default {
+    props: {
+        popperClass: {
+            default: []
+        },
+        title: {
+            default: 'Title'
+        },
+        show: {
+            default: false
+        },
+        mobileMode: {
+            default: false
+        },
+        background: {
+            default: ''
+        },
+        theme: {
+            default: 'light'
+        }
+    },
+    data() {
+        return {
+            thisShow: false
+        }
+    },
+    watch: {
+        show(val) {
+            this.thisShow = val
+        },
+        thisShow(val) {
+            this.$emit('update:show', val)
+        }
+    },
+    methods: {
+        triggerShow() {
+            this.thisShow = true
+        }
+    }
+}
+</script>
+
+<style lang="scss">
+.fabulous-callout-base-container {
+    &.dark {
+        .fabulous-callout-base-mobile-container {
+            background: rgba(36, 36, 36, 0.9);
+
+            .fabulous-c-b-m-banner {
+                background: rgba(47, 52, 55, 0.95);
+                color: whitesmoke;
+
+                .fabulous-c-b-m-close {
+                    color: rgba(46, 170, 220, 1);
+                }
+            }
+        }
+
+        * {
+            color: whitesmoke;
+        }
+    }
+
+    .fabulous-callout-base-mobile-container {
+        background: rgba(247, 246, 243, 0.9);
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        z-index: 9;
+
+        .fabulous-c-b-m-banner {
+            position: relative;
+            width: 100%;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: rgba(200, 200, 200, 0.1) solid thin;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .fabulous-c-b-m-title {
+                font-size: 16px;
+                user-select: none;
+            }
+
+            .fabulous-c-b-m-close {
+                width: 60px;
+                color: rgba(140, 148, 228, 1);
+                text-align: center;
+                user-select: none;
+                cursor: pointer;
+            }
+        }
+
+        .fabulous-c-b-m-content-block {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            padding: 30px 15px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+    }
+}
+</style>

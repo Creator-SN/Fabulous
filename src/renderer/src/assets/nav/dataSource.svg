@@ -1,0 +1,54 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="top" x1="122" y1="126" x2="390" y2="232" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9B8FF"/>
+      <stop offset="0.55" stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+
+    <linearGradient id="middle" x1="118" y1="220" x2="394" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C084FC"/>
+      <stop offset="0.45" stop-color="#F472B6"/>
+      <stop offset="1" stop-color="#FF7A3D"/>
+    </linearGradient>
+
+    <linearGradient id="bottom" x1="120" y1="314" x2="392" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDBA74"/>
+      <stop offset="0.55" stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+
+    <linearGradient id="highlight" x1="143" y1="118" x2="350" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <filter id="shadow" x="64" y="80" width="384" height="380" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#7C3AED" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="white"/>
+
+  <g filter="url(#shadow)">
+    <!-- bottom layer -->
+    <path d="M112 344C112 312.5 176.5 287 256 287C335.5 287 400 312.5 400 344V381C400 412.5 335.5 438 256 438C176.5 438 112 412.5 112 381V344Z" fill="url(#bottom)"/>
+    <ellipse cx="256" cy="344" rx="144" ry="57" fill="#FFB15C"/>
+    <ellipse cx="256" cy="338" rx="128" ry="43" fill="url(#bottom)" opacity="0.96"/>
+
+    <!-- middle layer -->
+    <path d="M112 250C112 218.5 176.5 193 256 193C335.5 193 400 218.5 400 250V287C400 318.5 335.5 344 256 344C176.5 344 112 318.5 112 287V250Z" fill="url(#middle)"/>
+    <ellipse cx="256" cy="250" rx="144" ry="57" fill="#F07AC9"/>
+    <ellipse cx="256" cy="244" rx="128" ry="43" fill="url(#middle)" opacity="0.96"/>
+
+    <!-- top layer -->
+    <path d="M112 156C112 124.5 176.5 99 256 99C335.5 99 400 124.5 400 156V193C400 224.5 335.5 250 256 250C176.5 250 112 224.5 112 193V156Z" fill="url(#top)"/>
+    <ellipse cx="256" cy="156" rx="144" ry="57" fill="#B777FF"/>
+    <ellipse cx="256" cy="148" rx="124" ry="40" fill="url(#highlight)"/>
+
+    <!-- soft fluent highlights -->
+    <path d="M140 177C162 203 204 216 256 216C308 216 350 203 372 177" stroke="white" stroke-opacity="0.28" stroke-width="10" stroke-linecap="round"/>
+    <path d="M142 271C164 297 205 310 256 310C307 310 348 297 370 271" stroke="white" stroke-opacity="0.24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M142 365C164 391 205 404 256 404C307 404 348 391 370 365" stroke="white" stroke-opacity="0.22" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>

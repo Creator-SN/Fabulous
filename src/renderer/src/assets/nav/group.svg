@@ -1,0 +1,83 @@
+<svg width="1696" height="1773" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xml:space="preserve" overflow="hidden">
+    <defs>
+        <linearGradient x1="2320.44" y1="542.765" x2="1939.86" y2="1886.97" gradientUnits="userSpaceOnUse"
+            spreadMethod="reflect" id="stroke0">
+            <stop offset="0" stop-color="#CFB1EC" />
+            <stop offset="0.0416667" stop-color="#D0B2EC" />
+            <stop offset="0.0833333" stop-color="#D1B4EC" />
+            <stop offset="0.125" stop-color="#D2B6ED" />
+            <stop offset="0.166667" stop-color="#D3B8ED" />
+            <stop offset="0.208333" stop-color="#D4B9ED" />
+            <stop offset="0.25" stop-color="#D5BBEE" />
+            <stop offset="0.291667" stop-color="#D6BCEE" />
+            <stop offset="0.333333" stop-color="#D6BEEE" />
+            <stop offset="0.375" stop-color="#D7BFEE" />
+            <stop offset="0.416667" stop-color="#D8C0EF" />
+            <stop offset="0.458333" stop-color="#D9C2EF" />
+            <stop offset="0.5" stop-color="#D9C3EF" />
+            <stop offset="0.541667" stop-color="#DAC4EF" />
+            <stop offset="0.583333" stop-color="#DBC5F0" />
+            <stop offset="0.625" stop-color="#DBC6F0" />
+            <stop offset="0.666667" stop-color="#DCC6F0" />
+            <stop offset="0.708333" stop-color="#DCC7F0" />
+            <stop offset="0.75" stop-color="#DCC8F0" />
+            <stop offset="0.791667" stop-color="#DDC8F0" />
+            <stop offset="0.833333" stop-color="#DDC9F0" />
+            <stop offset="0.875" stop-color="#DDC9F0" />
+            <stop offset="0.916667" stop-color="#DDC9F0" />
+            <stop offset="0.958333" stop-color="#DDC9F0" />
+            <stop offset="1" stop-color="#DECAF1" />
+        </linearGradient>
+        <linearGradient x1="1627.75" y1="468.898" x2="2632.55" y2="1960.84" gradientUnits="userSpaceOnUse"
+            spreadMethod="reflect" id="fill1">
+            <stop offset="0" stop-color="#D7C0FD" stop-opacity="0.701961" />
+            <stop offset="0.68" stop-color="#CFB1EC" stop-opacity="0.701961" />
+            <stop offset="1" stop-color="#9F66D7" stop-opacity="0.701961" />
+        </linearGradient>
+        <linearGradient x1="1786" y1="718.208" x2="1786" y2="2180.79" gradientUnits="userSpaceOnUse"
+            spreadMethod="reflect" id="stroke2">
+            <stop offset="0" stop-color="#F2F2F2" stop-opacity="0.701961" />
+            <stop offset="0.0833333" stop-color="#F3F3F3" stop-opacity="0.701961" />
+            <stop offset="0.166667" stop-color="#F5F5F5" stop-opacity="0.701961" />
+            <stop offset="0.25" stop-color="#F7F7F7" stop-opacity="0.701961" />
+            <stop offset="0.333333" stop-color="#F8F8F8" stop-opacity="0.701961" />
+            <stop offset="0.416667" stop-color="#FAFAFA" stop-opacity="0.701961" />
+            <stop offset="0.5" stop-color="#FBFBFB" stop-opacity="0.701961" />
+            <stop offset="0.583333" stop-color="#FCFCFC" stop-opacity="0.701961" />
+            <stop offset="0.666667" stop-color="#FDFDFD" stop-opacity="0.701961" />
+            <stop offset="0.75" stop-color="#FEFEFE" stop-opacity="0.701961" />
+            <stop offset="0.833333" stop-color="#FEFEFE" stop-opacity="0.701961" />
+            <stop offset="0.916667" stop-color="#FEFEFE" stop-opacity="0.701961" />
+            <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.701961" />
+        </linearGradient>
+        <linearGradient x1="1067.12" y1="841.56" x2="2504.88" y2="2057.44" gradientUnits="userSpaceOnUse"
+            spreadMethod="reflect" id="fill3">
+            <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.701961" />
+            <stop offset="0.68" stop-color="#F2F2F2" stop-opacity="0.701961" />
+            <stop offset="1" stop-color="#D9D9D9" stop-opacity="0.701961" />
+        </linearGradient>
+        <clipPath id="topPanelClip">
+            <path
+                d="M1169.5 865.723C1169.5 785.518 1234.52 720.5 1314.72 720.5L2257.28 720.5C2337.48 720.5 2402.5 785.518 2402.5 865.723L2402.5 2033.28C2402.5 2113.48 2337.48 2178.5 2257.28 2178.5L1314.72 2178.5C1234.52 2178.5 1169.5 2113.48 1169.5 2033.28Z"
+                fill-rule="evenodd" />
+        </clipPath>
+        <filter id="coveredBlur" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="12" />
+        </filter>
+    </defs>
+    <g transform="translate(-1167 -408)">
+        <path
+            d="M1722.86 491.151C1739.54 432.254 1800.8 398.027 1859.69 414.701L2779.93 675.239C2838.83 691.914 2873.06 753.177 2856.38 812.073L2537.44 1938.59C2520.77 1997.48 2459.5 2031.71 2400.61 2015.04L1480.37 1754.5C1421.47 1737.82 1387.25 1676.56 1403.92 1617.67Z"
+            stroke="url(#stroke0)" stroke-width="4.58333" stroke-miterlimit="8" fill="url(#fill1)"
+            fill-rule="evenodd" />
+        <path
+            d="M1722.86 491.151C1739.54 432.254 1800.8 398.027 1859.69 414.701L2779.93 675.239C2838.83 691.914 2873.06 753.177 2856.38 812.073L2537.44 1938.59C2520.77 1997.48 2459.5 2031.71 2400.61 2015.04L1480.37 1754.5C1421.47 1737.82 1387.25 1676.56 1403.92 1617.67Z"
+            clip-path="url(#topPanelClip)" filter="url(#coveredBlur)" stroke="url(#stroke0)" stroke-width="4.58333"
+            stroke-miterlimit="8" fill="url(#fill1)" fill-rule="evenodd" />
+        <path
+            d="M1169.5 865.723C1169.5 785.518 1234.52 720.5 1314.72 720.5L2257.28 720.5C2337.48 720.5 2402.5 785.518 2402.5 865.723L2402.5 2033.28C2402.5 2113.48 2337.48 2178.5 2257.28 2178.5L1314.72 2178.5C1234.52 2178.5 1169.5 2113.48 1169.5 2033.28Z"
+            stroke="url(#stroke2)" stroke-width="4.58333" stroke-miterlimit="8" fill="url(#fill3)"
+            fill-rule="evenodd" />
+    </g>
+</svg>
