@@ -13,6 +13,7 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock()
 remoteMain.initialize()
 
 const NOTEBOOK_FILE_EXTENSIONS = new Set(['.fbn', '.md', '.html', '.json'])
+const GITHUB_LATEST_RELEASE_API = 'https://api.github.com/repos/Creator-SN/Fabulous/releases/latest'
 const localDirectoryWatchers = new Map()
 let mainWindow = null
 const updaterState = {
@@ -38,8 +39,49 @@ function updateUpdaterState(nextState = {}) {
   emitUpdaterState()
 }
 
+function normalizeVersionString(version = '') {
+  return String(version || '').trim().replace(/^v/i, '')
+}
+
 function normalizeVersionInfo(info = {}) {
-  return info?.version || info?.releaseName || ''
+  return normalizeVersionString(
+    info?.version || info?.tag || info?.tag_name || info?.releaseName || info?.name || ''
+  )
+}
+
+function compareVersions(left = '', right = '') {
+  const leftParts = normalizeVersionString(left)
+    .split('.')
+    .map((item) => Number.parseInt(item, 10) || 0)
+  const rightParts = normalizeVersionString(right)
+    .split('.')
+    .map((item) => Number.parseInt(item, 10) || 0)
+  const length = Math.max(leftParts.length, rightParts.length)
+
+  for (let index = 0; index < length; index += 1) {
+    const leftValue = leftParts[index] || 0
+    const rightValue = rightParts[index] || 0
+    if (leftValue === rightValue) continue
+    return leftValue > rightValue ? 1 : -1
+  }
+
+  return 0
+}
+
+async function fetchLatestReleaseVersion() {
+  const response = await fetch(GITHUB_LATEST_RELEASE_API, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'Fabulous3-Updater'
+    }
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch latest release: ${response.status}`)
+  }
+
+  const payload = await response.json()
+  return normalizeVersionInfo(payload)
 }
 
 function setupAutoUpdater() {
@@ -102,15 +144,30 @@ function setupAutoUpdater() {
 }
 
 async function checkForAppUpdates() {
+  let remoteVersion = ''
+
+  try {
+    remoteVersion = await fetchLatestReleaseVersion()
+  } catch (error) {
+    console.warn('fetch latest release failed', error)
+  }
+
   if (!app.isPackaged) {
+    const hasNewVersion = remoteVersion && compareVersions(remoteVersion, updaterState.currentVersion) > 0
     updateUpdaterState({
-      status: 'latest',
-      version: updaterState.currentVersion,
-      remoteVersion: updaterState.currentVersion,
-      message: 'Updates are available in packaged app builds.'
+      status: hasNewVersion ? 'available' : 'latest',
+      version: remoteVersion || updaterState.currentVersion,
+      remoteVersion,
+      downloadPercent: 0,
+      message: 'Dev mode only reads release info. Auto update works in packaged app builds.'
     })
     return { ...updaterState }
   }
+
+  updateUpdaterState({
+    version: remoteVersion || updaterState.version,
+    remoteVersion: remoteVersion || updaterState.remoteVersion
+  })
 
   await autoUpdater.checkForUpdates()
   return { ...updaterState }

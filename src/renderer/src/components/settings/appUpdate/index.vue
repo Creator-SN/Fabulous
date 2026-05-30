@@ -20,6 +20,9 @@
                     <p v-show="updater.status === 'latest'" class="update-content-info">
                         {{ local('Latest Version') }}
                     </p>
+                    <p v-show="updater.status === 'available'" class="update-content-info">
+                        {{ local('Update Available') }}
+                    </p>
                     <p v-show="updater.remoteVersion" class="update-content-info">
                         {{ local('Remote Version') }}: v{{ updater.remoteVersion }}
                     </p>
@@ -40,6 +43,9 @@
                 </p>
                 <p v-show="updater.status === 'downloaded'" class="update-content-info">
                     {{ local('Ready to Install') }}
+                </p>
+                <p v-show="updater.status === 'available'" class="update-content-info">
+                    {{ updater.message }}
                 </p>
                 <p v-show="updater.status === 'error'" class="update-content-info error">
                     {{ updater.message || local('Update Error') }}

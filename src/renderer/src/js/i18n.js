@@ -803,6 +803,10 @@ export default {
         "en": "Remote Version",
         "cn": "远端版本"
     },
+    "Update Available": {
+        "en": "Update Available",
+        "cn": "有更新"
+    },
     "Downloading...": {
         "en": "Downloading...",
         "cn": "下载中..."
