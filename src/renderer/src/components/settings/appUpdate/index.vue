@@ -32,6 +32,10 @@
                     v-show="updater.status === 'checking' || updater.status === 'loading'"
                     :model-value="updater.downloadPercent"
                     :loading="updater.status === 'checking'"
+                    :color="color"
+                    :background="
+                        theme === 'dark' ? 'rgba(23, 29, 39, 0.3)' : 'rgba(255, 255, 255, 0.3)'
+                    "
                     r="15"
                     borderWidth="3"
                 ></fv-progress-ring>
@@ -101,7 +105,8 @@ export default {
     },
     computed: {
         ...mapState(useTheme, {
-            theme: 'theme'
+            theme: 'theme',
+            color: 'color'
         }),
         ...mapState(useAppConfig, {
             local: 'local'
