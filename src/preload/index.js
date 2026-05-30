@@ -7,6 +7,9 @@ const api = {
   minimizeWindow: () => ipcRenderer.send('min'),
   maximizeWindow: () => ipcRenderer.send('max'),
   closeWindow: () => ipcRenderer.send('close'),
+  getAppUpdateState: () => ipcRenderer.invoke('get-app-update-state'),
+  checkAppUpdate: () => ipcRenderer.invoke('check-app-update'),
+  installAppUpdate: () => ipcRenderer.invoke('install-app-update'),
   chooseLocalDirectory: () => ipcRenderer.invoke('choose-local-directory'),
   chooseLocalFile: () => ipcRenderer.invoke('choose-local-file'),
   listLocalDirectoryChildren: (directoryPath) =>
@@ -34,6 +37,11 @@ const api = {
     const handler = (_, payload) => callback(payload)
     ipcRenderer.on('local-directory-changed', handler)
     return () => ipcRenderer.removeListener('local-directory-changed', handler)
+  },
+  onUpdaterMessage: (callback) => {
+    const handler = (_, payload) => callback(payload)
+    ipcRenderer.on('updater-callback', handler)
+    return () => ipcRenderer.removeListener('updater-callback', handler)
   }
 }
 

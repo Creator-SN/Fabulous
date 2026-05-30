@@ -795,6 +795,38 @@ export default {
         "en": "Latest Version",
         "cn": "已经是最新版本"
     },
+    "Current Version": {
+        "en": "Current Version",
+        "cn": "当前版本"
+    },
+    "Remote Version": {
+        "en": "Remote Version",
+        "cn": "远端版本"
+    },
+    "Downloading...": {
+        "en": "Downloading...",
+        "cn": "下载中..."
+    },
+    "Ready to Install": {
+        "en": "Ready to Install",
+        "cn": "准备安装"
+    },
+    "Update Error": {
+        "en": "Update Error",
+        "cn": "更新错误"
+    },
+    "Check Update": {
+        "en": "Check Update",
+        "cn": "检查更新"
+    },
+    "Install Update": {
+        "en": "Install Update",
+        "cn": "安装更新"
+    },
+    "Unknown Version": {
+        "en": "Unknown Version",
+        "cn": "未知版本"
+    },
     "Save": {
         "en": "Save",
         "cn": "保存"

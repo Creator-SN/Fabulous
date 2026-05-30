@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import remoteMain from '@electron/remote/main'
+import { autoUpdater } from 'electron-updater'
 import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import path from 'path'
@@ -13,9 +14,106 @@ remoteMain.initialize()
 
 const NOTEBOOK_FILE_EXTENSIONS = new Set(['.fbn', '.md', '.html', '.json'])
 const localDirectoryWatchers = new Map()
+let mainWindow = null
+const updaterState = {
+  status: 'init',
+  currentVersion: app.getVersion(),
+  version: '',
+  remoteVersion: '',
+  downloadPercent: 0,
+  message: ''
+}
 
 function normalizeSlashes(targetPath) {
   return targetPath.replace(/\\/g, '/')
+}
+
+function emitUpdaterState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  mainWindow.webContents.send('updater-callback', { ...updaterState })
+}
+
+function updateUpdaterState(nextState = {}) {
+  Object.assign(updaterState, nextState)
+  emitUpdaterState()
+}
+
+function normalizeVersionInfo(info = {}) {
+  return info?.version || info?.releaseName || ''
+}
+
+function setupAutoUpdater() {
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+
+  autoUpdater.on('checking-for-update', () => {
+    updateUpdaterState({
+      status: 'checking',
+      message: '',
+      downloadPercent: 0
+    })
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    const remoteVersion = normalizeVersionInfo(info)
+    updateUpdaterState({
+      status: 'loading',
+      version: remoteVersion,
+      remoteVersion,
+      message: ''
+    })
+  })
+
+  autoUpdater.on('download-progress', (progress) => {
+    updateUpdaterState({
+      status: 'loading',
+      downloadPercent: Math.max(0, Math.min(100, Math.round(progress?.percent || 0)))
+    })
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    const remoteVersion = normalizeVersionInfo(info)
+    updateUpdaterState({
+      status: 'downloaded',
+      version: remoteVersion,
+      remoteVersion,
+      downloadPercent: 100,
+      message: ''
+    })
+  })
+
+  autoUpdater.on('update-not-available', (info) => {
+    const remoteVersion = normalizeVersionInfo(info)
+    updateUpdaterState({
+      status: 'latest',
+      version: remoteVersion || updaterState.currentVersion,
+      remoteVersion: remoteVersion || updaterState.currentVersion,
+      downloadPercent: 100,
+      message: ''
+    })
+  })
+
+  autoUpdater.on('error', (error) => {
+    updateUpdaterState({
+      status: 'error',
+      message: error?.message || 'update failed'
+    })
+  })
+}
+
+async function checkForAppUpdates() {
+  if (!app.isPackaged) {
+    updateUpdaterState({
+      status: 'latest',
+      version: updaterState.currentVersion,
+      remoteVersion: updaterState.currentVersion,
+      message: 'Updates are available in packaged app builds.'
+    })
+    return { ...updaterState }
+  }
+
+  await autoUpdater.checkForUpdates()
+  return { ...updaterState }
 }
 
 function isVisibleNotebookFile(targetPath) {
@@ -195,6 +293,7 @@ function createWindow() {
       devTools: true
     }
   })
+  mainWindow = win
 
   remoteMain.enable(win.webContents)
 
@@ -313,6 +412,20 @@ function createWindow() {
     return true
   })
 
+  ipcMain.handle('get-app-update-state', async () => {
+    return { ...updaterState }
+  })
+
+  ipcMain.handle('check-app-update', async () => {
+    return await checkForAppUpdates()
+  })
+
+  ipcMain.handle('install-app-update', async () => {
+    if (updaterState.status !== 'downloaded') return false
+    setImmediate(() => autoUpdater.quitAndInstall())
+    return true
+  })
+
   win.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
@@ -343,7 +456,7 @@ if (!gotSingleInstanceLock) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.creatorsn.fabulous')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -360,6 +473,7 @@ app.whenReady().then(() => {
     return getWindowState(win)
   })
 
+  setupAutoUpdater()
   createWindow()
 
   app.on('activate', function () {

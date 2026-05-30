@@ -327,45 +327,7 @@
                     </fv-button>
                 </template>
             </fv-Collapse>
-            <fv-Collapse
-                v-if="false"
-                :disabledCollapse="true"
-                :theme="theme"
-                :icon="'DevUpdate'"
-                :title="local('App Update')"
-                :content="
-                    !updater.version ? local('Automatic application update') : updater.version
-                "
-                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
-            >
-                <template v-slot:extension>
-                    <div class="update-info-block">
-                        <i
-                            v-show="updater.status === 'latest'"
-                            class="ms-Icon ms-Icon--Accept latest-icon"
-                        ></i>
-                        <p v-show="updater.status === 'latest'" class="update-content-info">
-                            {{ local('Latest Version') }}
-                        </p>
-                        <fv-progress-ring
-                            v-show="updater.status === 'checking' || updater.status === 'loading'"
-                            :model-value="updater.downloadPercent"
-                            :loading="updater.status === 'checking'"
-                            r="15"
-                            borderWidth="3"
-                        ></fv-progress-ring>
-                        <p v-show="updater.status === 'checking'" class="update-content-info">
-                            {{ local('Checking...') }}
-                        </p>
-                        <p
-                            v-show="updater.status === 'checking' || updater.status === 'loading'"
-                            class="update-content-info"
-                        >
-                            {{ updater.downloadPercent }}%
-                        </p>
-                    </div>
-                </template>
-            </fv-Collapse>
+            <app-update v-if="clientMode === 'electron'"></app-update>
         </div>
         <source-editor
             v-model:show="show.addDS"
@@ -392,6 +354,7 @@ import userProfile from './profile/userProfile.vue'
 import sourceEditor from '@/components/settings/dataSource/sourceEditor.vue'
 import dataSource from '@/components/settings/dataSource/index.vue'
 import joinInvitePanel from '@/components/settings/dataSource/joinInvitePanel.vue'
+import appUpdate from '@/components/settings/appUpdate/index.vue'
 
 import sourceImg from '@/assets/settings/source.svg'
 import themeImg from '@/assets/settings/theme.svg'
@@ -409,7 +372,8 @@ export default {
         userProfile,
         sourceEditor,
         dataSource,
-        joinInvitePanel
+        joinInvitePanel,
+        appUpdate
     },
     data() {
         return {
@@ -426,11 +390,6 @@ export default {
                 { key: 'both', text: () => this.local('Both Systems') }
             ],
             db_index: -1,
-            updater: {
-                status: 'init',
-                downloadPercent: 0,
-                version: false
-            },
             editingDS: null,
             img: {
                 source: sourceImg,
@@ -531,10 +490,9 @@ export default {
             theme: 'theme',
             color: 'color'
         }),
-        ...mapState(useAppConfig, ['local'])
+        ...mapState(useAppConfig, ['local', 'clientMode'])
     },
     async mounted() {
-        this.eventInit()
         await this.getConfig()
     },
     methods: {
@@ -545,16 +503,6 @@ export default {
             getDataPath: 'getDataPath',
             acceptSourcePermissionGroupInvite: 'acceptSourcePermissionGroupInvite'
         }),
-        eventInit() {
-            // this.nw.on('updater-callback', (event, { status, info }) => {
-            //     this.updater.status = status;
-            //     if (status === 'latest')
-            //         this.updater.version = info.releaseName;
-            //     if (status === 'loading')
-            //         this.updater.downloadPercent = info.percent.toFixed(0);
-            //     console.log({ status, info });
-            // });
-        },
         openAddDS() {
             this.show.dsMode = 'add'
             this.editingDS = null

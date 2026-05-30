@@ -24,7 +24,14 @@
         "mac": {
             "icon": "build/icon.icns",
             "entitlements": "build/entitlements.mac.plist"
-        }
+        },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "Creator-SN",
+                "repo": "Fabulous"
+            }
+        ]
     },
     "scripts": {
         "format": "prettier --write .",
@@ -46,6 +53,7 @@
         "@electron-toolkit/preload": "^3.0.2",
         "@electron-toolkit/utils": "^4.0.0",
         "@electron/remote": "^2.1.2",
+        "electron-updater": "^6.3.9",
         "axios": "^0.21.4",
         "bibtex-parser": "^0.0.0",
         "cropperjs": "^1.5.13",
