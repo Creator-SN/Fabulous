@@ -251,6 +251,10 @@ export default {
         isRemote: {
             default: true,
             type: Boolean
+        },
+        mentionItemAttr: {
+            type: Object,
+            default: null
         }
     },
     data() {

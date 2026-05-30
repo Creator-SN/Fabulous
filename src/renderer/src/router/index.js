@@ -19,14 +19,18 @@ const router = createRouter({
             component: AsyncLoad(() => import("@/views/home/partition.vue"))
         },
         {
+            path: "/notebook/local/:path",
+            name: "LocalNotebook",
+            component: AsyncLoad(() => import("@/views/notebook/local.vue"))
+        },
+        {
             path: "/notebook/:path",
-            name: "NoteBook",
-            component: AsyncLoad(() => import("@/views/notebook/index.vue"))
+            redirect: to => `/notebook/local/${to.params.path}`
         },
         {
             path: "/notebook/remote/:path",
             name: "NoteBook",
-            component: AsyncLoad(() => import("@/views/notebook/index.vue"))
+            component: AsyncLoad(() => import("@/views/notebook/remote.vue"))
         },
         {
             path: "/templates",

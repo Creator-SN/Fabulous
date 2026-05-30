@@ -37,7 +37,8 @@ export const useAppConfig = defineStore('appConfig', () => {
 
     const editor = ref({
         academic: createEditorPrototype(),
-        notebook: createEditorPrototype()
+        notebook: createEditorPrototype(),
+        local: createEditorPrototype()
     })
 
     const tabList = ref([])

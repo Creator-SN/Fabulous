@@ -6,7 +6,34 @@ const api = {
   getWindowState: () => ipcRenderer.invoke('get-window-state'),
   minimizeWindow: () => ipcRenderer.send('min'),
   maximizeWindow: () => ipcRenderer.send('max'),
-  closeWindow: () => ipcRenderer.send('close')
+  closeWindow: () => ipcRenderer.send('close'),
+  chooseLocalDirectory: () => ipcRenderer.invoke('choose-local-directory'),
+  listLocalDirectoryChildren: (directoryPath) =>
+    ipcRenderer.invoke('list-local-directory-children', directoryPath),
+  searchLocalDirectories: (directoryPath, keyword) =>
+    ipcRenderer.invoke('search-local-directories', directoryPath, keyword),
+  searchLocalNotebooks: (directoryPath, keyword, top) =>
+    ipcRenderer.invoke('search-local-notebooks', directoryPath, keyword, top),
+  readLocalFile: (filePath) => ipcRenderer.invoke('read-local-file', filePath),
+  writeLocalFile: (filePath, content) => ipcRenderer.invoke('write-local-file', filePath, content),
+  createLocalDirectory: (directoryPath) =>
+    ipcRenderer.invoke('create-local-directory', directoryPath),
+  renameLocalEntry: (entryPath, newName) =>
+    ipcRenderer.invoke('rename-local-entry', entryPath, newName),
+  removeLocalEntry: (entryPath) => ipcRenderer.invoke('remove-local-entry', entryPath),
+  copyLocalEntry: (sourcePath, targetPath) =>
+    ipcRenderer.invoke('copy-local-entry', sourcePath, targetPath),
+  moveLocalEntry: (sourcePath, targetPath) =>
+    ipcRenderer.invoke('move-local-entry', sourcePath, targetPath),
+  openLocalPath: (targetPath) => ipcRenderer.invoke('open-local-path', targetPath),
+  watchLocalDirectory: (directoryPath) => ipcRenderer.invoke('watch-local-directory', directoryPath),
+  unwatchLocalDirectory: (directoryPath) =>
+    ipcRenderer.invoke('unwatch-local-directory', directoryPath),
+  onLocalDirectoryChange: (callback) => {
+    const handler = (_, payload) => callback(payload)
+    ipcRenderer.on('local-directory-changed', handler)
+    return () => ipcRenderer.removeListener('local-directory-changed', handler)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -90,13 +90,7 @@
                         :Go="Go"
                     ></ds-tree-view>
                     <local-tree-view
-                        v-if="false"
-                        v-show="
-                            expand &&
-                            activeSystemMode !== 'ds' &&
-                            computeDisplay('notebook') &&
-                            notebookMode === 0
-                        "
+                        v-show="expand && computeDisplay('local') && clientMode !== 'local'"
                         v-model="localPath"
                         :Go="Go"
                         ref="local_view"
@@ -188,7 +182,7 @@
 <script>
 import loading from '@/components/general/loading.vue'
 import dsTreeView from '@/components/general/navigationView/dsTreeView/index.vue'
-import localTreeView from '@/components/general/navigationView/localTreeView.vue'
+import localTreeView from '@/components/general/navigationView/localTreeView/index.vue'
 import remoteTreeView from '@/components/general/navigationView/remoteTreeView/index.vue'
 import { mapState, mapActions } from 'pinia'
 import { useAppConfig } from '@/stores/appConfig'
@@ -342,6 +336,10 @@ export default {
                     if (this.activeSystemMode === 'ds') return false
                     if (this.activeSystemMode === 'notebook') return true
                     return this.menuDisplayMode.key === 1
+                }
+                if (name === 'local') {
+                    if (this.activeSystemMode === 'ds') return false
+                    return this.menuDisplayMode.key === 2
                 }
             }
         },
