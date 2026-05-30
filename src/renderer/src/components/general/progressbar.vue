@@ -1,0 +1,29 @@
+<template>
+<div v-show="progress > 0 && progress <= 100" class="fabulous-global-progress-bar">
+    <fv-progress-bar :model-value="progress" background="transparent" foreground="rgba(252, 194, 0, 1)" style="width: 100%;"></fv-progress-bar>
+</div>
+</template>
+
+<script>
+import { mapState } from "pinia";
+import { useAppConfig } from "@/stores/appConfig";
+
+export default {
+    computed: {
+        ...mapState(useAppConfig, {
+            progress: (state) => state.progress,
+        })
+    }
+}
+</script>
+
+<style lang="scss">
+.fabulous-global-progress-bar
+{
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    z-index: 2;
+}
+</style>

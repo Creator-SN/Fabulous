@@ -1,136 +1,153 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Release
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     tags:
-      - "v*"
-
-  # Allows you to run this workflow manually from the Actions tab
+      - 'v*'
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: write
+
 jobs:
-  # This workflow contains a single job called "build"
-  window:
-    # The type of runner that the job will run on
+  windows:
     runs-on: windows-2022
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Uses NodeJs Environment
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
+          node-version: 20
+          cache: yarn
 
-      - name: install dependencies
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        env:
+          npm_config_python: ${{ env.pythonLocation }}\python.exe
         run: yarn install --frozen-lockfile
 
-      - name: build win x64
-        run: yarn electron:build
+      - name: Build Windows package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn build:win
 
-      - name: Get tag
+      - name: Read tag
         id: tag
         uses: dawidd6/action-get-tag@v1
 
-      # - name: Archive Release
-      #   run: powershell Compress-Archive -Path ./dist_electron/ -DestinationPath win_x64_Fabulous_${{steps.tag.outputs.tag}}.zip
-
-      - name: Rename
+      - name: Collect Windows artifacts
+        shell: pwsh
         run: |
-          $v="${{steps.tag.outputs.tag}}".Substring(1)
-          mv "./dist_electron/Fabulous Setup $v.exe" "Fabulous-Setup-$v.exe"
-          mv "./dist_electron/Fabulous Setup $v.exe.blockmap" "Fabulous-Setup-$v.exe.blockmap"
-          mv "./dist_electron/latest.yml" "latest.yml"
+          $version = "${{ steps.tag.outputs.tag }}".Substring(1)
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item "dist\latest.yml" "release\latest.yml"
+          Get-ChildItem "dist" -File | Where-Object {
+            $_.Extension -in @('.exe', '.blockmap')
+          } | ForEach-Object {
+            $targetName = $_.Name.Replace("Fabulous Setup $version", "Fabulous-Setup-$version")
+            Copy-Item $_.FullName (Join-Path "release" $targetName)
+          }
 
-      - name: Upload Prerelease
+      - name: Upload prerelease
+        if: contains(steps.tag.outputs.tag, 'beta')
         uses: ncipollo/release-action@v1
-        if: ${{ contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.exe,*.blockmap,*.yml"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'release/*.exe,release/*.blockmap,release/*.yml'
           prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Release
+      - name: Upload release
+        if: ${{ !contains(steps.tag.outputs.tag, 'beta') }}
         uses: ncipollo/release-action@v1
-        if: ${{ !contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.exe,*.blockmap,*.yml"
+          artifacts: 'release/*.exe,release/*.blockmap,release/*.yml'
           token: ${{ secrets.GITHUB_TOKEN }}
 
   macos:
     runs-on: macos-14
     env:
+      SKIP_MAC_NOTARIZE: 'true'
       USE_HARD_LINKS: false
       CSC_LINK: ~/app.p12
       P12: ${{ secrets.APP_P12 }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || secrets.TEAM_ID }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-      APP_ID: ${{ secrets.APP_ID }}
-      TEAM_ID: ${{ secrets.TEAM_ID }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Uses NodeJs Environment
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
+          node-version: 20
+          cache: yarn
 
-      - name: create app.p12
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create app certificate
+        if: env.P12 != ''
         run: |
           cat > ~/app.p12.base64 << EOF
           $P12
           EOF
           base64 -D -i ~/app.p12.base64 -o ~/app.p12
 
-      - name: install dependencies
+      - name: Install dependencies
+        env:
+          npm_config_python: ${{ env.pythonLocation }}/bin/python
         run: yarn install --frozen-lockfile
 
-      - name: build macos x64
-        run: yarn electron:build
+      - name: Build macOS package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$SKIP_MAC_NOTARIZE" = "true" ]; then
+            unset APPLE_ID
+            unset APPLE_PASSWORD
+            unset APPLE_APP_SPECIFIC_PASSWORD
+            unset APPLE_TEAM_ID
+          fi
+          yarn build:mac
 
-      - name: Get tag
+      - name: Read tag
         id: tag
         uses: dawidd6/action-get-tag@v1
 
-      - name: Rename
+      - name: Collect macOS artifacts
         run: |
-          ls -alh ./dist_electron/
-          v=${{steps.tag.outputs.tag}}
-          v=${v:1}
-          mv ./dist_electron/Fabulous-$v-arm64.dmg ./Fabulous-$v-arm64.dmg
-          mv ./dist_electron/Fabulous-$v-arm64.dmg.blockmap ./Fabulous-$v-arm64.dmg.blockmap
-          mv ./dist_electron/latest-mac.yml ./latest-mac.yml
-          mv ./dist_electron/Fabulous-$v-arm64-mac.zip ./Fabulous-$v-arm64-mac.zip
-          mv ./dist_electron/Fabulous-$v-arm64-mac.zip.blockmap ./Fabulous-$v-arm64-mac.zip.blockmap
+          mkdir -p release
+          cp dist/latest-mac.yml release/latest-mac.yml
+          find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.blockmap" \) -exec cp {} release/ \;
 
-      - name: Upload Prerelease
+      - name: Upload prerelease
+        if: contains(steps.tag.outputs.tag, 'beta')
         uses: ncipollo/release-action@v1
-        if: ${{ contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.dmg,*.blockmap,*.yml,*.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'release/*.dmg,release/*.zip,release/*.blockmap,release/*.yml'
           prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Release
+      - name: Upload release
+        if: ${{ !contains(steps.tag.outputs.tag, 'beta') }}
         uses: ncipollo/release-action@v1
-        if: ${{ !contains(steps.tag.outputs.tag,'beta') }}
         with:
           allowUpdates: true
-          artifacts: "*.dmg,*.blockmap,*.yml,*.zip"
+          artifacts: 'release/*.dmg,release/*.zip,release/*.blockmap,release/*.yml'
           token: ${{ secrets.GITHUB_TOKEN }}

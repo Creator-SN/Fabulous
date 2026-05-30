@@ -2,7 +2,8 @@
 node_modules
 /dist
 /dist_electron
-/dist_electron/*
+.vscode
+out
 
 
 # local env files
@@ -23,6 +24,3 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-dist_electron/index.js
-
-out/
