@@ -23,7 +23,14 @@ jobs:
           node-version: 20
           cache: yarn
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install dependencies
+        env:
+          npm_config_python: ${{ env.pythonLocation }}\python.exe
         run: yarn install --frozen-lockfile
 
       - name: Build Windows package
@@ -87,6 +94,11 @@ jobs:
           node-version: 20
           cache: yarn
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Create app certificate
         if: env.P12 != ''
         run: |
@@ -96,6 +108,8 @@ jobs:
           base64 -D -i ~/app.p12.base64 -o ~/app.p12
 
       - name: Install dependencies
+        env:
+          npm_config_python: ${{ env.pythonLocation }}/bin/python
         run: yarn install --frozen-lockfile
 
       - name: Build macOS package
