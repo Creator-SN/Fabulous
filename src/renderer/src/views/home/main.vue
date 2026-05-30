@@ -925,7 +925,7 @@ export default {
     z-index: 1;
 
     &.dark {
-        background: rgba(5, 9, 15, 0.9);
+        background: rgba(5, 9, 15, 0.85);
 
         .s-title {
             color: whitesmoke;
@@ -934,7 +934,7 @@ export default {
         .m-home-block {
             .row {
                 &.main-table {
-                    background: rgba(16, 20, 28, 0.9);
+                    background: rgba(36, 36, 36, 0.9);
                 }
 
                 .row-item-info {

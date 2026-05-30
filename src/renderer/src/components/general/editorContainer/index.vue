@@ -24,6 +24,7 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
+                    background="transparent"
                     ref="itemNavTrigger"
                     @click="show.currentItemNav ^= true"
                 >
@@ -38,6 +39,7 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
+                    background="transparent"
                     @click="readonly = readonly == true ? false : true"
                     ><i
                         class="ms-Icon"
@@ -48,6 +50,7 @@
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
+                    background="transparent"
                     @click="expandContentModel = expandContentModel == true ? false : true"
                     ><i
                         class="ms-Icon"
@@ -66,6 +69,7 @@
                     :background="editorShowNavModel ? 'rgba(140, 148, 228, 1)' : ''"
                     :foreground="editorShowNavModel ? '#fff' : ''"
                     class="control-btn"
+                    background="transparent"
                     @click="editorShowNavModel = editorShowNavModel ? false : true"
                 >
                     <i class="ms-Icon ms-Icon--ButtonMenu"></i>

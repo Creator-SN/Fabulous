@@ -8,7 +8,7 @@
         :placeholder="` ` + local('Search Partitions')"
         :theme="theme"
         borderWidth="1"
-        background="rgba(255, 255, 255, 0.1)"
+        :background="theme === 'dark' ? 'rgba(36, 39, 45, 0.6)' : 'rgba(255, 255, 255, 0.1)'"
         :border-radius="30"
         :revealBorder="true"
         :resultBorderRadius="8"

@@ -171,7 +171,7 @@ export default {
     }
 
     &.dark {
-        background: rgba(5, 9, 15, 0.9);
+        background: rgba(5, 9, 15, 0.85);
         background-size: 180% 180%;
         animation: loading-dark 18s ease-in-out infinite;
 

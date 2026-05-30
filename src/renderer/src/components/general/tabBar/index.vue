@@ -24,6 +24,9 @@
                 overflowMode="scroll"
                 class="tab-view"
                 styleMode="rounded"
+                :normal-background="
+                    theme === 'dark' ? 'rgba(2, 9, 15, 0)' : 'rgba(236, 236, 236, 0)'
+                "
                 @update:items="updateItems"
                 @click="handleClick"
                 @close="closeTab"
@@ -256,8 +259,7 @@ export default {
         font-size: 13px;
         -webkit-app-region: drag;
 
-        .tab-view-item
-        {
+        .tab-view-item {
             -webkit-app-region: no-drag;
         }
     }

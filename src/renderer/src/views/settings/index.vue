@@ -13,7 +13,7 @@
                 :icon="'StorageTape'"
                 :title="local('Source')"
                 :content="local('Add New Source')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 35px"
@@ -53,7 +53,7 @@
                 :icon="'Color'"
                 :title="local('Theme')"
                 :content="theme === 'light' ? `${local('Light')}` : `${local('Dark')}`"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 15px"
@@ -99,7 +99,7 @@
                 :icon="'LocaleLanguage'"
                 :title="local('Language')"
                 :content="local('Choose A Language')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -135,7 +135,7 @@
                 :icon="'Manage'"
                 :title="local('System Mode')"
                 :content="local('Switch System Mode')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -171,7 +171,7 @@
                 :icon="'Save'"
                 :title="local('Auto Save')"
                 :content="local('Auto Save')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -211,7 +211,7 @@
                 "
                 :title="local('Editor Content Expand')"
                 :content="local('Switch Editor Content Expand')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -247,7 +247,7 @@
                 :icon="'ButtonMenu'"
                 :title="local('Show Navigation')"
                 :content="local('Show Navigation on Editor')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -284,7 +284,7 @@
                 :icon="'Diagnostic'"
                 :title="local('Watch All Files')"
                 :content="local('Switch whether to watch all extension files on Notebook system')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -309,7 +309,7 @@
                 :icon="'DeveloperTools'"
                 :title="local('Dev Tools')"
                 :content="local('Dev Tools for Developer')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 1)' : ''"
+                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -592,7 +592,7 @@ export default {
     transition: all 0.3s;
 
     &.dark {
-        background: rgba(5, 9, 15, 0.9);
+        background: rgba(5, 9, 15, 0.85);
 
         .s-title {
             color: whitesmoke;

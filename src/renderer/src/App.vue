@@ -276,10 +276,6 @@ export default {
     overflow: hidden;
     transition: all 0.3s;
 
-    &.dark {
-        background: rgba(36, 36, 36, 1);
-    }
-
     ::-webkit-scrollbar {
         width: 10px;
         height: 8px;

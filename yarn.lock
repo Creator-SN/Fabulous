@@ -357,10 +357,22 @@
     url "^0.11.4"
     vue "^3.5.13"
 
-"@creatorsn/vfluent3@^0.3.80", "@creatorsn/vfluent3@^0.3.86":
+"@creatorsn/vfluent3@^0.3.80":
   version "0.3.86"
   resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.86.tgz#ee446ad06ce1978303880463bacc1c1fc1482f42"
   integrity sha512-A6zIhY8W+7sj/gVvoopsxy5sdekHrHWBhwC+92B25Gn6TP7USo9tZQrcacPBRqlOqictiGGwHqoGlqtnPN8csA==
+  dependencies:
+    "@vue/shared" "^3.4.20"
+    gsap "3.1.1"
+    onecolor "3.1.0"
+    pinia "^2.1.7"
+    swiper "8.3.2"
+    vue "^3.4.20"
+
+"@creatorsn/vfluent3@^0.3.87":
+  version "0.3.87"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.87.tgz#a767d46e9d5eb7481a3b5dd3dafddbf68f12965a"
+  integrity sha512-rWqD5DvyYjparVmkejUl3XiCCgjbs+7KdRzOhOLGHmDgZA6KLDE6Ipl4DZ0OoZjPQl0pGj+vnQN9KeB0MM92lA==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"

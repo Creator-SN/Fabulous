@@ -258,7 +258,7 @@ export default {
     transition: all 0.3s;
 
     &.dark {
-        background: rgba(5, 9, 15, 0.9);
+        background: rgba(5, 9, 15, 0.85);
 
         .s-title {
             color: whitesmoke;

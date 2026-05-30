@@ -8,7 +8,13 @@
         :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : 'rgba(255, 255, 255, 1)'"
     >
         <template v-slot:trigger>
-            <fv-button :theme="theme" :borderRadius="30" class="control-btn" :is-box-shadow="true">
+            <fv-button
+                :theme="theme"
+                :borderRadius="30"
+                background="transparent"
+                class="control-btn"
+                :is-box-shadow="true"
+            >
                 <i class="ms-Icon ms-Icon--History"></i>
             </fv-button>
         </template>
@@ -50,7 +56,7 @@
                                 :size="28"
                                 :font-size="10"
                                 :infoTitle="'Updater'"
-                                style="max-width: 120px;"
+                                style="max-width: 120px"
                             ></user-avatar>
                         </div>
                     </template>
@@ -99,9 +105,6 @@ export default {
         },
         local: {
             default: () => {}
-        },
-        theme: {
-            default: 'light'
         }
     },
     data() {
@@ -126,7 +129,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(useTheme, ['color'])
+        ...mapState(useTheme, ['theme', 'color'])
     },
     methods: {
         async getNotebookHistory() {

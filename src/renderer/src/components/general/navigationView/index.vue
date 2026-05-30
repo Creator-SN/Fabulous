@@ -32,7 +32,7 @@
                             foreground="black"
                             choosenForeground="black"
                             :background="
-                                theme === 'dark' ? 'rgba(20, 20, 20, 1)' : 'rgba(238, 238, 239, 1)'
+                                theme === 'dark' ? 'rgba(2, 9, 15, 0.3)' : 'rgba(255, 255, 255, 0.5)'
                             "
                             borderRadius="30"
                             padding="0 3px"
@@ -308,7 +308,7 @@ export default {
         }),
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(246, 246, 246, 0.7)'
-            return 'rgba(5, 9, 15, 0.9)'
+            return 'rgba(5, 9, 15, 0.85)'
         },
         localPathFolderName() {
             let pathList = this.localPath.split(/[\\/]/)
