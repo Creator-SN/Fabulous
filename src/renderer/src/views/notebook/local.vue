@@ -289,7 +289,7 @@ export default {
                 history: this.history
             })
             if (last?.page?.filePath) {
-                let url = `/notebook/local/${encodeURI(last.page.filePath.replace(/\//g, '\\'))}`
+                let url = `/local_notebook/${encodeURI(last.page.filePath.replace(/\//g, '\\'))}`
                 this.$Go(url)
             }
         },

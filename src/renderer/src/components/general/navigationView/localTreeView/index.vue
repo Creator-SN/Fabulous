@@ -560,7 +560,7 @@ export default {
             this.openNotebook(item)
         },
         openNotebook(item) {
-            let url = `/notebook/local/${encodeURI(item.filePath.replace(/\//g, '\\'))}`
+            let url = `/local_notebook/${encodeURI(item.filePath.replace(/\//g, '\\'))}`
             const switchNotebook = () => {
                 const parentPath = this.getParentPath(item.filePath)
                 const parentItem =

@@ -1690,5 +1690,29 @@ export default {
     "User Info": {
         "en": "User Info",
         "cn": "用户信息"
+    },
+    "Are you sure to delete this file?": {
+        "en": "Are you sure to delete this file?",
+        "cn": "确定要删除此文件吗？"
+    },
+    "Local": {
+        "en": "Local",
+        "cn": "本地"
+    },
+    "Mention Disabled": {
+        "en": "Mention Disabled",
+        "cn": "提及已禁用"
+    },
+    "Open File": {
+        "en": "Open File",
+        "cn": "打开文件"
+    },
+    "Open File Failed": {
+        "en": "Open File Failed",
+        "cn": "打开文件失败"
+    },
+    "Open Folder Failed": {
+        "en": "Open Folder Failed",
+        "cn": "打开文件夹失败"
     }
 }

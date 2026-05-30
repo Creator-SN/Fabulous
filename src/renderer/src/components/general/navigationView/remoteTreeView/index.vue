@@ -606,14 +606,14 @@ export default {
             if (!item?.id) return
             this.getRemoteNotebookPath(item.id).then((res) => {
                 if (res?.code !== 200 || !res?.data?.guidPath) return
-                let url = `/notebook/remote/${encodeURI(res.data.guidPath.replace(/\//g, '\\'))}`
+                let url = `/notebook/${encodeURI(res.data.guidPath.replace(/\//g, '\\'))}`
                 this.Go(url)
             })
         },
         treeItemClick(item) {
             if (!item.filePath || item.loading) return
             if (!item.isDir) {
-                let url = `/notebook/remote/${encodeURI(item.filePath.replace(/\//g, '\\'))}`
+                let url = `/notebook/${encodeURI(item.filePath.replace(/\//g, '\\'))}`
                 const switchNotebook = () => {
                     let parentPath = this.findParentPath(item)
                     let parentItem = this.FLAT.find((it) =>

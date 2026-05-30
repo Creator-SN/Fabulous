@@ -210,7 +210,7 @@ export default {
             if (item.type === 'notebook') {
                 this.getRemoteNotebookPath(item.id).then((res) => {
                     if (res?.code !== 200 || !res?.data?.guidPath) return
-                    let url = `/notebook/remote/${encodeURI(
+                    let url = `/notebook/${encodeURI(
                         res.data.guidPath.replace(/\//g, '\\')
                     )}`
                     this.$Go(url)

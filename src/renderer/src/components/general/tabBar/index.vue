@@ -92,8 +92,10 @@ export default {
             tabValue: (state) => state.tabValue,
             academicTarget: (state) => state.editor.academic?.target,
             notebookTarget: (state) => state.editor.notebook?.target,
+            localNotebookTarget: (state) => state.editor.local?.target,
             academicUnsaved: (state) => state.editor.academic?.unsave,
-            notebookUnsaved: (state) => state.editor.notebook?.unsave
+            notebookUnsaved: (state) => state.editor.notebook?.unsave,
+            localNotebookUnsaved: (state) => state.editor.local?.unsave
         }),
         ...mapState(useDataStore, {
             currentDataPath: (state) => state.currentDataPath,
@@ -120,6 +122,14 @@ export default {
                     },
                     image: notebookIcon,
                     modified: () => this.notebookUnsaved
+                },
+                local_notebook: {
+                    name: () => {
+                        if (this.localNotebookTarget?.name) return this.localNotebookTarget.name
+                        return this.local('Local Notebook')
+                    },
+                    image: notebookIcon,
+                    modified: () => this.localNotebookUnsaved
                 },
                 academic: {
                     name: () => {

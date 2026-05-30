@@ -481,7 +481,7 @@ export default {
                 let path = `${last.dsId}/${last.page.id}`
                 url = `/academic/template/${encodeURI(path.replace(/\//g, '\\'))}`
             } else if (this.itemType === 'notebook' && last.page.filePath) {
-                url = `/notebook/remote/${encodeURI(last.page.filePath.replace(/\//g, '\\'))}`
+                url = `/notebook/${encodeURI(last.page.filePath.replace(/\//g, '\\'))}`
             }
             this.$Go(url)
         },

@@ -219,7 +219,7 @@ export default {
                     history: history,
                     cache: true
                 })
-                let url = `/notebook/remote/${encodeURI(page.filePath.replace(/\//g, '\\'))}`
+                let url = `/notebook/${encodeURI(page.filePath.replace(/\//g, '\\'))}`
                 this.$Go(url)
             }
         }

@@ -153,11 +153,7 @@ export default {
             listRemoteDirectoryChildren: 'listRemoteDirectoryChildren'
         }),
         refreshRemote() {
-            if (
-                this.$route.path.startsWith('/notebook/') &&
-                !this.$route.path.startsWith('/notebook/remote')
-            )
-                this.isRemote = false
+            if (this.$route.path.startsWith('/local_notebook/')) this.isRemote = false
             else this.isRemote = true
         },
         refreshPathParams() {
@@ -423,7 +419,7 @@ export default {
             return { shouldStop: true }
         },
         notebookRoute() {
-            return this.isRemote ? '/notebook/remote/' : '/notebook/'
+            return this.isRemote ? '/notebook/' : '/local_notebook/'
         },
         openEditorTool(item, page, getScrollTop) {
             this.history.push({
