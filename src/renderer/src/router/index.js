@@ -30,7 +30,7 @@ const router = createRouter({
         {
             path: "/notebook/remote/:path",
             name: "NoteBook",
-            component: AsyncLoad(() => import("@/views/notebook/remote.vue"))
+            component: AsyncLoad(() => import("@/views/notebook/index.vue"))
         },
         {
             path: "/templates",

@@ -47,7 +47,8 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
         removeEntry: true,
         copyEntry: true,
         moveEntry: true,
-        chooseDirectory: true
+        chooseDirectory: true,
+        chooseFile: true
     })
 
     function warningMessage(message) {
@@ -109,6 +110,23 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
                 code: 200,
                 status: 'success',
                 data
+            }
+        }, { code: 423, data: null })
+    }
+
+    async function chooseLocalFile() {
+        return await withLock('chooseFile', async () => {
+            const api = getLocalApi()
+            if (!api?.chooseLocalFile) {
+                warningMessage('local file picker unavailable')
+                return createError('local file picker unavailable')
+            }
+            const data = await api.chooseLocalFile()
+            if (!data) return { code: 204, data: null }
+            return {
+                code: 200,
+                status: 'success',
+                data: normalizePath(data)
             }
         }, { code: 423, data: null })
     }
@@ -377,6 +395,7 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
         currentWatchPath,
         setRootPath,
         chooseLocalDirectory,
+        chooseLocalFile,
         listLocalDirectoryChildren,
         searchLocalDirectories,
         searchLocalNotebooks,

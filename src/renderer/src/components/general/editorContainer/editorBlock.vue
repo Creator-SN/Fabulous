@@ -697,7 +697,9 @@ export default {
             if (!this.refreshContentTool) return
             if (!this.lock.loading) return
             this.lock.loading = false
-            let { shouldStop, docInfo, contentType } = await this.refreshContentTool()
+            let { shouldStop, docInfo, contentType } = await this.refreshContentTool({
+                getEditor: this.getEditor
+            })
             if (shouldStop) {
                 this.lock.loading = true
                 return

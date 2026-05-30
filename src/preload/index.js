@@ -8,6 +8,7 @@ const api = {
   maximizeWindow: () => ipcRenderer.send('max'),
   closeWindow: () => ipcRenderer.send('close'),
   chooseLocalDirectory: () => ipcRenderer.invoke('choose-local-directory'),
+  chooseLocalFile: () => ipcRenderer.invoke('choose-local-file'),
   listLocalDirectoryChildren: (directoryPath) =>
     ipcRenderer.invoke('list-local-directory-children', directoryPath),
   searchLocalDirectories: (directoryPath, keyword) =>

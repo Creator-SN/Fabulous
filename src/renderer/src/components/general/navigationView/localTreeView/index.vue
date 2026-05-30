@@ -159,10 +159,7 @@
                     <p>{{ local('New Note') }}</p>
                 </span>
                 <span v-show="rightMenuItem.isDir" @click="createFolder(rightMenuItem.filePath)">
-                    <i
-                        class="ms-Icon ms-Icon--NewFolder"
-                        style="color: rgba(140, 148, 228, 1)"
-                    ></i>
+                    <i class="ms-Icon ms-Icon--NewFolder" style="color: rgba(140, 148, 228, 1)"></i>
                     <p>{{ local('New Folder') }}</p>
                 </span>
                 <hr v-show="rightMenuItem.isDir" />
@@ -174,7 +171,10 @@
                     <i class="ms-Icon ms-Icon--Cut" style="color: rgba(140, 148, 228, 1)"></i>
                     <p>{{ local('Cut') }}</p>
                 </span>
-                <span v-show="rightMenuItem.isDir && copyList.length > 0" @click="paste(rightMenuItem)">
+                <span
+                    v-show="rightMenuItem.isDir && copyList.length > 0"
+                    @click="paste(rightMenuItem)"
+                >
                     <i class="ms-Icon ms-Icon--Paste" style="color: rgba(140, 148, 228, 1)"></i>
                     <p>{{ local('Paste') }}</p>
                 </span>
@@ -188,17 +188,11 @@
                 </span>
                 <hr />
                 <span @click="showRename(rightMenuItem)">
-                    <i
-                        class="ms-Icon ms-Icon--Rename"
-                        style="color: rgba(149, 141, 241, 1)"
-                    ></i>
+                    <i class="ms-Icon ms-Icon--Rename" style="color: rgba(149, 141, 241, 1)"></i>
                     <p>{{ local('Rename') }}</p>
                 </span>
                 <span @click="deleteConfirm(rightMenuItem)">
-                    <i
-                        class="ms-Icon ms-Icon--Delete"
-                        style="color: rgba(220, 62, 72, 1)"
-                    ></i>
+                    <i class="ms-Icon ms-Icon--Delete" style="color: rgba(220, 62, 72, 1)"></i>
                     <p>{{ local('Delete') }}</p>
                 </span>
             </div>
@@ -250,6 +244,13 @@ export default {
             copyList: [],
             rightMenuItem: {},
             notebookCmdList: [
+                {
+                    name: () => this.local('Open File'),
+                    func: () => this.chooseFile(),
+                    img: 'note',
+                    disabled: () => false,
+                    show: () => true
+                },
                 {
                     name: () => this.local('Choose Folder'),
                     func: () => this.chooseFolder(),
@@ -341,6 +342,7 @@ export default {
         ...mapActions(useLocalNotebookConfig, [
             'setRootPath',
             'chooseLocalDirectory',
+            'chooseLocalFile',
             'listLocalDirectoryChildren',
             'searchLocalDirectories',
             'searchLocalNotebooks',
@@ -494,6 +496,28 @@ export default {
             })
             await this.resetAndWatch()
         },
+        async chooseFile() {
+            let res = await this.chooseLocalFile()
+            if (res?.code === 204) return
+            if (res?.code !== 200 || !res?.data) {
+                this.$barWarning(res?.message || this.local('Open File Failed'), {
+                    status: 'warning'
+                })
+                return
+            }
+            const filePath = this.normalizePath(res.data)
+            this.openNotebook(
+                this.buildItem(
+                    {
+                        name: filePath.split('/').pop(),
+                        filePath,
+                        isFile: true,
+                        isDir: false
+                    },
+                    this.getParentPath(filePath)
+                )
+            )
+        },
         async focusDirectory(item) {
             if (!item?.filePath) return
             let targetPath = this.normalizePath(item.filePath)
@@ -553,7 +577,9 @@ export default {
                 const siblings = this.comparePath(parentPath, this.path)
                     ? this.treeList
                     : parentItem.children || []
-                const pages = siblings.filter((child) => child.isFile).map((child) => ({ ...child }))
+                const pages = siblings
+                    .filter((child) => child.isFile)
+                    .map((child) => ({ ...child }))
                 const history =
                     this.currentEditor?.type === 'notebook'
                         ? (this.currentEditor.history || []).concat({
@@ -982,6 +1008,11 @@ export default {
                     background: rgba(200, 200, 200, 0.3);
                 }
             }
+        }
+
+        .image-menu-btn {
+            padding: 0px;
+            overflow: hidden;
         }
     }
 

@@ -78,6 +78,9 @@ export default {
             if (targetPath) return targetPath.replace(/\\/g, '/')
             return this.filePath
         },
+        isMarkdownFile() {
+            return this.activeFilePath.toLowerCase().endsWith('.md')
+        },
         disableMentionItemAttr() {
             return {
                 mentionList: () => [],
@@ -158,7 +161,7 @@ export default {
             })
             this.loading = false
         },
-        async refreshContentTool() {
+        async refreshContentTool({ getEditor }) {
             const currentFilePath = this.activeFilePath
             if (!currentFilePath) {
                 return {
@@ -182,6 +185,31 @@ export default {
             const contentData = res.data.content
             this.docInfo = res.data
             let contentType = 'fabulous_notebook'
+
+            if (this.isMarkdownFile) {
+                contentType = 'md'
+                let markdownContent = {
+                    type: 'doc',
+                    content: []
+                }
+                const editor = getEditor()
+                if (editor?.computeMarkdown) {
+                    markdownContent = editor.computeMarkdown(contentData)
+                }
+                this.reviseEditorContent({
+                    id: 'local',
+                    title: '',
+                    banner: '',
+                    content: markdownContent,
+                    updateDate: new Date(),
+                    author: []
+                })
+                return {
+                    shouldStop: false,
+                    docInfo: this.docInfo,
+                    contentType
+                }
+            }
 
             try {
                 const rawJson = JSON.parse(contentData)

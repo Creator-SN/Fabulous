@@ -235,6 +235,21 @@ function createWindow() {
     return normalizeSlashes(filePaths[0])
   })
 
+  ipcMain.handle('choose-local-file', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Fab Notes',
+          extensions: ['fbn']
+        }
+      ]
+    })
+
+    if (canceled || filePaths.length === 0) return null
+    return normalizeSlashes(filePaths[0])
+  })
+
   ipcMain.handle('list-local-directory-children', async (_, directoryPath) => {
     return await listLocalDirectoryChildren(directoryPath)
   })
