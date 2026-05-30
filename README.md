@@ -213,8 +213,8 @@ For macOS signing and notarization, the workflow expects:
 - `CSC_KEY_PASSWORD`
 - `APPLE_ID`
 - `APPLE_PASSWORD`
-- `APP_ID`
-- `TEAM_ID`
+- `APPLE_APP_SPECIFIC_PASSWORD` or `APPLE_PASSWORD`
+- `APPLE_TEAM_ID` or legacy `TEAM_ID`
 
 If these secrets are missing, Windows builds can still succeed, but macOS signing/notarization will likely fail.
 
