@@ -1,95 +1,90 @@
-# 快卷 (FAB)
+<div align="center">
+    <img src="../src/renderer/src/assets/logo.png" width="180" />
+    <p>Fabulous</p>
+    <p>一个面向阅读、写作与研究整理的跨平台桌面笔记工作区。</p>
+</div>
 
-**F (Fast and Fluent) A (Academic) B (Baseline)** - 即流畅学术辅助体系, 助力学术内卷. 它是一款集文献管理和出色笔记体验的应用
+<p align="center">
+    <img src="https://img.shields.io/github/v/release/Creator-SN/Fabulous?style=flat-square" />
+    <img src="https://img.shields.io/github/downloads/Creator-SN/Fabulous/total?color=green&style=flat-square" />
+</p>
 
-**快卷 (FAB)** 是`Electron`驱动的基于 [Microsft Fluent Design System](https://developer.microsoft.com/en-us/fluentui#/) Win UI 3.0的文献管理 + 笔记管理综合应用。
+# Fabulous Desktop
 
-> 关于UI组件库的更多信息, 请了解[VFluent](https://github.com/aleversn/VFluent)。
+Fabulous Desktop 是 Fabulous 生态的本地桌面版。
 
-> 该项目仍在进行中，我们欢迎您成为贡献者。 😄
+它将本地笔记、研究资料整理、文件系统操作和桌面端交互整合到同一个应用中，适合把笔记和资料都放在自己电脑上管理的使用方式。
 
-## 🤔 快卷 (FAB)可以做什么?
+## Fabulous 能做什么？
 
-**快卷 (FAB)**提供完整的**PDF文献管理**和出色的**妙动笔记**体验。我们提供:
+Fabulous 提供：
 
-- PDF文献元数据自动检索归纳
-- PDF文献阅读划词翻译
-- 支持`Markdown`输入的富文本妙动笔记
-- 笔记与PDF选区互动
+- 支持 `.fbn`、Markdown、HTML、JSON 的本地笔记编辑
+- 所见即所得的快速写作体验
+- 本地文件夹浏览与文件管理
+- 面向 PDF 阅读与文献整理的工作流
+- 支持从系统中直接双击打开 `.fbn` 文件
 
-## 🎈 平台
+## 支持平台
 
-- ✔ Windows 11 [支持]
-- ✔ Windows 10 [支持]
-- ✔ Mac [支持]
+- Windows 10 / 11
+- macOS
 
-### 📍 快速上手
+## 快速开始
 
-**首次安装**
+**下载安装**
 
-从发布(`Release`)页面，选择最新的稳定版本并下载。
+请从 GitHub Releases 页面下载最新版本：
+
+- <https://github.com/Creator-SN/Fabulous/releases>
 
 **首次使用**
 
-首次使用会弹出引导页, 根据自己的兴趣爱好往下走就够了, 如果你只想做笔记管理, 则只需开启**笔记本系统**。
+第一次启动后，你可以直接从本地笔记区域开始使用；如果你还需要更完整的文献管理能力，也可以继续进入更完整的 Fabulous 工作流。
 
-![f1](./assets/Chinese-f1.png)
+如果你当前主要把它当作本地笔记应用来使用，那么本地笔记视图就已经足够开始。
 
-- 如果你选择了**文献管理系统**, 或**全部开启**, 则需要指定一个数据源。
-- 数据源是一个用于**存储文献数据的目录**，创建后**不用管理它**, 确保里面的文件不要被修改删除即可, 也建议不要在里面自行创建其他内容。
+![预览 1](./assets/Chinese-f1.png)
 
-输入好名称, 选择好目录后, 点击**确认**即可完成初次引导设置。
+## 本地笔记工作流
 
-![f2](./assets/Chinese-f2.png)
+Fabulous Desktop 支持偏本地优先的笔记方式：
 
-**文献管理**
+- 将某个文件夹作为本地笔记工作区打开
+- 直接从系统中打开单个 `.fbn` 文件
+- 在当前本地根目录下搜索笔记文件
+- 编辑后按原文件路径直接保存
 
-直接拖入一篇或多篇文献PDF文件即可将文献导入到快卷 (FAB)中，快卷 (FAB)会自动解析并检索文献的元数据。
+![预览 2](./assets/Chinese-f5.png)
 
-![f3](./assets/Chinese-f3.png)
+## 阅读与写作体验
 
-你可以看到文献的标题被自动识别出来了,`PDF文献`和`元数据(Metadata)`被归纳在一个`项目`里 点击`Metadata`可以查看更多的数据。
+编辑器提供了较完整的富文本写作能力，同时保留了适合 Markdown 使用者的操作习惯。
 
-![f4](./assets/Chinese-f4.png)
+常见能力包括：
 
-**添加文献**
+- 标题、列表、任务列表、引用块
+- 加粗、斜体、下划线、删除线等行内格式
+- 链接、图片、嵌入、代码块
+- 本地笔记内容刷新与保存
 
-您也可以单击`导入`按钮在每个`分区`页面中导入文章，**快卷 (FAB)**会自动为每篇文章创建一个`项目`。
+![预览 3](./assets/Chinese-f6.png)
 
-**文献笔记**
+## 桌面版特性
 
-在每一个项目中都可以添加多个笔记, 点击**添加笔记**, 你可以从模板中快速新建一个格式优美的笔记。
+相比纯 Web 前端，桌面版额外支持：
 
-![f5](./assets/Chinese-f5.png)
+- 本地文件与文件夹访问
+- 自定义标题栏与窗口控制
+- 单实例运行
+- `.fbn` 文件关联
+- 自动更新集成
 
-妙动笔记支持丰富的文本编辑和**Markdown快捷编辑方式**。我们编辑器的扩展功能可以显示如下：
+## 相关文档
 
-![f6](./assets/Chinese-f6.png)
+- [English Guide](./English.md)
+- [开发说明](./README.dev.md)
 
-- 字体样式（粗体，斜体，笔划，下划线）
-- 块引用
-- 水平线
-- 标题头
-- 任务列表 
-- 顺序列表
-- 文本对齐
-- 文本颜色
-- 文本突出显示
-- 绘图块
-- Emoji表情
-- 代码块
-- 行内公式
-- 块公式
-- 图片
-- 链接
-- 嵌入
+## License
 
-**与PDF联动**
-
-快卷 (FAB)妙动笔记支持通过添加`PDF Note`来生成与对应PDF文献位置关联的笔记，你只需在PDF浏览器上选择指定内容，然后点击黄色小按钮即可在妙动笔记里创建对应的笔记。
-
-![f7](./assets/Chinese-f7.png)
-
-在双栏模式下, 你可以看到左侧的笔记已经创建了对应的PDF块。
-
-![f8](./assets/Chinese-f8.png)
+GPL 3 License
