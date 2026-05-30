@@ -12,9 +12,7 @@
         :border-radius="30"
         :revealBorder="true"
         :resultBorderRadius="8"
-        :result-background="
-            theme === 'dark' ? 'rgba(42, 42, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)'
-        "
+        :result-background="theme === 'dark' ? 'rgba(42, 42, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)'"
         style="width: 100%"
         @debounce-input="searchNotebooks"
         @keydown="handleSearchKeydown"
@@ -62,7 +60,9 @@
                     >
                         <div class="item-main">
                             <img draggable="false" :src="notebookImg" alt="" class="icon-img" />
-                            <p class="item-name" style="font-size: 10px">{{ itemSlot.item.name }}</p>
+                            <p class="item-name" style="font-size: 10px">
+                                {{ itemSlot.item.name }}
+                            </p>
                         </div>
                         <p class="item-type" style="font-size: 10px">
                             {{ local('Notebook') }}
@@ -158,7 +158,6 @@ export default {
             let list = this.$refs.list
             if (!list) return
             list.setFocus()
-            list.move(event, event.key === 'ArrowDown' ? 1 : -1)
         },
         chooseListItem(item, chooseResult) {
             if (!item || item.type === 'header') return

@@ -12,9 +12,7 @@
         :border-radius="30"
         :revealBorder="true"
         :resultBorderRadius="8"
-        :result-background="
-            theme === 'dark' ? 'rgba(42, 42, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)'
-        "
+        :result-background="theme === 'dark' ? 'rgba(42, 42, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)'"
         style="width: 100%"
         @debounce-input="searchFolders"
         @keydown="handleSearchKeydown"
@@ -134,7 +132,6 @@ export default {
             let list = this.$refs.list
             if (!list) return
             list.setFocus()
-            list.move(event, event.key === 'ArrowDown' ? 1 : -1)
         },
         chooseListItem(item, chooseResult) {
             if (!item || item.type === 'header') return

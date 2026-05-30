@@ -73,6 +73,11 @@ export default {
         itemType() {
             return this.currentEditor?.type || null
         },
+        activeFilePath() {
+            const targetPath = this.target?.filePath || ''
+            if (targetPath) return targetPath.replace(/\\/g, '/')
+            return this.filePath
+        },
         disableMentionItemAttr() {
             return {
                 mentionList: () => [],
@@ -112,22 +117,22 @@ export default {
         }),
         refreshPathParams() {
             let filePath = decodeURI(this.$route.params.path || '')
-            if (!filePath) return
-            this.filePath = filePath.replace(/\\/g, '/')
+            this.filePath = filePath ? filePath.replace(/\\/g, '/') : ''
         },
         async initEditorBinding() {
-            if (!this.filePath) return
+            const currentFilePath = this.activeFilePath
+            if (!currentFilePath) return
             this.loading = true
-            let parentPath = this.filePath.substring(0, this.filePath.lastIndexOf('/'))
-            let fileName = this.filePath.split('/').pop()
+            let parentPath = currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
+            let fileName = currentFilePath.split('/').pop()
             let res = await this.listLocalDirectoryChildren(parentPath)
             let pages = res?.data || []
-            let target = pages.find((item) => item.filePath === this.filePath)
+            let target = pages.find((item) => item.filePath === currentFilePath)
             if (!target) {
                 target = {
-                    id: encodeURIComponent(this.filePath),
+                    id: encodeURIComponent(currentFilePath),
                     name: fileName,
-                    filePath: this.filePath,
+                    filePath: currentFilePath,
                     isFile: true,
                     isDir: false
                 }
@@ -154,14 +159,15 @@ export default {
             this.loading = false
         },
         async refreshContentTool() {
-            if (!this.filePath) {
+            const currentFilePath = this.activeFilePath
+            if (!currentFilePath) {
                 return {
                     shouldStop: true,
                     docInfo: {},
                     contentType: 'fabulous_notebook'
                 }
             }
-            const res = await this.getNotebookDocument('local', this.filePath)
+            const res = await this.getNotebookDocument('local', currentFilePath)
             if (res.status !== 'success') {
                 this.$barWarning(this.local('Read File Failed'), {
                     status: 'warning'
@@ -220,9 +226,10 @@ export default {
             }
         },
         async saveConfirmTool({ json, docInfo, wrapCotent }) {
+            const currentFilePath = this.activeFilePath
             const res = await this.updateNotebookDocument(
                 'local',
-                this.filePath,
+                currentFilePath,
                 docInfo.versionId,
                 wrapCotent(json)
             )
@@ -235,7 +242,7 @@ export default {
         openFileTool() {},
         breadcrumbTool() {
             return {
-                path: this.filePath,
+                path: this.activeFilePath,
                 disabled: this.history.length === 0,
                 rootIcon: this.history.length > 0 ? 'PageLeft' : 'FolderHorizontal'
             }
