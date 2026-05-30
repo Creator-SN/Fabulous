@@ -25,3 +25,4 @@ pnpm-debug.log*
 *.sw?
 dist_electron/index.js
 
+out/
