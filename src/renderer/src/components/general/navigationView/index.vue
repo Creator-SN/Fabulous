@@ -32,7 +32,9 @@
                             foreground="black"
                             choosenForeground="black"
                             :background="
-                                theme === 'dark' ? 'rgba(2, 9, 15, 0.3)' : 'rgba(242, 242, 242, 0.5)'
+                                theme === 'dark'
+                                    ? 'rgba(2, 9, 15, 0.3)'
+                                    : 'rgba(242, 242, 242, 0.5)'
                             "
                             borderRadius="30"
                             padding="0 3px"
@@ -196,6 +198,7 @@ import { useTheme } from '@/stores/theme'
 
 import dataSource from '@/assets/nav/research.svg'
 import notebook from '@/assets/nav/notebook.svg'
+import localFile from '@/assets/nav/local.svg'
 
 export default {
     name: 'fab-navigation-view',
@@ -221,7 +224,7 @@ export default {
                     },
                     img: dataSource,
                     show: () => this.activeSystemMode !== 'notebook',
-                    width: '50%'
+                    width: () => (this.clientMode === 'web' ? '50%' : '33%')
                 },
                 {
                     key: 1,
@@ -230,7 +233,16 @@ export default {
                     },
                     img: notebook,
                     show: () => this.activeSystemMode !== 'ds',
-                    width: '50%'
+                    width: () => (this.clientMode === 'web' ? '50%' : '33%')
+                },
+                {
+                    key: 2,
+                    name: () => {
+                        return this.local('Local')
+                    },
+                    img: localFile,
+                    show: () => this.clientMode !== 'web',
+                    width: () => (this.clientMode === 'web' ? '50%' : '33%')
                 }
             ],
             notebookMode: 0,
@@ -254,7 +266,8 @@ export default {
             ],
             img: {
                 dataSource,
-                notebook
+                notebook,
+                localFile
             },
             localPath: '',
             menuDisplayMode: {
@@ -293,6 +306,7 @@ export default {
             lock_config: (state) => state.lock.config
         }),
         ...mapState(useAppConfig, {
+            clientMode: (state) => state.clientMode,
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
             fullScreen: (state) => state.fullScreen,

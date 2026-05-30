@@ -123,6 +123,7 @@
                         :disabled="!lock_config"
                         :placeholder="local('Choose A Language')"
                         :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :choosenSliderBackground="color"
                         border-color="rgba(120, 120, 120, 0.3)"
                         :border-radius="6"
                         style="width: 120px"
@@ -159,6 +160,7 @@
                         :disabled="!lock_config"
                         :placeholder="local('Choose A Mode')"
                         :background="theme === 'dark' ? 'rgba(36, 36, 36, 1)' : ''"
+                        :choosenSliderBackground="color"
                         border-color="rgba(120, 120, 120, 0.3)"
                         :border-radius="6"
                         style="width: 120px"
@@ -526,7 +528,8 @@ export default {
             }
         },
         ...mapState(useTheme, {
-            theme: 'theme'
+            theme: 'theme',
+            color: 'color'
         }),
         ...mapState(useAppConfig, ['local'])
     },
