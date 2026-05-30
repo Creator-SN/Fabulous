@@ -1,6 +1,6 @@
 {
     "name": "@creatorsn/fabulous",
-    "version": "3.10.5",
+    "version": "3.10.6",
     "description": "Fabulous Notebook is a WYSIWYG notebook with an exciting paper and literature management system.",
     "main": "./out/main/index.js",
     "author": {
@@ -12,7 +12,7 @@
         "type": "git",
         "url": "https://github.com/Creator-SN/Fabulous"
     },
-        "build": {
+    "build": {
         "appId": "com.creatorsn.fabulous",
         "productName": "Fabulous",
         "fileAssociations": [
