@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { useDataStore } from './data'
 import { useTheme } from './theme'
 import { getProxy } from '@/stores/proxyHolder'
+import { resolveClientMode } from '@/js/clientMode'
 
 const createEditorPrototype = () => ({
     type: null,
@@ -62,6 +63,7 @@ export const useAppConfig = defineStore('appConfig', () => {
         mobileDisplay: 1024
     })
 
+    const clientMode = ref(resolveClientMode())
     const fullScreen = ref(false)
 
     const progress = ref(0)
@@ -216,6 +218,7 @@ export const useAppConfig = defineStore('appConfig', () => {
         pdfImporter,
         itemCarrier,
         window,
+        clientMode,
         fullScreen,
         progress,
         i18n,
