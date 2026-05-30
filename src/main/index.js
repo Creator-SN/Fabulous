@@ -7,6 +7,7 @@ import fs from 'fs-extra'
 import path from 'path'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
 remoteMain.initialize()
 
@@ -324,6 +325,17 @@ function createWindow() {
   } else {
     win.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+if (!gotSingleInstanceLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    const win = BrowserWindow.getAllWindows()[0]
+    if (!win) return
+    if (win.isMinimized()) win.restore()
+    win.focus()
+  })
 }
 
 // This method will be called when Electron has finished
