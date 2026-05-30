@@ -21,6 +21,7 @@
                 :item-height="30"
                 list-padding="0px 2px"
                 background="transparent"
+                :dropColor="color"
                 overflowMode="scroll"
                 class="tab-view"
                 styleMode="rounded"
@@ -55,6 +56,7 @@
 import { mapActions, mapState } from 'pinia'
 import { useAppConfig } from '@/stores/appConfig'
 import { useDataStore } from '@/stores/data'
+import { useTheme } from '@/stores/theme'
 
 import researchIcon from '@/assets/nav/research.svg'
 import notebookIcon from '@/assets/nav/notebook.svg'
@@ -73,9 +75,6 @@ export default {
         },
         hidePrefix: {
             default: () => ['/login']
-        },
-        theme: {
-            default: 'light'
         }
     },
     data() {
@@ -96,6 +95,10 @@ export default {
             academicUnsaved: (state) => state.editor.academic?.unsave,
             notebookUnsaved: (state) => state.editor.notebook?.unsave,
             localNotebookUnsaved: (state) => state.editor.local?.unsave
+        }),
+        ...mapState(useTheme, {
+            theme: (state) => state.theme,
+            color: (state) => state.color
         }),
         ...mapState(useDataStore, {
             currentDataPath: (state) => state.currentDataPath,

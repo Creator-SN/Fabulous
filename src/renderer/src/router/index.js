@@ -20,7 +20,7 @@ const router = createRouter({
         },
         {
             path: "/local_notebook/:path",
-            name: "Local Notebook",
+            name: "LocalNotebook",
             component: AsyncLoad(() => import("@/views/notebook/local.vue"))
         },
         {

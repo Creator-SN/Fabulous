@@ -124,8 +124,14 @@ export default {
         },
         async initEditorBinding() {
             const currentFilePath = this.activeFilePath
+            console.log(this.target, currentFilePath)
             if (!currentFilePath) return
             this.loading = true
+            if (this.target?.filePath === currentFilePath) {
+                this.loading = false
+                this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
+                return
+            }
             let parentPath = currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
             let fileName = currentFilePath.split('/').pop()
             let res = await this.listLocalDirectoryChildren(parentPath)
