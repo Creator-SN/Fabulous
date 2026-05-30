@@ -80,6 +80,7 @@ jobs:
       P12: ${{ secrets.APP_P12 }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       APP_ID: ${{ secrets.APP_ID }}
       TEAM_ID: ${{ secrets.TEAM_ID }}
