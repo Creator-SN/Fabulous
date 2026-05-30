@@ -42,6 +42,11 @@ const api = {
     const handler = (_, payload) => callback(payload)
     ipcRenderer.on('updater-callback', handler)
     return () => ipcRenderer.removeListener('updater-callback', handler)
+  },
+  onOpenNotebookFile: (callback) => {
+    const handler = (_, payload) => callback(payload)
+    ipcRenderer.on('open-notebook-file', handler)
+    return () => ipcRenderer.removeListener('open-notebook-file', handler)
   }
 }
 

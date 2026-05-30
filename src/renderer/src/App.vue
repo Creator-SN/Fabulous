@@ -26,6 +26,7 @@
         <item-carrier @update-progress="updateProgress"></item-carrier>
         <div v-show="show.drop" class="file-drop-mask" ref="drop"></div>
         <progress-bar></progress-bar>
+        <desktop-file-open-bridge v-if="clientMode === 'electron'"></desktop-file-open-bridge>
     </div>
 </template>
 
@@ -45,6 +46,7 @@ import titleBar from '@/components/general/titleBar.vue'
 import tabBar from '@/components/general/tabBar/index.vue'
 import pdfImporter from '@/components/general/pdfImporter.vue'
 import itemCarrier from '@/components/general/itemCarrier.vue'
+import desktopFileOpenBridge from '@/components/general/desktopFileOpenBridge.vue'
 import { useAppConfig } from '@/stores/appConfig'
 import { useDataStore } from '@/stores/data'
 import { useUserStore } from '@/stores/user'
@@ -58,7 +60,8 @@ export default {
         tabBar,
         navigationView,
         pdfImporter,
-        itemCarrier
+        itemCarrier,
+        desktopFileOpenBridge
     },
     data() {
         return {

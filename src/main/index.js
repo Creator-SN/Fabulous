@@ -15,6 +15,7 @@ remoteMain.initialize()
 const NOTEBOOK_FILE_EXTENSIONS = new Set(['.fbn', '.md', '.html', '.json'])
 const GITHUB_LATEST_RELEASE_API = 'https://api.github.com/repos/Creator-SN/Fabulous/releases/latest'
 const localDirectoryWatchers = new Map()
+const pendingNotebookOpenPaths = []
 let mainWindow = null
 const updaterState = {
   status: 'init',
@@ -27,6 +28,53 @@ const updaterState = {
 
 function normalizeSlashes(targetPath) {
   return targetPath.replace(/\\/g, '/')
+}
+
+function isNotebookPath(targetPath = '') {
+  const ext = path.extname(targetPath).toLowerCase()
+  return NOTEBOOK_FILE_EXTENSIONS.has(ext)
+}
+
+function normalizeNotebookPath(targetPath = '') {
+  if (!targetPath) return ''
+  return normalizeSlashes(path.resolve(targetPath))
+}
+
+function collectNotebookPaths(argv = []) {
+  return (argv || [])
+    .filter((item) => typeof item === 'string' && item.trim())
+    .map((item) => item.trim())
+    .filter((item) => !item.startsWith('-'))
+    .filter((item) => isNotebookPath(item))
+    .map((item) => normalizeNotebookPath(item))
+}
+
+function queueNotebookOpen(targetPath) {
+  const notebookPath = normalizeNotebookPath(targetPath)
+  if (!notebookPath || !isNotebookPath(notebookPath)) return
+  if (pendingNotebookOpenPaths.includes(notebookPath)) return
+  pendingNotebookOpenPaths.push(notebookPath)
+}
+
+function emitNotebookOpen(targetPath) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    queueNotebookOpen(targetPath)
+    return
+  }
+
+  const notebookPath = normalizeNotebookPath(targetPath)
+  if (!notebookPath || !isNotebookPath(notebookPath)) return
+  mainWindow.webContents.send('open-notebook-file', {
+    filePath: notebookPath
+  })
+}
+
+function flushPendingNotebookOpen() {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  while (pendingNotebookOpenPaths.length > 0) {
+    const targetPath = pendingNotebookOpenPaths.shift()
+    emitNotebookOpen(targetPath)
+  }
 }
 
 function emitUpdaterState() {
@@ -358,6 +406,10 @@ function createWindow() {
     win.show()
   })
 
+  win.webContents.on('did-finish-load', () => {
+    flushPendingNotebookOpen()
+  })
+
   win.setMenu(null)
 
   ipcMain.on('min', () => {
@@ -500,11 +552,16 @@ function createWindow() {
 if (!gotSingleInstanceLock) {
   app.quit()
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (_, argv) => {
     const win = BrowserWindow.getAllWindows()[0]
     if (!win) return
     if (win.isMinimized()) win.restore()
     win.focus()
+
+    const notebookPaths = collectNotebookPaths(argv)
+    for (const notebookPath of notebookPaths) {
+      emitNotebookOpen(notebookPath)
+    }
   })
 }
 
@@ -532,12 +589,21 @@ app.whenReady().then(() => {
 
   setupAutoUpdater()
   createWindow()
+  const notebookPaths = collectNotebookPaths(process.argv.slice(1))
+  for (const notebookPath of notebookPaths) {
+    queueNotebookOpen(notebookPath)
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+app.on('open-file', (event, targetPath) => {
+  event.preventDefault()
+  emitNotebookOpen(targetPath)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

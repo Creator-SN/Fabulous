@@ -12,9 +12,17 @@
         "type": "git",
         "url": "https://github.com/Creator-SN/Fabulous"
     },
-    "build": {
+        "build": {
         "appId": "com.creatorsn.fabulous",
         "productName": "Fabulous",
+        "fileAssociations": [
+            {
+                "ext": "fbn",
+                "name": "Fabulous Notebook File",
+                "description": "Fabulous Notebook File",
+                "icon": "src/renderer/src/assets/notebook.ico"
+            }
+        ],
         "directories": {
             "buildResources": "build"
         },
@@ -39,7 +47,15 @@
         },
         "mac": {
             "icon": "build/icon.icns",
-            "entitlements": "build/entitlements.mac.plist"
+            "entitlements": "build/entitlements.mac.plist",
+            "fileAssociations": [
+                {
+                    "ext": "fbn",
+                    "name": "Fabulous Notebook File",
+                    "description": "Fabulous Notebook File",
+                    "icon": "src/renderer/src/assets/notebook.icns"
+                }
+            ]
         },
         "publish": [
             {
