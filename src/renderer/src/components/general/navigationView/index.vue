@@ -32,7 +32,7 @@
                             foreground="black"
                             choosenForeground="black"
                             :background="
-                                theme === 'dark' ? 'rgba(2, 9, 15, 0.3)' : 'rgba(255, 255, 255, 0.5)'
+                                theme === 'dark' ? 'rgba(2, 9, 15, 0.3)' : 'rgba(242, 242, 242, 0.5)'
                             "
                             borderRadius="30"
                             padding="0 3px"
