@@ -3,7 +3,6 @@
         <editor-block
             v-show="displayMode !== 'pdf'"
             ref="editor_block"
-            :visible="displayMode !== 'pdf'"
             :editor-id="editorId"
             :readonly="readonly"
             :refreshContentTool="refreshContentTool"

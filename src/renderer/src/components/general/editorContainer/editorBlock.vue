@@ -301,10 +301,6 @@ export default {
             type: Boolean,
             default: false
         },
-        visible: {
-            type: Boolean,
-            default: true
-        },
         editorId: {
             type: String,
             required: true
@@ -348,6 +344,7 @@ export default {
     },
     data() {
         return {
+            visible: false,
             fontSize: 16,
             docInfo: {
                 versionId: null
@@ -391,12 +388,8 @@ export default {
         $route() {
             this.toggleUnsave(false)
         },
-        visible: {
-            handler() {
-                this.toggleUnsave(false)
-                this.refreshContent()
-            },
-            immediate: true
+        displayMode(val) {
+            if (val !== 'pdf') this.refreshContent()
         },
         target() {
             this.toggleUnsave(false)
@@ -500,6 +493,7 @@ export default {
         }
     },
     mounted() {
+        this.visible = true
         this.ShortCutInit()
         this.timerInit()
         this.bindNativeImageEvents()
@@ -993,6 +987,12 @@ export default {
             this.$el.removeEventListener('drop', this.handleImageDrop, true)
         }
         window.removeEventListener('keydown', this.shortCutEvent)
+    },
+    activated() {
+        this.visible = true
+    },
+    deactivated() {
+        this.visible = false
     }
 }
 </script>
