@@ -388,8 +388,14 @@ export default {
         $route() {
             this.toggleUnsave(false)
         },
-        displayMode(val) {
-            if (val !== 'pdf') this.refreshContent()
+        displayMode: {
+            handler(newVal, oldVal) {
+                if (!oldVal || oldVal === 'pdf') {
+                    this.toggleUnsave(false)
+                    this.refreshContent()
+                }
+            },
+            immediate: true
         },
         target() {
             this.toggleUnsave(false)
