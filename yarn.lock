@@ -310,10 +310,10 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.6.3.tgz#291dcd1cdfae453a16b40e0b50961e2a444f6d3c"
   integrity sha512-w/gJKME9mYN7ZoUAmSMAWXk4hkVpxRKvEJCb3dV5g9wwWdxTJJ0ayOJAVcNxtdqaxDyFuC0uz4RSGVacJ030PQ==
 
-"@creatorsn/powereditor3@^0.2.10":
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.2.10.tgz#39c4baeda1d774236d7e6c57b8cc6b2c547153d3"
-  integrity sha512-KMJsWh9a01zRih944W+IioHMEshB3i2WQFz3zbyoGM8i8djVd8lHP30A0l0up43zuoHqCZESMvk+rLglY9FuOw==
+"@creatorsn/powereditor3@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.2.12.tgz#3d3e6ab59e519525bbca494f967a0bf894757d82"
+  integrity sha512-fvLbTtBfIUXV/F6qU2XDJvz8WSJ/QBT6zNL0P17xJfNG/v/WRaTJwkWHIzM037WMlmKkkbCXH+IFWujRarclgw==
   dependencies:
     "@creatorsn/vfluent3" "^0.3.80"
     "@tiptap/core" "3.23.6"

@@ -706,8 +706,10 @@ export default {
             }
             this.docInfo = docInfo
             this.contentType = contentType
-            if (this.$refs.editor)
-                this.getEditor().editor().chain().focus().setTextSelection(0).run()
+            try {
+                if (this.$refs.editor)
+                    this.getEditor().editor().chain().focus().setTextSelection(0).run()
+            } catch (e) {}
             this.lock.loading = true
         },
         toggleUnsave(status = true) {
