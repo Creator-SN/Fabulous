@@ -56,7 +56,7 @@ export default Node.create({
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['pdf-note', mergeAttributes(HTMLAttributes)];
+        return ['pdf-note', mergeAttributes(HTMLAttributes), 0];
     },
 
     addNodeView() {

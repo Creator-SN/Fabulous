@@ -55,6 +55,8 @@
                 :extensions="customExtensions"
                 :imgInterceptor="imgIntercept"
                 ref="editor"
+                :show-drag-handler="true"
+                :useTab="true"
                 :style="{ background: 'transparent', 'font-size': `${fontSize}px` }"
                 style="position: relative; width: 100%; height: 100%; flex: 1"
                 @save-json="saveConfirm"
@@ -593,17 +595,6 @@ export default {
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                 event.preventDefault()
                 this.saveAs()
-            }
-
-            if (event.keyCode === 9) {
-                event.preventDefault()
-                if (
-                    this.getEditor().editor().isActive('bulletList') ||
-                    this.getEditor().editor().isActive('orderedList')
-                )
-                    return
-                if (this.readonly) return
-                this.getEditor().editor().commands.insertContent('\t')
             }
         },
         getEditor() {

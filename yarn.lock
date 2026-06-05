@@ -310,19 +310,24 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.6.3.tgz#291dcd1cdfae453a16b40e0b50961e2a444f6d3c"
   integrity sha512-w/gJKME9mYN7ZoUAmSMAWXk4hkVpxRKvEJCb3dV5g9wwWdxTJJ0ayOJAVcNxtdqaxDyFuC0uz4RSGVacJ030PQ==
 
-"@creatorsn/powereditor3@^0.2.12":
-  version "0.2.12"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.2.12.tgz#3d3e6ab59e519525bbca494f967a0bf894757d82"
-  integrity sha512-fvLbTtBfIUXV/F6qU2XDJvz8WSJ/QBT6zNL0P17xJfNG/v/WRaTJwkWHIzM037WMlmKkkbCXH+IFWujRarclgw==
+"@creatorsn/powereditor3@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.3.2.tgz#af869498ebb6d9e809c22b18d5d62ea4a9434ac7"
+  integrity sha512-3b0RN4fhp/CPbhW6ffGxyCZTYhBFd+sDh3cc+qMs9eY05JzPAsdUhHlGDv2Ph9Wk31AtqxucajlU1JC/IdBLJg==
   dependencies:
-    "@creatorsn/vfluent3" "^0.3.80"
+    "@creatorsn/vfluent3" "^0.3.90"
     "@tiptap/core" "3.23.6"
     "@tiptap/extension-bubble-menu" "3.23.6"
     "@tiptap/extension-code-block" "3.23.6"
     "@tiptap/extension-code-block-lowlight" "3.23.6"
+    "@tiptap/extension-collaboration" "^3.26.0"
     "@tiptap/extension-color" "3.23.6"
+    "@tiptap/extension-details" "^3.25.0"
+    "@tiptap/extension-drag-handle" "^3.26.0"
+    "@tiptap/extension-drag-handle-vue-3" "^3.26.0"
     "@tiptap/extension-highlight" "3.23.6"
     "@tiptap/extension-link" "3.23.6"
+    "@tiptap/extension-node-range" "^3.26.0"
     "@tiptap/extension-placeholder" "3.23.6"
     "@tiptap/extension-subscript" "3.23.6"
     "@tiptap/extension-superscript" "3.23.6"
@@ -338,6 +343,7 @@
     "@tiptap/pm" "3.23.6"
     "@tiptap/starter-kit" "3.23.6"
     "@tiptap/vue-3" "3.23.6"
+    "@tiptap/y-tiptap" "^3.0.4"
     autoprefixer "^10.4.21"
     core-js "3.30.1"
     d3 "7.0.4"
@@ -356,11 +362,13 @@
     unplugin-vue-define-options "^3.0.0-beta.14"
     url "^0.11.4"
     vue "^3.5.13"
+    y-protocols "^1.0.7"
+    yjs "^13.6.31"
 
-"@creatorsn/vfluent3@^0.3.80":
-  version "0.3.86"
-  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.86.tgz#ee446ad06ce1978303880463bacc1c1fc1482f42"
-  integrity sha512-A6zIhY8W+7sj/gVvoopsxy5sdekHrHWBhwC+92B25Gn6TP7USo9tZQrcacPBRqlOqictiGGwHqoGlqtnPN8csA==
+"@creatorsn/vfluent3@^0.3.89":
+  version "0.3.89"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.89.tgz#9cdefaeed8bdedda188190a265508af095606934"
+  integrity sha512-erYDTOmL3HFEqUM5XmE8n6xp5ZN5QrbkWSmFaUE8OaqjPh5dOtQM5NKia/09HE3Cg2zRXFpuq/vewciRmY+FWQ==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"
@@ -369,10 +377,10 @@
     swiper "8.3.2"
     vue "^3.4.20"
 
-"@creatorsn/vfluent3@^0.3.89":
-  version "0.3.89"
-  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.89.tgz#9cdefaeed8bdedda188190a265508af095606934"
-  integrity sha512-erYDTOmL3HFEqUM5XmE8n6xp5ZN5QrbkWSmFaUE8OaqjPh5dOtQM5NKia/09HE3Cg2zRXFpuq/vewciRmY+FWQ==
+"@creatorsn/vfluent3@^0.3.90":
+  version "0.3.90"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.90.tgz#d01273f6dce663eebab17768393450483c7ccbe0"
+  integrity sha512-Hps9TbUY1z0gGyyavaixVr1VCFS/6VNAbrRdS/YXFaNpdvxn8vu+DnqnZCs5hY1BBCGJQUCmgJ62seGSc0z/IQ==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"
@@ -701,7 +709,7 @@
   dependencies:
     "@floating-ui/utils" "^0.2.11"
 
-"@floating-ui/dom@^1.0.0":
+"@floating-ui/dom@^1.0.0", "@floating-ui/dom@^1.6.13":
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.7.6.tgz#f915bba5abbb177e1f227cacee1b4d0634b187bf"
   integrity sha512-9gZSAI5XM36880PPMm//9dfiEngYoC6Am2izES1FF406YFsjvyBMmeJ2g4SAju3xWwtuynNRFL2s9hgxpLI5SQ==
@@ -1168,15 +1176,37 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-code/-/extension-code-3.23.6.tgz#1f7c8e9520c092c318d2842892afa7a1b56bf8cd"
   integrity sha512-KG8KXFYyLrtYvT7AZ1WGV61ofx8pDe5g9pH658MERxqQGii+Pyfc6xkz04l7XeBts/7+571UQp/0O7i/z560TA==
 
+"@tiptap/extension-collaboration@^3.26.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-collaboration/-/extension-collaboration-3.26.0.tgz#38dd2cfe79bc7d8580035a8551e7fb64b456cc4a"
+  integrity sha512-zSNsjznGSpYC9CYg3acvLOt36ldjs4dA2qEsh7jaONqo6sKJo76UuZAN0N38V8qnH8WtAWes4uGmwWcWcRg90A==
+
 "@tiptap/extension-color@3.23.6":
   version "3.23.6"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-color/-/extension-color-3.23.6.tgz#13234db0dbee64c7eb29088880f74b3e7701e44f"
   integrity sha512-2WxYc+X+OGFXbq/Ak0VXODEzfK1l5wz33oTWSuhdSw44HAQM7+SSyiDnMCXDQdqi063ANqMmQmlw5WngjQ6wCA==
 
+"@tiptap/extension-details@^3.25.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-details/-/extension-details-3.26.0.tgz#2713edf65248024770db8cb655e4abf07a143db6"
+  integrity sha512-Jr/JZUsZREW6Ut16/513MPKzi5XSRjAdv8mDJb+F8i3ulpWI80JEs14yTQ2KtbEKUx+3Gsq9Gr1FGm1MuDwG7A==
+
 "@tiptap/extension-document@^3.23.6":
   version "3.23.6"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-document/-/extension-document-3.23.6.tgz#a3b3d20edb0670cf1230d64ebb340541fd89b46e"
   integrity sha512-XDAIgG9KcKumFM9KJWUEUhXPbFIhhl47bfy5GknareWTRKke85rcoj/oxKKO9ihLZr8JfpbXjqnS4SCm5yhYPw==
+
+"@tiptap/extension-drag-handle-vue-3@^3.26.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-drag-handle-vue-3/-/extension-drag-handle-vue-3-3.26.0.tgz#36e9617beef3efd7d14d7bf07387068fd60126ce"
+  integrity sha512-dNcIKyZKfrrHCl8eZxNZS6J2hJ01HKXz+Co9NF6tq5vhJkbKZ87cD7gJpnvDeZIqjIuo3c4YARZ84I1P5+P3sA==
+
+"@tiptap/extension-drag-handle@^3.26.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-drag-handle/-/extension-drag-handle-3.26.0.tgz#9f2654f4cd69c5aa3950c3837600bf2448bd3eb9"
+  integrity sha512-TUnSbNVKGwUfGZnIrOKf97CY8po6R0oy3Wx0yRVlXiLej+wlGNqOp4xgjLSuUNkNP0ZikifWZAhYjnqiVNBfIA==
+  dependencies:
+    "@floating-ui/dom" "^1.6.13"
 
 "@tiptap/extension-dropcursor@^3.23.6":
   version "3.23.6"
@@ -1239,6 +1269,11 @@
   version "3.23.6"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-list/-/extension-list-3.23.6.tgz#65f2573389baed413c8df3bbb5a037651d34c634"
   integrity sha512-z6vj9+Qht2sjdQkyyHcUpsC/yCIZqTrQiyHDhs/HGKrfvoANyAZGpqdNeKf1wSyjIso+27tQuIH5NDfk8ygyNw==
+
+"@tiptap/extension-node-range@^3.26.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-node-range/-/extension-node-range-3.26.0.tgz#cca4f8a12d0a3e927dd8033014a5d9c9e63ac5db"
+  integrity sha512-LYPStSzfVicp3AGqIl5nsUbd86bqZCz0F1+N03cJIZ2hAj3kXU8ouLLGhE+EIq66Y8vh/SdN/imyIEoqtuA1QQ==
 
 "@tiptap/extension-ordered-list@^3.23.6":
   version "3.23.6"
@@ -1380,6 +1415,13 @@
   optionalDependencies:
     "@tiptap/extension-bubble-menu" "^3.23.6"
     "@tiptap/extension-floating-menu" "^3.23.6"
+
+"@tiptap/y-tiptap@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@tiptap/y-tiptap/-/y-tiptap-3.0.4.tgz#df822c587af4df7f48bd5f9ba1a073f05cf70bfa"
+  integrity sha512-I7NnntIPR9PgCuBEjZ0hco+eeLvTpMDnXxsyhwn8z7Se0/Ac6RIq903wn6KoMn7FRVXpTtXAfZphFtpErjabVw==
+  dependencies:
+    lib0 "^0.2.100"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -4230,6 +4272,11 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
 
+isomorphic.js@^0.2.4:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/isomorphic.js/-/isomorphic.js-0.2.5.tgz#13eecf36f2dba53e85d355e11bf9d4208c6f7f88"
+  integrity sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==
+
 jackspeak@^3.1.2:
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/jackspeak/-/jackspeak-3.4.3.tgz#8833a9d89ab4acde6188942bd1c53b6390ed5a8a"
@@ -4349,6 +4396,13 @@ levn@^0.4.1:
   dependencies:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
+
+lib0@^0.2.100, lib0@^0.2.85, lib0@^0.2.99:
+  version "0.2.117"
+  resolved "https://registry.yarnpkg.com/lib0/-/lib0-0.2.117.tgz#6c3f926475d28904af05b590703cbbbc29475716"
+  integrity sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==
+  dependencies:
+    isomorphic.js "^0.2.4"
 
 linkify-it@^4.0.1:
   version "4.0.1"
@@ -6257,6 +6311,13 @@ xmlbuilder@>=11.0.1, xmlbuilder@^15.1.1:
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-15.1.1.tgz#9dcdce49eea66d8d10b42cae94a79c3c8d0c2ec5"
   integrity sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==
 
+y-protocols@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/y-protocols/-/y-protocols-1.0.7.tgz#6631c492e75b78b3a61353a60067e6f8a4c38d5f"
+  integrity sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw==
+  dependencies:
+    lib0 "^0.2.85"
+
 y18n@^5.0.5:
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-5.0.8.tgz#7f4934d0f7ca8c56f95314939ddcd2dd91ce1d55"
@@ -6297,6 +6358,13 @@ yauzl@^2.10.0:
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.1.0"
+
+yjs@^13.6.31:
+  version "13.6.31"
+  resolved "https://registry.yarnpkg.com/yjs/-/yjs-13.6.31.tgz#3a9ddfe6d0c5d788521b70dfdd7b907148610418"
+  integrity sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==
+  dependencies:
+    lib0 "^0.2.99"
 
 yocto-queue@^0.1.0:
   version "0.1.0"

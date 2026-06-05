@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
+import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-3'
 
 import barePdf from '@/assets/home/bare_pdf.svg'
 
@@ -40,47 +40,7 @@ export default {
         NodeViewContent
     },
 
-    props: {
-        // the editor instance
-        editor: {
-            type: Object
-        },
-
-        // the current node
-        node: {
-            type: Object
-        },
-
-        // an array of decorations
-        decorations: {
-            type: Array
-        },
-
-        // `true` when there is a `NodeSelection` at the current node view
-        selected: {
-            type: Boolean
-        },
-
-        // access to the node extension, for example to get options
-        extension: {
-            type: Object
-        },
-
-        // get the document position of the current node
-        getPos: {
-            type: Function
-        },
-
-        // update attributes of the current node
-        updateAttributes: {
-            type: Function
-        },
-
-        // delete the current node
-        deleteNode: {
-            type: Function
-        }
-    },
+    props: nodeViewProps,
 
     data() {
         return {
