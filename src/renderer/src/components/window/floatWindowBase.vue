@@ -5,7 +5,7 @@
         :theme="theme"
         width="800px"
         :height="height"
-        :background="theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)'"
+        :background="theme === 'dark' ? 'rgba(32, 35, 45, 0.3)' : 'rgba(255, 255, 255, 0.3)'"
         :title-size="15"
         :teleport="teleport"
         :isAcrylic="true"

@@ -13,6 +13,7 @@ export const config = {
     dynamicEffect: true,
     watchAllExtensions: false,
     themeColorList: [],
+    aiOption: null,
     theme: "light"
 }
 

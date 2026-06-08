@@ -752,6 +752,7 @@ export default {
             if (mode === 'inside') {
                 this.reviseEditor({
                     id: 'academic',
+                    dsId: this.currentDataPath,
                     type: 'item',
                     item: item,
                     target: item.pages.length > 0 ? item.pages[0] : null,

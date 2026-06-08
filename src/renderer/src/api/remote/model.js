@@ -1,3 +1,60 @@
+export class AIAPICreateRequest {
+  
+    /**
+     *
+     * @param {String} name 
+     * @param {String} provider 
+     * @param {String} api_key 
+     * @param {String} base_url 
+     */ 
+    constructor(name = undefined,description = undefined,mode = undefined,provider = undefined,api_key = undefined,base_url = undefined){
+        this.name = name
+        this.description = description
+        this.mode = mode
+        this.provider = provider
+        this.api_key = api_key
+        this.base_url = base_url
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    provider=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    api_key=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    base_url=undefined
+    
+}
+export class AIAPIUpdateRequest {
+  
+    /**
+     *
+
+     */ 
+    constructor(name = undefined,description = undefined,mode = undefined,provider = undefined,api_key = undefined,base_url = undefined){
+        this.name = name
+        this.description = description
+        this.mode = mode
+        this.provider = provider
+        this.api_key = api_key
+        this.base_url = base_url
+    }
+    
+    
+}
 export class Base64ImageRequest {
   
     /**
@@ -54,7 +111,7 @@ export class ConfigCreateOrUpdateRequest {
      *
      * @param {String} language 
      */ 
-    constructor(configId = undefined,data_index = undefined,language = undefined,autoSave = undefined,init_status = undefined,name = undefined,lastLocalPath = undefined,editorExpandContent = undefined,activeSystemMode = undefined,dynamicEffect = undefined,watchAllExtensions = undefined,theme = undefined,data_path = undefined,userId = undefined){
+    constructor(configId = undefined,data_index = undefined,language = undefined,autoSave = undefined,init_status = undefined,name = undefined,lastLocalPath = undefined,editorExpandContent = undefined,activeSystemMode = undefined,dynamicEffect = undefined,watchAllExtensions = undefined,theme = undefined,readonly = undefined,aiOption = undefined,data_path = undefined,userId = undefined){
         this.configId = configId
         this.data_index = data_index
         this.language = language
@@ -67,6 +124,8 @@ export class ConfigCreateOrUpdateRequest {
         this.dynamicEffect = dynamicEffect
         this.watchAllExtensions = watchAllExtensions
         this.theme = theme
+        this.readonly = readonly
+        this.aiOption = aiOption
         this.data_path = data_path
         this.userId = userId
     }

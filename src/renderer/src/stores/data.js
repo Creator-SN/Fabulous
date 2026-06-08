@@ -20,21 +20,26 @@ export const useDataStore = defineStore('data', () => {
         editorShowNav: true,
         activeSystemMode: 'both',
         dynamicEffect: true,
+        readonly: false,
         watchAllExtensions: false,
         isConfigMounted: false,
         themeColorList: [],
+        aiOption: null,
         theme: 'light'
     })
     const data_path = ref([])
     const lock = ref({
         config: true,
         data_path: true,
+        ai_option: true,
         permission_groups: true,
         permission_group_users: true,
         permission_group_invite: true,
         permission_group_user_update: true,
         user_search: true
     })
+
+    const aiOptionList = ref([])
 
     // getters
     const currentDataPathItem = computed(() => {
@@ -77,6 +82,106 @@ export const useDataStore = defineStore('data', () => {
 
             await checkDataIndex();
         }
+    }
+
+    async function listAIOptions(query = '', offset = 0, pageSize = 100) {
+        let id = useUserStore().info.id;
+        if (!id)
+            return { code: 401, data: [] };
+        if (!lock.value.ai_option)
+            return { code: 423, data: aiOptionList.value };
+        lock.value.ai_option = false;
+        let resp = await proxy.$api.ConfigController.listAIAPIs(query, offset, pageSize)
+            .then((res) => {
+                if (res.code === 200) {
+                    const target = Array.isArray(res.data)
+                        ? res.data
+                        : Array.isArray(res.data?.items)
+                            ? res.data.items
+                            : Array.isArray(res.data?.list)
+                                ? res.data.list
+                                : [];
+                    aiOptionList.value = target;
+                } else {
+                    warningMessage(res.message);
+                }
+                return res;
+            })
+            .catch((err) => {
+                warningMessage(err.message);
+                return err;
+            })
+            .finally(() => {
+                lock.value.ai_option = true;
+            });
+        return resp;
+    }
+
+    async function createAIOption(payload) {
+        let id = useUserStore().info.id;
+        if (!id)
+            return { code: 401 };
+        if (!lock.value.ai_option)
+            return { code: 423 };
+        lock.value.ai_option = false;
+        let resp = await proxy.$api.ConfigController.createAIAPI(payload)
+            .then((res) => {
+                if (res.code !== 200)
+                    warningMessage(res.message);
+                return res;
+            })
+            .catch((err) => {
+                warningMessage(err.message);
+                return err;
+            })
+            .finally(() => {
+                lock.value.ai_option = true;
+            });
+        return resp;
+    }
+
+    async function updateAIOption(id, payload) {
+        if (!id)
+            return { code: 400 };
+        if (!lock.value.ai_option)
+            return { code: 423 };
+        lock.value.ai_option = false;
+        let resp = await proxy.$api.ConfigController.updateAIAPI(id, payload)
+            .then((res) => {
+                if (res.code !== 200)
+                    warningMessage(res.message);
+                return res;
+            })
+            .catch((err) => {
+                warningMessage(err.message);
+                return err;
+            })
+            .finally(() => {
+                lock.value.ai_option = true;
+            });
+        return resp;
+    }
+
+    async function removeAIOption(id) {
+        if (!id)
+            return { code: 400 };
+        if (!lock.value.ai_option)
+            return { code: 423 };
+        lock.value.ai_option = false;
+        let resp = await proxy.$api.ConfigController.removeAIAPI(id)
+            .then((res) => {
+                if (res.code !== 200)
+                    warningMessage(res.message);
+                return res;
+            })
+            .catch((err) => {
+                warningMessage(err.message);
+                return err;
+            })
+            .finally(() => {
+                lock.value.ai_option = true;
+            });
+        return resp;
     }
 
     async function checkDataIndex() {
@@ -547,10 +652,15 @@ export const useDataStore = defineStore('data', () => {
     return {
         // state
         configState,
+        aiOptionList,
         data_path,
         lock,
         // actions
         getDataPath,
+        listAIOptions,
+        createAIOption,
+        updateAIOption,
+        removeAIOption,
         addDataSource,
         reviseDataSource,
         listSourcePermissionGroups,

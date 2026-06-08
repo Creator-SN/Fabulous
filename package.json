@@ -82,7 +82,7 @@
         "release:beta": "npm version prerelease --preid beta"
     },
     "dependencies": {
-        "@creatorsn/powereditor3": "^0.3.2",
+        "@creatorsn/powereditor3": "^0.4.7",
         "@creatorsn/vfluent3": "^0.3.89",
         "@electron-toolkit/preload": "^3.0.2",
         "@electron-toolkit/utils": "^4.0.0",

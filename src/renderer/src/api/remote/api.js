@@ -2928,6 +2928,279 @@ export class ConfigController {
   }
  
   /**
+  * @summary 创建 AI 服务配置
+  * @param {UserModel.AIAPICreateRequest} [aiapicreaterequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async createAIAPI(aiapicreaterequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/configs/ai-apis',
+        data:aiapicreaterequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 分页查询 AI 服务配置
+  * @param {undefined} [query] 
+  * @param {Number} [offset] 
+  * @param {Number} [pagesize] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listAIAPIs(query,offset,pagesize,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/configs/ai-apis',
+        data:{},
+        params:{query,offset,pagesize},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取单个 AI 服务配置
+  * @param {String} [pathid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async getAIAPI(pathid,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/configs/ai-apis/'+pathid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 修改 AI 服务配置
+  * @param {String} [pathid] 
+  * @param {UserModel.AIAPIUpdateRequest} [aiapiupdaterequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateAIAPI(pathid,aiapiupdaterequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'put',
+        url:'/configs/ai-apis/'+pathid+'',
+        data:aiapiupdaterequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 删除 AI 服务配置
+  * @param {String} [pathid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async removeAIAPI(pathid,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'delete',
+        url:'/configs/ai-apis/'+pathid+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
   * @summary 获取当前用户的数据源列表
   * @param {undefined} [query] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
@@ -4047,6 +4320,46 @@ ConfigController.getConfig.fullPath=`${axios.defaults.baseURL}/me/config`
 * @description getConfig url链接，不包含baseURL
 */
 ConfigController.getConfig.path=`/me/config`
+/**
+* @description createAIAPI url链接，包含baseURL
+*/
+ConfigController.createAIAPI.fullPath=`${axios.defaults.baseURL}/configs/ai-apis`
+/**
+* @description createAIAPI url链接，不包含baseURL
+*/
+ConfigController.createAIAPI.path=`/configs/ai-apis`
+/**
+* @description listAIAPIs url链接，包含baseURL
+*/
+ConfigController.listAIAPIs.fullPath=`${axios.defaults.baseURL}/configs/ai-apis`
+/**
+* @description listAIAPIs url链接，不包含baseURL
+*/
+ConfigController.listAIAPIs.path=`/configs/ai-apis`
+/**
+* @description getAIAPI url链接，包含baseURL
+*/
+ConfigController.getAIAPI.fullPath=`${axios.defaults.baseURL}/configs/ai-apis/{id}`
+/**
+* @description getAIAPI url链接，不包含baseURL
+*/
+ConfigController.getAIAPI.path=`/configs/ai-apis/{id}`
+/**
+* @description updateAIAPI url链接，包含baseURL
+*/
+ConfigController.updateAIAPI.fullPath=`${axios.defaults.baseURL}/configs/ai-apis/{id}`
+/**
+* @description updateAIAPI url链接，不包含baseURL
+*/
+ConfigController.updateAIAPI.path=`/configs/ai-apis/{id}`
+/**
+* @description removeAIAPI url链接，包含baseURL
+*/
+ConfigController.removeAIAPI.fullPath=`${axios.defaults.baseURL}/configs/ai-apis/{id}`
+/**
+* @description removeAIAPI url链接，不包含baseURL
+*/
+ConfigController.removeAIAPI.path=`/configs/ai-apis/{id}`
 /**
 * @description listDataSources url链接，包含baseURL
 */

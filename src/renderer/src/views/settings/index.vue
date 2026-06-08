@@ -13,7 +13,9 @@
                 :icon="'StorageTape'"
                 :title="local('Source')"
                 :content="local('Add New Source')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 35px"
@@ -53,7 +55,9 @@
                 :icon="'Color'"
                 :title="local('Theme')"
                 :content="theme === 'light' ? `${local('Light')}` : `${local('Dark')}`"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 15px"
@@ -99,7 +103,9 @@
                 :icon="'LocaleLanguage'"
                 :title="local('Language')"
                 :content="local('Choose A Language')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -136,7 +142,9 @@
                 :icon="'Manage'"
                 :title="local('System Mode')"
                 :content="local('Switch System Mode')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -173,7 +181,9 @@
                 :icon="'Save'"
                 :title="local('Auto Save')"
                 :content="local('Auto Save')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -213,7 +223,9 @@
                 "
                 :title="local('Editor Content Expand')"
                 :content="local('Switch Editor Content Expand')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -249,7 +261,9 @@
                 :icon="'ButtonMenu'"
                 :title="local('Show Navigation')"
                 :content="local('Show Navigation on Editor')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -280,13 +294,54 @@
                 </template>
             </fv-Collapse>
             <fv-Collapse
+                :disabledCollapse="true"
+                :theme="theme"
+                :icon="'Robot'"
+                :title="local('AI API Config')"
+                :content="local('Configure AI API models and provider endpoints')"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
+                :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
+                :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
+                style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
+            >
+                <template #icon>
+                    <div class="collapse-icon-block">
+                        <img
+                            class="collapse-icon"
+                            :src="img.aiOption"
+                            alt=""
+                            draggable="false"
+                            style="width: 24px"
+                        />
+                    </div>
+                </template>
+                <template v-slot:extension>
+                    <fv-button
+                        theme="dark"
+                        icon="Calories"
+                        background="linear-gradient(70deg,  rgba(159, 102, 215, 1), rgba(158, 153, 240, 1), rgba(207, 177, 236, 1))"
+                        :border-radius="6"
+                        font-size="12"
+                        :is-box-shadow="true"
+                        style="width: 80px"
+                        @click="show.aiOption = true"
+                    >
+                        {{ local('Config') }}
+                    </fv-button>
+                </template>
+            </fv-Collapse>
+            <fv-Collapse
                 v-if="false"
                 :disabledCollapse="true"
                 :theme="theme"
                 :icon="'Diagnostic'"
                 :title="local('Watch All Files')"
                 :content="local('Switch whether to watch all extension files on Notebook system')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -311,7 +366,9 @@
                 :icon="'DeveloperTools'"
                 :title="local('Dev Tools')"
                 :content="local('Dev Tools for Developer')"
-                :background="theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'"
+                :background="
+                    theme === 'dark' ? 'rgba(23, 29, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)'
+                "
                 :hover-background="theme === 'dark' ? 'rgba(19, 24, 35, 1)' : ''"
                 :border-color="theme === 'dark' ? 'rgba(120, 120, 120, 0.2)' : ''"
                 style="width: calc(100% - 15px); max-width: 1280px; margin-top: 3px"
@@ -329,6 +386,7 @@
             </fv-Collapse>
             <app-update v-if="clientMode === 'electron'"></app-update>
         </div>
+        <ai-option-panel v-model="show.aiOption"></ai-option-panel>
         <source-editor
             v-model:show="show.addDS"
             :theme="theme"
@@ -355,6 +413,7 @@ import sourceEditor from '@/components/settings/dataSource/sourceEditor.vue'
 import dataSource from '@/components/settings/dataSource/index.vue'
 import joinInvitePanel from '@/components/settings/dataSource/joinInvitePanel.vue'
 import appUpdate from '@/components/settings/appUpdate/index.vue'
+import aiOptionPanel from '@/components/settings/aiOption/index.vue'
 
 import sourceImg from '@/assets/settings/source.svg'
 import themeImg from '@/assets/settings/theme.svg'
@@ -365,6 +424,7 @@ import expandingImg from '@/assets/settings/expanding.svg'
 import navImg from '@/assets/settings/nav.svg'
 import sunImg from '@/assets/settings/sun.svg'
 import moonImg from '@/assets/settings/moon.svg'
+import aiOptionImg from '@/assets/settings/aiOption.svg'
 
 export default {
     name: 'Settings',
@@ -373,7 +433,8 @@ export default {
         sourceEditor,
         dataSource,
         joinInvitePanel,
-        appUpdate
+        appUpdate,
+        aiOptionPanel
     },
     data() {
         return {
@@ -400,9 +461,11 @@ export default {
                 expanding: expandingImg,
                 nav: navImg,
                 sun: sunImg,
-                moon: moonImg
+                moon: moonImg,
+                aiOption: aiOptionImg
             },
             show: {
+                aiOption: false,
                 addDS: false,
                 dsMode: 'add',
                 joinInvite: false

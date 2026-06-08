@@ -1750,5 +1750,89 @@ export default {
     "Open Folder Failed": {
         "en": "Open Folder Failed",
         "cn": "打开文件夹失败"
+    },
+    "AI API Config": {
+        "en": "AI API Config",
+        "cn": "AI API 配置"
+    },
+    "API Key": {
+        "en": "API Key",
+        "cn": "API 密钥"
+    },
+    "API Option": {
+        "en": "API Option",
+        "cn": "API 选项"
+    },
+    "Are you sure to delete selected models?": {
+        "en": "Are you sure to delete selected models?",
+        "cn": "确定要删除选中的模型吗？"
+    },
+    "Are you sure to delete this model?": {
+        "en": "Are you sure to delete this model?",
+        "cn": "确定要删除此模型吗？"
+    },
+    "Base URL": {
+        "en": "Base URL",
+        "cn": "基础 URL"
+    },
+    "Cancel Select": {
+        "en": "Cancel Select",
+        "cn": "取消选择"
+    },
+    "Configure AI API models and provider endpoints": {
+        "en": "Configure AI API models and provider endpoints",
+        "cn": "配置 AI API 模型和提供商端点"
+    },
+    "Delete Model": {
+        "en": "Delete Model",
+        "cn": "删除模型"
+    },
+    "Delete Selected": {
+        "en": "Delete Selected",
+        "cn": "删除选中"
+    },
+    "Description": {
+        "en": "Description",
+        "cn": "描述"
+    },
+    "Manage your model endpoints, provider and credentials.": {
+        "en": "Manage your model endpoints, provider and credentials.",
+        "cn": "管理您的模型端点、提供商和凭据。"
+    },
+    "Model Name": {
+        "en": "Model Name",
+        "cn": "模型名称"
+    },
+    "Multi Select": {
+        "en": "Multi Select",
+        "cn": "多选"
+    },
+    "No API model configured yet.": {
+        "en": "No API model configured yet.",
+        "cn": "尚未配置 API 模型。"
+    },
+    "Optional": {
+        "en": "Optional",
+        "cn": "可选"
+    },
+    "Provider": {
+        "en": "Provider",
+        "cn": "提供商"
+    },
+    "Required": {
+        "en": "Required",
+        "cn": "必填"
+    },
+    "Saving...": {
+        "en": "Saving...",
+        "cn": "保存中..."
+    },
+    "Search or input provider": {
+        "en": "Search or input provider",
+        "cn": "搜索或输入提供商"
+    },
+    "Config": {
+        "en": "Config",
+        "cn": "配置"
     }
 }
