@@ -310,10 +310,10 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.6.3.tgz#291dcd1cdfae453a16b40e0b50961e2a444f6d3c"
   integrity sha512-w/gJKME9mYN7ZoUAmSMAWXk4hkVpxRKvEJCb3dV5g9wwWdxTJJ0ayOJAVcNxtdqaxDyFuC0uz4RSGVacJ030PQ==
 
-"@creatorsn/powereditor3@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.3.2.tgz#af869498ebb6d9e809c22b18d5d62ea4a9434ac7"
-  integrity sha512-3b0RN4fhp/CPbhW6ffGxyCZTYhBFd+sDh3cc+qMs9eY05JzPAsdUhHlGDv2Ph9Wk31AtqxucajlU1JC/IdBLJg==
+"@creatorsn/powereditor3@^0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.4.7.tgz#1e76223ed8956c932a7a131f00a43318d5c0ed62"
+  integrity sha512-xwbDKaNggz9J2RnyM+9YjPfHqhM6fUsBjdLk562R+kpUvA0HizFmB7ilbNeMVfKYCiyye0ysUGVgoydDhzZ9cA==
   dependencies:
     "@creatorsn/vfluent3" "^0.3.90"
     "@tiptap/core" "3.23.6"
@@ -347,6 +347,7 @@
     autoprefixer "^10.4.21"
     core-js "3.30.1"
     d3 "7.0.4"
+    diff "^9.0.0"
     highlight.js "11.6.0"
     katex "0.13.18"
     lowlight "2.7.0"
@@ -3223,6 +3224,11 @@ diff@^5.1.0:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/diff/-/diff-5.2.2.tgz#0a4742797281d09cfa699b79ea32d27723623bad"
   integrity sha512-vtcDfH3TOjP8UekytvnHH1o1P4FcUdt4eQ1Y+Abap1tk/OB2MWQvcwS2ClCd1zuIhc3JKOx6p3kod8Vfys3E+A==
+
+diff@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/diff/-/diff-9.0.0.tgz#297c31cd7c280f13dfe335791ec2063bd4a73a6f"
+  integrity sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==
 
 dir-compare@^4.2.0:
   version "4.2.0"
