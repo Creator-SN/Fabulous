@@ -3,8 +3,8 @@
         <div
             v-show="thisValue"
             class="fabulous-rightMenu"
-            :class="[{dark: theme === 'dark'}]"
-            :style="{left: posX + 'px', top: posY + 'px', width: rightMenuWidth + 'px'}"
+            :class="[{ dark: theme === 'dark', electron: clientMode === 'electron' }]"
+            :style="{ left: posX + 'px', top: posY + 'px', width: rightMenuWidth + 'px' }"
         >
             <slot>
                 <div>
@@ -18,6 +18,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
+import { useAppConfig } from '@/stores/appConfig'
+
 export default {
     name: 'rightMenu',
     props: {
@@ -37,59 +40,64 @@ export default {
             posX: 0,
             posY: 0,
             rightMenuHeight: 0
-        };
+        }
     },
     watch: {
         modelValue(val) {
-            this.thisValue = val;
+            this.thisValue = val
         },
         thisValue(val) {
-            this.$emit('update:modelValue', val);
+            this.$emit('update:modelValue', val)
             if (this.rightMenuHeight == 0) {
-                this.rightMenuHeight = this.$el.clientHeight;
-                this.$emit('update-height', this.rightMenuHeight);
+                this.rightMenuHeight = this.$el.clientHeight
+                this.$emit('update-height', this.rightMenuHeight)
             }
         }
     },
+    computed: {
+        ...mapState(useAppConfig, {
+            clientMode: (state) => state.clientMode
+        })
+    },
     mounted() {
-        this.globalAppendInit();
-        this.rightMenuClearInit();
+        this.globalAppendInit()
+        this.rightMenuClearInit()
     },
     methods: {
         globalAppendInit() {
             this.$nextTick(() => {
-                const body = document.querySelector('body');
+                const body = document.querySelector('body')
                 if (body.append) {
-                    body.append(this.$el);
+                    body.append(this.$el)
                 } else {
-                    body.appendChild(this.$el);
+                    body.appendChild(this.$el)
                 }
-            });
+            })
         },
         rightMenuClearInit() {
             window.addEventListener('click', (event) => {
-                let x = event.target;
-                if (x && x !== this.$el) this.thisValue = false;
-            });
+                let x = event.target
+                if (x && x !== this.$el) this.thisValue = false
+            })
         },
         rightClick(event, el) {
-            event.preventDefault();
-            this.thisValue = true;
-            let bounding = el.getBoundingClientRect();
-            let targetPos = {};
-            targetPos.x = event.x;
-            targetPos.y = event.y;
-            if (targetPos.x < bounding.left) targetPos.x = bounding.left;
+            event.preventDefault()
+            this.thisValue = true
+            let bounding = el.getBoundingClientRect()
+            let targetPos = {}
+            targetPos.x = event.x
+            targetPos.y = event.y
+            if (targetPos.x < bounding.left) targetPos.x = bounding.left
             if (targetPos.x + this.rightMenuWidth > bounding.right)
-                targetPos.x = bounding.right - this.rightMenuWidth;
-            if (targetPos.y < bounding.top) targetPos.y = bounding.top;
+                targetPos.x = bounding.right - this.rightMenuWidth
+            if (targetPos.y < bounding.top) targetPos.y = bounding.top
             if (targetPos.y + this.rightMenuHeight > bounding.bottom)
-                targetPos.y = bounding.bottom - this.rightMenuHeight;
-            this.posX = targetPos.x;
-            this.posY = targetPos.y;
+                targetPos.y = bounding.bottom - this.rightMenuHeight
+            this.posX = targetPos.x
+            this.posY = targetPos.y
         }
     }
-};
+}
 </script>
 
 <style lang="scss">
@@ -103,10 +111,16 @@ export default {
     border: rgba(36, 36, 36, 0.1) solid thin;
     border-radius: 8px;
     box-sizing: border-box;
-    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1), 0px 3px 6px rgba(0, 0, 0, 0.1);
+    box-shadow:
+        0px 0px 0px rgba(0, 0, 0, 0.1),
+        0px 3px 6px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     z-index: 3;
+
+    &.electron {
+        background: linear-gradient(90deg, rgba(241, 241, 242, 1), rgba(250, 250, 249, 1));
+    }
 
     div {
         padding: 1px 0px;
@@ -154,8 +168,13 @@ export default {
     &.dark {
         background: rgba(36, 36, 36, 0.6);
         border: rgba(200, 200, 200, 0.1) solid thin;
-        box-shadow: 0px 0px 0px rgba(36, 36, 36, 0.1),
+        box-shadow:
+            0px 0px 0px rgba(36, 36, 36, 0.1),
             0px 3px 6px rgba(36, 36, 36, 0.3);
+
+        &.electron {
+            background: linear-gradient(90deg, rgba(46, 46, 46, 1) 0%, rgba(39, 40, 42, 1) 100%);
+        }
 
         div {
             span {
@@ -185,7 +204,8 @@ export default {
 .zoom-in-top-leave-active {
     opacity: 1;
     transform: scaleY(1);
-    transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1),
+    transition:
+        transform 300ms cubic-bezier(0.23, 1, 0.32, 1),
         opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
     transform-origin: center top;
 }

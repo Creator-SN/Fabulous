@@ -49,7 +49,7 @@
                 :toolbarHeight="170"
                 :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
-                :contentMaxWidth="editorExpandContent ? '99999px' : '900px'"
+                :contentMaxWidth="editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'"
                 :mobileDisplayWidth="0"
                 :mentionItemAttr="currentMentionItemAttr"
                 :extensions="customExtensions"
@@ -158,7 +158,7 @@
                             style="height: 60px"
                             :style="{
                                 width: '100%',
-                                'max-width': editorExpandContent ? '99999px' : '900px'
+                                'max-width': editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'
                             }"
                         ></fv-text-box>
                         <p
@@ -167,7 +167,7 @@
                             :class="[{ dark: theme === 'dark' }]"
                             :style="{
                                 width: '100%',
-                                'max-width': editorExpandContent ? '99999px' : '900px'
+                                'max-width': editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'
                             }"
                         >
                             {{ editorContent.title }}

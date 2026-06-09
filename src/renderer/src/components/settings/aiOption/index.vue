@@ -608,8 +608,6 @@ export default {
         align-items: flex-start;
         align-content: flex-start;
         flex-wrap: wrap;
-        
-        
     }
 
     .api-card-shell {
@@ -772,10 +770,14 @@ export default {
             min-width: 0;
         }
 
-        .api-option-list,
-        .summary-grid,
-        .editor-grid {
-            grid-template-columns: 1fr;
+        .api-card-shell {
+            width: 100%;
+
+            .api-card {
+                &.expanded {
+                    width: 100%;
+                }
+            }
         }
     }
 }

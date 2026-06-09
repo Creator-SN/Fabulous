@@ -1,43 +1,42 @@
 <template>
     <fv-affix
         v-show="navList.length > 0"
+        class="editor-nav-affix"
         :target="getTarget"
-        :mode="fixed ? 'fixed' : 'relative'"
         :left="0"
         :top="marginTop"
     >
         <div
             class="editor-nav-wrapper"
-            :class="[{dark: theme === 'dark'}, {fixed}, {expand: editorExpandContent}]"
-            :style="{width: fixed ? width + 'px' : '', height: fixed ? height + 'px' : ''}"
+            :class="[
+                { dark: theme === 'dark' },
+                fixed ? 'fixed' : 'absolute',
+                { expand: editorExpandContent }
+            ]"
+            :style="{ width: fixed ? width + 'px' : '', height: height + 'px' }"
         >
             <div class="editor-nav-container">
                 <div
                     class="editor-nav-item"
-                    :class="[{choosen: isChoosen(index)}]"
+                    :class="[{ choosen: isChoosen(index) }]"
                     v-for="(item, index) in navList"
                     :key="index"
+                    :title="item.text"
                     @click="jumpTo(item)"
                 >
                     <div class="left-ul-block">
-                        <i
-                            class="up-line"
-                            :class="[{hidden: index === 0}]"
-                        ></i>
-                        <i
-                            class="mid-ring"
-                            :class="[{mini: item.level > 0}]"
-                        ></i>
+                        <i class="up-line" :class="[{ hidden: index === 0 }]"></i>
+                        <i class="mid-ring" :class="[{ mini: item.level > 0 }]"></i>
                         <i
                             class="down-line"
-                            :class="[{hidden: index === navList.length - 1}]"
+                            :class="[{ hidden: index === navList.length - 1 }]"
                         ></i>
                     </div>
                     <div
                         class="right-content-block"
-                        :style="{padding: `0px ${10 + item.level * 5}px`}"
+                        :style="{ padding: `0px ${10 + item.level * 5}px` }"
                     >
-                        <p>{{item.text}}</p>
+                        <p>{{ item.text }}</p>
                     </div>
                 </div>
             </div>
@@ -46,10 +45,10 @@
 </template>
 
 <script>
-import gsap from 'gsap';
-import { mapState } from 'pinia';
-import { useDataStore } from '@/stores/data';
-import { useTheme } from '@/stores/theme';
+import gsap from 'gsap'
+import { mapState } from 'pinia'
+import { useDataStore } from '@/stores/data'
+import { useTheme } from '@/stores/theme'
 
 export default {
     props: {
@@ -71,7 +70,7 @@ export default {
             lock: {
                 raf: true
             }
-        };
+        }
     },
     watch: {},
     computed: {
@@ -81,104 +80,99 @@ export default {
         ...mapState(useTheme, { theme: 'theme' }),
         isChoosen() {
             return (index) => {
-                let item = this.navList[index];
-                if (index == this.navList.length - 1)
-                    return this.scrollTop >= this.getTop(item.el);
+                let item = this.navList[index]
+                if (index == this.navList.length - 1) return this.scrollTop >= this.getTop(item.el)
                 return (
                     this.scrollTop >= this.getTop(item.el) &&
                     this.scrollTop < this.getTop(this.navList[index + 1].el)
-                );
-            };
+                )
+            }
         }
     },
     mounted() {
-        this.eventInit();
+        this.eventInit()
     },
     methods: {
         eventInit() {
-            let editorContainer = this.el().$refs.container;
-            let contentContainer = this.el().$refs.editor.$el;
-            editorContainer.addEventListener('scroll', this.layoutFormat);
+            let editorContainer = this.el().$refs.container
+            let contentContainer = this.el().$refs.editor.$el
+            editorContainer.addEventListener('scroll', this.layoutFormat)
             const resizeObserver = new ResizeObserver(() => {
-                this.layoutFormat();
-            });
-            resizeObserver.observe(editorContainer);
-            resizeObserver.observe(contentContainer);
+                this.layoutFormat()
+            })
+            resizeObserver.observe(editorContainer)
+            resizeObserver.observe(contentContainer)
         },
         getTarget() {
-            if (this.el()) return this.el().$refs.container;
+            if (this.el()) return this.el().$refs.container
         },
         jumpTo(item) {
-            let editorContainer = this.el().$refs.container;
+            let editorContainer = this.el().$refs.container
             try {
                 gsap.to(editorContainer, {
                     scrollTop: this.getTop(item.el),
                     duration: 0.3,
                     onUpdate: () => {}
-                });
+                })
             } catch (e) {
-                console.log(e);
+                console.log(e)
             }
         },
         getTop(el) {
-            let editorContainer = this.el().$refs.container;
-            let { top } = el.getBoundingClientRect();
-            return editorContainer.scrollTop + top - 180;
+            let editorContainer = this.el().$refs.container
+            let { top } = el.getBoundingClientRect()
+            return editorContainer.scrollTop + top - 180
         },
         getEditorNavList() {
-            clearTimeout(this.timer.nav);
+            clearTimeout(this.timer.nav)
             this.timer.nav = setTimeout(() => {
-                let contentContainer = this.el().$refs.editor.$el;
-                let navList = [];
-                let hList = contentContainer.querySelectorAll(
-                    'h1, h2, h3, h4, h5, h6'
-                );
-                let maxLevel = 6;
+                let contentContainer = this.el().$refs.editor.$el
+                let navList = []
+                let hList = contentContainer.querySelectorAll('h1, h2, h3, h4, h5, h6')
+                let maxLevel = 6
                 hList.forEach((el) => {
-                    let level = el.tagName.slice(1);
-                    if (level < maxLevel) maxLevel = level;
-                });
+                    let level = el.tagName.slice(1)
+                    if (level < maxLevel) maxLevel = level
+                })
                 hList.forEach((el) => {
-                    let text = el.innerText;
-                    let level = el.tagName.slice(1);
+                    let text = el.innerText
+                    let level = el.tagName.slice(1)
                     navList.push({
                         text,
                         level: level - maxLevel,
                         el
-                    });
-                });
-                this.navList = navList;
-            }, 300);
+                    })
+                })
+                this.navList = navList
+            }, 300)
         },
         layoutFormat() {
-            if (!this.lock.raf) return;
-            this.lock.raf = false;
+            if (!this.lock.raf) return
+            this.lock.raf = false
             window.requestAnimationFrame(() => {
                 if (!this.el()) {
-                    this.lock.raf = true;
-                    return;
+                    this.lock.raf = true
+                    return
                 }
-                let editorContainer = this.el().$refs.container;
-                let contentContainer = this.el().$refs.editor.$el;
-                let editorWidth = editorContainer.offsetWidth;
-                let contentWidth = contentContainer.offsetWidth;
-                let editorHeight = editorContainer.offsetHeight;
-                let editorPaddingTop = parseInt(
-                    window.getComputedStyle(editorContainer).paddingTop
-                );
-                let top = editorContainer.scrollTop;
-                let width = (editorWidth - contentWidth) / 2;
-                this.width = width - 30;
-                this.height = editorHeight - editorPaddingTop;
-                this.marginTop = editorPaddingTop;
-                this.scrollTop = top;
+                let editorContainer = this.el().$refs.container
+                let contentContainer = this.el().$refs.editor.$el
+                let editorWidth = editorContainer.offsetWidth
+                let contentWidth = contentContainer.offsetWidth
+                let editorHeight = editorContainer.offsetHeight
+                let editorPaddingTop = parseInt(window.getComputedStyle(editorContainer).paddingTop)
+                let top = editorContainer.scrollTop
+                let width = (editorWidth - contentWidth) / 2
+                this.width = width - 30
+                this.height = editorHeight - editorPaddingTop
+                this.marginTop = editorPaddingTop
+                this.scrollTop = top
                 if (editorWidth - contentWidth > 460) {
-                    this.fixed = true;
+                    this.fixed = true
                 } else {
-                    this.fixed = false;
+                    this.fixed = false
                 }
-                this.lock.raf = true;
-            });
+                this.lock.raf = true
+            })
         }
     },
     beforeUnmount() {
@@ -186,10 +180,16 @@ export default {
         // let editorContainer = this.el().$refs.container;
         // editorContainer.removeEventListener('scroll', this.layoutFormat);
     }
-};
+}
 </script>
 
 <style lang="scss">
+.editor-nav-affix {
+    &:hover {
+        z-index: 3;
+    }
+}
+
 .editor-nav-wrapper {
     @include HcenterVcenterC;
 
@@ -197,7 +197,9 @@ export default {
     width: 100%;
     box-sizing: border-box;
     opacity: 0.6;
-    transition: opacity 0.6s;
+    transition:
+        background 0.6s,
+        opacity 0.6s;
 
     &:hover {
         opacity: 1;
@@ -215,6 +217,66 @@ export default {
         }
     }
 
+    &.absolute {
+        width: 100%;
+        height: 100%;
+        padding: 0px 25px;
+        opacity: 1;
+
+        &:hover {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 255, 1) 50%,
+                rgba(255, 255, 255, 0.6) 70%,
+                rgba(255, 255, 255, 0) 100%
+            );
+
+            .editor-nav-container {
+                width: 300px;
+
+                .left-ul-block {
+                    .up-line {
+                        visibility: visible;
+                    }
+
+                    .down-line {
+                        visibility: visible;
+                    }
+                }
+
+                .right-content-block {
+                    visibility: visible;
+                }
+            }
+        }
+
+        .editor-nav-container {
+            width: 20px;
+            max-width: 270px;
+            max-height: 100%;
+            flex-shrink: 0;
+            justify-content: flex-start;
+            transition: width 0.3s ease-out;
+            overflow-x: hidden;
+            overflow-y: overlay;
+
+            .left-ul-block {
+                .up-line {
+                    visibility: hidden;
+                }
+
+                .down-line {
+                    visibility: hidden;
+                }
+            }
+
+            .right-content-block {
+                visibility: hidden;
+            }
+        }
+    }
+
     &.expand {
         .editor-nav-container {
             max-width: none;
@@ -228,10 +290,22 @@ export default {
                     color: rgba(255, 255, 255, 1);
 
                     &:hover {
-                        background: rgba(255, 255, 255, 1);
+                        background: rgba(35, 38, 41, 1);
                         color: rgba(161, 169, 255, 1);
                     }
                 }
+            }
+        }
+
+        &.absolute {
+            &:hover {
+                background: linear-gradient(
+                    90deg,
+                    rgba(43, 46, 51, 1) 0%,
+                    rgba(43, 46, 51, 1) 50%,
+                    rgba(43, 46, 51, 0.6) 70%,
+                    rgba(43, 46, 51, 0) 100%
+                );
             }
         }
     }
@@ -322,7 +396,7 @@ export default {
             cursor: pointer;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.6);
+                background: rgba(252, 252, 252, 1);
                 color: rgba(140, 148, 228, 1);
             }
 
