@@ -1,6 +1,6 @@
 {
     "name": "@creatorsn/fabulous",
-    "version": "3.10.14",
+    "version": "3.10.15",
     "description": "Fabulous Notebook is a WYSIWYG notebook with an exciting paper and literature management system.",
     "main": "./out/main/index.js",
     "author": {
