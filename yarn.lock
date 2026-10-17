@@ -366,10 +366,10 @@
     y-protocols "^1.0.7"
     yjs "^13.6.31"
 
-"@creatorsn/vfluent3@^0.3.89":
-  version "0.3.89"
-  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.89.tgz#9cdefaeed8bdedda188190a265508af095606934"
-  integrity sha512-erYDTOmL3HFEqUM5XmE8n6xp5ZN5QrbkWSmFaUE8OaqjPh5dOtQM5NKia/09HE3Cg2zRXFpuq/vewciRmY+FWQ==
+"@creatorsn/vfluent3@^0.3.105":
+  version "0.3.105"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.105.tgz#d8db976af1283f46172ce285e578aeb1abbd6f84"
+  integrity sha512-Ls6fc9fApE9C66R6LqXOSy63h/763aOtw6ZlVziniKjjE1JN0eep/Wb3fYHkQ1lYSCKytWnbEty1Anx2EzX9CQ==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"

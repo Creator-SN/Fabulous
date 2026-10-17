@@ -150,15 +150,16 @@ export default {
             })
         },
         dropFilesInit() {
-            const skip_condition = () => {
-                if (this.show_editor) return true
-                if (!this.draggingEl?.classList?.contains('tab-view')) return true
-                return false
-            }
+            const isTabViewTarget = (event) => event.target?.closest?.('.tab-view')
+            const hasFiles = (event) => Array.from(event.dataTransfer?.types || []).includes('Files')
             this.$el.addEventListener(
                 'dragenter',
                 (e) => {
-                    if (!skip_condition(e)) {
+                    if (hasFiles(e)) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        this.show.drop = !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
+                    } else if (this.draggingEl?.classList?.contains('tab-view') && !this.show_editor) {
                         this.show.drop = true
                         e.preventDefault()
                         e.stopPropagation()
@@ -170,7 +171,11 @@ export default {
             this.$el.addEventListener(
                 'dragover',
                 (e) => {
-                    if (!skip_condition(e)) {
+                    if (hasFiles(e)) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        this.show.drop = !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
+                    } else if (this.draggingEl?.classList?.contains('tab-view') && !this.show_editor) {
                         this.show.drop = true
                         e.preventDefault()
                         e.stopPropagation()
@@ -203,19 +208,19 @@ export default {
                 e.stopPropagation()
 
                 this.show.drop = false
+                if (isTabViewTarget(e)) return
                 var df = e.dataTransfer
                 var files = []
 
-                if (df.items !== undefined) {
+                if (df?.items !== undefined) {
                     for (let i = 0; i < df.items.length; i++) {
                         let item = df.items[i]
-                        let fileEntry = item.webkitGetAsEntry()
-                        let ext = fileEntry ? fileEntry.name.split('.') : []
-                        ext = ext[ext.length - 1]
+                        let fileEntry = item.webkitGetAsEntry?.()
+                        let ext = (fileEntry?.name || '').split('.').pop().toLowerCase()
                         // 用webkitGetAsEntry禁止上传目录
                         if (
                             item.kind === 'file' &&
-                            fileEntry.isFile &&
+                            fileEntry?.isFile &&
                             item.type === 'application/pdf'
                         ) {
                             let file = item.getAsFile()

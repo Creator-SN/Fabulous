@@ -61,9 +61,16 @@
                                 :color="'rgba(255, 180, 0, 0.8)'"
                                 style="display: flex; align-item: center"
                             ></fv-progress-ring>
-                            <p v-show="!x.item.editable" class="tree-view-custom-label">
+                            <fv-roll-text
+                                v-show="!x.item.editable"
+                                mode="loop"
+                                trigger="hover"
+                                forward="left"
+                                class="tree-view-custom-label"
+                                :title="x.item.name"
+                            >
                                 {{ x.item.name }}
-                            </p>
+                            </fv-roll-text>
                             <fv-text-box
                                 v-model="x.item.name"
                                 v-show="x.item.editable"
@@ -696,16 +703,18 @@ export default {
                 @include Vcenter;
 
                 flex: 1;
+                gap: 5px;
+                overflow: hidden;
 
                 .tree-view-custom-label {
-                    margin-left: 5px;
+                    flex: 1;
+                    font-size: 12px;
                     user-select: none;
                     cursor: default;
                 }
 
                 .tree-view-custom-text-box {
                     width: 100%;
-                    margin-left: 5px;
                     flex: 1;
                 }
 
@@ -713,7 +722,6 @@ export default {
                     width: 30px;
                     height: 30px;
                     flex-shrink: 0;
-                    margin-left: 5px;
                     margin-right: 25px;
 
                     i.ms-Icon {

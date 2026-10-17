@@ -71,13 +71,16 @@
                             color="rgba(255, 180, 0, 0.8)"
                             background="rgba(200, 200, 200, 0.1)"
                         ></fv-progress-ring>
-                        <p
+                        <fv-roll-text
                             v-show="!x.item.editable"
                             class="tree-view-custom-label"
+                            mode="loop"
+                            trigger="hover"
+                            forward="left"
                             :title="x.item.name"
                         >
                             {{ x.item.name }}
-                        </p>
+                        </fv-roll-text>
                         <fv-text-box
                             v-model="x.item.name"
                             v-show="x.item.editable"
@@ -962,14 +965,11 @@ export default {
             overflow: hidden;
 
             .tree-view-custom-label {
-                @include nowrap;
-
                 width: 90%;
                 margin-left: 5px;
                 flex: 1;
                 font-size: 12px;
                 user-select: none;
-                overflow: hidden;
                 cursor: default;
             }
 
