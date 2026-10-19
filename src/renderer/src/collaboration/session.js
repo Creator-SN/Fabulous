@@ -42,6 +42,7 @@ export function createCollaborationSession({
     )
     endpoint.protocol = endpoint.protocol === 'https:' ? 'wss:' : 'ws:'
     endpoint.searchParams.set('token', localStorage.getItem('ApiToken') || '')
+    const isLocal = resourceType === 'local-notebook'
 
     const doc = markRaw(new Y.Doc())
     const awareness = markRaw(new Awareness(doc))
@@ -57,6 +58,7 @@ export function createCollaborationSession({
     let disposed = false
     let presenceUsers = []
     let publishedAwarenessState = null
+    let localSeeded = false
 
     const createUpdateEntry = (update, submitted = false) => ({
         id: `${doc.clientID.toString(36)}-${++updateSequence}`,
@@ -71,7 +73,7 @@ export function createCollaborationSession({
 
     const currentSnapshot = () => getSnapshot?.()
 
-    const sendUpdate = (entry, snapshot) => {
+    const sendUpdate = (entry, snapshot, baseline = false) => {
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             queuedUpdates.push(entry)
             return false
@@ -83,6 +85,7 @@ export function createCollaborationSession({
             updateId: entry.id,
             update: encode(entry.update),
             snapshot,
+            baseline: isLocal ? baseline : undefined,
             stateVector: encode(Y.encodeStateVector(doc))
         }))
         return true
@@ -226,6 +229,7 @@ export function createCollaborationSession({
     const connect = () => {
         if (disposed) return
         onStatus?.('connecting')
+        if (isLocal && localSeeded) endpoint.searchParams.set('seeded', '1')
         const currentSocket = new WebSocket(endpoint)
         socket = currentSocket
         currentSocket.addEventListener('message', handleMessage)
@@ -263,7 +267,9 @@ export function createCollaborationSession({
             const update = Y.encodeStateAsUpdate(doc)
             queuedUpdates.length = 0
             inFlightUpdates.clear()
-            return sendUpdate(createUpdateEntry(update), snapshot)
+            const published = sendUpdate(createUpdateEntry(update), snapshot, true)
+            if (published && isLocal) localSeeded = true
+            return published
         },
         flush(snapshot = currentSnapshot()) {
             if (!ready || !canWrite || !socket || socket.readyState !== WebSocket.OPEN) return false

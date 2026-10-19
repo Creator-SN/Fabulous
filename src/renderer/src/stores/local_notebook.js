@@ -34,12 +34,12 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
     const currentRootPath = ref('')
     const currentWatchPath = ref('')
     const releaseWatch = ref(null)
+    const documentReads = new Map()
 
     const lock = ref({
         directoryChildren: {},
         searchDirectories: true,
         searchNotebooks: true,
-        documentRead: true,
         documentWrite: true,
         createDocument: true,
         createDirectory: true,
@@ -180,7 +180,10 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
     }
 
     async function getDocument(_, filePath) {
-        return await withLock('documentRead', async () => {
+        const key = normalizePath(filePath)
+        if (documentReads.has(key)) return await documentReads.get(key)
+
+        const request = Promise.resolve().then(async () => {
             const api = getLocalApi()
             if (!api?.readLocalFile) {
                 warningMessage('local file reader unavailable')
@@ -196,7 +199,15 @@ export const useLocalNotebookConfig = defineStore('localNotebookConfig', () => {
                     content
                 }
             }
+        }).catch(error => {
+            warningMessage(error?.message)
+            return createError(error?.message || 'operation failed')
+        }).finally(() => {
+            documentReads.delete(key)
         })
+
+        documentReads.set(key, request)
+        return await request
     }
 
     async function updateDocument(_, filePath, versionId, content) {

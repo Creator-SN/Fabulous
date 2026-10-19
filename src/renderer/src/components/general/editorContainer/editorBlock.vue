@@ -293,12 +293,9 @@ import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vu
 import historyCallout from '@/components/general/callout/historyCallout.vue'
 import templatePreview from '@/components/templates/templatePreview.vue'
 import collaboratorAvatars from '@/components/general/editorContainer/collaboratorAvatars.vue'
-import {
-    Collaboration,
-    prosemirrorJSONToYXmlFragment,
-    yXmlFragmentToProsemirrorJSON
-} from '@creatorsn/powereditor3/collaboration'
+import { Collaboration, yXmlFragmentToProsemirrorJSON } from '@creatorsn/powereditor3/collaboration'
 import { createCollaborationSession } from '@/collaboration/session.js'
+import { seedYXmlFragmentFromJSON } from '@/collaboration/seed.js'
 import collaborationCaret from '@/collaboration/caret.js'
 import { useUserStore } from '@/stores/user'
 
@@ -510,8 +507,8 @@ export default {
         },
         collaborationResourceKey() {
             if (
-                !import.meta.env.DEV ||
-                !this.isRemote ||
+                (this.isRemote && !import.meta.env.DEV) ||
+                (!this.isRemote && !this.target?.filePath?.toLowerCase().endsWith('.fbn')) ||
                 !this.target?.id ||
                 !['notebook', 'item'].includes(this.itemType)
             )
@@ -1153,8 +1150,16 @@ export default {
             }
             if (body?.type === 'doc') {
                 const fragment = session.doc.getXmlFragment('default')
-                if (fragment.length === 0)
-                    prosemirrorJSONToYXmlFragment(editor.schema, body, fragment)
+                if (fragment.length === 0) {
+                    try {
+                        const normalized = editor.schema.nodeFromJSON(body).toJSON()
+                        seedYXmlFragmentFromJSON(fragment, normalized)
+                    } catch (error) {
+                        console.error('[collaboration] Failed to load notebook into Yjs.', error)
+                        this.collabStatus = 'error'
+                        return
+                    }
+                }
             }
             const published = session.publishBaseline(this.collaborationSnapshot())
             if (published) this.collabSavedSnapshot = this.collaborationSnapshot()
@@ -1163,11 +1168,13 @@ export default {
         startCollaboration() {
             if (!this.collaborationResourceKey) return
             this.collabSavedSnapshot = null
-            const resourceType = this.itemType === 'notebook' ? 'notebook' : 'page'
+            const resourceType = this.isRemote
+                ? this.itemType === 'notebook' ? 'notebook' : 'page'
+                : 'local-notebook'
             let session = null
             session = createCollaborationSession({
                 resourceType,
-                resourceId: this.target.id,
+                resourceId: this.isRemote ? this.target.id : this.target.filePath,
                 user: this.info,
                 autoSave: () => this.autoSave,
                 getSnapshot: () =>
@@ -1224,7 +1231,10 @@ export default {
                         }
                     }
                     if (!snapshot || typeof snapshot !== 'object') return
-                    if (snapshot.fabulous_notebook || 'title' in snapshot || 'banner' in snapshot) {
+                    if (
+                        (this.isRemote || (!this.unsave && !this.collabSession?.hasPendingUpdates)) &&
+                        (snapshot.fabulous_notebook || 'title' in snapshot || 'banner' in snapshot)
+                    ) {
                         this.reviseEditorContent({
                             id: this.editorId,
                             title: snapshot.title,

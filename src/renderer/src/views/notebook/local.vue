@@ -75,8 +75,7 @@ export default {
         },
         activeFilePath() {
             const targetPath = this.target?.filePath || ''
-            if (targetPath) return targetPath.replace(/\\/g, '/')
-            return this.filePath
+            return this.filePath || targetPath.replace(/\\/g, '/')
         },
         isMarkdownFile() {
             return this.activeFilePath.toLowerCase().endsWith('.md')
@@ -136,6 +135,7 @@ export default {
             let parentPath = currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
             let fileName = currentFilePath.split('/').pop()
             let res = await this.listLocalDirectoryChildren(parentPath)
+            if (currentFilePath !== this.activeFilePath) return
             let pages = res?.data || []
             let target = pages.find((item) => item.filePath === currentFilePath)
             if (!target) {
@@ -178,6 +178,13 @@ export default {
                 }
             }
             const res = await this.getNotebookDocument('local', currentFilePath)
+            if (currentFilePath !== this.activeFilePath) {
+                return {
+                    shouldStop: true,
+                    docInfo: {},
+                    contentType: 'fabulous_notebook'
+                }
+            }
             if (res.status !== 'success') {
                 this.$barWarning(this.local('Read File Failed'), {
                     status: 'warning'
