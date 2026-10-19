@@ -1,5 +1,4 @@
-import { Node, mergeAttributes } from '@tiptap/core';
-import { VueNodeViewRenderer } from '@tiptap/vue-3';
+import { Node, mergeAttributes, VueNodeViewRenderer } from '@creatorsn/powereditor3';
 import pdfNote from '../source/pdfNote.vue';
 
 export default Node.create({

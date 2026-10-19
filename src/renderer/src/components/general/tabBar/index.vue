@@ -61,6 +61,7 @@ import { useTheme } from '@/stores/theme'
 import researchIcon from '@/assets/nav/research.svg'
 import notebookIcon from '@/assets/nav/notebook.svg'
 import templateIcon from '@/assets/nav/template.svg'
+import favorIcon from '@/assets/nav/favor.svg'
 
 export default {
     props: {
@@ -145,6 +146,10 @@ export default {
                 templates: {
                     name: this.local('Templates'),
                     image: templateIcon
+                },
+                favorites: {
+                    name: this.local('My Favorites'),
+                    image: favorIcon
                 }
             }
         },

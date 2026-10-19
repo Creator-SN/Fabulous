@@ -1339,6 +1339,10 @@ export default {
         "en": "Read Image Failed",
         "cn": "读取图像失败"
     },
+    "Failed to load document content.": {
+        "en": "Failed to load document content.",
+        "cn": "加载笔记内容失败"
+    },
     "Open PDF": {
         "en": "Open PDF",
         "cn": "打开 PDF"
@@ -1834,5 +1838,109 @@ export default {
     "Config": {
         "en": "Config",
         "cn": "配置"
+    },
+    "My Favorites": {
+        "en": "My Favorites",
+        "cn": "我的收藏"
+    },
+    "Favorites": {
+        "en": "Favorites",
+        "cn": "收藏夹"
+    },
+    "Manage Favorites": {
+        "en": "Manage Favorites",
+        "cn": "收藏夹管理"
+    },
+    "Notes": {
+        "en": "notes",
+        "cn": "条笔记"
+    },
+    "Keep your favorites close.": {
+        "en": "Keep your favorites close.",
+        "cn": "收藏灵感，随时继续。"
+    },
+    "Collect useful notes and pick up where you left off.": {
+        "en": "Collect useful notes and pick up where you left off.",
+        "cn": "把重要笔记收在一起，随时接着阅读。"
+    },
+    "Search favorite folders or notes": {
+        "en": "Search favorite folders or notes",
+        "cn": "搜索收藏夹或笔记"
+    },
+    "All Favorite Folders": {
+        "en": "All Favorite Folders",
+        "cn": "全部收藏夹"
+    },
+    "Saved for easy access": {
+        "en": "Saved for easy access",
+        "cn": "随时快速访问"
+    },
+    "Favorite Folder": {
+        "en": "Favorite Folder",
+        "cn": "收藏夹"
+    },
+    "Create a space for your notes": {
+        "en": "Create a space for your notes",
+        "cn": "为笔记创建专属空间"
+    },
+    "No matching folders": {
+        "en": "No matching folders",
+        "cn": "未找到匹配的收藏夹"
+    },
+    "Open a note to continue reading": {
+        "en": "Open a note to continue reading",
+        "cn": "打开笔记，继续阅读"
+    },
+    "Edit Favorites": {
+        "en": "Edit Favorites",
+        "cn": "编辑收藏"
+    },
+    "No matching notes": {
+        "en": "No matching notes",
+        "cn": "未找到匹配的笔记"
+    },
+    "No favorites": {
+        "en": "No favorites",
+        "cn": "暂无收藏笔记"
+    },
+    "Keep useful notes in favorites to find them faster next time.": {
+        "en": "Keep useful notes in favorites to find them faster next time.",
+        "cn": "把常用笔记加入收藏，下次更快找到它。"
+    },
+    "Make research easier": {
+        "en": "Make research easier",
+        "cn": "让研究更轻松"
+    },
+    "A space for your notes": {
+        "en": "A space for your notes",
+        "cn": "你的笔记专属空间"
+    },
+    "Folder Name": {
+        "en": "Folder Name",
+        "cn": "收藏夹名称"
+    },
+    "Remove from Favorites": {
+        "en": "Remove from Favorites",
+        "cn": "移出当前收藏夹"
+    },
+    "No favorite folders": {
+        "en": "No favorite folders",
+        "cn": "暂无收藏夹"
+    },
+    "Choose Favorites": {
+        "en": "Choose Favorites",
+        "cn": "选择收藏夹"
+    },
+    "Add Favorite Folder": {
+        "en": "Add Favorite Folder",
+        "cn": "添加收藏夹"
+    },
+    "Create a folder to organize notes": {
+        "en": "Create a folder to organize notes",
+        "cn": "创建收藏夹来整理笔记"
+    },
+    "Open": {
+        "en": "Open",
+        "cn": "查看"
     }
 }

@@ -1070,6 +1070,10 @@ export default {
 
         &.dark {
             color: whitesmoke;
+
+            .tree-view-custom-label {
+                color: whitesmoke;
+            }
         }
 
         .tree-view-item-left-block {

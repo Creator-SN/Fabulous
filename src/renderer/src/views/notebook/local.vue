@@ -98,7 +98,7 @@ export default {
         $route() {
             if (this.$route.name !== 'LocalNotebook') return
             this.refreshPathParams()
-            this.initEditorBinding()
+            this.initEditorBinding(true)
         },
         target() {
             this.refreshPathParams()
@@ -122,12 +122,13 @@ export default {
             let filePath = decodeURI(this.$route.params.path || '')
             this.filePath = filePath ? filePath.replace(/\\/g, '/') : ''
         },
-        async initEditorBinding() {
+        async initEditorBinding(refreshMatchedTarget = false) {
             const currentFilePath = this.activeFilePath
             console.log(this.target, currentFilePath)
             if (!currentFilePath) return
             this.loading = true
             if (this.target?.filePath === currentFilePath) {
+                if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                 this.loading = false
                 this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
                 return

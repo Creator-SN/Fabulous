@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-3'
+import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@creatorsn/powereditor3'
 
 import barePdf from '@/assets/home/bare_pdf.svg'
 

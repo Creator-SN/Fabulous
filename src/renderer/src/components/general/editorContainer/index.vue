@@ -63,6 +63,17 @@
                     ></i
                 ></fv-button>
                 <fv-button
+                    v-if="isRemote && favoriteTarget"
+                    :theme="theme"
+                    :borderRadius="30"
+                    class="control-btn"
+                    background="transparent"
+                    :title="local('Add to Favorites')"
+                    @click="showFavoritePicker = true"
+                >
+                    <img :src="hasFavorites ? favorIcon : favorEmptyIcon" alt="Favorites" />
+                </fv-button>
+                <fv-button
                     :theme="theme"
                     :borderRadius="30"
                     :background="editorShowNavModel ? 'rgba(140, 148, 228, 1)' : ''"
@@ -176,6 +187,12 @@
             :item="item"
         ></add-item-page>
         <user-card v-model:show="show.userCard" :model-value="currentMentionUser"></user-card>
+        <favorite-picker
+            v-if="favoriteTarget"
+            v-model="showFavoritePicker"
+            :target="favoriteTarget"
+            @saved="hasFavorites = $event.length > 0"
+        ></favorite-picker>
     </div>
 </template>
 
@@ -186,7 +203,8 @@ const proxy = getCurrentInstance().proxy
 
 defineExpose({
     getScrollTop: (...args) => proxy.getScrollTop(...args),
-    scrollToTop: (...args) => proxy.scrollToTop(...args)
+    scrollToTop: (...args) => proxy.scrollToTop(...args),
+    refreshContent: (...args) => proxy.refreshContent(...args)
 })
 </script>
 
@@ -203,6 +221,9 @@ import editorMention from '@/components/general/editorContainer/editorMention.js
 import itemNav from '@/components/academic/itemNav.vue'
 import addItemPage from '@/components/home/addItemPage.vue'
 import barePdf from '@/assets/home/bare_pdf.svg'
+import favoritePicker from '@/components/general/favorites/favoritePicker.vue'
+import favorIcon from '@/assets/nav/favor.svg'
+import favorEmptyIcon from '@/assets/nav/favor_empty.svg'
 
 export default {
     name: 'EditorContainer',
@@ -212,7 +233,8 @@ export default {
         splitBar,
         pdfViewer,
         itemNav,
-        addItemPage
+        addItemPage,
+        favoritePicker
     },
     props: {
         refreshContentTool: {
@@ -266,6 +288,10 @@ export default {
             },
             displayMentionItem: null,
             pdfBtnAnimating: true,
+            showFavoritePicker: false,
+            hasFavorites: false,
+            favorIcon,
+            favorEmptyIcon,
             img: {
                 barePdf
             }
@@ -281,6 +307,10 @@ export default {
         },
         item() {
             if (this.item?.pdf) this.displayMentionItem = null
+            this.refreshFavoriteState()
+        },
+        target() {
+            this.refreshFavoriteState()
         }
     },
     computed: {
@@ -314,6 +344,16 @@ export default {
         },
         target() {
             return this.currentEditor?.target || null
+        },
+        favoriteTarget() {
+            if (!this.isRemote || !this.item || !this.target?.id || !this.editorDsId) return null
+            const isAcademic = this.editorId === 'academic'
+            return {
+                kind: isAcademic ? 'academic' : 'notebook',
+                sourceId: this.editorDsId,
+                itemId: isAcademic ? this.item.id : this.target.id,
+                pageId: isAcademic ? this.target.id : null
+            }
         },
         unsave() {
             return this.currentEditor?.unsave || false
@@ -376,6 +416,7 @@ export default {
     },
     mounted() {
         this.pdfNoteStorageInit()
+        this.refreshFavoriteState()
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -384,6 +425,21 @@ export default {
         ...mapActions(useDataStore, {
             reviseConfig: 'reviseConfig'
         }),
+        async refreshFavoriteState() {
+            const target = this.favoriteTarget
+            if (!target) {
+                this.hasFavorites = false
+                return
+            }
+            try {
+                const { data = [] } = await this.$api.FavoriteController.listFavoriteFolders(
+                    target.kind, target.sourceId, target.itemId, target.pageId || undefined
+                )
+                this.hasFavorites = data.some((folder) => folder.containsItem)
+            } catch (error) {
+                console.error(error)
+            }
+        },
         handlePdfBtnAnimationEnd(event) {
             if (event.animationName === 'pdfBtnAutoCollapse') {
                 this.pdfBtnAnimating = false
@@ -486,6 +542,9 @@ export default {
         getEditor() {
             return this.$refs.editor_block.getEditor()
         },
+        refreshContent() {
+            return this.$refs.editor_block?.refreshContent()
+        },
         getScrollTop() {
             let editorContent = this.$el.querySelectorAll('.tip-tap-editor-container')[0]
             return editorContent.scrollTop ? editorContent.scrollTop : 0
@@ -526,6 +585,11 @@ export default {
     width: 100%;
     height: 100%;
     display: flex;
+
+    .control-banner .control-btn img {
+        width: 17px;
+        height: 17px;
+    }
 
     .control-banner {
         .pdf-entry-btn {

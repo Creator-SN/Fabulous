@@ -16,7 +16,6 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
         createDirectory: true,
         updateDocumentInfo: true,
         updateDirectoryInfo: true,
-        documentRead: true,
         directoryRead: true,
         documentWrite: true,
         removeDocument: true,
@@ -406,11 +405,9 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
     }
 
     async function getDocument(uri, filepath, isRemote = true) {
-        return await withLock('documentRead', async () => {
-            return await getNotebookController(isRemote).getDocument(uri, filepath)
-                .then((res) => handleResponse(res))
-                .catch((err) => handleError(err))
-        })
+        return await getNotebookController(isRemote).getDocument(uri, filepath)
+            .then((res) => handleResponse(res))
+            .catch((err) => handleError(err))
     }
 
     async function updateDocument(uri, filepath, versionId, content, isRemote = true) {

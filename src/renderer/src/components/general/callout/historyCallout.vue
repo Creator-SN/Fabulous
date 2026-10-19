@@ -21,7 +21,14 @@
 
         <template v-slot:header>
             <div class="fabulous-history-banner">
-                <p style="font-size: 13.8px">{{ local('History') }}</p>
+                <p
+                    style="font-size: 13.8px"
+                    :style="{
+                        color: theme === 'dark' ? 'rgba(133, 148, 211, 1)' : ''
+                    }"
+                >
+                    {{ local('History') }}
+                </p>
             </div>
         </template>
         <template v-slot:content>

@@ -316,6 +316,62 @@ export class DataTemplateUpdateRequest {
     id=undefined
     
 }
+export class FavoriteFolderRequest {
+  
+    /**
+     *
+     * @param {String} name 
+     */ 
+    constructor(name = undefined){
+        this.name = name
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined
+    
+}
+export class FavoriteTargetRequest {
+  
+    /**
+     *
+     * @param {String} kind 
+     * @param {String} sourceId 
+     * @param {String} itemId 
+     * @param {Array} folderIds 
+     */ 
+    constructor(kind = undefined,sourceId = undefined,itemId = undefined,pageId = undefined,folderIds = undefined){
+        this.kind = kind
+        this.sourceId = sourceId
+        this.itemId = itemId
+        this.pageId = pageId
+        this.folderIds = folderIds
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    kind=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    itemId=undefined   
+    /**
+     * 
+     * @type {Array}
+     */
+    folderIds=undefined
+    
+}
 export class GroupCreateRequest {
   
     /**
@@ -456,6 +512,38 @@ export class PartitionUpdateRequest {
      * @type {String}
      */
     id=undefined
+    
+}
+export class RecentViewRequest {
+  
+    /**
+     *
+     * @param {String} kind 
+     * @param {String} sourceId 
+     * @param {String} itemId 
+     */ 
+    constructor(kind = undefined,sourceId = undefined,itemId = undefined,pageId = undefined){
+        this.kind = kind
+        this.sourceId = sourceId
+        this.itemId = itemId
+        this.pageId = pageId
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    kind=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    itemId=undefined
     
 }
 export class RoleRequest {

@@ -9,6 +9,7 @@
                 <slot name="control-left"></slot>
             </div>
             <div class="control-right-block">
+                <collaborator-avatars :users="collabUsers"></collaborator-avatars>
                 <history-callout
                     v-if="isRemote && item && itemType !== 'template'"
                     :model-value="target"
@@ -35,9 +36,11 @@
         <input v-show="false" type="file" accept=".md" ref="md_input" @change="openMarkdown" />
         <div v-show="lock.loading" class="main-display-block">
             <power-editor
-                :model-value="editorContent.content"
+                :key="collabKey"
+                :model-value="collabSession ? '' : editorContent.content"
+                :starter-kit="collabSession ? { undoRedo: false } : undefined"
                 :placeholder="local('Write something ...')"
-                :editable="!readonly"
+                :editable="!readonly && (!collabSession || collabCanWrite)"
                 :theme="theme"
                 :language="language"
                 :editorBackground="
@@ -49,7 +52,9 @@
                 :toolbarHeight="170"
                 :editablePaddingTop="180"
                 :readOnlyPaddingTop="100"
-                :contentMaxWidth="editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'"
+                :contentMaxWidth="
+                    editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'
+                "
                 :mobileDisplayWidth="0"
                 :mentionItemAttr="currentMentionItemAttr"
                 :extensions="customExtensions"
@@ -62,6 +67,7 @@
                 @save-json="saveConfirm"
                 @click.capture="show.quickNav = false"
                 @change="editorContentChange"
+                @on-mounted="onPowerEditorMounted"
                 @content-change="editorSetContentChange"
                 @container-scroll="$emit('container-scroll', $event)"
             >
@@ -158,7 +164,9 @@
                             style="height: 60px"
                             :style="{
                                 width: '100%',
-                                'max-width': editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'
+                                'max-width': editorExpandContent
+                                    ? 'calc(100% - 50px)'
+                                    : 'min(900px, calc(100% - 50px))'
                             }"
                         ></fv-text-box>
                         <p
@@ -167,7 +175,9 @@
                             :class="[{ dark: theme === 'dark' }]"
                             :style="{
                                 width: '100%',
-                                'max-width': editorExpandContent ? 'calc(100% - 50px)' : 'min(900px, calc(100% - 50px))'
+                                'max-width': editorExpandContent
+                                    ? 'calc(100% - 50px)'
+                                    : 'min(900px, calc(100% - 50px))'
                             }"
                         >
                             {{ editorContent.title }}
@@ -263,11 +273,13 @@ const proxy = getCurrentInstance().proxy
 
 defineExpose({
     scrollToTop: (...args) => proxy.scrollToTop(...args),
-    getEditor: (...args) => proxy.getEditor(...args)
+    getEditor: (...args) => proxy.getEditor(...args),
+    refreshContent: (...args) => proxy.refreshContent(...args)
 })
 </script>
 
 <script>
+import { markRaw } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useDataStore } from '@/stores/data'
 import { useAppConfig } from '@/stores/appConfig'
@@ -280,6 +292,15 @@ import saveOptions from '@/components/notebook/saveOptions.vue'
 import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vue'
 import historyCallout from '@/components/general/callout/historyCallout.vue'
 import templatePreview from '@/components/templates/templatePreview.vue'
+import collaboratorAvatars from '@/components/general/editorContainer/collaboratorAvatars.vue'
+import {
+    Collaboration,
+    prosemirrorJSONToYXmlFragment,
+    yXmlFragmentToProsemirrorJSON
+} from '@creatorsn/powereditor3/collaboration'
+import { createCollaborationSession } from '@/collaboration/session.js'
+import collaborationCaret from '@/collaboration/caret.js'
+import { useUserStore } from '@/stores/user'
 
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
 
@@ -296,7 +317,8 @@ export default {
         saveOptions,
         diffPreviewer,
         historyCallout,
-        templatePreview
+        templatePreview,
+        collaboratorAvatars
     },
     props: {
         readonly: {
@@ -361,6 +383,19 @@ export default {
             currentHistory: {},
             contentType: 'fabulous_notebook',
             customExtensions: [pdfNote],
+            collabSession: null,
+            collabKey: 0,
+            collabResourceKey: null,
+            collabRestartNeeded: false,
+            collabUsers: [],
+            collabApplyingRemote: false,
+            collabStatus: 'disconnected',
+            collabCanWrite: false,
+            collabRestartPending: false,
+            collabEditRevision: 0,
+            collabPendingRevision: null,
+            collabSavedSnapshot: null,
+            contentLoadRequestId: 0,
             img: {
                 pdf: pdf,
                 note: note,
@@ -402,6 +437,12 @@ export default {
         target() {
             this.toggleUnsave(false)
             this.refreshContent()
+        },
+        collaborationResourceKey() {
+            this.restartCollaboration()
+        },
+        autoSave() {
+            this.collabSession?.syncAwarenessMode()
         }
     },
     computed: {
@@ -420,6 +461,7 @@ export default {
             local: 'local'
         }),
         ...mapState(useTheme, { theme: 'theme', color: 'color' }),
+        ...mapState(useUserStore, ['info']),
         currentEditor() {
             return this.editorMap?.[this.editorId] || null
         },
@@ -466,6 +508,16 @@ export default {
         target() {
             return this.currentEditor?.target || null
         },
+        collaborationResourceKey() {
+            if (
+                !import.meta.env.DEV ||
+                !this.isRemote ||
+                !this.target?.id ||
+                !['notebook', 'item'].includes(this.itemType)
+            )
+                return null
+            return `${this.editorId}:${this.currentEditor?.dsId || ''}:${this.itemType}:${this.target.id}`
+        },
         breadcrumbState() {
             if (this.breadcrumbTool) {
                 let state = this.breadcrumbTool()
@@ -502,6 +554,7 @@ export default {
     },
     mounted() {
         this.visible = true
+        this.startCollaboration()
         this.ShortCutInit()
         this.timerInit()
         this.bindNativeImageEvents()
@@ -520,6 +573,10 @@ export default {
             this.timer.autoSave = setInterval(() => {
                 if (this.visible && this.autoSave && this.unsave && !this.show.diff) {
                     let editor = this.getEditor()
+                    if (this.collabSession) {
+                        if (!this.collabSession.hasPendingUpdates) this.flushCollaboration()
+                        return
+                    }
                     editor.save()
                     this.toggleUnsave(false)
                 }
@@ -559,7 +616,13 @@ export default {
                     let storeContent = JSON.parse(JSON.stringify(this.storeContent))
                     nodeDirtyAttrRemove(storeContent)
                     nodeDirtyAttrRemove(thisContent)
-                    let diff = Diff.diffJson(storeContent, thisContent)
+                    let diff =
+                        this.collabSession && this.collabSavedSnapshot
+                            ? Diff.diffJson(
+                                  this.collaborationComparable(this.collabSavedSnapshot),
+                                  this.collaborationComparable(this.collaborationSnapshot())
+                              )
+                            : Diff.diffJson(storeContent, thisContent)
                     if (diff.length > 1) status = true
                     else {
                         if (diff[0].added || diff[0].removed) status = true
@@ -575,7 +638,20 @@ export default {
             }, 300)
         },
         ShortCutInit() {
-            window.addEventListener('keydown', this.shortCutEvent)
+            window.addEventListener('keydown', this.shortCutEvent, true)
+        },
+        onPowerEditorMounted(editor) {
+            if (!this.collabSession) return
+            // 菜单插件重建编辑器状态时可能移除 UndoManager 对自身的追踪，导致撤销无法生成重做记录。
+            const restoreUndoOrigin = () => {
+                const undoManager = editor.state.plugins
+                    .find((plugin) => plugin.key === 'y-undo$')
+                    ?.getState(editor.state)?.undoManager
+                undoManager?.addTrackedOrigin(undoManager)
+            }
+            editor.on('transaction', restoreUndoOrigin)
+            editor.on('destroy', () => editor.off('transaction', restoreUndoOrigin))
+            restoreUndoOrigin()
         },
         bindNativeImageEvents() {
             this.$nextTick(() => {
@@ -587,9 +663,37 @@ export default {
         shortCutEvent(event) {
             if (!this.visible) return
             let ctrl = event.ctrlKey || event.metaKey
+            if (
+                this.collabSession &&
+                ctrl &&
+                !event.altKey &&
+                (event.target?.closest?.('.ProseMirror') ||
+                    document.activeElement?.closest?.('.ProseMirror'))
+            ) {
+                const isUndo = event.keyCode === 90 && !event.shiftKey
+                const isRedo = event.keyCode === 89 || (event.keyCode === 90 && event.shiftKey)
+                if (isUndo || isRedo) {
+                    event.preventDefault()
+                    event.stopImmediatePropagation()
+                    const editor = this.getEditor()?.editor?.()
+                    if (isUndo) editor?.commands.undo()
+                    else editor?.commands.redo()
+                    return
+                }
+            }
             if (event.keyCode === 83 && ctrl && !event.shiftKey) {
                 event.preventDefault()
                 let editor = this.getEditor()
+                if (this.collabSession) {
+                    if (!this.flushCollaboration())
+                        this.$barWarning(
+                            this.local(
+                                'Collaboration is not connected. Changes are still waiting to sync.'
+                            ),
+                            { status: 'warning' }
+                        )
+                    return
+                }
                 editor.save()
                 this.toggleUnsave(false)
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
@@ -686,24 +790,32 @@ export default {
         },
         async refreshContent() {
             if (!this.refreshContentTool) return
-            if (!this.lock.loading) return
+            const requestId = ++this.contentLoadRequestId
             this.lock.loading = false
-            let { shouldStop, docInfo, contentType } = await this.refreshContentTool({
-                getEditor: this.getEditor
-            })
-            if (shouldStop) {
-                this.lock.loading = true
-                return
-            }
-            this.docInfo = docInfo
-            this.contentType = contentType
             try {
-                if (this.$refs.editor)
-                    this.getEditor().editor().chain().focus().setTextSelection(0).run()
-            } catch (e) {}
-            this.lock.loading = true
+                const { shouldStop, docInfo, contentType } = await this.refreshContentTool({
+                    getEditor: this.getEditor
+                })
+                if (requestId !== this.contentLoadRequestId || shouldStop) return
+                this.docInfo = docInfo
+                this.contentType = contentType
+                try {
+                    if (this.$refs.editor)
+                        this.getEditor().editor().chain().focus().setTextSelection(0).run()
+                } catch (e) {}
+            } catch (error) {
+                if (requestId === this.contentLoadRequestId) {
+                    console.error('[editor] Failed to load document content.', error)
+                    this.$barWarning(this.local('Failed to load document content.'), {
+                        status: 'error'
+                    })
+                }
+            } finally {
+                if (requestId === this.contentLoadRequestId) this.lock.loading = true
+            }
         },
         toggleUnsave(status = true) {
+            if (status && this.collabSession) this.collabEditRevision += 1
             this.reviseEditor({
                 id: this.editorId,
                 unsave: status
@@ -741,6 +853,17 @@ export default {
             return json
         },
         async saveConfirm(json) {
+            if (this.collabSession) {
+                if (!this.flushCollaboration(this.collaborationSnapshot(json)))
+                    this.$barWarning(
+                        this.local(
+                            'Collaboration is not connected. Changes are still waiting to sync.'
+                        ),
+                        { status: 'warning' }
+                    )
+                this.lock.save = true
+                return
+            }
             if (!this.lock.save) return
             this.lock.save = false
             let onerror = (res) => {
@@ -908,6 +1031,10 @@ export default {
             })
         },
         editorContentChange() {
+            if (this.collabApplyingRemote) {
+                this.$refs.editor_nav.getEditorNavList()
+                return
+            }
             this.timerInit() // 重新初始化自动保存
             this.diffContent() // 比较内容是否有变化
             this.$refs.editor_nav.getEditorNavList()
@@ -977,18 +1104,208 @@ export default {
             }
             reader.readAsDataURL(file)
             this.toggleUnsave(true)
+        },
+        collaborationSnapshot(content = null) {
+            let body = this.collabSession
+                ? yXmlFragmentToProsemirrorJSON(this.collabSession.doc.getXmlFragment('default'))
+                : content || this.getEditor()?.editor()?.getJSON() || this.editorContent.content
+            try {
+                return JSON.parse(this.wrapCotent(body, 'fabulous_notebook'))
+            } catch {
+                return {
+                    content: body,
+                    title: this.editorContent.title,
+                    banner: this.editorContent.banner
+                }
+            }
+        },
+        collaborationComparable(snapshot) {
+            const cleanContent = (value, inAttrs = false) => {
+                if (Array.isArray(value)) return value.map((child) => cleanContent(child))
+                if (!value || typeof value !== 'object') return value
+                return Object.fromEntries(
+                    Object.entries(value)
+                        .filter(([key]) => !inAttrs || !['theme', 'headerForeground'].includes(key))
+                        .map(([key, child]) => [key, cleanContent(child, key === 'attrs')])
+                )
+            }
+            return {
+                title: snapshot?.title ?? '',
+                banner: snapshot?.banner ?? '',
+                description: snapshot?.description ?? null,
+                content: cleanContent(snapshot?.content ?? { type: 'doc', content: [] })
+            }
+        },
+        flushCollaboration(snapshot = this.collaborationSnapshot()) {
+            if (!this.collabSession?.flush(snapshot)) return false
+            this.collabPendingRevision = this.collabEditRevision
+            return true
+        },
+        seedCollaborationBaseline(attempt = 0, body = null, session = this.collabSession) {
+            if (session !== this.collabSession) return
+            const editor = this.getEditor()?.editor?.()
+            if (!editor || !session) {
+                if (attempt < 30)
+                    requestAnimationFrame(() =>
+                        this.seedCollaborationBaseline(attempt + 1, body, session)
+                    )
+                return
+            }
+            if (body?.type === 'doc') {
+                const fragment = session.doc.getXmlFragment('default')
+                if (fragment.length === 0)
+                    prosemirrorJSONToYXmlFragment(editor.schema, body, fragment)
+            }
+            const published = session.publishBaseline(this.collaborationSnapshot())
+            if (published) this.collabSavedSnapshot = this.collaborationSnapshot()
+            this.collabCanWrite = Boolean(published && session.canWrite)
+        },
+        startCollaboration() {
+            if (!this.collaborationResourceKey) return
+            this.collabSavedSnapshot = null
+            const resourceType = this.itemType === 'notebook' ? 'notebook' : 'page'
+            let session = null
+            session = createCollaborationSession({
+                resourceType,
+                resourceId: this.target.id,
+                user: this.info,
+                autoSave: () => this.autoSave,
+                getSnapshot: () =>
+                    session === this.collabSession ? this.collaborationSnapshot() : null,
+                onUsers: (users) => {
+                    if (session !== this.collabSession) return
+                    this.collabUsers = users.filter((user) => user.id !== this.info.id)
+                },
+                onStatus: (status) => {
+                    if (session && session !== this.collabSession) return
+                    this.collabStatus = status
+                },
+                onPersisted: () => {
+                    if (session !== this.collabSession) return
+                    if (
+                        this.collabPendingRevision === null ||
+                        this.collabSession?.hasPendingUpdates
+                    )
+                        return
+                    if (this.collabPendingRevision === this.collabEditRevision) {
+                        this.collabSavedSnapshot = this.collaborationSnapshot()
+                        this.toggleUnsave(false)
+                    }
+                    this.collabPendingRevision = null
+                },
+                onWritePermission: (canWrite, needsSeed) => {
+                    if (session !== this.collabSession) return
+                    this.collabCanWrite = canWrite && !needsSeed
+                    if (!canWrite)
+                        console.warn(
+                            '[collaboration] Backend denied write access for this resource.'
+                        )
+                },
+                onRemoteUpdate: () => {
+                    if (session !== this.collabSession) return
+                    this.collabApplyingRemote = true
+                    this.$nextTick(() => {
+                        if (session === this.collabSession) this.collabApplyingRemote = false
+                    })
+                },
+                onSnapshot: (snapshot, meta = {}) => {
+                    if (session !== this.collabSession) return
+                    if (snapshot == null) {
+                        if (meta.needsSeed) {
+                            this.$nextTick(() => this.seedCollaborationBaseline(0, null, session))
+                        }
+                        return
+                    }
+                    if (typeof snapshot === 'string') {
+                        try {
+                            snapshot = JSON.parse(snapshot)
+                        } catch {
+                            return
+                        }
+                    }
+                    if (!snapshot || typeof snapshot !== 'object') return
+                    if (snapshot.fabulous_notebook || 'title' in snapshot || 'banner' in snapshot) {
+                        this.reviseEditorContent({
+                            id: this.editorId,
+                            title: snapshot.title,
+                            banner: snapshot.banner,
+                            description: snapshot.description
+                        })
+                    }
+                    this.collabSavedSnapshot =
+                        !this.unsave && !this.collabSession?.hasPendingUpdates
+                            ? this.collaborationSnapshot()
+                            : snapshot
+                    const body = snapshot.fabulous_notebook ? snapshot.content : snapshot
+                    if (meta.needsSeed) {
+                        this.$nextTick(() =>
+                            this.seedCollaborationBaseline(
+                                0,
+                                body?.type === 'doc' ? body : null,
+                                session
+                            )
+                        )
+                    }
+                }
+            })
+            this.collabSession = markRaw(session)
+            this.customExtensions = [
+                pdfNote,
+                Collaboration.configure({ document: this.collabSession.doc }),
+                collaborationCaret.configure({ provider: this.collabSession.provider })
+            ]
+            this.collabResourceKey = this.collaborationResourceKey
+            this.collabKey += 1
+        },
+        stopCollaboration() {
+            this.collabSession?.destroy()
+            this.collabSession = null
+            this.collabResourceKey = null
+            this.collabCanWrite = false
+            this.collabApplyingRemote = false
+            this.collabPendingRevision = null
+            this.collabSavedSnapshot = null
+            this.collabUsers = []
+            this.customExtensions = [pdfNote]
+            this.collabKey += 1
+        },
+        restartCollaboration() {
+            if (this.collabRestartPending) {
+                this.collabRestartNeeded = true
+                return
+            }
+            if (!this.visible) {
+                this.stopCollaboration()
+                this.collabRestartNeeded = true
+                return
+            }
+            this.collabRestartPending = true
+            this.collabRestartNeeded = false
+            this.stopCollaboration()
+            this.$nextTick(() => {
+                this.collabRestartPending = false
+                if (!this.visible) {
+                    this.collabRestartNeeded = true
+                    return
+                }
+                this.startCollaboration()
+                this.collabRestartNeeded = false
+            })
         }
     },
     beforeUnmount() {
         clearInterval(this.timer.autoSave)
+        this.collabSession?.destroy()
         if (this.$el) {
             this.$el.removeEventListener('paste', this.handleImagePaste, true)
             this.$el.removeEventListener('drop', this.handleImageDrop, true)
         }
-        window.removeEventListener('keydown', this.shortCutEvent)
+        window.removeEventListener('keydown', this.shortCutEvent, true)
     },
     activated() {
         this.visible = true
+        if (this.collabRestartNeeded || this.collabResourceKey !== this.collaborationResourceKey)
+            this.restartCollaboration()
     },
     deactivated() {
         this.visible = false
@@ -1218,6 +1535,29 @@ export default {
         * {
             line-height: 2;
         }
+    }
+
+    .fab-collab-cursor {
+        position: relative;
+        border-left: 2px solid;
+        margin-left: -1px;
+        margin-right: -1px;
+        pointer-events: none;
+    }
+
+    .fab-collab-cursor-label {
+        position: absolute;
+        z-index: 5;
+        top: -1.4em;
+        left: -1px;
+        padding: 1px 5px;
+        border-radius: 3px 3px 3px 0;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.5;
+        white-space: nowrap;
+        user-select: none;
     }
 }
 

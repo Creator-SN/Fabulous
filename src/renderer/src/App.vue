@@ -16,7 +16,7 @@
         <div class="addition-container">
             <div class="global-container">
                 <router-view v-slot="{ Component }">
-                    <keep-alive include="Home,Partition,Templates,Settings,Academic,Notebook,LocalNotebook">
+                    <keep-alive include="Home,Partition,Templates,Settings,Academic,Notebook,LocalNotebook,Favorites">
                         <component :is="Component" :key="$route.name" />
                     </keep-alive>
                 </router-view>

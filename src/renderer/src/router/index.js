@@ -34,6 +34,11 @@ const router = createRouter({
             component: AsyncLoad(() => import("@/views/templates/index.vue"))
         },
         {
+            path: "/favorites",
+            name: "Favorites",
+            component: AsyncLoad(() => import("@/views/favorites/index.vue"))
+        },
+        {
             path: "/settings",
             name: "Settings",
             component: AsyncLoad(() => import("@/views/settings/index.vue"))

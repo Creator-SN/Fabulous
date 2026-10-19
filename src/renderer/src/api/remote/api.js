@@ -6560,6 +6560,579 @@ NotebookController.removeSourcePermissionGroupNotebookPermission.fullPath=`${axi
 */
 NotebookController.removeSourcePermissionGroupNotebookPermission.path=`/sources/{uri}/permission-groups/{groupId}/notebooks/{notebookId}/permission`
 
+export class RecentViewController {
+ 
+  /**
+  * @summary 获取当前用户最近查看的笔记
+  * @param {Number} [top] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listRecentViews(top,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/users/me/recent-views',
+        data:{},
+        params:{top},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 记录当前用户查看笔记
+  * @param {UserModel.RecentViewRequest} [recentviewrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async recordRecentView(recentviewrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/users/me/recent-views',
+        data:recentviewrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+}
+
+// class RecentViewController static method properties bind
+/**
+* @description listRecentViews url链接，包含baseURL
+*/
+RecentViewController.listRecentViews.fullPath=`${axios.defaults.baseURL}/users/me/recent-views`
+/**
+* @description listRecentViews url链接，不包含baseURL
+*/
+RecentViewController.listRecentViews.path=`/users/me/recent-views`
+/**
+* @description recordRecentView url链接，包含baseURL
+*/
+RecentViewController.recordRecentView.fullPath=`${axios.defaults.baseURL}/users/me/recent-views`
+/**
+* @description recordRecentView url链接，不包含baseURL
+*/
+RecentViewController.recordRecentView.path=`/users/me/recent-views`
+
+export class FavoriteController {
+ 
+  /**
+  * @summary 获取收藏夹
+  * @param {undefined} [kind] 
+  * @param {undefined} [sourceid] 
+  * @param {undefined} [itemid] 
+  * @param {undefined} [pageid] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listFavoriteFolders(kind,sourceid,itemid,pageid,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/users/me/favorite-folders',
+        data:{},
+        params:{kind,sourceid,itemid,pageid},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 创建收藏夹
+  * @param {UserModel.FavoriteFolderRequest} [favoritefolderrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async createFavoriteFolder(favoritefolderrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/users/me/favorite-folders',
+        data:favoritefolderrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 重命名收藏夹
+  * @param {String} [pathfolder_id] 
+  * @param {UserModel.FavoriteFolderRequest} [favoritefolderrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async renameFavoriteFolder(pathfolder_id,favoritefolderrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'patch',
+        url:'/users/me/favorite-folders/'+pathfolder_id+'',
+        data:favoritefolderrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 删除收藏夹
+  * @param {String} [pathfolder_id] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async deleteFavoriteFolder(pathfolder_id,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'delete',
+        url:'/users/me/favorite-folders/'+pathfolder_id+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取收藏夹笔记
+  * @param {String} [pathfolder_id] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listFavoriteItems(pathfolder_id,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/users/me/favorite-folders/'+pathfolder_id+'/items',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 设置笔记所属收藏夹
+  * @param {UserModel.FavoriteTargetRequest} [favoritetargetrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async setFavoriteFolders(favoritetargetrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'put',
+        url:'/users/me/favorite-items',
+        data:favoritetargetrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 从收藏夹移除笔记
+  * @param {String} [pathfolder_id] 
+  * @param {UserModel.FavoriteTargetRequest} [favoritetargetrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async removeFavoriteItem(pathfolder_id,favoritetargetrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/users/me/favorite-folders/'+pathfolder_id+'/items/remove',
+        data:favoritetargetrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+}
+
+// class FavoriteController static method properties bind
+/**
+* @description listFavoriteFolders url链接，包含baseURL
+*/
+FavoriteController.listFavoriteFolders.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders`
+/**
+* @description listFavoriteFolders url链接，不包含baseURL
+*/
+FavoriteController.listFavoriteFolders.path=`/users/me/favorite-folders`
+/**
+* @description createFavoriteFolder url链接，包含baseURL
+*/
+FavoriteController.createFavoriteFolder.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders`
+/**
+* @description createFavoriteFolder url链接，不包含baseURL
+*/
+FavoriteController.createFavoriteFolder.path=`/users/me/favorite-folders`
+/**
+* @description renameFavoriteFolder url链接，包含baseURL
+*/
+FavoriteController.renameFavoriteFolder.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders/{folder_id}`
+/**
+* @description renameFavoriteFolder url链接，不包含baseURL
+*/
+FavoriteController.renameFavoriteFolder.path=`/users/me/favorite-folders/{folder_id}`
+/**
+* @description deleteFavoriteFolder url链接，包含baseURL
+*/
+FavoriteController.deleteFavoriteFolder.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders/{folder_id}`
+/**
+* @description deleteFavoriteFolder url链接，不包含baseURL
+*/
+FavoriteController.deleteFavoriteFolder.path=`/users/me/favorite-folders/{folder_id}`
+/**
+* @description listFavoriteItems url链接，包含baseURL
+*/
+FavoriteController.listFavoriteItems.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders/{folder_id}/items`
+/**
+* @description listFavoriteItems url链接，不包含baseURL
+*/
+FavoriteController.listFavoriteItems.path=`/users/me/favorite-folders/{folder_id}/items`
+/**
+* @description setFavoriteFolders url链接，包含baseURL
+*/
+FavoriteController.setFavoriteFolders.fullPath=`${axios.defaults.baseURL}/users/me/favorite-items`
+/**
+* @description setFavoriteFolders url链接，不包含baseURL
+*/
+FavoriteController.setFavoriteFolders.path=`/users/me/favorite-items`
+/**
+* @description removeFavoriteItem url链接，包含baseURL
+*/
+FavoriteController.removeFavoriteItem.fullPath=`${axios.defaults.baseURL}/users/me/favorite-folders/{folder_id}/items/remove`
+/**
+* @description removeFavoriteItem url链接，不包含baseURL
+*/
+FavoriteController.removeFavoriteItem.path=`/users/me/favorite-folders/{folder_id}/items/remove`
+
 export class UserController {
  
   /**

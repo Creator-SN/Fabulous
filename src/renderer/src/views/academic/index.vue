@@ -49,7 +49,8 @@ export default {
     data() {
         return {
             path: '',
-            loading: false
+            loading: false,
+            bindingRequestId: 0
         }
     },
     computed: {
@@ -111,14 +112,16 @@ export default {
             return (
                 !this.editorCache ||
                 this.editorDsId !== this.parsePath.data_path ||
-                this.item.id !== this.parsePath.parentId
+                this.itemType !== (this.$route.name === 'Template' ? 'template' : 'item') ||
+                this.item?.id !== this.parsePath.parentId ||
+                !this.item?.pages?.some((page) => page.id === this.parsePath.targetId)
             )
         }
     },
     watch: {
         $route() {
             if (this.$route.name !== 'Academic' && this.$route.name !== 'Template') return
-            this.initEditorBinding()
+            this.initEditorBinding(true)
         },
         currentDataPath() {
             this.initEditorBinding()
@@ -153,88 +156,125 @@ export default {
             if (!path) return
             this.path = path.replace(/\\/g, '/')
         },
-        async initEditorBinding() {
+        async initEditorBinding(refreshMatchedTarget = false) {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
+            if (this.$route.name !== 'Academic' && this.$route.name !== 'Template') return
+            this.refreshPathParams()
             if (!this.currentDataPath) return
             if (!this.path) return
             if (!this.parsePath.valid) return
+            const requestId = ++this.bindingRequestId
+            const routePath = this.$route.fullPath
+            const isCurrent = () =>
+                requestId === this.bindingRequestId && this.$route.fullPath === routePath
             this.loading = true
-            this.refreshPathParams()
-            const { name, data_path, parentId, targetId } = this.parsePath
-            if (this.target?.id === targetId) {
-                this.loading = false
-                this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
-                return
-            }
-            if (this.shouldReloadItem) {
-                let parentItem = {}
-                if (name === 'Academic') {
-                    await this.getItem(data_path, parentId).then((res) => {
-                        if (res.code === 200 || res.status === 'success') {
-                            parentItem = res.data || {}
-                        } else {
-                            this.$barWarning(res.message, {
-                                status: 'error'
+            try {
+                const { name, data_path, parentId, targetId } = this.parsePath
+                if (
+                    this.target?.id === targetId &&
+                    this.itemType === (name === 'Template' ? 'template' : 'item') &&
+                    this.item?.id === parentId &&
+                    this.editorDsId === data_path
+                ) {
+                    if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
+                    if (name === 'Academic' && targetId) {
+                        this.$api.RecentViewController
+                            .recordRecentView({
+                                kind: 'academic',
+                                sourceId: data_path,
+                                itemId: parentId,
+                                pageId: targetId
                             })
-                        }
-                    })
-                    let targetItem = parentItem.pages.find((item) => item.id === targetId) || {}
-                    this.reviseEditor({
-                        id: 'academic',
-                        dsId: data_path,
-                        type: 'item',
-                        item: {
-                            ...parentItem
-                        },
-                        target: {
-                            ...targetItem
-                        },
-                        scrollTop: 0,
-                        displayMode: 'note',
-                        cache: true
-                    })
-                } else {
-                    await this.getTemplateInfo(data_path).then((res) => {
-                        if (res.code === 200 || res.status === 'success') {
-                            parentItem = {
-                                id: parentId,
-                                name: this.local('Template'),
-                                pages: res.data || []
+                            .catch((error) => console.error(error))
+                    }
+                    this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
+                    return
+                }
+                if (this.shouldReloadItem) {
+                    let parentItem = {}
+                    if (name === 'Academic') {
+                        await this.getItem(data_path, parentId).then((res) => {
+                            if (res.code === 200 || res.status === 'success') {
+                                parentItem = res.data || {}
+                            } else {
+                                this.$barWarning(res.message, {
+                                    status: 'error'
+                                })
                             }
-                        } else {
-                            this.$barWarning(res.message, {
-                                status: 'error'
-                            })
-                        }
-                    })
-                    let targetItem = parentItem.pages.find((item) => item.id === targetId) || {}
+                        })
+                        if (!isCurrent()) return
+                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || {}
+                        this.reviseEditor({
+                            id: 'academic',
+                            dsId: data_path,
+                            type: 'item',
+                            item: {
+                                ...parentItem
+                            },
+                            target: {
+                                ...targetItem
+                            },
+                            scrollTop: 0,
+                            displayMode: 'note',
+                            cache: true
+                        })
+                    } else {
+                        await this.getTemplateInfo(data_path).then((res) => {
+                            if (res.code === 200 || res.status === 'success') {
+                                parentItem = {
+                                    id: parentId,
+                                    name: this.local('Template'),
+                                    pages: res.data || []
+                                }
+                            } else {
+                                this.$barWarning(res.message, {
+                                    status: 'error'
+                                })
+                            }
+                        })
+                        if (!isCurrent()) return
+                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || {}
+                        this.reviseEditor({
+                            id: 'academic',
+                            dsId: data_path,
+                            type: 'template',
+                            item: {
+                                ...parentItem
+                            },
+                            target: {
+                                ...targetItem
+                            },
+                            scrollTop: 0,
+                            displayMode: 'note',
+                            cache: true
+                        })
+                    }
+                } else {
+                    let targetItem = this.item?.pages?.find((item) => item.id === targetId) || {}
                     this.reviseEditor({
                         id: 'academic',
                         dsId: data_path,
-                        type: 'template',
-                        item: {
-                            ...parentItem
-                        },
                         target: {
                             ...targetItem
                         },
-                        scrollTop: 0,
-                        displayMode: 'note',
-                        cache: true
+                        scrollTop: 0
                     })
                 }
-            } else {
-                let targetItem = this.item.pages.find((item) => item.id === targetId) || {}
-                this.reviseEditor({
-                    id: 'academic',
-                    dsId: data_path,
-                    target: {
-                        ...targetItem
-                    },
-                    scrollTop: 0
-                })
+                if (name === 'Academic' && targetId) {
+                    this.$api.RecentViewController
+                        .recordRecentView({
+                            kind: 'academic',
+                            sourceId: data_path,
+                            itemId: parentId,
+                            pageId: targetId
+                        })
+                        .catch((error) => console.error(error))
+                }
+            } catch (error) {
+                if (isCurrent()) console.error(error)
+            } finally {
+                if (isCurrent()) this.loading = false
             }
-            this.loading = false
         },
         async refreshContentTool() {
             if (
@@ -249,16 +289,41 @@ export default {
                     docInfo: {},
                     contentType: ''
                 }
+            const routeSegments = decodeURI(this.$route.params.path || '')
+                .replace(/\\/g, '/')
+                .split('/')
+                .filter(Boolean)
+            const routeTargetId = routeSegments[routeSegments.length - 1]
+            if (
+                !['Academic', 'Template'].includes(this.$route.name) ||
+                routeTargetId !== this.target.id ||
+                routeSegments[0] !== this.editorDsId ||
+                (this.itemType === 'item' && routeSegments[1] !== this.item?.id)
+            ) return { shouldStop: true, docInfo: {}, contentType: '' }
+            const requestContext = {
+                type: this.itemType,
+                targetId: this.target.id,
+                itemId: this.item?.id,
+                dataSourceId: this.editorDsId,
+                routePath: this.$route.fullPath
+            }
             let res = null
-            if (this.itemType === 'item') {
+            if (requestContext.type === 'item') {
                 res = await this.getRemoteItemPageContent(
-                    this.editorDsId,
-                    this.item.id,
-                    this.target.id
+                    requestContext.dataSourceId,
+                    requestContext.itemId,
+                    requestContext.targetId
                 )
             } else {
-                res = await this.getRemoteTemplateContent(this.editorDsId, this.target.id)
+                res = await this.getRemoteTemplateContent(requestContext.dataSourceId, requestContext.targetId)
             }
+            if (
+                this.itemType !== requestContext.type ||
+                this.target?.id !== requestContext.targetId ||
+                this.item?.id !== requestContext.itemId ||
+                this.editorDsId !== requestContext.dataSourceId ||
+                this.$route.fullPath !== requestContext.routePath
+            ) return { shouldStop: true, docInfo: {}, contentType: '' }
             let docInfo = res.data
             let contentType = ''
             if (res.code === 200) {
@@ -379,7 +444,7 @@ export default {
                 displayMode: this.displayMode === 'pdf' ? 'both' : this.displayMode,
                 history: this.history
             })
-            let path = `${this.editorDsId}/${this.item.id}/${this.target.id}`
+            let path = `${this.editorDsId}/${item.id}/${page.id}`
             let url = `/academic/${encodeURI(path.replace(/\//g, '\\'))}`
             this.$Go(url)
         },
