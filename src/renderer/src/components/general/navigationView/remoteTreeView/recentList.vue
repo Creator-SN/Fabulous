@@ -1,5 +1,5 @@
 <template>
-    <div class="recent-notes-list" :class="[{ dark: theme === 'dark' }]">
+    <div v-show="items.length > 0" class="recent-notes-list" :class="[{ dark: theme === 'dark' }]">
         <button
             v-for="item in items"
             :key="`${item.kind}:${item.sourceId}:${item.itemId}:${item.pageId || ''}`"
@@ -29,8 +29,9 @@
 </template>
 
 <script>
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useAppConfig } from '@/stores/appConfig'
+import { useCollectionStore } from '@/stores/collection'
 import noteIcon from '@/assets/nav/note.svg'
 import notebookIcon from '@/assets/nav/notebook.svg'
 
@@ -38,19 +39,18 @@ export default {
     props: {
         theme: { type: String, default: 'light' },
         local: { type: Function, default: (value) => value },
-        active: { type: Boolean, default: false },
         Go: { type: Function, default: () => {} }
     },
     data() {
-        return { items: [], loading: false, noteIcon, notebookIcon }
+        return { loading: false, noteIcon, notebookIcon }
+    },
+    computed: {
+        ...mapState(useCollectionStore, {
+            items: (state) => state.recentItems.slice(0, 5)
+        })
     },
     mounted() {
-        if (this.active) this.loadRecent()
-    },
-    watch: {
-        active(value) {
-            if (value) this.loadRecent()
-        }
+        this.loadRecent()
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -59,11 +59,9 @@ export default {
         async loadRecent() {
             this.loading = true
             try {
-                const response = await this.$api.RecentViewController.listRecentViews(5)
-                this.items = (response?.data || []).slice(0, 5)
+                await useCollectionStore().loadRecent()
             } catch (error) {
                 console.error(error)
-                this.items = []
             } finally {
                 this.loading = false
             }

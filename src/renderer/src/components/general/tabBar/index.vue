@@ -147,7 +147,7 @@ export default {
                     name: this.local('Templates'),
                     image: templateIcon
                 },
-                favorites: {
+                collections: {
                     name: this.local('My Favorites'),
                     image: favorIcon
                 }

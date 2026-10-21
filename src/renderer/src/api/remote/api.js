@@ -8,6 +8,203 @@ import * as UserModel from './model.js'
 const CancelTokenSource = Axios.CancelTokenSource;
 
 
+export class FileResourceController {
+ 
+  /**
+  * @summary 校验附件指纹并关联已有文件
+  * @param {String} [pathresource_type] 
+  * @param {String} [pathresource_id] 
+  * @param {UserModel.FileCheckRequest} [filecheckrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async checkFileResource(pathresource_type,pathresource_id,filecheckrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/files/'+pathresource_type+'/'+pathresource_id+'/check',
+        data:filecheckrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 上传笔记附件
+  * @param {String} [pathresource_type] 
+  * @param {String} [pathresource_id] 
+  * @param {UserModel.Body_uploadFileResource} [body_uploadfileresource] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async uploadFileResource(pathresource_type,pathresource_id,body_uploadfileresource,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/files/'+pathresource_type+'/'+pathresource_id+'',
+        data:body_uploadfileresource,
+        params:{},
+        headers:{
+          "Content-Type":"multipart/form-data"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 按笔记权限下载附件
+  * @param {String} [pathresource_type] 
+  * @param {String} [pathresource_id] 
+  * @param {String} [pathfile_id] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async downloadFileResource(pathresource_type,pathresource_id,pathfile_id,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "blob";
+      let options = {
+        method:'get',
+        url:'/files/'+pathresource_type+'/'+pathresource_id+'/'+pathfile_id+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+}
+
+// class FileResourceController static method properties bind
+/**
+* @description checkFileResource url链接，包含baseURL
+*/
+FileResourceController.checkFileResource.fullPath=`${axios.defaults.baseURL}/files/{resource_type}/{resource_id}/check`
+/**
+* @description checkFileResource url链接，不包含baseURL
+*/
+FileResourceController.checkFileResource.path=`/files/{resource_type}/{resource_id}/check`
+/**
+* @description uploadFileResource url链接，包含baseURL
+*/
+FileResourceController.uploadFileResource.fullPath=`${axios.defaults.baseURL}/files/{resource_type}/{resource_id}`
+/**
+* @description uploadFileResource url链接，不包含baseURL
+*/
+FileResourceController.uploadFileResource.path=`/files/{resource_type}/{resource_id}`
+/**
+* @description downloadFileResource url链接，包含baseURL
+*/
+FileResourceController.downloadFileResource.fullPath=`${axios.defaults.baseURL}/files/{resource_type}/{resource_id}/{file_id}`
+/**
+* @description downloadFileResource url链接，不包含baseURL
+*/
+FileResourceController.downloadFileResource.path=`/files/{resource_type}/{resource_id}/{file_id}`
+
 export class AcademicController {
  
   /**
@@ -1127,18 +1324,19 @@ export class AcademicController {
   * @summary 根据数据项id获取指定数据项信息
   * @param {String} [pathuri] 
   * @param {String} [pathid] 
+  * @param {undefined} [pageid] 
   * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
   * @param {Function} [uploadProgress] 上传回调函数
   * @param {Function} [downloadProgress] 下载回调函数
   */
-  static async getItem(pathuri,pathid,cancelSource,uploadProgress,downloadProgress,baseURL){
+  static async getItem(pathuri,pathid,pageid,cancelSource,uploadProgress,downloadProgress,baseURL){
     return await new Promise((resolve,reject)=>{
       let responseType = "json";
       let options = {
         method:'get',
         url:'/sources/'+pathuri+'/items/'+pathid+'',
         data:{},
-        params:{},
+        params:{pageid},
         headers:{
           "Content-Type":""
         },
@@ -7132,6 +7330,321 @@ FavoriteController.removeFavoriteItem.fullPath=`${axios.defaults.baseURL}/users/
 * @description removeFavoriteItem url链接，不包含baseURL
 */
 FavoriteController.removeFavoriteItem.path=`/users/me/favorite-folders/{folder_id}/items/remove`
+
+export class ShareController {
+ 
+  /**
+  * @summary 解析分享链接
+  * @param {String} [key] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async resolveMagicShare(key,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/magic',
+        data:{},
+        params:{key},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 获取我分享的笔记
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async listSharedItems(cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/users/me/shared-items',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 创建或获取笔记分享
+  * @param {UserModel.ShareTargetRequest} [sharetargetrequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async createSharedItem(sharetargetrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/users/me/shared-items',
+        data:sharetargetrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 更新笔记分享
+  * @param {String} [pathshare_id] 
+  * @param {UserModel.ShareTargetUpdateRequest} [sharetargetupdaterequest] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async updateSharedItem(pathshare_id,sharetargetupdaterequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'patch',
+        url:'/users/me/shared-items/'+pathshare_id+'',
+        data:sharetargetupdaterequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+ 
+  /**
+  * @summary 移除笔记分享
+  * @param {String} [pathshare_id] 
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async deleteSharedItem(pathshare_id,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'delete',
+        url:'/users/me/shared-items/'+pathshare_id+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+}
+
+// class ShareController static method properties bind
+/**
+* @description resolveMagicShare url链接，包含baseURL
+*/
+ShareController.resolveMagicShare.fullPath=`${axios.defaults.baseURL}/magic`
+/**
+* @description resolveMagicShare url链接，不包含baseURL
+*/
+ShareController.resolveMagicShare.path=`/magic`
+/**
+* @description listSharedItems url链接，包含baseURL
+*/
+ShareController.listSharedItems.fullPath=`${axios.defaults.baseURL}/users/me/shared-items`
+/**
+* @description listSharedItems url链接，不包含baseURL
+*/
+ShareController.listSharedItems.path=`/users/me/shared-items`
+/**
+* @description createSharedItem url链接，包含baseURL
+*/
+ShareController.createSharedItem.fullPath=`${axios.defaults.baseURL}/users/me/shared-items`
+/**
+* @description createSharedItem url链接，不包含baseURL
+*/
+ShareController.createSharedItem.path=`/users/me/shared-items`
+/**
+* @description updateSharedItem url链接，包含baseURL
+*/
+ShareController.updateSharedItem.fullPath=`${axios.defaults.baseURL}/users/me/shared-items/{share_id}`
+/**
+* @description updateSharedItem url链接，不包含baseURL
+*/
+ShareController.updateSharedItem.path=`/users/me/shared-items/{share_id}`
+/**
+* @description deleteSharedItem url链接，包含baseURL
+*/
+ShareController.deleteSharedItem.fullPath=`${axios.defaults.baseURL}/users/me/shared-items/{share_id}`
+/**
+* @description deleteSharedItem url链接，不包含baseURL
+*/
+ShareController.deleteSharedItem.path=`/users/me/shared-items/{share_id}`
 
 export class UserController {
  

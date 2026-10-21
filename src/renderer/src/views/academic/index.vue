@@ -12,7 +12,7 @@
             ref="editor_container"
             @container-scroll="handleContainerScroll"
         ></editor-container>
-        <loading v-show="loading || !currentDataPath" style="z-index: 2">
+        <loading v-show="loading || !userInfoReady" style="z-index: 2">
             <div class="central-box">
                 <fv-progress-ring
                     :loading="true"
@@ -31,7 +31,8 @@
 <script>
 import { useTheme } from '@/stores/theme'
 import { useAppConfig } from '@/stores/appConfig'
-import { useDataStore } from '@/stores/data'
+import { useCollectionStore } from '@/stores/collection'
+import { useUserStore } from '@/stores/user'
 import { useAcademicConfig } from '@/stores/academic.js'
 import { mapState, mapActions } from 'pinia'
 
@@ -50,14 +51,13 @@ export default {
         return {
             path: '',
             loading: false,
-            bindingRequestId: 0
+            bindingRequestId: 0,
+            bindingUserId: undefined
         }
     },
     computed: {
         ...mapState(useTheme, ['theme', 'color']),
-        ...mapState(useDataStore, {
-            currentDataPath: (state) => state.currentDataPath
-        }),
+        ...mapState(useUserStore, { userInfo: 'info', userInfoReady: 'infoReady' }),
         ...mapState(useAppConfig, {
             local: (state) => state.local,
             editorMap: (state) => state.editor
@@ -85,6 +85,11 @@ export default {
         },
         editorCache() {
             return this.currentEditor?.cache || false
+        },
+        editorBindingKey() {
+            if (!['Academic', 'Template'].includes(this.$route.name) || !this.userInfoReady) return null
+            const path = decodeURI(this.$route.params.path || '').replace(/\\/g, '/')
+            return JSON.stringify([this.$route.name, path, this.userInfo.id ?? null])
         },
         parsePath() {
             const segs = this.path.split('/').filter(Boolean) // 去除无效路径段
@@ -119,20 +124,17 @@ export default {
         }
     },
     watch: {
-        $route() {
-            if (this.$route.name !== 'Academic' && this.$route.name !== 'Template') return
-            this.initEditorBinding(true)
-        },
-        currentDataPath() {
-            this.initEditorBinding()
-        },
-        target() {
-            this.refreshPathParams()
+        editorBindingKey: {
+            immediate: true,
+            handler(key) {
+                if (!key) {
+                    this.bindingRequestId += 1
+                    this.loading = false
+                    return
+                }
+                this.initEditorBinding(true)
+            }
         }
-    },
-    mounted() {
-        this.refreshPathParams()
-        this.initEditorBinding()
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -158,19 +160,21 @@ export default {
         },
         async initEditorBinding(refreshMatchedTarget = false) {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
-            if (this.$route.name !== 'Academic' && this.$route.name !== 'Template') return
+            if (!this.editorBindingKey) return
             this.refreshPathParams()
-            if (!this.currentDataPath) return
             if (!this.path) return
             if (!this.parsePath.valid) return
             const requestId = ++this.bindingRequestId
-            const routePath = this.$route.fullPath
+            const bindingKey = this.editorBindingKey
+            const identityChanged = this.bindingUserId !== this.userInfo.id
+            this.bindingUserId = this.userInfo.id
             const isCurrent = () =>
-                requestId === this.bindingRequestId && this.$route.fullPath === routePath
+                requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
             this.loading = true
             try {
                 const { name, data_path, parentId, targetId } = this.parsePath
                 if (
+                    !identityChanged &&
                     this.target?.id === targetId &&
                     this.itemType === (name === 'Template' ? 'template' : 'item') &&
                     this.item?.id === parentId &&
@@ -178,8 +182,8 @@ export default {
                 ) {
                     if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                     if (name === 'Academic' && targetId) {
-                        this.$api.RecentViewController
-                            .recordRecentView({
+                        useCollectionStore()
+                            .recordRecent({
                                 kind: 'academic',
                                 sourceId: data_path,
                                 itemId: parentId,
@@ -190,10 +194,11 @@ export default {
                     this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
                     return
                 }
-                if (this.shouldReloadItem) {
+                if (identityChanged || this.shouldReloadItem) {
                     let parentItem = {}
                     if (name === 'Academic') {
-                        await this.getItem(data_path, parentId).then((res) => {
+                        await this.getItem(data_path, parentId, targetId).then((res) => {
+                            if (!isCurrent()) return
                             if (res.code === 200 || res.status === 'success') {
                                 parentItem = res.data || {}
                             } else {
@@ -203,12 +208,13 @@ export default {
                             }
                         })
                         if (!isCurrent()) return
-                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || {}
+                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || { id: targetId }
                         this.reviseEditor({
                             id: 'academic',
                             dsId: data_path,
                             type: 'item',
                             item: {
+                                id: parentId,
                                 ...parentItem
                             },
                             target: {
@@ -220,6 +226,7 @@ export default {
                         })
                     } else {
                         await this.getTemplateInfo(data_path).then((res) => {
+                            if (!isCurrent()) return
                             if (res.code === 200 || res.status === 'success') {
                                 parentItem = {
                                     id: parentId,
@@ -261,8 +268,8 @@ export default {
                     })
                 }
                 if (name === 'Academic' && targetId) {
-                    this.$api.RecentViewController
-                        .recordRecentView({
+                    useCollectionStore()
+                        .recordRecent({
                             kind: 'academic',
                             sourceId: data_path,
                             itemId: parentId,
@@ -324,6 +331,9 @@ export default {
                 this.editorDsId !== requestContext.dataSourceId ||
                 this.$route.fullPath !== requestContext.routePath
             ) return { shouldStop: true, docInfo: {}, contentType: '' }
+            if (res?.code === 40300) {
+                return { shouldStop: true, readDenied: true, docInfo: {}, contentType: '' }
+            }
             let docInfo = res.data
             let contentType = ''
             if (res.code === 200) {

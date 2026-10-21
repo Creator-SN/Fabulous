@@ -1,10 +1,36 @@
 <template>
-    <div v-if="currentEditor" class="academic-view">
+    <div
+        v-if="currentEditor"
+        class="academic-view"
+        :class="{ 'read-denied': readDenied, dark: theme === 'dark' }"
+    >
+        <div v-if="readDenied" class="read-permission-mask" role="status">
+            <i class="ms-Icon ms-Icon--Lock" aria-hidden="true"></i>
+            <p>{{ local('No Read Permission for This Notebook') }}</p>
+            <fv-button
+                :theme="theme"
+                :border-radius="6"
+                :disabled="retryingRead"
+                @click="retryRead"
+            >
+                {{ local('Retry') }}
+            </fv-button>
+        </div>
+        <fv-button
+            v-show="!userInfo.id"
+            class="not-login-btn"
+            theme="dark"
+            :background="gradient"
+            :border-radius="12"
+            style="width: 120px"
+            @click="$router.push({ name: 'Login', query: { redirect: $route.fullPath } })"
+            >{{ local('Login to Start') }}</fv-button
+        >
         <editor-block
-            v-show="displayMode !== 'pdf'"
+            v-show="!readDenied && displayMode !== 'pdf'"
             ref="editor_block"
             :editor-id="editorId"
-            :readonly="readonly"
+            :readonly="readonly || (isRemote && !userInfo.id)"
             :refreshContentTool="refreshContentTool"
             :imgInterceptTool="imgInterceptTool"
             :openEditorTool="openEditorTool"
@@ -16,6 +42,8 @@
             :mentionItemAttr="editorMentionItemAttr"
             :style="{ width: `${displayMode === 'both' ? splitRatio * 100 + '%' : ''}` }"
             @container-scroll="$emit('container-scroll', $event)"
+            @editor-mounted="pdfNoteStorageInit"
+            @read-permission-change="readDenied = $event"
         >
             <template #control-left>
                 <fv-button
@@ -35,6 +63,9 @@
                     ></i>
                 </fv-button>
                 <fv-button
+                    v-if="
+                        (!isRemote || userInfo.id) && (!collaborationExpected || collaborationReady)
+                    "
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
@@ -63,7 +94,7 @@
                     ></i
                 ></fv-button>
                 <fv-button
-                    v-if="isRemote && favoriteTarget"
+                    v-if="isRemote && userInfo.id && favoriteTarget"
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
@@ -71,8 +102,22 @@
                     :title="local('Add to Favorites')"
                     @click="showFavoritePicker = true"
                 >
-                    <img :src="hasFavorites ? favorIcon : favorEmptyIcon" alt="Favorites" />
+                    <img
+                        :src="hasFavorites ? favorIcon : favorEmptyIcon"
+                        alt="Favorites"
+                        style="width: 15px; height: 15px"
+                    />
                 </fv-button>
+                <fv-button
+                    v-if="isRemote && userInfo.id && favoriteTarget"
+                    :theme="theme"
+                    :borderRadius="30"
+                    class="control-btn"
+                    background="transparent"
+                    :title="local('Share')"
+                    @click="showShareEditor = true"
+                    ><i class="ms-Icon ms-Icon--Share"></i
+                ></fv-button>
                 <fv-button
                     :theme="theme"
                     :borderRadius="30"
@@ -85,13 +130,14 @@
                     <i class="ms-Icon ms-Icon--ButtonMenu"></i>
                 </fv-button>
                 <fv-toggle-switch
+                    v-show="userInfo.id"
                     :title="local('Auto Save')"
                     v-model="autoSaveModel"
                     class="save-btn"
                     width="85"
                     height="30"
-                    :on="local('Auto Save')"
-                    :off="local('Auto Save')"
+                    :on="savePending ? local('Saving...') : local('Auto Save')"
+                    :off="savePending ? local('Saving...') : local('Auto Save')"
                     :onForeground="theme === 'dark' ? '#fff' : '#000'"
                     :offForeground="theme === 'dark' ? '#fff' : '#000'"
                     :switch-on-background="theme === 'dark' ? '#000' : 'rgba(140, 148, 228, 1)'"
@@ -100,11 +146,11 @@
                 >
                 </fv-toggle-switch>
                 <fv-button
-                    v-show="unsave"
+                    v-show="unsave || savePending"
                     :theme="theme"
                     :borderRadius="30"
                     class="control-btn"
-                    background="rgba(0, 204, 153, 1)"
+                    :background="savePending ? 'rgba(245, 158, 11, 1)' : 'rgba(0, 204, 153, 1)'"
                     style="width: 10px; height: 10px; margin-left: 15px"
                 >
                     {{ '' }}
@@ -129,7 +175,7 @@
             </template>
         </editor-block>
         <split-bar
-            v-show="displayMode === 'both'"
+            v-show="!readDenied && displayMode === 'both'"
             :model-value="splitRatio"
             @change-ratio="splitViewRatio"
             @only-left="splitViewRatio(0.5, 'left')"
@@ -138,6 +184,7 @@
         ></split-bar>
         <!-- PDF拥有一个自己的id, 但是目前访问PDF时, 后端实际需要的是项目ID -->
         <pdf-viewer
+            v-show="!readDenied"
             v-if="displayMode !== 'note' && displayPDF"
             v-model="displayPDF"
             :editor-id="editorId"
@@ -193,6 +240,11 @@
             :target="favoriteTarget"
             @saved="hasFavorites = $event.length > 0"
         ></favorite-picker>
+        <share-editor
+            v-if="favoriteTarget"
+            v-model="showShareEditor"
+            :target="favoriteTarget"
+        ></share-editor>
     </div>
 </template>
 
@@ -212,7 +264,10 @@ defineExpose({
 import { mapActions, mapState } from 'pinia'
 import { useTheme } from '@/stores/theme'
 import { useAppConfig } from '@/stores/appConfig'
+import { useUserStore } from '@/stores/user'
 import { useDataStore } from '@/stores/data'
+import { useCollaborationStore } from '@/stores/editorStore/collaboration'
+import { useCollectionStore } from '@/stores/collection'
 import editorBlock from '@/components/general/editorContainer/editorBlock.vue'
 import splitBar from '@/components/general/editorContainer/splitBar.vue'
 import pdfViewer from '@/components/general/pdfViewer/index.vue'
@@ -221,9 +276,10 @@ import editorMention from '@/components/general/editorContainer/editorMention.js
 import itemNav from '@/components/academic/itemNav.vue'
 import addItemPage from '@/components/home/addItemPage.vue'
 import barePdf from '@/assets/home/bare_pdf.svg'
-import favoritePicker from '@/components/general/favorites/favoritePicker.vue'
+import favoritePicker from '@/components/collections/favorites/favoritePicker.vue'
 import favorIcon from '@/assets/nav/favor.svg'
 import favorEmptyIcon from '@/assets/nav/favor_empty.svg'
+import shareEditor from '@/components/collections/shares/shareEditor.vue'
 
 export default {
     name: 'EditorContainer',
@@ -234,7 +290,8 @@ export default {
         pdfViewer,
         itemNav,
         addItemPage,
-        favoritePicker
+        favoritePicker,
+        shareEditor
     },
     props: {
         refreshContentTool: {
@@ -280,8 +337,9 @@ export default {
     },
     data() {
         return {
+            readDenied: false,
+            retryingRead: false,
             splitRatio: 0.5,
-            readonly: false,
             show: {
                 currentItemNav: false,
                 addItemPage: false
@@ -289,6 +347,7 @@ export default {
             displayMentionItem: null,
             pdfBtnAnimating: true,
             showFavoritePicker: false,
+            showShareEditor: false,
             hasFavorites: false,
             favorIcon,
             favorEmptyIcon,
@@ -310,16 +369,21 @@ export default {
             this.refreshFavoriteState()
         },
         target() {
+            this.readDenied = false
             this.refreshFavoriteState()
         }
     },
     computed: {
         ...mapState(useTheme, {
-            theme: (state) => state.theme
+            theme: (state) => state.theme,
+            gradient: (state) => state.gradient
         }),
         ...mapState(useAppConfig, {
             local: (state) => state.local,
             editorMap: (state) => state.editor
+        }),
+        ...mapState(useUserStore, {
+            userInfo: (state) => state.info
         }),
         ...mapState(useDataStore, {
             autoSave: (state) => state.configState.autoSave,
@@ -329,6 +393,16 @@ export default {
         }),
         currentEditor() {
             return this.editorMap?.[this.editorId] || null
+        },
+        collaborationExpected() {
+            return useCollaborationStore().resourceKey(
+                this.editorId,
+                this.currentEditor,
+                this.isRemote
+            )
+        },
+        collaborationReady() {
+            return useCollaborationStore().isReady(this.editorId, this.collaborationExpected)
         },
         displayMode() {
             return this.currentEditor?.displayMode || 'note'
@@ -357,6 +431,17 @@ export default {
         },
         unsave() {
             return this.currentEditor?.unsave || false
+        },
+        savePending() {
+            return this.currentEditor?.savePending || false
+        },
+        readonly: {
+            get() {
+                return useDataStore().configState.readonly === true
+            },
+            set(value) {
+                this.reviseConfig({ readonly: value })
+            }
         },
         expandContentModel: {
             get() {
@@ -427,15 +512,13 @@ export default {
         }),
         async refreshFavoriteState() {
             const target = this.favoriteTarget
-            if (!target) {
+            if (!target || !this.userInfo.id) {
                 this.hasFavorites = false
                 return
             }
             try {
-                const { data = [] } = await this.$api.FavoriteController.listFavoriteFolders(
-                    target.kind, target.sourceId, target.itemId, target.pageId || undefined
-                )
-                this.hasFavorites = data.some((folder) => folder.containsItem)
+                const folders = await useCollectionStore().loadFolders(target)
+                this.hasFavorites = folders.some((folder) => folder.containsItem)
             } catch (error) {
                 console.error(error)
             }
@@ -462,8 +545,9 @@ export default {
             }
             this.splitRatio = event
         },
-        pdfNoteStorageInit() {
-            const editor = this.$refs.editor_block.getEditor().editor()
+        pdfNoteStorageInit(mountedEditor) {
+            const editor = mountedEditor || this.$refs.editor_block?.getEditor()?.editor()
+            if (!editor?.storage?.defaultStorage) return
             editor.storage.defaultStorage.pdfNote = {
                 getContainer: () => {
                     const pdfViewer = this.$refs.pdf_viewer
@@ -481,6 +565,7 @@ export default {
             }
         },
         addPDFNote(event) {
+            if (!this.userInfo.id) return
             let { pos, anchor, content } = event
             let inteliInsert = (x) => {
                 // 防止光标在pdfNote内部时嵌套添加
@@ -545,6 +630,15 @@ export default {
         refreshContent() {
             return this.$refs.editor_block?.refreshContent()
         },
+        async retryRead() {
+            if (this.retryingRead) return
+            this.retryingRead = true
+            try {
+                await this.refreshContent()
+            } finally {
+                this.retryingRead = false
+            }
+        },
         getScrollTop() {
             let editorContent = this.$el.querySelectorAll('.tip-tap-editor-container')[0]
             return editorContent.scrollTop ? editorContent.scrollTop : 0
@@ -585,6 +679,37 @@ export default {
     width: 100%;
     height: 100%;
     display: flex;
+
+    .read-permission-mask {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #605e5c;
+        background: rgba(250, 249, 248, 0.826);
+
+        > i {
+            font-size: 32px;
+        }
+
+        > p {
+            margin: 16px 0;
+        }
+    }
+
+    .not-login-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+    }
+
+    &.dark .read-permission-mask {
+        color: #f3f2f1;
+        background: #2f3437;
+    }
 
     .control-banner .control-btn img {
         width: 17px;

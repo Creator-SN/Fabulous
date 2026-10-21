@@ -5,6 +5,7 @@ export const config = {
     data_index: -1,
     language: "en",
     autoSave: false,
+    readonly: false,
     lastLocalPath: "",
     editorExpandContent: false,
     editorSplitRatio: 0.5,

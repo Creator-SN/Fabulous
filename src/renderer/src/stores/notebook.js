@@ -4,9 +4,9 @@ import { getProxy } from '@/stores/proxyHolder'
 
 export const useNotebookConfig = defineStore('notebookConfig', () => {
     const proxy = getProxy()
+    const pendingDirectoryReads = new Map()
 
     const lock = ref({
-        directoryChildren: {},
         permissionGroups: true,
         directoryPermissionRead: {},
         notebookPermissionRead: {},
@@ -16,7 +16,6 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
         createDirectory: true,
         updateDocumentInfo: true,
         updateDirectoryInfo: true,
-        directoryRead: true,
         documentWrite: true,
         removeDocument: true,
         removeDirectory: true,
@@ -63,17 +62,11 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
         }
     }
 
-    async function withDirectoryChildrenLock(pathId, task) {
-        if (!pathId) return { code: 400, data: [] }
-        if (lock.value.directoryChildren[pathId] === false) {
-            return { code: 423, data: [] }
+    async function withSharedDirectoryRead(key, task) {
+        if (!pendingDirectoryReads.has(key)) {
+            pendingDirectoryReads.set(key, task().finally(() => pendingDirectoryReads.delete(key)))
         }
-        lock.value.directoryChildren[pathId] = false
-        try {
-            return await task()
-        } finally {
-            lock.value.directoryChildren[pathId] = true
-        }
+        return await pendingDirectoryReads.get(key)
     }
 
     function handleResponse(res) {
@@ -101,7 +94,8 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
     }
 
     async function listRemoteDirectoryChildren(pathId) {
-        return await withDirectoryChildrenLock(pathId, async () => {
+        if (!pathId) return { code: 400, data: [] }
+        return await withSharedDirectoryRead(`children:${pathId}`, async () => {
             return await proxy.$api.NotebookController.getDirectoryChildren(pathId)
                 .then((res) => handleResponse(res))
                 .catch((err) => handleError(err))
@@ -110,7 +104,7 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
 
     async function getRemoteDirectory(pathId) {
         if (!pathId) return { code: 400, data: null }
-        return await withLock('directoryRead', async () => {
+        return await withSharedDirectoryRead(`directory:${pathId}`, async () => {
             return await proxy.$api.NotebookController.getDirectory(pathId)
                 .then((res) => handleResponse(res))
                 .catch((err) => handleError(err))
@@ -375,16 +369,16 @@ export const useNotebookConfig = defineStore('notebookConfig', () => {
     async function removeRemoteDocument(uri, filepath) {
         return await withLock('removeDocument', async () => {
             return await proxy.$api.NotebookController.removeDocument(uri, filepath)
-                .then((res) => handleResponse(res))
-                .catch((err) => handleError(err))
+                .then((res) => res?.code === 40300 ? res : handleResponse(res))
+                .catch((err) => err?.code === 40300 ? err : handleError(err))
         })
     }
 
     async function removeRemoteDirectory(uri, filepath) {
         return await withLock('removeDirectory', async () => {
             return await proxy.$api.NotebookController.removeDirectory(uri, filepath)
-                .then((res) => handleResponse(res))
-                .catch((err) => handleError(err))
+                .then((res) => res?.code === 40300 ? res : handleResponse(res))
+                .catch((err) => err?.code === 40300 ? err : handleError(err))
         })
     }
 

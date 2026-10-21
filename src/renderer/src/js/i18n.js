@@ -1,4 +1,48 @@
 export default {
+    "Parsing file...": {
+        "en": "Parsing file...",
+        "cn": "正在解析文件…"
+    },
+    "Finalizing upload...": {
+        "en": "Finalizing upload...",
+        "cn": "正在保存附件…"
+    },
+    "Cancel upload": {
+        "en": "Cancel upload",
+        "cn": "取消上传"
+    },
+    "Upload File": {
+        "en": "Upload File",
+        "cn": "上传文件"
+    },
+    "Download": {
+        "en": "Download",
+        "cn": "下载"
+    },
+    "Attachment is unavailable": {
+        "en": "Attachment is unavailable",
+        "cn": "附件不可用"
+    },
+    "File download failed": {
+        "en": "File download failed",
+        "cn": "文件下载失败"
+    },
+    "File upload failed": {
+        "en": "File upload failed",
+        "cn": "文件上传失败"
+    },
+    "Calculating file hash...": {
+        "en": "Calculating file hash...",
+        "cn": "正在计算文件指纹…"
+    },
+    "Checking file...": {
+        "en": "Checking file...",
+        "cn": "正在检查文件…"
+    },
+    "Uploading file...": {
+        "en": "Uploading file...",
+        "cn": "正在上传文件…"
+    },
     "Confirm": {
         "en": "Confirm",
         "cn": "确认"
@@ -606,6 +650,22 @@ export default {
     "Read File Failed": {
         "en": "Read File Failed",
         "cn": "读取文件失败"
+    },
+    "No Permission to Delete": {
+        "en": "No Permission to Delete",
+        "cn": "没有删除权限"
+    },
+    "No Write Permission": {
+        "en": "No Write Permission",
+        "cn": "没有写入权限"
+    },
+    "No Read Permission for This Notebook": {
+        "en": "You do not have permission to read this notebook",
+        "cn": "无权读取此笔记"
+    },
+    "Retry": {
+        "en": "Retry",
+        "cn": "重试"
     },
     "Input title here ...": {
         "en": "Input title here ...",
@@ -1843,6 +1903,18 @@ export default {
         "en": "My Favorites",
         "cn": "我的收藏"
     },
+    "Recent": {
+        "en": "Recent",
+        "cn": "最近"
+    },
+    "Shared": {
+        "en": "Shared",
+        "cn": "共享"
+    },
+    "No recent notes": {
+        "en": "No recent notes",
+        "cn": "暂无最近查看的笔记"
+    },
     "Favorites": {
         "en": "Favorites",
         "cn": "收藏夹"
@@ -1942,5 +2014,101 @@ export default {
     "Open": {
         "en": "Open",
         "cn": "查看"
+    },
+    "Add to Favorites": {
+        "en": "Add to Favorites",
+        "cn": "添加到收藏"
+    },
+    "Are you sure to delete this folder?": {
+        "en": "Are you sure to delete this folder?",
+        "cn": "您确定要删除此文件夹吗？"
+    },
+    "Can Edit": {
+        "en": "Can Edit",
+        "cn": "可编辑"
+    },
+    "Can View": {
+        "en": "Can View",
+        "cn": "可查看"
+    },
+    "Collaboration is not connected. Changes are still waiting to sync.": {
+        "en": "Collaboration is not connected. Changes are still waiting to sync.",
+        "cn": "协作未连接。更改仍在等待同步。"
+    },
+    "Collaborator": {
+        "en": "Collaborator",
+        "cn": "协作者"
+    },
+    "Collaborators": {
+        "en": "Collaborators",
+        "cn": "协作者"
+    },
+    "FAVORITES": {
+        "en": "FAVORITES",
+        "cn": "FAVORITES"
+    },
+    "Magic Link": {
+        "en": "Magic Link",
+        "cn": "Magic链接"
+    },
+    "Open Recent Note Failed": {
+        "en": "Open Recent Note Failed",
+        "cn": "打开最近笔记失败"
+    },
+    "Permission": {
+        "en": "Permission",
+        "cn": "权限"
+    },
+    "Public": {
+        "en": "Public",
+        "cn": "公开"
+    },
+    "Save to create a share link": {
+        "en": "Save to create a share link",
+        "cn": "保存以创建分享链接"
+    },
+    "Share": {
+        "en": "Share",
+        "cn": "分享"
+    },
+    "Share Note": {
+        "en": "Share Note",
+        "cn": "分享笔记"
+    },
+    "Share Scope": {
+        "en": "Share Scope",
+        "cn": "分享范围"
+    },
+    "Source Members": {
+        "en": "Source Members",
+        "cn": "数据源成员"
+    },
+    "Publicly sharing this note also makes the associated PDF public.": {
+        "en": "Publicly sharing this note also makes the item's associated PDF public.",
+        "cn": "公开分享此笔记时，所在条目关联的 PDF 也会公开。"
+    },
+    "Collections and Sharing": {
+        "en": "Collections and Sharing",
+        "cn": "集合和分享"
+    },
+    "All Shared Folders": {
+        "en": "All Shared Folders",
+        "cn": "全部共享目录"
+    },
+    "Edit Share": {
+        "en": "Edit Share",
+        "cn": "编辑共享"
+    },
+    "No shared notes": {
+        "en": "No shared notes",
+        "cn": "没有共享的笔记"
+    },
+    "Notes you have shared": {
+        "en": "Notes you have shared",
+        "cn": "您已共享的笔记"
+    },
+    "Remove Share": {
+        "en": "Remove Share",
+        "cn": "移除共享"
     }
 }

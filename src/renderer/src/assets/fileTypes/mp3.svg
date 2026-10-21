@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512"
+    height="512" x="0" y="0" viewBox="0 0 60 60" style="enable-background:new 0 0 512 512" xml:space="preserve"
+    class="">
+    <g>
+        <path fill="#3bb351" d="M52 43v14a2.006 2.006 0 0 1-2 2H10a2.006 2.006 0 0 1-2-2V43l1-1h42z" opacity="1"
+            data-original="#49ba5e" class=""></path>
+        <path fill="#e8edf3"
+            d="M52 14v29H8V3a2.006 2.006 0 0 1 2-2h29a1.3 1.3 0 0 1 .2.01 4.5 4.5 0 0 1 3.2 1.39l8.2 8.2a4.5 4.5 0 0 1 1.39 3.2 1.3 1.3 0 0 1 .01.2"
+            opacity="1" data-original="#e8edf3" class=""></path>
+        <path fill="#bfcedd"
+            d="M51.99 13.8A2.006 2.006 0 0 0 50 12h-6a3 3 0 0 1-3-3V3a2.006 2.006 0 0 0-1.8-1.99 4.5 4.5 0 0 1 3.2 1.39l8.2 8.2a4.5 4.5 0 0 1 1.39 3.2"
+            opacity="1" data-original="#bfcedd" class=""></path>
+        <g fill="#49ba5e">
+            <ellipse cx="35.5" cy="33" rx="3.5" ry="3" fill="#32bc67" opacity="1" data-original="#000000" class="">
+            </ellipse>
+            <ellipse cx="22.5" cy="35" rx="3.5" ry="3" fill="#32bc67" opacity="1" data-original="#000000" class="">
+            </ellipse>
+            <path d="m39 21-15 2v-4.738a1.72 1.72 0 0 1 1.493-1.705l11.559-1.542A1.72 1.72 0 0 1 39 16.72z"
+                fill="#32bc67" opacity="1" data-original="#000000" class=""></path>
+            <path d="M37 20h2v13h-2zM24 22h2v13h-2z" fill="#32bc67" opacity="1" data-original="#000000" class=""></path>
+        </g>
+        <path fill="#ffffff"
+            d="M24.316 46.052a1 1 0 0 0-1.116.348L21 49.333 18.8 46.4a1 1 0 0 0-1.8.6v8a1 1 0 0 0 2 0v-5l1.2 1.6a1.036 1.036 0 0 0 1.6 0L23 50v5a1 1 0 0 0 2 0v-8a1 1 0 0 0-.684-.948M32 46h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 2 0v-3h2a3 3 0 0 0 0-6m0 4h-2v-2h2a1 1 0 0 1 0 2M43 49a3 3 0 0 0-5.6-1.5 1 1 0 0 0 1.731 1A1 1 0 1 1 40 50a1 1 0 0 0 0 2 1 1 0 1 1-.867 1.5 1 1 0 0 0-1.731 1 3 3 0 1 0 4.832-3.5A3 3 0 0 0 43 49"
+            opacity="1" data-original="#ffffff"></path>
+    </g>
+</svg>

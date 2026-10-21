@@ -155,6 +155,7 @@ import floatWindowBase from '@/components/window/floatWindowBase.vue'
 import timeRounder from '@/components/general/timeRounder.vue'
 
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
+import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 
 import * as Diff from 'diff'
 
@@ -206,7 +207,7 @@ export default {
                 email: '',
                 avatar: null
             },
-            customExtensions: [pdfNote],
+            customExtensions: [pdfNote, fileAttachment],
             thisShow: this.modelValue,
             timer: {
                 diff: null

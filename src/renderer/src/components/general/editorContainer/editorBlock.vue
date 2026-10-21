@@ -9,11 +9,17 @@
                 <slot name="control-left"></slot>
             </div>
             <div class="control-right-block">
+                <span
+                    v-if="collabSession && collabWriteDenied"
+                    class="collaboration-permission-status"
+                    :title="local('No Write Permission')"
+                    >{{ local('No Write Permission') }}</span
+                >
                 <collaborator-avatars :users="collabUsers"></collaborator-avatars>
                 <history-callout
                     v-if="isRemote && item && itemType !== 'template'"
                     :model-value="target"
-                    :uri="currentDataPath"
+                    :uri="currentEditor?.dsId"
                     :itemid="item.id"
                     :mode="itemType"
                     :theme="theme"
@@ -23,7 +29,7 @@
                 <slot name="control-right"></slot>
             </div>
         </div>
-        <div class="nav-banner" :class="[{ half: displayMode === 2 }]">
+        <div v-show="info.id" class="nav-banner" :class="[{ half: displayMode === 2 }]">
             <fv-Breadcrumb
                 :model-value="breadcrumbState.path"
                 :disabled="breadcrumbState.disabled"
@@ -34,6 +40,13 @@
             ></fv-Breadcrumb>
         </div>
         <input v-show="false" type="file" accept=".md" ref="md_input" @change="openMarkdown" />
+        <input
+            v-show="false"
+            type="file"
+            multiple
+            ref="attachment_input"
+            @change="chooseAttachments"
+        />
         <div v-show="lock.loading" class="main-display-block">
             <power-editor
                 :key="collabKey"
@@ -101,6 +114,20 @@
                         @click="saveAs"
                     >
                         <i class="ms-Icon ms-Icon--SaveAs"></i>
+                    </fv-button>
+                </template>
+                <template #custom-buttons-2="x">
+                    <fv-button
+                        v-if="attachmentResource && !readonly"
+                        :theme="theme"
+                        background="transparent"
+                        border-color="transparent"
+                        :class="[x.defaultClass]"
+                        :disabled="!!collabSession && !collabCanWrite"
+                        :title="local('Upload File')"
+                        @click="$refs.attachment_input.click()"
+                    >
+                        <i class="ms-Icon ms-Icon--Attach"></i>
                     </fv-button>
                 </template>
                 <template v-slot:front-content>
@@ -240,6 +267,7 @@
         >
             <template v-slot:control="x">
                 <fv-button
+                    v-if="info.id && !readonly && (!collabSession || collabCanWrite)"
                     theme="dark"
                     background="rgba(140, 148, 228, 1)"
                     border-radius="6"
@@ -279,7 +307,6 @@ defineExpose({
 </script>
 
 <script>
-import { markRaw } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useDataStore } from '@/stores/data'
 import { useAppConfig } from '@/stores/appConfig'
@@ -294,12 +321,13 @@ import historyCallout from '@/components/general/callout/historyCallout.vue'
 import templatePreview from '@/components/templates/templatePreview.vue'
 import collaboratorAvatars from '@/components/general/editorContainer/collaboratorAvatars.vue'
 import { Collaboration, yXmlFragmentToProsemirrorJSON } from '@creatorsn/powereditor3/collaboration'
-import { createCollaborationSession } from '@/collaboration/session.js'
-import { seedYXmlFragmentFromJSON } from '@/collaboration/seed.js'
-import collaborationCaret from '@/collaboration/caret.js'
+import { useCollaborationStore } from '@/stores/editorStore/collaboration'
+import { seedYXmlFragmentFromJSON } from '@/js/collaboration/seed.js'
+import collaborationCaret from '@/js/collaboration/caret.js'
 import { useUserStore } from '@/stores/user'
 
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
+import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 
 import pdf from '@/assets/home/pdf.svg'
 import note from '@/assets/home/note.svg'
@@ -309,6 +337,7 @@ import openMarkdownImg from '@/assets/home/open_md.svg'
 import { fabulous_notebook } from '@/js/data_sample.js'
 
 export default {
+    emits: ['read-permission-change', 'container-scroll', 'editor-mounted'],
     components: {
         editorNav,
         saveOptions,
@@ -379,18 +408,14 @@ export default {
             },
             currentHistory: {},
             contentType: 'fabulous_notebook',
-            customExtensions: [pdfNote],
-            collabSession: null,
+            customExtensions: [pdfNote, fileAttachment],
+            collabOwner: Symbol('editorBlock'),
             collabKey: 0,
-            collabResourceKey: null,
             collabRestartNeeded: false,
-            collabUsers: [],
             collabApplyingRemote: false,
-            collabStatus: 'disconnected',
-            collabCanWrite: false,
             collabRestartPending: false,
-            collabEditRevision: 0,
-            collabPendingRevision: null,
+            collabPendingSnapshot: null,
+            saveRequestSnapshot: null,
             collabSavedSnapshot: null,
             contentLoadRequestId: 0,
             img: {
@@ -432,6 +457,7 @@ export default {
             immediate: true
         },
         target() {
+            this.$emit('read-permission-change', false)
             this.toggleUnsave(false)
             this.refreshContent()
         },
@@ -440,6 +466,9 @@ export default {
         },
         autoSave() {
             this.collabSession?.syncAwarenessMode()
+        },
+        collabStatus(status) {
+            if (status !== 'connected') this.reviseEditor({ id: this.editorId, savePending: false })
         }
     },
     computed: {
@@ -461,6 +490,11 @@ export default {
         ...mapState(useUserStore, ['info']),
         currentEditor() {
             return this.editorMap?.[this.editorId] || null
+        },
+        attachmentResource() {
+            if (!this.isRemote || !this.target?.id || !['notebook', 'item'].includes(this.itemType))
+                return null
+            return { type: this.itemType === 'notebook' ? 'notebook' : 'page', id: this.target.id }
         },
         itemType() {
             return this.currentEditor?.type || null
@@ -506,14 +540,33 @@ export default {
             return this.currentEditor?.target || null
         },
         collaborationResourceKey() {
-            if (
-                (this.isRemote && !import.meta.env.DEV) ||
-                (!this.isRemote && !this.target?.filePath?.toLowerCase().endsWith('.fbn')) ||
-                !this.target?.id ||
-                !['notebook', 'item'].includes(this.itemType)
+            return useCollaborationStore().resourceKey(
+                this.editorId,
+                this.currentEditor,
+                this.isRemote
             )
-                return null
-            return `${this.editorId}:${this.currentEditor?.dsId || ''}:${this.itemType}:${this.target.id}`
+        },
+        collaborationState() {
+            const state = useCollaborationStore().editors[this.editorId]
+            return state?.owner === this.collabOwner ? state : null
+        },
+        collabSession() {
+            return this.collaborationState?.session || null
+        },
+        collabResourceKey() {
+            return this.collaborationState?.resourceKey || null
+        },
+        collabUsers() {
+            return this.collaborationState?.users || []
+        },
+        collabStatus() {
+            return this.collaborationState?.status || 'disconnected'
+        },
+        collabCanWrite() {
+            return this.collaborationState?.canWrite || false
+        },
+        collabWriteDenied() {
+            return this.collaborationState?.writeDenied || false
         },
         breadcrumbState() {
             if (this.breadcrumbTool) {
@@ -554,7 +607,7 @@ export default {
         this.startCollaboration()
         this.ShortCutInit()
         this.timerInit()
-        this.bindNativeImageEvents()
+        this.bindNativeEditorEvents()
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -575,7 +628,6 @@ export default {
                         return
                     }
                     editor.save()
-                    this.toggleUnsave(false)
                 }
             }, 3000)
         },
@@ -638,6 +690,8 @@ export default {
             window.addEventListener('keydown', this.shortCutEvent, true)
         },
         onPowerEditorMounted(editor) {
+            editor.storage.fileAttachment.getResource = () => this.attachmentResource
+            this.$emit('editor-mounted', editor)
             if (!this.collabSession) return
             // 菜单插件重建编辑器状态时可能移除 UndoManager 对自身的追踪，导致撤销无法生成重做记录。
             const restoreUndoOrigin = () => {
@@ -650,15 +704,33 @@ export default {
             editor.on('destroy', () => editor.off('transaction', restoreUndoOrigin))
             restoreUndoOrigin()
         },
-        bindNativeImageEvents() {
+        chooseAttachments(event) {
+            const files = Array.from(event.target.files || [])
+            event.target.value = ''
+            this.insertAttachments(files)
+        },
+        insertAttachments(files = [], position = null) {
+            const editor = this.getEditor()?.editor?.()
+            if (!files.length || this.readonly || !this.attachmentResource || !editor?.isEditable) return
+            for (const [index, file] of files.entries()) {
+                editor.chain().focus().insertFileAttachment(file, index === 0 ? position : null).run()
+            }
+        },
+        bindNativeEditorEvents() {
             this.$nextTick(() => {
                 if (!this.$el) return
-                this.$el.addEventListener('paste', this.handleImagePaste, true)
-                this.$el.addEventListener('drop', this.handleImageDrop, true)
+                this.$el.addEventListener('paste', this.handleEditorPaste, true)
+                this.$el.addEventListener('dragenter', this.handleEditorDragOver, true)
+                this.$el.addEventListener('dragover', this.handleEditorDragOver, true)
+                this.$el.addEventListener('drop', this.handleEditorDrop, true)
             })
         },
         shortCutEvent(event) {
             if (!this.visible) return
+            if (this.isRemote && !this.info.id) {
+                if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) event.preventDefault()
+                return
+            }
             let ctrl = event.ctrlKey || event.metaKey
             if (
                 this.collabSession &&
@@ -683,16 +755,12 @@ export default {
                 let editor = this.getEditor()
                 if (this.collabSession) {
                     if (!this.flushCollaboration())
-                        this.$barWarning(
-                            this.local(
-                                'Collaboration is not connected. Changes are still waiting to sync.'
-                            ),
-                            { status: 'warning' }
-                        )
+                        this.$barWarning(this.collaborationSaveFailureMessage(), {
+                            status: 'warning'
+                        })
                     return
                 }
                 editor.save()
-                this.toggleUnsave(false)
             } else if (event.keyCode === 83 && ctrl && event.shiftKey) {
                 event.preventDefault()
                 this.saveAs()
@@ -701,15 +769,14 @@ export default {
         getEditor() {
             return this.$refs.editor
         },
-        getClipboardImageFiles(items = []) {
-            let imageFiles = []
-            for (const item of items) {
-                if (item.kind !== 'file') continue
-                if (!item.type || !item.type.startsWith('image/')) continue
-                const file = item.getAsFile ? item.getAsFile() : null
-                if (file) imageFiles.push(file)
-            }
-            return imageFiles
+        getClipboardFiles(clipboardData) {
+            const files = Array.from(clipboardData?.files || [])
+            if (files.length) return files
+            // Some browsers expose pasted files through items instead of the FileList.
+            return Array.from(clipboardData?.items || [])
+                .filter((item) => item.kind === 'file')
+                .map((item) => item.getAsFile?.())
+                .filter(Boolean)
         },
         async readFilesAsDataUrls(files = []) {
             return await Promise.all(
@@ -738,12 +805,26 @@ export default {
                     .run()
             })
         },
-        async handleImagePaste(event) {
-            const imageFiles = this.getClipboardImageFiles(event?.clipboardData?.items || [])
-            if (imageFiles.length === 0) return
+        async handleEditorPaste(event) {
+            if (event.defaultPrevented) return
+            const editor = this.getEditor()?.editor?.()
+            if (this.readonly || !editor?.isEditable || !editor.view.dom.contains(event.target)) return
+            const files = this.getClipboardFiles(event.clipboardData)
+            if (!files.length) return
+            const hasAttachments = files.some((file) => !file.type?.startsWith('image/'))
+            if (hasAttachments && this.attachmentResource) {
+                event.preventDefault()
+                event.stopImmediatePropagation()
+                this.insertAttachments(files)
+                return
+            }
+            const imageFiles = files.filter((file) => file.type?.startsWith('image/'))
+            if (!imageFiles.length) return
             event.preventDefault()
+            event.stopImmediatePropagation()
             try {
                 const dataUrls = await this.readFilesAsDataUrls(imageFiles)
+                if (editor.isDestroyed || !editor.isEditable || this.getEditor()?.editor?.() !== editor) return
                 this.insertImages(dataUrls)
             } catch (err) {
                 console.error(err)
@@ -752,14 +833,50 @@ export default {
                 })
             }
         },
-        async handleImageDrop(event) {
-            const files = Array.from(event?.dataTransfer?.files || []).filter(
-                (file) => file.type && file.type.startsWith('image/')
-            )
-            if (files.length === 0) return
+        isFileDrag(event) {
+            const transfer = event.dataTransfer
+            return Array.from(transfer?.types || []).includes('Files') ||
+                Boolean(transfer?.files?.length) ||
+                Array.from(transfer?.items || []).some((item) => item.kind === 'file')
+        },
+        getDroppedFiles(transfer) {
+            const items = Array.from(transfer?.items || []).filter((item) => item.kind === 'file')
+            if (!items.length) return Array.from(transfer?.files || [])
+            return items
+                .filter((item) => !item.webkitGetAsEntry?.()?.isDirectory)
+                .map((item) => item.getAsFile?.())
+                .filter(Boolean)
+        },
+        handleEditorDragOver(event) {
+            const editor = this.getEditor()?.editor?.()
+            if (!editor || !editor.view.dom.contains(event.target) || !this.isFileDrag(event)) return
             event.preventDefault()
+            event.stopImmediatePropagation()
+            const hasImages = Array.from(event.dataTransfer.items || []).some((item) => item.type?.startsWith('image/')) ||
+                Array.from(event.dataTransfer.files || []).some((file) => file.type?.startsWith('image/'))
+            event.dataTransfer.dropEffect = !this.readonly && editor.isEditable &&
+                (this.attachmentResource || hasImages) ? 'copy' : 'none'
+        },
+        async handleEditorDrop(event) {
+            const editor = this.getEditor()?.editor?.()
+            if (!editor || !editor.view.dom.contains(event.target) || !this.isFileDrag(event)) return
+            // Keep an editor file drop from reaching the app-wide PDF/notebook importer.
+            event.preventDefault()
+            event.stopImmediatePropagation()
+            if (this.readonly || !editor.isEditable) return
+            const files = this.getDroppedFiles(event.dataTransfer)
+            if (!files.length) return
+            const hasAttachments = files.some((file) => !file.type?.startsWith('image/'))
+            if (hasAttachments && this.attachmentResource) {
+                const position = editor.view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos
+                this.insertAttachments(files, position)
+                return
+            }
+            const imageFiles = files.filter((file) => file.type?.startsWith('image/'))
+            if (!imageFiles.length) return
             try {
-                const dataUrls = await this.readFilesAsDataUrls(files)
+                const dataUrls = await this.readFilesAsDataUrls(imageFiles)
+                if (editor.isDestroyed || !editor.isEditable || this.getEditor()?.editor?.() !== editor) return
                 this.insertImages(dataUrls)
             } catch (err) {
                 console.error(err)
@@ -790,10 +907,14 @@ export default {
             const requestId = ++this.contentLoadRequestId
             this.lock.loading = false
             try {
-                const { shouldStop, docInfo, contentType } = await this.refreshContentTool({
-                    getEditor: this.getEditor
-                })
-                if (requestId !== this.contentLoadRequestId || shouldStop) return
+                const { shouldStop, readDenied, docInfo, contentType } =
+                    await this.refreshContentTool({
+                        getEditor: this.getEditor
+                    })
+                if (requestId !== this.contentLoadRequestId) return
+                if (readDenied) this.$emit('read-permission-change', true)
+                if (shouldStop) return
+                this.$emit('read-permission-change', false)
                 this.docInfo = docInfo
                 this.contentType = contentType
                 try {
@@ -812,10 +933,20 @@ export default {
             }
         },
         toggleUnsave(status = true) {
-            if (status && this.collabSession) this.collabEditRevision += 1
+            const pendingSnapshot = this.collabPendingSnapshot || this.saveRequestSnapshot
+            const savePending = Boolean(
+                status &&
+                    pendingSnapshot &&
+                    (!this.collabSession || this.collabStatus === 'connected') &&
+                    !Diff.diffJson(
+                        this.collaborationComparable(pendingSnapshot),
+                        this.collaborationComparable(this.collaborationSnapshot())
+                    ).some((change) => change.added || change.removed)
+            )
             this.reviseEditor({
                 id: this.editorId,
-                unsave: status
+                unsave: status,
+                savePending
             })
         },
         wrapCotent(json, contentType = null) {
@@ -850,14 +981,10 @@ export default {
             return json
         },
         async saveConfirm(json) {
+            if (this.isRemote && !this.info.id) return
             if (this.collabSession) {
                 if (!this.flushCollaboration(this.collaborationSnapshot(json)))
-                    this.$barWarning(
-                        this.local(
-                            'Collaboration is not connected. Changes are still waiting to sync.'
-                        ),
-                        { status: 'warning' }
-                    )
+                    this.$barWarning(this.collaborationSaveFailureMessage(), { status: 'warning' })
                 this.lock.save = true
                 return
             }
@@ -889,27 +1016,35 @@ export default {
                     status: 'error'
                 })
             }
-            let { res, shouldStop } = await this.saveConfirmTool({
-                json,
-                docInfo: this.docInfo,
-                wrapCotent: this.wrapCotent
-            })
-            if (shouldStop) {
-                this.lock.save = true
-                return
-            }
-            if (res.code === 200) {
-                if (res.data.versionId) this.docInfo.versionId = res.data.versionId
-                this.reviseEditor({
-                    id: this.editorId,
-                    storeContent: this.getEditor().editor().getJSON(),
-                    realtimeContent: this.getEditor().editor().getJSON()
+            this.saveRequestSnapshot = this.collaborationSnapshot(json)
+            this.reviseEditor({ id: this.editorId, savePending: true })
+            try {
+                let { res, shouldStop } = await this.saveConfirmTool({
+                    json,
+                    docInfo: this.docInfo,
+                    wrapCotent: this.wrapCotent
                 })
-                this.toggleUnsave(false)
-            } else {
-                onerror(res)
+                if (shouldStop) return
+                if (res.code === 200) {
+                    if (res.data.versionId) this.docInfo.versionId = res.data.versionId
+                    this.reviseEditor({
+                        id: this.editorId,
+                        storeContent: this.saveRequestSnapshot.content,
+                        realtimeContent: this.getEditor().editor().getJSON()
+                    })
+                    const changes = Diff.diffJson(
+                        this.collaborationComparable(this.saveRequestSnapshot),
+                        this.collaborationComparable(this.collaborationSnapshot())
+                    )
+                    this.toggleUnsave(changes.some((change) => change.added || change.removed))
+                } else {
+                    onerror(res)
+                }
+            } finally {
+                this.saveRequestSnapshot = null
+                this.reviseEditor({ id: this.editorId, savePending: false })
+                this.lock.save = true
             }
-            this.lock.save = true
         },
         async commitDiff(result) {
             console.log(result)
@@ -930,7 +1065,6 @@ export default {
             setTimeout(() => {
                 let editor = this.getEditor()
                 editor.save()
-                this.toggleUnsave(false)
             }, 300)
         },
         downloadTxtFile(text, filename) {
@@ -1135,8 +1269,13 @@ export default {
         },
         flushCollaboration(snapshot = this.collaborationSnapshot()) {
             if (!this.collabSession?.flush(snapshot)) return false
-            this.collabPendingRevision = this.collabEditRevision
+            this.collabPendingSnapshot = snapshot
+            this.reviseEditor({ id: this.editorId, savePending: true })
             return true
+        },
+        collaborationSaveFailureMessage() {
+            if (this.collabWriteDenied) return this.local('No Write Permission')
+            return this.local('Collaboration is not connected. Changes are still waiting to sync.')
         },
         seedCollaborationBaseline(attempt = 0, body = null, session = this.collabSession) {
             if (session !== this.collabSession) return
@@ -1156,57 +1295,50 @@ export default {
                         seedYXmlFragmentFromJSON(fragment, normalized)
                     } catch (error) {
                         console.error('[collaboration] Failed to load notebook into Yjs.', error)
-                        this.collabStatus = 'error'
+                        useCollaborationStore().setStatus(this.editorId, 'error')
                         return
                     }
                 }
             }
             const published = session.publishBaseline(this.collaborationSnapshot())
             if (published) this.collabSavedSnapshot = this.collaborationSnapshot()
-            this.collabCanWrite = Boolean(published && session.canWrite)
+            useCollaborationStore().setCanWrite(
+                this.editorId,
+                Boolean(published && session.canWrite)
+            )
         },
         startCollaboration() {
             if (!this.collaborationResourceKey) return
             this.collabSavedSnapshot = null
             const resourceType = this.isRemote
-                ? this.itemType === 'notebook' ? 'notebook' : 'page'
+                ? this.itemType === 'notebook'
+                    ? 'notebook'
+                    : 'page'
                 : 'local-notebook'
-            let session = null
-            session = createCollaborationSession({
+            const session = useCollaborationStore().start(this.editorId, {
+                owner: this.collabOwner,
+                resourceKey: this.collaborationResourceKey,
                 resourceType,
                 resourceId: this.isRemote ? this.target.id : this.target.filePath,
+                sourceId: this.currentEditor?.dsId,
+                targetId: this.target.id,
                 user: this.info,
                 autoSave: () => this.autoSave,
-                getSnapshot: () =>
-                    session === this.collabSession ? this.collaborationSnapshot() : null,
-                onUsers: (users) => {
-                    if (session !== this.collabSession) return
-                    this.collabUsers = users.filter((user) => user.id !== this.info.id)
-                },
-                onStatus: (status) => {
-                    if (session && session !== this.collabSession) return
-                    this.collabStatus = status
-                },
+                getSnapshot: () => this.collaborationSnapshot(),
                 onPersisted: () => {
                     if (session !== this.collabSession) return
                     if (
-                        this.collabPendingRevision === null ||
+                        this.collabPendingSnapshot === null ||
                         this.collabSession?.hasPendingUpdates
                     )
                         return
-                    if (this.collabPendingRevision === this.collabEditRevision) {
-                        this.collabSavedSnapshot = this.collaborationSnapshot()
-                        this.toggleUnsave(false)
-                    }
-                    this.collabPendingRevision = null
-                },
-                onWritePermission: (canWrite, needsSeed) => {
-                    if (session !== this.collabSession) return
-                    this.collabCanWrite = canWrite && !needsSeed
-                    if (!canWrite)
-                        console.warn(
-                            '[collaboration] Backend denied write access for this resource.'
-                        )
+                    this.collabSavedSnapshot = this.collabPendingSnapshot
+                    this.collabPendingSnapshot = null
+                    const changes = Diff.diffJson(
+                        this.collaborationComparable(this.collabSavedSnapshot),
+                        this.collaborationComparable(this.collaborationSnapshot())
+                    )
+                    this.toggleUnsave(changes.some((change) => change.added || change.removed))
                 },
                 onRemoteUpdate: () => {
                     if (session !== this.collabSession) return
@@ -1232,7 +1364,8 @@ export default {
                     }
                     if (!snapshot || typeof snapshot !== 'object') return
                     if (
-                        (this.isRemote || (!this.unsave && !this.collabSession?.hasPendingUpdates)) &&
+                        (this.isRemote ||
+                            (!this.unsave && !this.collabSession?.hasPendingUpdates)) &&
                         (snapshot.fabulous_notebook || 'title' in snapshot || 'banner' in snapshot)
                     ) {
                         this.reviseEditorContent({
@@ -1258,25 +1391,21 @@ export default {
                     }
                 }
             })
-            this.collabSession = markRaw(session)
             this.customExtensions = [
                 pdfNote,
-                Collaboration.configure({ document: this.collabSession.doc }),
-                collaborationCaret.configure({ provider: this.collabSession.provider })
+                fileAttachment,
+                Collaboration.configure({ document: session.doc }),
+                collaborationCaret.configure({ provider: session.provider })
             ]
-            this.collabResourceKey = this.collaborationResourceKey
             this.collabKey += 1
         },
         stopCollaboration() {
-            this.collabSession?.destroy()
-            this.collabSession = null
-            this.collabResourceKey = null
-            this.collabCanWrite = false
+            useCollaborationStore().stop(this.editorId, this.collabOwner)
             this.collabApplyingRemote = false
-            this.collabPendingRevision = null
+            this.collabPendingSnapshot = null
+            this.reviseEditor({ id: this.editorId, savePending: false })
             this.collabSavedSnapshot = null
-            this.collabUsers = []
-            this.customExtensions = [pdfNote]
+            this.customExtensions = [pdfNote, fileAttachment]
             this.collabKey += 1
         },
         restartCollaboration() {
@@ -1305,10 +1434,12 @@ export default {
     },
     beforeUnmount() {
         clearInterval(this.timer.autoSave)
-        this.collabSession?.destroy()
+        useCollaborationStore().stop(this.editorId, this.collabOwner)
         if (this.$el) {
-            this.$el.removeEventListener('paste', this.handleImagePaste, true)
-            this.$el.removeEventListener('drop', this.handleImageDrop, true)
+            this.$el.removeEventListener('paste', this.handleEditorPaste, true)
+            this.$el.removeEventListener('dragenter', this.handleEditorDragOver, true)
+            this.$el.removeEventListener('dragover', this.handleEditorDragOver, true)
+            this.$el.removeEventListener('drop', this.handleEditorDrop, true)
         }
         window.removeEventListener('keydown', this.shortCutEvent, true)
     },
@@ -1355,6 +1486,11 @@ export default {
     &.dark {
         background: rgba(47, 52, 55, 1);
 
+        .collaboration-permission-status {
+            color: rgba(255, 194, 151, 1);
+            background: rgba(225, 151, 99, 0.2);
+        }
+
         .main-display-block {
             background: rgba(47, 52, 55, 0.8);
         }
@@ -1378,6 +1514,15 @@ export default {
 
         .control-right-block {
             @include Vcenter;
+
+            .collaboration-permission-status {
+                padding: 4px 8px;
+                border-radius: 6px;
+                color: rgba(156, 78, 36, 1);
+                background: rgba(225, 151, 99, 0.14);
+                font-size: 11px;
+                white-space: nowrap;
+            }
 
             .save-btn {
                 margin-right: 15px;

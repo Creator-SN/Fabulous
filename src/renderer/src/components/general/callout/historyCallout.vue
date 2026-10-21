@@ -58,6 +58,7 @@
                                 ></time-rounder>
                             </span>
                             <user-avatar
+                                v-if="userInfo.id"
                                 v-model="x.item.author"
                                 :show-info="true"
                                 :size="28"
@@ -80,6 +81,7 @@
 
 <script>
 import { useTheme } from '@/stores/theme'
+import { useUserStore } from '@/stores/user'
 import { mapState } from 'pinia'
 
 import calloutBase from './calloutBase.vue'
@@ -136,11 +138,13 @@ export default {
         }
     },
     computed: {
-        ...mapState(useTheme, ['theme', 'color'])
+        ...mapState(useTheme, ['theme', 'color']),
+        ...mapState(useUserStore, { userInfo: 'info' })
     },
     methods: {
         async getNotebookHistory() {
             if (!this.modelValue.id) return
+            if (this.mode !== 'notebook' && (!this.uri || !this.itemid)) return
             if (!this.lock.loading) return
             this.lock.loading = false
             let computeRes = (res) => {
@@ -182,6 +186,7 @@ export default {
             this.lock.loading = true
         },
         getNotebookHistoryContent(event) {
+            if (this.mode !== 'notebook' && (!this.uri || !this.itemid)) return
             if (!this.lock.content) return
             this.lock.content = false
             const item = event.item

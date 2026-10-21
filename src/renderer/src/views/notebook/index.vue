@@ -13,7 +13,7 @@
             ref="editor_container"
             @container-scroll="handleContainerScroll"
         ></editor-container>
-        <loading v-show="loading || !currentDataPath" style="z-index: 2">
+        <loading v-show="loading || !userInfoReady" style="z-index: 2">
             <div class="central-box">
                 <fv-progress-ring
                     :loading="true"
@@ -32,8 +32,9 @@
 import { mapActions, mapState } from 'pinia'
 import { useTheme } from '@/stores/theme'
 import { useAppConfig } from '@/stores/appConfig'
-import { useDataStore } from '@/stores/data'
+import { useCollectionStore } from '@/stores/collection'
 import { useNotebookConfig } from '@/stores/notebook'
+import { useUserStore } from '@/stores/user'
 import loading from '@/components/general/loading.vue'
 import editorContainer from '@/components/general/editorContainer/index.vue'
 import { item } from '@/js/data_sample'
@@ -54,15 +55,13 @@ export default {
                 versionId: null
             },
             loading: false,
-            bindingRequestId: 0
+            bindingRequestId: 0,
+            bindingUserId: undefined
         }
     },
     computed: {
         ...mapState(useTheme, ['theme', 'color']),
-        ...mapState(useDataStore, {
-            currentDataPath: (state) => state.currentDataPath,
-            currentDataPathItem: (state) => state.currentDataPathItem
-        }),
+        ...mapState(useUserStore, { userInfo: 'info', userInfoReady: 'infoReady' }),
         ...mapState(useAppConfig, {
             local: (state) => state.local,
             editorMap: (state) => state.editor
@@ -90,6 +89,11 @@ export default {
         },
         editorCache() {
             return this.currentEditor?.cache || false
+        },
+        editorBindingKey() {
+            if (this.$route.name !== 'NoteBook' || !this.userInfoReady) return null
+            const path = decodeURI(this.$route.params.path || '').replace(/\\/g, '/')
+            return JSON.stringify([this.$route.name, path, this.userInfo.id ?? null])
         },
         parsePath() {
             const segs = this.path.split('/').filter(Boolean) // 去除无效路径段
@@ -125,22 +129,17 @@ export default {
         }
     },
     watch: {
-        $route() {
-            if (this.$route.name !== 'NoteBook') return
-            this.refreshRemote()
-            this.initEditorBinding(true)
-        },
-        currentDataPath() {
-            this.initEditorBinding()
-        },
-        target() {
-            this.refreshPathParams()
+        editorBindingKey: {
+            immediate: true,
+            handler(key) {
+                if (!key) {
+                    this.bindingRequestId += 1
+                    this.loading = false
+                    return
+                }
+                this.initEditorBinding(true)
+            }
         }
-    },
-    mounted() {
-        this.refreshRemote()
-        this.refreshPathParams()
-        this.initEditorBinding()
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -163,26 +162,28 @@ export default {
             let path = decodeURI(this.$route.params.path || '')
             if (!path) return
             const normalizedPath = path.replace(/\\/g, '/')
-            if (this.path === normalizedPath) return
             this.path = normalizedPath
             this.getRemotePath()
         },
         async initEditorBinding(refreshMatchedTarget = false) {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
-            if (this.$route.name !== 'NoteBook') return
+            if (!this.editorBindingKey) return
             this.refreshRemote()
             this.refreshPathParams()
-            if (!this.currentDataPath) return
             if (!this.path) return
             if (!this.parsePath.valid) return
             const requestId = ++this.bindingRequestId
-            const routePath = this.$route.fullPath
+            const bindingKey = this.editorBindingKey
+            const identityChanged = this.bindingUserId !== this.userInfo.id
+            this.bindingUserId = this.userInfo.id
             const isCurrent = () =>
-                requestId === this.bindingRequestId && this.$route.fullPath === routePath
+                requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
             this.loading = true
             try {
                 const { data_path, parentId, targetId, parentPath, targetPath } = this.parsePath
                 if (
+                    this.editorCache &&
+                    !identityChanged &&
                     this.target?.id === targetId &&
                     this.target?.filePath === targetPath &&
                     this.item?.id === parentId &&
@@ -190,20 +191,21 @@ export default {
                 ) {
                     if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                     if (this.isRemote && targetId) {
-                        this.$api.RecentViewController
-                            .recordRecentView({ kind: 'notebook', sourceId: data_path, itemId: targetId })
+                        useCollectionStore()
+                            .recordRecent({ kind: 'notebook', sourceId: data_path, itemId: targetId })
                             .catch((error) => console.error(error))
                     }
                     this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
                     return
                 }
-                if (this.shouldReloadItem) {
+                if (identityChanged || this.shouldReloadItem) {
                     let parentItem = {}
                     let children = []
                     let promises = []
                     if (data_path !== parentId) {
                         promises.push(
                             this.getRemoteDirectory(parentId).then((res) => {
+                                if (!isCurrent()) return
                                 if (res.code === 200 || res.status === 'success') {
                                     parentItem = res.data || {}
                                 } else {
@@ -214,10 +216,11 @@ export default {
                             })
                         )
                     } else {
-                        parentItem = this.currentDataPathItem || {}
+                        parentItem = { id: data_path }
                     }
                     promises.push(
                         this.listRemoteDirectoryChildren(parentId).then((res) => {
+                            if (!isCurrent()) return
                             if (res.code === 200 || res.status === 'success') {
                                 children = res.data || []
                                 children = children.filter((item) => item.type === 'notebook')
@@ -233,12 +236,13 @@ export default {
                     )
                     await Promise.all(promises)
                     if (!isCurrent()) return
-                    let targetItem = children.find((item) => item.id === targetId) || {}
+                    let targetItem = children.find((item) => item.id === targetId) || { id: targetId }
                     this.reviseEditor({
                         id: 'notebook',
                         dsId: data_path,
                         type: 'notebook',
                         item: {
+                            id: parentId,
                             ...parentItem,
                             pages: children,
                             filePath: parentPath
@@ -252,7 +256,7 @@ export default {
                         cache: true
                     })
                 } else {
-                    let targetItem = this.item?.pages?.find((item) => item.id === targetId) || {}
+                    let targetItem = this.item?.pages?.find((item) => item.id === targetId) || { id: targetId }
                     this.reviseEditor({
                         id: 'notebook',
                         dsId: data_path,
@@ -264,8 +268,8 @@ export default {
                     })
                 }
                 if (this.isRemote && targetId) {
-                    this.$api.RecentViewController
-                        .recordRecentView({ kind: 'notebook', sourceId: data_path, itemId: targetId })
+                    useCollectionStore()
+                        .recordRecent({ kind: 'notebook', sourceId: data_path, itemId: targetId })
                         .catch((error) => console.error(error))
                 }
             } catch (error) {
@@ -275,13 +279,14 @@ export default {
             }
         },
         async getRemotePath() {
-            if (!this.isRemote || !this.path) {
+            if (!this.isRemote || !this.path || !this.userInfo.id) {
                 this.remotePath = this.path
                 return
             }
             const requestedPath = this.path
+            const requestedUserId = this.userInfo.id
             const res = await this.transferIdsToNames(requestedPath, true)
-            if (this.path !== requestedPath || !this.isRemote) return
+            if (this.path !== requestedPath || !this.isRemote || this.userInfo.id !== requestedUserId) return
             if (res.code === 200 || res.status === 'success') {
                 this.remotePath = (res.data || requestedPath).replace(/\\/g, '/')
             } else {
@@ -317,7 +322,10 @@ export default {
                 requestContext.dataSourceId,
                 requestContext.filePath,
                 requestContext.isRemote
-            )
+            ).catch((error) => {
+                if (error?.code === 40300) return error
+                throw error
+            })
 
             if (
                 this.editorDsId !== requestContext.dataSourceId ||
@@ -328,6 +336,15 @@ export default {
             ) {
                 return {
                     shouldStop: true,
+                    docInfo: {},
+                    contentType: 'fabulous_notebook'
+                }
+            }
+
+            if (res.code === 40300) {
+                return {
+                    shouldStop: true,
+                    readDenied: true,
                     docInfo: {},
                     contentType: 'fabulous_notebook'
                 }

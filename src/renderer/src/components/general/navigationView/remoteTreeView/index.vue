@@ -20,14 +20,13 @@
                 foreground="rgba(133, 148, 211, 1)"
                 font-weight="bold"
                 :reveal-border-color="['rgba(133, 148, 211, 1)']"
-                @click="showRecent = !showRecent"
+                style="height: 25px;"
+                @click="openRecentCollection"
             >
                 {{ local('Recent') }}
             </fv-button>
         </div>
         <recent-list
-            v-if="showRecent"
-            :active="showRecent"
             :theme="theme"
             :local="local"
             :Go="Go"
@@ -245,6 +244,7 @@ import { useDataStore } from '@/stores/data'
 import { useTheme } from '@/stores/theme'
 import { useNotebookConfig } from '@/stores/notebook'
 import { mapState, mapActions } from 'pinia'
+import { useCollectionStore } from '@/stores/collection'
 
 import rightMenu from '@/components/general/rightMenu.vue'
 import permissionPanel from './permissionPanel.vue'
@@ -284,7 +284,6 @@ export default {
     data() {
         return {
             path: this.modelValue,
-            showRecent: false,
             treeList: [],
             notebookCmdList: [
                 {
@@ -309,9 +308,9 @@ export default {
                     show: () => true
                 },
                 {
-                    name: () => this.local('My Favorites'),
+                    name: () => this.local('Collections and Sharing'),
                     img: 'favor',
-                    func: () => this.Go('/favorites'),
+                    func: () => this.Go('/collections'),
                     disabled: () => !this.path,
                     show: () => true
                 }
@@ -406,6 +405,10 @@ export default {
         window.addEventListener('click', this.whiteClickClearTmp)
     },
     methods: {
+        openRecentCollection() {
+            useCollectionStore().setActiveSection('recent')
+            this.$Go('/collections')
+        },
         ...mapActions(useAppConfig, {
             reviseEditor: 'reviseEditor',
             tryGetScrollTop: 'tryGetScrollTop'
@@ -970,6 +973,8 @@ export default {
 
             if (res?.code === 200) {
                 this.removeItemFromCollections(target.filePath)
+            } else if (res?.code === 40300) {
+                this.$barWarning(this.local('No Permission to Delete'), { status: 'warning' })
             }
             this.lock.remove = true
         },

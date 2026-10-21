@@ -173,10 +173,7 @@ export default {
         min-height: 330px;
         height: auto;
         background: white;
-        border: rgba(200, 200, 200, 0.3) solid thin;
         border-radius: 8px;
-        box-shadow: 0 5px 5px 0 rgba(154, 160, 185, 0.05),
-            0 5px 30px 0 rgba(166, 173, 201, 0.22);
         overflow: hidden;
 
         .s1 {

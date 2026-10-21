@@ -27,6 +27,7 @@
                 ></pdf-item>
             </div>
             <add-ring-button
+                v-if="userInfo.id"
                 v-model="show.addNote"
                 :parent="$refs.parent"
                 :selectionObj="selectionObj"
@@ -86,6 +87,7 @@ import gsap from 'gsap'
 import { markRaw } from 'vue'
 import { useAppConfig } from '@/stores/appConfig'
 import { useDataStore } from '@/stores/data'
+import { useUserStore } from '@/stores/user'
 import { mapState, mapActions } from 'pinia'
 
 import pdfItem from './pdfItem.vue'
@@ -217,6 +219,7 @@ export default {
         }
     },
     computed: {
+        ...mapState(useUserStore, { userInfo: 'info' }),
         ...mapState(useDataStore, {
             currentDataPath: (state) => state.currentDataPath
         }),
@@ -472,7 +475,10 @@ export default {
             }
             // 点击事件：添加 PDF 笔记
             let addPDFNoteEvent = (event) => {
-                if (this.disabledEditor) return
+                if (this.disabledEditor || !this.userInfo.id) {
+                    this.show.addNote = false
+                    return
+                }
                 const selected = getSelectionAnchor()
                 if (!selected) {
                     this.show.addNote = false
@@ -498,9 +504,10 @@ export default {
             if (!this.lock.init) return
             this.lock.init = false
             await this.$api.AcademicController.getItemPDF(
-                this.currentDataPath,
+                this.currentEditor?.dsId || this.currentDataPath,
                 this.modelValue,
                 this.modelValue,
+                null,
                 null,
                 null,
                 ({ loaded, total }) => {
