@@ -1,4 +1,48 @@
 export default {
+    "Parsing file...": {
+        "en": "Parsing file...",
+        "cn": "正在解析文件…"
+    },
+    "Finalizing upload...": {
+        "en": "Finalizing upload...",
+        "cn": "正在保存附件…"
+    },
+    "Cancel upload": {
+        "en": "Cancel upload",
+        "cn": "取消上传"
+    },
+    "Upload File": {
+        "en": "Upload File",
+        "cn": "上传文件"
+    },
+    "Download": {
+        "en": "Download",
+        "cn": "下载"
+    },
+    "Attachment is unavailable": {
+        "en": "Attachment is unavailable",
+        "cn": "附件不可用"
+    },
+    "File download failed": {
+        "en": "File download failed",
+        "cn": "文件下载失败"
+    },
+    "File upload failed": {
+        "en": "File upload failed",
+        "cn": "文件上传失败"
+    },
+    "Calculating file hash...": {
+        "en": "Calculating file hash...",
+        "cn": "正在计算文件指纹…"
+    },
+    "Checking file...": {
+        "en": "Checking file...",
+        "cn": "正在检查文件…"
+    },
+    "Uploading file...": {
+        "en": "Uploading file...",
+        "cn": "正在上传文件…"
+    },
     "Confirm": {
         "en": "Confirm",
         "cn": "确认"
@@ -606,6 +650,22 @@ export default {
     "Read File Failed": {
         "en": "Read File Failed",
         "cn": "读取文件失败"
+    },
+    "No Permission to Delete": {
+        "en": "No Permission to Delete",
+        "cn": "没有删除权限"
+    },
+    "No Write Permission": {
+        "en": "No Write Permission",
+        "cn": "没有写入权限"
+    },
+    "No Read Permission for This Notebook": {
+        "en": "You do not have permission to read this notebook",
+        "cn": "无权读取此笔记"
+    },
+    "Retry": {
+        "en": "Retry",
+        "cn": "重试"
     },
     "Input title here ...": {
         "en": "Input title here ...",
@@ -1339,6 +1399,10 @@ export default {
         "en": "Read Image Failed",
         "cn": "读取图像失败"
     },
+    "Failed to load document content.": {
+        "en": "Failed to load document content.",
+        "cn": "加载笔记内容失败"
+    },
     "Open PDF": {
         "en": "Open PDF",
         "cn": "打开 PDF"
@@ -1834,5 +1898,217 @@ export default {
     "Config": {
         "en": "Config",
         "cn": "配置"
+    },
+    "My Favorites": {
+        "en": "My Favorites",
+        "cn": "我的收藏"
+    },
+    "Recent": {
+        "en": "Recent",
+        "cn": "最近"
+    },
+    "Shared": {
+        "en": "Shared",
+        "cn": "共享"
+    },
+    "No recent notes": {
+        "en": "No recent notes",
+        "cn": "暂无最近查看的笔记"
+    },
+    "Favorites": {
+        "en": "Favorites",
+        "cn": "收藏夹"
+    },
+    "Manage Favorites": {
+        "en": "Manage Favorites",
+        "cn": "收藏夹管理"
+    },
+    "Notes": {
+        "en": "notes",
+        "cn": "条笔记"
+    },
+    "Keep your favorites close.": {
+        "en": "Keep your favorites close.",
+        "cn": "收藏灵感，随时继续。"
+    },
+    "Collect useful notes and pick up where you left off.": {
+        "en": "Collect useful notes and pick up where you left off.",
+        "cn": "把重要笔记收在一起，随时接着阅读。"
+    },
+    "Search favorite folders or notes": {
+        "en": "Search favorite folders or notes",
+        "cn": "搜索收藏夹或笔记"
+    },
+    "All Favorite Folders": {
+        "en": "All Favorite Folders",
+        "cn": "全部收藏夹"
+    },
+    "Saved for easy access": {
+        "en": "Saved for easy access",
+        "cn": "随时快速访问"
+    },
+    "Favorite Folder": {
+        "en": "Favorite Folder",
+        "cn": "收藏夹"
+    },
+    "Create a space for your notes": {
+        "en": "Create a space for your notes",
+        "cn": "为笔记创建专属空间"
+    },
+    "No matching folders": {
+        "en": "No matching folders",
+        "cn": "未找到匹配的收藏夹"
+    },
+    "Open a note to continue reading": {
+        "en": "Open a note to continue reading",
+        "cn": "打开笔记，继续阅读"
+    },
+    "Edit Favorites": {
+        "en": "Edit Favorites",
+        "cn": "编辑收藏"
+    },
+    "No matching notes": {
+        "en": "No matching notes",
+        "cn": "未找到匹配的笔记"
+    },
+    "No favorites": {
+        "en": "No favorites",
+        "cn": "暂无收藏笔记"
+    },
+    "Keep useful notes in favorites to find them faster next time.": {
+        "en": "Keep useful notes in favorites to find them faster next time.",
+        "cn": "把常用笔记加入收藏，下次更快找到它。"
+    },
+    "Make research easier": {
+        "en": "Make research easier",
+        "cn": "让研究更轻松"
+    },
+    "A space for your notes": {
+        "en": "A space for your notes",
+        "cn": "你的笔记专属空间"
+    },
+    "Folder Name": {
+        "en": "Folder Name",
+        "cn": "收藏夹名称"
+    },
+    "Remove from Favorites": {
+        "en": "Remove from Favorites",
+        "cn": "移出当前收藏夹"
+    },
+    "No favorite folders": {
+        "en": "No favorite folders",
+        "cn": "暂无收藏夹"
+    },
+    "Choose Favorites": {
+        "en": "Choose Favorites",
+        "cn": "选择收藏夹"
+    },
+    "Add Favorite Folder": {
+        "en": "Add Favorite Folder",
+        "cn": "添加收藏夹"
+    },
+    "Create a folder to organize notes": {
+        "en": "Create a folder to organize notes",
+        "cn": "创建收藏夹来整理笔记"
+    },
+    "Open": {
+        "en": "Open",
+        "cn": "查看"
+    },
+    "Add to Favorites": {
+        "en": "Add to Favorites",
+        "cn": "添加到收藏"
+    },
+    "Are you sure to delete this folder?": {
+        "en": "Are you sure to delete this folder?",
+        "cn": "您确定要删除此文件夹吗？"
+    },
+    "Can Edit": {
+        "en": "Can Edit",
+        "cn": "可编辑"
+    },
+    "Can View": {
+        "en": "Can View",
+        "cn": "可查看"
+    },
+    "Collaboration is not connected. Changes are still waiting to sync.": {
+        "en": "Collaboration is not connected. Changes are still waiting to sync.",
+        "cn": "协作未连接。更改仍在等待同步。"
+    },
+    "Collaborator": {
+        "en": "Collaborator",
+        "cn": "协作者"
+    },
+    "Collaborators": {
+        "en": "Collaborators",
+        "cn": "协作者"
+    },
+    "FAVORITES": {
+        "en": "FAVORITES",
+        "cn": "FAVORITES"
+    },
+    "Magic Link": {
+        "en": "Magic Link",
+        "cn": "Magic链接"
+    },
+    "Open Recent Note Failed": {
+        "en": "Open Recent Note Failed",
+        "cn": "打开最近笔记失败"
+    },
+    "Permission": {
+        "en": "Permission",
+        "cn": "权限"
+    },
+    "Public": {
+        "en": "Public",
+        "cn": "公开"
+    },
+    "Save to create a share link": {
+        "en": "Save to create a share link",
+        "cn": "保存以创建分享链接"
+    },
+    "Share": {
+        "en": "Share",
+        "cn": "分享"
+    },
+    "Share Note": {
+        "en": "Share Note",
+        "cn": "分享笔记"
+    },
+    "Share Scope": {
+        "en": "Share Scope",
+        "cn": "分享范围"
+    },
+    "Source Members": {
+        "en": "Source Members",
+        "cn": "数据源成员"
+    },
+    "Publicly sharing this note also makes the associated PDF public.": {
+        "en": "Publicly sharing this note also makes the item's associated PDF public.",
+        "cn": "公开分享此笔记时，所在条目关联的 PDF 也会公开。"
+    },
+    "Collections and Sharing": {
+        "en": "Collections and Sharing",
+        "cn": "集合和分享"
+    },
+    "All Shared Folders": {
+        "en": "All Shared Folders",
+        "cn": "全部共享目录"
+    },
+    "Edit Share": {
+        "en": "Edit Share",
+        "cn": "编辑共享"
+    },
+    "No shared notes": {
+        "en": "No shared notes",
+        "cn": "没有共享的笔记"
+    },
+    "Notes you have shared": {
+        "en": "Notes you have shared",
+        "cn": "您已共享的笔记"
+    },
+    "Remove Share": {
+        "en": "Remove Share",
+        "cn": "移除共享"
     }
 }

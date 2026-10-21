@@ -1,12 +1,13 @@
 <template>
     <div id="app" :class="{ dark: theme == 'dark' }">
-        <navigation-view v-show="show.nav"></navigation-view>
+        <navigation-view v-show="show.nav && userInfo.id"></navigation-view>
         <title-bar
             v-if="clientMode !== 'web'"
             :theme="theme"
             style="background: transparent"
         ></title-bar>
         <tab-bar
+            v-show="userInfo.id"
             class="tab-bar"
             :theme="theme"
             :left-offset="titleBarOffset"
@@ -16,7 +17,9 @@
         <div class="addition-container">
             <div class="global-container">
                 <router-view v-slot="{ Component }">
-                    <keep-alive include="Home,Partition,Templates,Settings,Academic,Notebook,LocalNotebook">
+                    <keep-alive
+                        include="Home,Partition,Templates,Settings,Academic,Notebook,LocalNotebook,Collections"
+                    >
                         <component :is="Component" :key="$route.name" />
                     </keep-alive>
                 </router-view>
@@ -151,15 +154,20 @@ export default {
         },
         dropFilesInit() {
             const isTabViewTarget = (event) => event.target?.closest?.('.tab-view')
-            const hasFiles = (event) => Array.from(event.dataTransfer?.types || []).includes('Files')
+            const hasFiles = (event) =>
+                Array.from(event.dataTransfer?.types || []).includes('Files')
             this.$el.addEventListener(
                 'dragenter',
                 (e) => {
                     if (hasFiles(e)) {
                         e.preventDefault()
                         e.stopPropagation()
-                        this.show.drop = !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
-                    } else if (this.draggingEl?.classList?.contains('tab-view') && !this.show_editor) {
+                        this.show.drop =
+                            !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
+                    } else if (
+                        this.draggingEl?.classList?.contains('tab-view') &&
+                        !this.show_editor
+                    ) {
                         this.show.drop = true
                         e.preventDefault()
                         e.stopPropagation()
@@ -174,8 +182,12 @@ export default {
                     if (hasFiles(e)) {
                         e.preventDefault()
                         e.stopPropagation()
-                        this.show.drop = !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
-                    } else if (this.draggingEl?.classList?.contains('tab-view') && !this.show_editor) {
+                        this.show.drop =
+                            !isTabViewTarget(e) && !this.show_editor && !this.SourceDisabled
+                    } else if (
+                        this.draggingEl?.classList?.contains('tab-view') &&
+                        !this.show_editor
+                    ) {
                         this.show.drop = true
                         e.preventDefault()
                         e.stopPropagation()

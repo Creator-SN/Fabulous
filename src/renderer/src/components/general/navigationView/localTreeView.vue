@@ -1058,6 +1058,7 @@ export default {
         position: relative;
         width: 100%;
         height: 50px;
+        flex: 1;
     }
 
     .tree-view-custom-item {
@@ -1070,6 +1071,10 @@ export default {
 
         &.dark {
             color: whitesmoke;
+
+            .tree-view-custom-label {
+                color: whitesmoke;
+            }
         }
 
         .tree-view-item-left-block {

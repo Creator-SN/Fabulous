@@ -75,8 +75,7 @@ export default {
         },
         activeFilePath() {
             const targetPath = this.target?.filePath || ''
-            if (targetPath) return targetPath.replace(/\\/g, '/')
-            return this.filePath
+            return this.filePath || targetPath.replace(/\\/g, '/')
         },
         isMarkdownFile() {
             return this.activeFilePath.toLowerCase().endsWith('.md')
@@ -98,7 +97,7 @@ export default {
         $route() {
             if (this.$route.name !== 'LocalNotebook') return
             this.refreshPathParams()
-            this.initEditorBinding()
+            this.initEditorBinding(true)
         },
         target() {
             this.refreshPathParams()
@@ -122,12 +121,13 @@ export default {
             let filePath = decodeURI(this.$route.params.path || '')
             this.filePath = filePath ? filePath.replace(/\\/g, '/') : ''
         },
-        async initEditorBinding() {
+        async initEditorBinding(refreshMatchedTarget = false) {
             const currentFilePath = this.activeFilePath
             console.log(this.target, currentFilePath)
             if (!currentFilePath) return
             this.loading = true
             if (this.target?.filePath === currentFilePath) {
+                if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                 this.loading = false
                 this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
                 return
@@ -135,6 +135,7 @@ export default {
             let parentPath = currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
             let fileName = currentFilePath.split('/').pop()
             let res = await this.listLocalDirectoryChildren(parentPath)
+            if (currentFilePath !== this.activeFilePath) return
             let pages = res?.data || []
             let target = pages.find((item) => item.filePath === currentFilePath)
             if (!target) {
@@ -177,6 +178,13 @@ export default {
                 }
             }
             const res = await this.getNotebookDocument('local', currentFilePath)
+            if (currentFilePath !== this.activeFilePath) {
+                return {
+                    shouldStop: true,
+                    docInfo: {},
+                    contentType: 'fabulous_notebook'
+                }
+            }
             if (res.status !== 'success') {
                 this.$barWarning(this.local('Read File Failed'), {
                     status: 'warning'

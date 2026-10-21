@@ -1,8 +1,9 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { config as configSample } from '@/js/data_sample'
 
 import { getProxy } from '@/stores/proxyHolder'
+import { getInitialLanguage, isSupportedLanguage, saveLanguagePreference, updateDocumentLanguage } from '@/js/language'
 
 export const useDataStore = defineStore('data', () => {
     const proxy = getProxy()
@@ -12,9 +13,8 @@ export const useDataStore = defineStore('data', () => {
         configId: null,
         init_status: false,
         data_index: -1,
-        language: 'en',
+        language: getInitialLanguage(),
         autoSave: false,
-        lastLocalPath: '',
         editorExpandContent: false,
         editorSplitRatio: 0.5,
         editorShowNav: true,
@@ -27,7 +27,9 @@ export const useDataStore = defineStore('data', () => {
         aiOption: null,
         theme: 'light'
     })
+    const lastLocalPath = ref(localStorage.getItem('lastLocalPath') || '')
     const data_path = ref([])
+    watch(() => configState.value.language, updateDocumentLanguage, { immediate: true })
     const lock = ref({
         config: true,
         data_path: true,
@@ -588,6 +590,7 @@ export const useDataStore = defineStore('data', () => {
         if (!lock.value.config)
             return;
         let _config = JSON.parse(JSON.stringify(configSample));
+        _config.language = getInitialLanguage();
         // 远程配置获取 //
         let id = useUserStore().info.id;
         if (id) {
@@ -596,12 +599,14 @@ export const useDataStore = defineStore('data', () => {
                 if (res.code === 200) {
                     let target = res.data;
                     for (let key in _config) {
+                        if (key === 'language' && !isSupportedLanguage(target[key])) continue;
                         if (!Object.prototype.hasOwnProperty.call(target, key))
                             // 要用undefined比较好, 因为其他情况也有可能false.
                             continue;
                         else
                             _config[key] = target[key];
                     }
+                    saveLanguagePreference(target.language);
                 }
             })
                 .catch((err) => {
@@ -624,9 +629,16 @@ export const useDataStore = defineStore('data', () => {
     }
 
     async function reviseConfig(obj) {
+        let id = useUserStore().info.id;
+        if (!id) {
+            for (let key in obj) {
+                configState.value[key] = obj[key];
+            }
+            saveLanguagePreference(obj.language);
+            return;
+        }
         if (!lock.value.config)
             return;
-        let id = useUserStore().info.id;
         if (id) {
             let remoteTarget = {
                 ...configState.value,
@@ -640,6 +652,7 @@ export const useDataStore = defineStore('data', () => {
                     for (let key in obj) {
                         configState.value[key] = obj[key];
                     }
+                    saveLanguagePreference(obj.language);
                 }
             })
                 .catch((err) => {
@@ -649,9 +662,16 @@ export const useDataStore = defineStore('data', () => {
         }
     }
 
+    function setLastLocalPath(path) {
+        lastLocalPath.value = path || '';
+        if (lastLocalPath.value) localStorage.setItem('lastLocalPath', lastLocalPath.value);
+        else localStorage.removeItem('lastLocalPath');
+    }
+
     return {
         // state
         configState,
+        lastLocalPath,
         aiOptionList,
         data_path,
         lock,
@@ -681,6 +701,7 @@ export const useDataStore = defineStore('data', () => {
         getConfig,
         refreshDataInfo,
         reviseConfig,
+        setLastLocalPath,
         // getters
         currentDataPathItem,
         currentDataPathOwner,

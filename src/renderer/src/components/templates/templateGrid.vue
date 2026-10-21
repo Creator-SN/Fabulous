@@ -49,6 +49,7 @@
                     :model-value="computeContent(item.minContent)"
                     :placeholder="local('No content here ...')"
                     :editable="false"
+                    :extensions="customExtensions"
                     :theme="theme"
                     :editorOutSideBackground="theme == 'dark' ? 'rgba(47, 52, 55, 1)' : 'white'"
                     :mobileDisplayWidth="0"
@@ -80,6 +81,7 @@
 </template>
 
 <script>
+import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 import rightMenu from '@/components/general/rightMenu.vue'
 import { useAppConfig } from '@/stores/appConfig'
 import { useDataStore } from '@/stores/data'
@@ -116,6 +118,7 @@ export default {
     data() {
         return {
             templates: [],
+            customExtensions: [fileAttachment],
             defaults: {
                 standard: standardT,
                 standardWithTable: standardWithTableT,

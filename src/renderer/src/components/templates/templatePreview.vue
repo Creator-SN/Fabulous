@@ -37,6 +37,7 @@
 <script>
 import floatWindowBase from '../window/floatWindowBase.vue'
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
+import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 import { useAppConfig } from '@/stores/appConfig'
 import { useDataStore } from '@/stores/data'
 import { useTheme } from '@/stores/theme'
@@ -66,7 +67,7 @@ export default {
     data() {
         return {
             thisShow: this.show,
-            customExtensions: [pdfNote],
+            customExtensions: [pdfNote, fileAttachment],
             computedContent: {
                 type: 'doc',
                 content: []

@@ -12,7 +12,7 @@
             ref="editor_container"
             @container-scroll="handleContainerScroll"
         ></editor-container>
-        <loading v-show="loading || !currentDataPath" style="z-index: 2">
+        <loading v-show="loading || !userInfoReady" style="z-index: 2">
             <div class="central-box">
                 <fv-progress-ring
                     :loading="true"
@@ -31,7 +31,8 @@
 <script>
 import { useTheme } from '@/stores/theme'
 import { useAppConfig } from '@/stores/appConfig'
-import { useDataStore } from '@/stores/data'
+import { useCollectionStore } from '@/stores/collection'
+import { useUserStore } from '@/stores/user'
 import { useAcademicConfig } from '@/stores/academic.js'
 import { mapState, mapActions } from 'pinia'
 
@@ -49,14 +50,15 @@ export default {
     data() {
         return {
             path: '',
-            loading: false
+            tmpScrollTop: 0,
+            loading: false,
+            bindingRequestId: 0,
+            bindingUserId: undefined
         }
     },
     computed: {
         ...mapState(useTheme, ['theme', 'color']),
-        ...mapState(useDataStore, {
-            currentDataPath: (state) => state.currentDataPath
-        }),
+        ...mapState(useUserStore, { userInfo: 'info', userInfoReady: 'infoReady' }),
         ...mapState(useAppConfig, {
             local: (state) => state.local,
             editorMap: (state) => state.editor
@@ -85,6 +87,11 @@ export default {
         editorCache() {
             return this.currentEditor?.cache || false
         },
+        editorBindingKey() {
+            if (!['Academic', 'Template'].includes(this.$route.name) || !this.userInfoReady) return null
+            const path = decodeURI(this.$route.params.path || '').replace(/\\/g, '/')
+            return JSON.stringify([this.$route.name, path, this.userInfo.id ?? null])
+        },
         parsePath() {
             const segs = this.path.split('/').filter(Boolean) // 去除无效路径段
             if (segs.length < 2)
@@ -111,25 +118,27 @@ export default {
             return (
                 !this.editorCache ||
                 this.editorDsId !== this.parsePath.data_path ||
-                this.item.id !== this.parsePath.parentId
+                this.itemType !== (this.$route.name === 'Template' ? 'template' : 'item') ||
+                this.item?.id !== this.parsePath.parentId ||
+                !this.item?.pages?.some((page) => page.id === this.parsePath.targetId)
             )
         }
     },
-    watch: {
-        $route() {
-            if (this.$route.name !== 'Academic' && this.$route.name !== 'Template') return
-            this.initEditorBinding()
-        },
-        currentDataPath() {
-            this.initEditorBinding()
-        },
-        target() {
-            this.refreshPathParams()
-        }
+    beforeRouteLeave() {
+        this.tmpScrollTop = this.$refs.editor_container?.getScrollTop() ?? this.tmpScrollTop
     },
-    mounted() {
-        this.refreshPathParams()
-        this.initEditorBinding()
+    watch: {
+        editorBindingKey: {
+            immediate: true,
+            handler(key) {
+                if (!key) {
+                    this.bindingRequestId += 1
+                    this.loading = false
+                    return
+                }
+                this.initEditorBinding()
+            }
+        }
     },
     methods: {
         ...mapActions(useAppConfig, {
@@ -155,86 +164,130 @@ export default {
         },
         async initEditorBinding() {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
-            if (!this.currentDataPath) return
+            if (!this.editorBindingKey) return
+            this.refreshPathParams()
             if (!this.path) return
             if (!this.parsePath.valid) return
+            const requestId = ++this.bindingRequestId
+            const bindingKey = this.editorBindingKey
+            const identityChanged = this.bindingUserId !== this.userInfo.id
+            this.bindingUserId = this.userInfo.id
+            const isCurrent = () =>
+                requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
             this.loading = true
-            this.refreshPathParams()
-            const { name, data_path, parentId, targetId } = this.parsePath
-            if (this.target?.id === targetId) {
-                this.loading = false
-                this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
-                return
-            }
-            if (this.shouldReloadItem) {
-                let parentItem = {}
-                if (name === 'Academic') {
-                    await this.getItem(data_path, parentId).then((res) => {
-                        if (res.code === 200 || res.status === 'success') {
-                            parentItem = res.data || {}
-                        } else {
-                            this.$barWarning(res.message, {
-                                status: 'error'
+            try {
+                const { name, data_path, parentId, targetId } = this.parsePath
+                if (
+                    this.editorCache &&
+                    !identityChanged &&
+                    this.target?.id === targetId &&
+                    this.itemType === (name === 'Template' ? 'template' : 'item') &&
+                    this.item?.id === parentId &&
+                    this.editorDsId === data_path
+                ) {
+                    if (name === 'Academic' && targetId) {
+                        useCollectionStore()
+                            .recordRecent({
+                                kind: 'academic',
+                                sourceId: data_path,
+                                itemId: parentId,
+                                pageId: targetId
                             })
-                        }
+                            .catch((error) => console.error(error))
+                    }
+                    this.$nextTick(() => {
+                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
                     })
-                    let targetItem = parentItem.pages.find((item) => item.id === targetId) || {}
-                    this.reviseEditor({
-                        id: 'academic',
-                        dsId: data_path,
-                        type: 'item',
-                        item: {
-                            ...parentItem
-                        },
-                        target: {
-                            ...targetItem
-                        },
-                        scrollTop: 0,
-                        displayMode: 'note',
-                        cache: true
-                    })
-                } else {
-                    await this.getTemplateInfo(data_path).then((res) => {
-                        if (res.code === 200 || res.status === 'success') {
-                            parentItem = {
-                                id: parentId,
-                                name: this.local('Template'),
-                                pages: res.data || []
+                    return
+                }
+                if (identityChanged || this.shouldReloadItem) {
+                    let parentItem = {}
+                    if (name === 'Academic') {
+                        await this.getItem(data_path, parentId, targetId).then((res) => {
+                            if (!isCurrent()) return
+                            if (res.code === 200 || res.status === 'success') {
+                                parentItem = res.data || {}
+                            } else {
+                                this.$barWarning(res.message, {
+                                    status: 'error'
+                                })
                             }
-                        } else {
-                            this.$barWarning(res.message, {
-                                status: 'error'
-                            })
-                        }
-                    })
-                    let targetItem = parentItem.pages.find((item) => item.id === targetId) || {}
+                        })
+                        if (!isCurrent()) return
+                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || { id: targetId }
+                        this.reviseEditor({
+                            id: 'academic',
+                            dsId: data_path,
+                            type: 'item',
+                            item: {
+                                id: parentId,
+                                ...parentItem
+                            },
+                            target: {
+                                ...targetItem
+                            },
+                            scrollTop: 0,
+                            displayMode: 'note',
+                            cache: true
+                        })
+                    } else {
+                        await this.getTemplateInfo(data_path).then((res) => {
+                            if (!isCurrent()) return
+                            if (res.code === 200 || res.status === 'success') {
+                                parentItem = {
+                                    id: parentId,
+                                    name: this.local('Template'),
+                                    pages: res.data || []
+                                }
+                            } else {
+                                this.$barWarning(res.message, {
+                                    status: 'error'
+                                })
+                            }
+                        })
+                        if (!isCurrent()) return
+                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || {}
+                        this.reviseEditor({
+                            id: 'academic',
+                            dsId: data_path,
+                            type: 'template',
+                            item: {
+                                ...parentItem
+                            },
+                            target: {
+                                ...targetItem
+                            },
+                            scrollTop: 0,
+                            displayMode: 'note',
+                            cache: true
+                        })
+                    }
+                } else {
+                    let targetItem = this.item?.pages?.find((item) => item.id === targetId) || {}
                     this.reviseEditor({
                         id: 'academic',
                         dsId: data_path,
-                        type: 'template',
-                        item: {
-                            ...parentItem
-                        },
                         target: {
                             ...targetItem
                         },
-                        scrollTop: 0,
-                        displayMode: 'note',
-                        cache: true
+                        scrollTop: 0
                     })
                 }
-            } else {
-                let targetItem = this.item.pages.find((item) => item.id === targetId) || {}
-                this.reviseEditor({
-                    id: 'academic',
-                    dsId: data_path,
-                    target: {
-                        ...targetItem
-                    },
-                    scrollTop: 0
-                })
+                if (name === 'Academic' && targetId) {
+                    useCollectionStore()
+                        .recordRecent({
+                            kind: 'academic',
+                            sourceId: data_path,
+                            itemId: parentId,
+                            pageId: targetId
+                        })
+                        .catch((error) => console.error(error))
+                }
+            } catch (error) {
+                if (isCurrent()) console.error(error)
+            } finally {
+                if (isCurrent()) this.loading = false
             }
-            this.loading = false
         },
         async refreshContentTool() {
             if (
@@ -249,15 +302,46 @@ export default {
                     docInfo: {},
                     contentType: ''
                 }
+            const routeSegments = decodeURI(this.$route.params.path || '')
+                .replace(/\\/g, '/')
+                .split('/')
+                .filter(Boolean)
+            const routeTargetId = routeSegments[routeSegments.length - 1]
+            if (
+                !['Academic', 'Template'].includes(this.$route.name) ||
+                routeTargetId !== this.target.id ||
+                routeSegments[0] !== this.editorDsId ||
+                (this.itemType === 'item' && routeSegments[1] !== this.item?.id)
+            ) return { shouldStop: true, docInfo: {}, contentType: '' }
+            const requestContext = {
+                type: this.itemType,
+                targetId: this.target.id,
+                itemId: this.item?.id,
+                dataSourceId: this.editorDsId,
+                bindingKey: this.editorBindingKey,
+                userId: this.userInfo.id ?? null
+            }
             let res = null
-            if (this.itemType === 'item') {
+            if (requestContext.type === 'item') {
                 res = await this.getRemoteItemPageContent(
-                    this.editorDsId,
-                    this.item.id,
-                    this.target.id
+                    requestContext.dataSourceId,
+                    requestContext.itemId,
+                    requestContext.targetId
                 )
             } else {
-                res = await this.getRemoteTemplateContent(this.editorDsId, this.target.id)
+                res = await this.getRemoteTemplateContent(requestContext.dataSourceId, requestContext.targetId)
+            }
+            if (
+                this.itemType !== requestContext.type ||
+                this.target?.id !== requestContext.targetId ||
+                this.item?.id !== requestContext.itemId ||
+                this.editorDsId !== requestContext.dataSourceId ||
+                (this.userInfo.id ?? null) !== requestContext.userId ||
+                // Inactive KeepAlive views can finish loading their own resource into their own cache.
+                (this.editorBindingKey && this.editorBindingKey !== requestContext.bindingKey)
+            ) return { shouldStop: true, docInfo: {}, contentType: '' }
+            if (res?.code === 40300) {
+                return { shouldStop: true, readDenied: true, docInfo: {}, contentType: '' }
             }
             let docInfo = res.data
             let contentType = ''
@@ -379,7 +463,7 @@ export default {
                 displayMode: this.displayMode === 'pdf' ? 'both' : this.displayMode,
                 history: this.history
             })
-            let path = `${this.editorDsId}/${this.item.id}/${this.target.id}`
+            let path = `${this.editorDsId}/${item.id}/${page.id}`
             let url = `/academic/${encodeURI(path.replace(/\//g, '\\'))}`
             this.$Go(url)
         },
@@ -486,6 +570,7 @@ export default {
             this.$Go(url)
         },
         handleContainerScroll(e) {
+            if (!this.editorBindingKey) return
             this.tmpScrollTop = e?.el?.scrollTop || 0
         }
     }

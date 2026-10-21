@@ -4,6 +4,7 @@ import { getProxy } from '@/stores/proxyHolder'
 
 export const useUserStore = defineStore('user', () => {
     const proxy = getProxy()
+    const infoReady = ref(false)
 
     const lock = ref({
         avatarById: {},
@@ -26,15 +27,22 @@ export const useUserStore = defineStore('user', () => {
     // actions
     async function getInfo() {
         let token = localStorage.getItem('ApiToken');
-        if (!token) return;
+        if (!token) {
+            clearInfo();
+            return;
+        }
         await proxy.$api.UserController.getMyUserInfo()
             .then((res) => {
-                if (res.code === 200) {
+                if (res.code === 200 && localStorage.getItem('ApiToken') === token) {
                     Object.assign(info.value, res.data);
                 }
             })
             .catch((err) => {
                 console.log(err);
+            })
+            .finally(() => {
+                const currentToken = localStorage.getItem('ApiToken');
+                if (!currentToken || currentToken === token) infoReady.value = true;
             });
     }
 
@@ -55,12 +63,14 @@ export const useUserStore = defineStore('user', () => {
 
     function setInfo(newInfo) {
         Object.assign(info.value, newInfo);
+        infoReady.value = true;
     }
 
     function clearInfo() {
         info.value = {
             id: null
         };
+        infoReady.value = !localStorage.getItem('ApiToken');
     }
 
     function setAvatarCache({
@@ -103,6 +113,7 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         info,
+        infoReady,
         avatarCache,
         infoCache,
         getInfo,

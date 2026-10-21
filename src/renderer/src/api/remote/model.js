@@ -105,6 +105,30 @@ export class Body_uploadBinaryImage {
     file=undefined
     
 }
+export class Body_uploadFileResource {
+  
+    /**
+     *
+     * @param {String} file 
+     * @param {String} sha256 
+     */ 
+    constructor(file = undefined,sha256 = undefined){
+        this.file = file
+        this.sha256 = sha256
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    file=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sha256=undefined
+    
+}
 export class ConfigCreateOrUpdateRequest {
   
     /**
@@ -316,6 +340,100 @@ export class DataTemplateUpdateRequest {
     id=undefined
     
 }
+export class FavoriteFolderRequest {
+  
+    /**
+     *
+     * @param {String} name 
+     */ 
+    constructor(name = undefined){
+        this.name = name
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined
+    
+}
+export class FavoriteTargetRequest {
+  
+    /**
+     *
+     * @param {String} kind 
+     * @param {String} sourceId 
+     * @param {String} itemId 
+     * @param {Array} folderIds 
+     */ 
+    constructor(kind = undefined,sourceId = undefined,itemId = undefined,pageId = undefined,folderIds = undefined){
+        this.kind = kind
+        this.sourceId = sourceId
+        this.itemId = itemId
+        this.pageId = pageId
+        this.folderIds = folderIds
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    kind=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    itemId=undefined   
+    /**
+     * 
+     * @type {Array}
+     */
+    folderIds=undefined
+    
+}
+export class FileCheckRequest {
+  
+    /**
+     *
+     * @param {String} sha256 
+     * @param {Number} size 
+     * @param {String} name 
+     * @param {String} contentType 
+     */ 
+    constructor(sha256 = undefined,size = undefined,name = undefined,contentType = undefined){
+        this.sha256 = sha256
+        this.size = size
+        this.name = name
+        this.contentType = contentType
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    sha256=undefined   
+    /**
+     * 
+     * @type {Number}
+     */
+    size=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    name=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    contentType=undefined
+    
+}
 export class GroupCreateRequest {
   
     /**
@@ -458,6 +576,38 @@ export class PartitionUpdateRequest {
     id=undefined
     
 }
+export class RecentViewRequest {
+  
+    /**
+     *
+     * @param {String} kind 
+     * @param {String} sourceId 
+     * @param {String} itemId 
+     */ 
+    constructor(kind = undefined,sourceId = undefined,itemId = undefined,pageId = undefined){
+        this.kind = kind
+        this.sourceId = sourceId
+        this.itemId = itemId
+        this.pageId = pageId
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    kind=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    itemId=undefined
+    
+}
 export class RoleRequest {
   
     /**
@@ -474,6 +624,76 @@ export class RoleRequest {
      * @type {String}
      */
     name=undefined
+    
+}
+export class ShareTargetRequest {
+  
+    /**
+     *
+     * @param {String} kind 
+     * @param {String} sourceId 
+     * @param {String} itemId 
+     * @param {String} scope 
+     * @param {String} permission 
+     */ 
+    constructor(kind = undefined,sourceId = undefined,itemId = undefined,pageId = undefined,scope = undefined,permission = undefined){
+        this.kind = kind
+        this.sourceId = sourceId
+        this.itemId = itemId
+        this.pageId = pageId
+        this.scope = scope
+        this.permission = permission
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    kind=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    sourceId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    itemId=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    scope=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    permission=undefined
+    
+}
+export class ShareTargetUpdateRequest {
+  
+    /**
+     *
+     * @param {String} scope 
+     * @param {String} permission 
+     */ 
+    constructor(scope = undefined,permission = undefined){
+        this.scope = scope
+        this.permission = permission
+    }
+       
+    /**
+     * 
+     * @type {String}
+     */
+    scope=undefined   
+    /**
+     * 
+     * @type {String}
+     */
+    permission=undefined
     
 }
 export class SourcePathPermissionUpsertRequest {

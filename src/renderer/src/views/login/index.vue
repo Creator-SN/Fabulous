@@ -68,11 +68,18 @@ export default {
                 name: 'Login',
                 params: {
                     block
-                }
+                },
+                query: this.$route.query
             })
         },
         handleFinished() {
-            this.$router.push('/')
+            const redirect = this.$route.query.redirect
+            const target = typeof redirect === 'string' &&
+                redirect.startsWith('/') && !redirect.startsWith('//') &&
+                !redirect.includes('\\') && !redirect.startsWith('/login')
+                ? redirect
+                : '/'
+            this.$router.replace(target)
         }
     }
 }

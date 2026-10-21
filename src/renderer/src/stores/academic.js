@@ -228,9 +228,9 @@ export const useAcademicConfig = defineStore('academicConfig', () => {
         }, { code: 423, status: 'error', data: 0 })
     }
 
-    async function getItem(uri, itemId) {
+    async function getItem(uri, itemId, pageId) {
         if (!itemId) return { code: 400, data: null }
-        return await proxy.$api.AcademicController.getItem(uri, itemId)
+        return await proxy.$api.AcademicController.getItem(uri, itemId, pageId)
             .then((res) => handleResponse(res))
             .catch((err) => handleError(err))
     }

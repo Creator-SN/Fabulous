@@ -124,8 +124,9 @@
         <div v-show="!path" class="local-empty-block">
             <fv-button
                 theme="dark"
+                icon="Folder"
                 background="rgba(255, 180, 0, 1)"
-                :is-box-shadow="true"
+                :border-radius="8"
                 style="width: calc(100% - 50px)"
                 @click="chooseFolder"
             >
@@ -308,7 +309,7 @@ export default {
             editorMap: (state) => state.editor
         }),
         ...mapState(useDataStore, {
-            lastLocalPath: (state) => state.configState.lastLocalPath
+            lastLocalPath: (state) => state.lastLocalPath
         }),
         currentEditor() {
             return this.editorMap?.local || null
@@ -340,7 +341,7 @@ export default {
             tryGetScrollTop: 'tryGetScrollTop'
         }),
         ...mapActions(useDataStore, {
-            reviseConfig: 'reviseConfig'
+            setLastLocalPath: 'setLastLocalPath'
         }),
         ...mapActions(useLocalNotebookConfig, [
             'setRootPath',
@@ -494,9 +495,7 @@ export default {
                 return
             }
             this.path = this.normalizePath(res.data)
-            await this.reviseConfig({
-                lastLocalPath: this.path
-            })
+            this.setLastLocalPath(this.path)
             await this.resetAndWatch()
         },
         async chooseFile() {
@@ -776,9 +775,7 @@ export default {
                 this.updateItemPath(target, nextPath)
                 if (target.isDir && this.comparePath(previousPath, this.path)) {
                     this.path = nextPath
-                    await this.reviseConfig({
-                        lastLocalPath: this.path
-                    })
+                    this.setLastLocalPath(this.path)
                     delete target.originName
                     await this.resetAndWatch()
                     return
@@ -943,6 +940,7 @@ export default {
         position: relative;
         width: 100%;
         height: 50px;
+        flex: 1;
     }
 
     .tree-view-custom-item {
@@ -955,6 +953,10 @@ export default {
 
         &.dark {
             color: whitesmoke;
+
+            .tree-view-custom-label {
+                color: whitesmoke;
+            }
         }
 
         .tree-view-item-left-block {

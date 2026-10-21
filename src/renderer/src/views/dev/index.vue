@@ -91,6 +91,7 @@ import { mapState } from 'pinia'
 import { useTheme } from '@/stores/theme'
 import { useDataStore } from '@/stores/data'
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
+import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 
 const createDemoDoc = () => ({
     type: 'doc',
@@ -143,7 +144,7 @@ export default {
     name: 'DevPowerEditorPage',
     data() {
         return {
-            customExtensions: [pdfNote],
+            customExtensions: [pdfNote, fileAttachment],
             editorContent: createDemoDoc(),
             jsonPreview: '',
             pdfState: {

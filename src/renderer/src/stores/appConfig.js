@@ -14,6 +14,7 @@ const createEditorPrototype = () => ({
     scrollTop: 0,
     displayMode: 'note',
     unsave: false,
+    savePending: false,
     editorContent: {
         title: null,
         description: null,
@@ -85,6 +86,9 @@ export const useAppConfig = defineStore('appConfig', () => {
         if (!id) return null
         if (!editor.value[id]) {
             editor.value[id] = createEditorPrototype()
+        }
+        if (!Object.prototype.hasOwnProperty.call(editor.value[id], 'savePending')) {
+            editor.value[id].savePending = false
         }
         return editor.value[id]
     }

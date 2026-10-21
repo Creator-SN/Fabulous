@@ -757,7 +757,7 @@ export default {
                     item: item,
                     target: item.pages.length > 0 ? item.pages[0] : null,
                     scrollTop: 0,
-                    displayMode: 'both',
+                    displayMode: 'pdf',
                     history: []
                 })
                 let path = `${this.currentDataPath}/${item.id}/${item.pages.length > 0 ? item.pages[0].id : 'no-page'}`

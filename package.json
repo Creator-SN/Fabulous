@@ -82,7 +82,7 @@
         "release:beta": "npm version prerelease --preid beta"
     },
     "dependencies": {
-        "@creatorsn/powereditor3": "^0.4.7",
+        "@creatorsn/powereditor3": "^0.5.1",
         "@creatorsn/vfluent3": "^0.3.105",
         "@electron-toolkit/preload": "^3.0.2",
         "@electron-toolkit/utils": "^4.0.0",
@@ -95,6 +95,7 @@
         "diff": "^5.1.0",
         "fs-extra": "^11.3.1",
         "gsap": "^3.13.0",
+        "hash-wasm": "4.12.0",
         "lowdb": "^1.0.0",
         "office-ui-fabric-core": "^11.1.0",
         "onecolor": "^4.1.0",

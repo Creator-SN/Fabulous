@@ -9,6 +9,28 @@
                 @choose-item="handleSearchNotebookChoose"
             ></search-box>
         </div>
+        <div class="remote-tree-view-sections">
+            <fv-button
+                :theme="theme"
+                icon="Recent"
+                background="transparent"
+                border-color="transparent"
+                :border-radius="30"
+                font-size="12"
+                foreground="rgba(133, 148, 211, 1)"
+                font-weight="bold"
+                :reveal-border-color="['rgba(133, 148, 211, 1)']"
+                style="height: 25px;"
+                @click="openRecentCollection"
+            >
+                {{ local('Recent') }}
+            </fv-button>
+        </div>
+        <recent-list
+            :theme="theme"
+            :local="local"
+            :Go="Go"
+        ></recent-list>
         <div class="navigation-view-mode-block" :class="[{ dark: theme === 'dark' }]">
             <div class="navigation-view-mode-left-block">
                 <img draggable="false" :src="img.notebook" alt="" class="icon-img" />
@@ -46,7 +68,7 @@
             :foreground="'rgba(255, 180, 0, 0.8)'"
             :item-height="35"
             :expandClickMode="'normal'"
-            style="width: 100%; height: 100%; padding-left: 5px; overflow: overlay"
+            style="width: 100%; height: 100%; flex: 1; padding-left: 5px; overflow: overlay"
             @click="treeItemClick"
         >
             <template v-slot:default="x">
@@ -222,11 +244,13 @@ import { useDataStore } from '@/stores/data'
 import { useTheme } from '@/stores/theme'
 import { useNotebookConfig } from '@/stores/notebook'
 import { mapState, mapActions } from 'pinia'
+import { useCollectionStore } from '@/stores/collection'
 
 import rightMenu from '@/components/general/rightMenu.vue'
 import permissionPanel from './permissionPanel.vue'
 import deleteConfirmPanel from './deleteConfirmPanel.vue'
 import searchBox from './searchBox.vue'
+import recentList from './recentList.vue'
 
 import { fabulous_notebook } from '@/js/data_sample.js'
 
@@ -240,10 +264,12 @@ import markdownImg from '@/assets/nav/markdown.svg'
 import newFolderImg from '@/assets/nav/newFolder.svg'
 import refreshImg from '@/assets/nav/refresh.svg'
 import pasteImg from '@/assets/nav/paste.svg'
+import favorImg from '@/assets/nav/favor.svg'
+import favorEmptyImg from '@/assets/nav/favor_empty.svg'
 
 export default {
     name: 'remote-tree-view',
-    components: { rightMenu, permissionPanel, deleteConfirmPanel, searchBox },
+    components: { rightMenu, permissionPanel, deleteConfirmPanel, searchBox, recentList },
     props: {
         modelValue: {
             default: ''
@@ -280,6 +306,13 @@ export default {
                     func: () => this.rootPaste(),
                     disabled: () => this.rootPasteDisabled(),
                     show: () => true
+                },
+                {
+                    name: () => this.local('Collections and Sharing'),
+                    img: 'favor',
+                    func: () => this.Go('/collections'),
+                    disabled: () => !this.path,
+                    show: () => true
                 }
             ],
             img: {
@@ -292,7 +325,9 @@ export default {
                 markdown: markdownImg,
                 newFolder: newFolderImg,
                 refresh: refreshImg,
-                paste: pasteImg
+                paste: pasteImg,
+                favor: favorImg,
+                favorEmpty: favorEmptyImg
             },
             FLAT: [],
             copyList: [],
@@ -370,6 +405,10 @@ export default {
         window.addEventListener('click', this.whiteClickClearTmp)
     },
     methods: {
+        openRecentCollection() {
+            useCollectionStore().setActiveSection('recent')
+            this.$Go('/collections')
+        },
         ...mapActions(useAppConfig, {
             reviseEditor: 'reviseEditor',
             tryGetScrollTop: 'tryGetScrollTop'
@@ -934,6 +973,8 @@ export default {
 
             if (res?.code === 200) {
                 this.removeItemFromCollections(target.filePath)
+            } else if (res?.code === 40300) {
+                this.$barWarning(this.local('No Permission to Delete'), { status: 'warning' })
             }
             this.lock.remove = true
         },
@@ -1059,6 +1100,14 @@ export default {
         padding: 0px 20px;
     }
 
+    .remote-tree-view-sections {
+        width: 100%;
+        padding: 4px 20px 8px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+    }
+
     .tree-view-custom-item {
         position: relative;
         width: 100%;
@@ -1069,6 +1118,10 @@ export default {
 
         &.dark {
             color: whitesmoke;
+
+            .tree-view-custom-label {
+                color: whitesmoke;
+            }
         }
 
         .tree-view-item-left-block {
