@@ -6,7 +6,6 @@ export const config = {
     language: "en",
     autoSave: false,
     readonly: false,
-    lastLocalPath: "",
     editorExpandContent: false,
     editorSplitRatio: 0.5,
     editorShowNav: true,

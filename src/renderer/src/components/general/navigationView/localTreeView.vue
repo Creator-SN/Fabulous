@@ -1058,6 +1058,7 @@ export default {
         position: relative;
         width: 100%;
         height: 50px;
+        flex: 1;
     }
 
     .tree-view-custom-item {

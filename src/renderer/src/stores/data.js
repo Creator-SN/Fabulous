@@ -15,7 +15,6 @@ export const useDataStore = defineStore('data', () => {
         data_index: -1,
         language: getInitialLanguage(),
         autoSave: false,
-        lastLocalPath: '',
         editorExpandContent: false,
         editorSplitRatio: 0.5,
         editorShowNav: true,
@@ -28,6 +27,7 @@ export const useDataStore = defineStore('data', () => {
         aiOption: null,
         theme: 'light'
     })
+    const lastLocalPath = ref(localStorage.getItem('lastLocalPath') || '')
     const data_path = ref([])
     watch(() => configState.value.language, updateDocumentLanguage, { immediate: true })
     const lock = ref({
@@ -662,9 +662,16 @@ export const useDataStore = defineStore('data', () => {
         }
     }
 
+    function setLastLocalPath(path) {
+        lastLocalPath.value = path || '';
+        if (lastLocalPath.value) localStorage.setItem('lastLocalPath', lastLocalPath.value);
+        else localStorage.removeItem('lastLocalPath');
+    }
+
     return {
         // state
         configState,
+        lastLocalPath,
         aiOptionList,
         data_path,
         lock,
@@ -694,6 +701,7 @@ export const useDataStore = defineStore('data', () => {
         getConfig,
         refreshDataInfo,
         reviseConfig,
+        setLastLocalPath,
         // getters
         currentDataPathItem,
         currentDataPathOwner,

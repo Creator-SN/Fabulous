@@ -278,9 +278,7 @@ export default {
             if (this.windowWidth > this.mobileDisplay) this.expand = true
         },
         localPath() {
-            this.reviseConfig({
-                lastLocalPath: this.localPath
-            })
+            this.setLastLocalPath(this.localPath)
         },
         lastLocalPath() {
             this.localPath = this.lastLocalPath
@@ -293,7 +291,7 @@ export default {
         ...mapState(useDataStore, {
             dataPathLock: (state) => state.lock.data_path,
             language: (state) => state.configState.language,
-            lastLocalPath: (state) => state.configState.lastLocalPath,
+            lastLocalPath: (state) => state.lastLocalPath,
             activeSystemMode: (state) => state.configState.activeSystemMode,
             watchAllExtensions: (state) => state.configState.watchAllExtensions,
             currentDataPath: (state) => state.currentDataPath,
@@ -363,7 +361,8 @@ export default {
             setFullScreen: 'setFullScreen'
         }),
         ...mapActions(useDataStore, {
-            reviseConfig: 'reviseConfig'
+            reviseConfig: 'reviseConfig',
+            setLastLocalPath: 'setLastLocalPath'
         }),
         switchDisplay(event) {
             this.menuDisplayMode = event
