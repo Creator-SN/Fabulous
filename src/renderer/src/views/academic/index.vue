@@ -50,6 +50,7 @@ export default {
     data() {
         return {
             path: '',
+            tmpScrollTop: 0,
             loading: false,
             bindingRequestId: 0,
             bindingUserId: undefined
@@ -123,6 +124,9 @@ export default {
             )
         }
     },
+    beforeRouteLeave() {
+        this.tmpScrollTop = this.$refs.editor_container?.getScrollTop() ?? this.tmpScrollTop
+    },
     watch: {
         editorBindingKey: {
             immediate: true,
@@ -132,7 +136,7 @@ export default {
                     this.loading = false
                     return
                 }
-                this.initEditorBinding(true)
+                this.initEditorBinding()
             }
         }
     },
@@ -158,7 +162,7 @@ export default {
             if (!path) return
             this.path = path.replace(/\\/g, '/')
         },
-        async initEditorBinding(refreshMatchedTarget = false) {
+        async initEditorBinding() {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
             if (!this.editorBindingKey) return
             this.refreshPathParams()
@@ -174,13 +178,13 @@ export default {
             try {
                 const { name, data_path, parentId, targetId } = this.parsePath
                 if (
+                    this.editorCache &&
                     !identityChanged &&
                     this.target?.id === targetId &&
                     this.itemType === (name === 'Template' ? 'template' : 'item') &&
                     this.item?.id === parentId &&
                     this.editorDsId === data_path
                 ) {
-                    if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                     if (name === 'Academic' && targetId) {
                         useCollectionStore()
                             .recordRecent({
@@ -191,7 +195,9 @@ export default {
                             })
                             .catch((error) => console.error(error))
                     }
-                    this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
+                    this.$nextTick(() => {
+                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
+                    })
                     return
                 }
                 if (identityChanged || this.shouldReloadItem) {
@@ -312,7 +318,8 @@ export default {
                 targetId: this.target.id,
                 itemId: this.item?.id,
                 dataSourceId: this.editorDsId,
-                routePath: this.$route.fullPath
+                bindingKey: this.editorBindingKey,
+                userId: this.userInfo.id ?? null
             }
             let res = null
             if (requestContext.type === 'item') {
@@ -329,7 +336,9 @@ export default {
                 this.target?.id !== requestContext.targetId ||
                 this.item?.id !== requestContext.itemId ||
                 this.editorDsId !== requestContext.dataSourceId ||
-                this.$route.fullPath !== requestContext.routePath
+                (this.userInfo.id ?? null) !== requestContext.userId ||
+                // Inactive KeepAlive views can finish loading their own resource into their own cache.
+                (this.editorBindingKey && this.editorBindingKey !== requestContext.bindingKey)
             ) return { shouldStop: true, docInfo: {}, contentType: '' }
             if (res?.code === 40300) {
                 return { shouldStop: true, readDenied: true, docInfo: {}, contentType: '' }
@@ -561,6 +570,7 @@ export default {
             this.$Go(url)
         },
         handleContainerScroll(e) {
+            if (!this.editorBindingKey) return
             this.tmpScrollTop = e?.el?.scrollTop || 0
         }
     }

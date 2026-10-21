@@ -444,9 +444,6 @@ export default {
         }
     },
     watch: {
-        $route() {
-            this.toggleUnsave(false)
-        },
         displayMode: {
             handler(newVal, oldVal) {
                 if (!oldVal || oldVal === 'pdf') {
@@ -918,7 +915,7 @@ export default {
                 this.docInfo = docInfo
                 this.contentType = contentType
                 try {
-                    if (this.$refs.editor)
+                    if (this.visible && this.$refs.editor)
                         this.getEditor().editor().chain().focus().setTextSelection(0).run()
                 } catch (e) {}
             } catch (error) {

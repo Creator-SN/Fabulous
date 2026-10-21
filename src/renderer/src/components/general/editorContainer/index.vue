@@ -641,7 +641,7 @@ export default {
         },
         getScrollTop() {
             let editorContent = this.$el.querySelectorAll('.tip-tap-editor-container')[0]
-            return editorContent.scrollTop ? editorContent.scrollTop : 0
+            return editorContent?.scrollTop || 0
         },
         scrollToTop(...args) {
             this.$refs.editor_block.scrollToTop(...args)

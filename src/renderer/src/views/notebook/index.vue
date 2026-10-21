@@ -128,6 +128,9 @@ export default {
             )
         }
     },
+    beforeRouteLeave() {
+        this.tmpScrollTop = this.$refs.editor_container?.getScrollTop() ?? this.tmpScrollTop
+    },
     watch: {
         editorBindingKey: {
             immediate: true,
@@ -137,7 +140,7 @@ export default {
                     this.loading = false
                     return
                 }
-                this.initEditorBinding(true)
+                this.initEditorBinding()
             }
         }
     },
@@ -157,24 +160,25 @@ export default {
             if (this.$route.path.startsWith('/local_notebook/')) this.isRemote = false
             else this.isRemote = true
         },
-        refreshPathParams() {
+        refreshPathParams(forceRemotePath = false) {
             // 1. 解析路由参数
             let path = decodeURI(this.$route.params.path || '')
             if (!path) return
             const normalizedPath = path.replace(/\\/g, '/')
+            if (this.path === normalizedPath && !forceRemotePath) return
             this.path = normalizedPath
             this.getRemotePath()
         },
-        async initEditorBinding(refreshMatchedTarget = false) {
+        async initEditorBinding() {
             // 是否更新Editor状态, 此举若修改target则会触发EditorBlock内容更新, 内容更新会调用refreshContentTool
             if (!this.editorBindingKey) return
+            const identityChanged = this.bindingUserId !== this.userInfo.id
             this.refreshRemote()
-            this.refreshPathParams()
+            this.refreshPathParams(identityChanged)
             if (!this.path) return
             if (!this.parsePath.valid) return
             const requestId = ++this.bindingRequestId
             const bindingKey = this.editorBindingKey
-            const identityChanged = this.bindingUserId !== this.userInfo.id
             this.bindingUserId = this.userInfo.id
             const isCurrent = () =>
                 requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
@@ -189,13 +193,14 @@ export default {
                     this.item?.id === parentId &&
                     this.editorDsId === data_path
                 ) {
-                    if (refreshMatchedTarget) this.$refs.editor_container?.refreshContent()
                     if (this.isRemote && targetId) {
                         useCollectionStore()
                             .recordRecent({ kind: 'notebook', sourceId: data_path, itemId: targetId })
                             .catch((error) => console.error(error))
                     }
-                    this.$refs.editor_container.scrollToTop(this.tmpScrollTop)
+                    this.$nextTick(() => {
+                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
+                    })
                     return
                 }
                 if (identityChanged || this.shouldReloadItem) {
@@ -316,7 +321,8 @@ export default {
                 filePath: this.target.filePath,
                 targetId: this.target.id,
                 isRemote: this.isRemote,
-                routePath: this.$route.fullPath
+                bindingKey: this.editorBindingKey,
+                userId: this.userInfo.id ?? null
             }
             const res = await this.getNotebookDocument(
                 requestContext.dataSourceId,
@@ -332,7 +338,9 @@ export default {
                 this.target?.filePath !== requestContext.filePath ||
                 this.target?.id !== requestContext.targetId ||
                 this.isRemote !== requestContext.isRemote ||
-                this.$route.fullPath !== requestContext.routePath
+                (this.userInfo.id ?? null) !== requestContext.userId ||
+                // Inactive KeepAlive views can finish loading their own resource into their own cache.
+                (this.editorBindingKey && this.editorBindingKey !== requestContext.bindingKey)
             ) {
                 return {
                     shouldStop: true,
@@ -559,6 +567,7 @@ export default {
             this.$Go(url)
         },
         handleContainerScroll(e) {
+            if (!this.editorBindingKey) return
             this.tmpScrollTop = e?.el?.scrollTop || 0
         }
     }
