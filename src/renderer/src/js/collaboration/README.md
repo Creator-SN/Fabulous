@@ -541,7 +541,7 @@ seedCollaborationBaseline(attempt = 0, body = null) {
 
 ```js
 startCollaboration() {
-    if (!import.meta.env.DEV || !this.isRemote || !this.target?.id ||
+    if (!this.isRemote || !this.target?.id ||
         !['notebook', 'item'].includes(this.itemType)) return
 
     const resourceType = this.itemType === 'notebook' ? 'notebook' : 'page'
@@ -753,7 +753,7 @@ warnOnCollabUnload(event) {
 - **`flush()` 返回 `true` 不等于保存完成。** 它只表明消息已交给 WebSocket；`ack` 之后才会清除待确认记录。
 - **建立基线与普通保存不能混用。** `publishBaseline()` 会清空本地待发和待确认更新，再发送当前 Y.Doc 状态，因此只能在确实需要建基线时调用。
 - **协同模式的正文来源是 Y.Doc。** `collaborationSnapshot(content)` 在协同模式下忽略 `content` 形参，直接从 Y.XmlFragment 取正文。
-- **这套协同目前只在开发模式启用。** `startCollaboration()` 使用 `import.meta.env.DEV` 作为启动条件。
+- **远程协同在开发和生产构建中均启用。** `resourceKey()` 检查登录状态、资源 ID 和资源类型；生产环境还需代理正确转发 `/api/collaboration/ws/` 的 WebSocket 连接。
 - **文档反映实现，不替实现兜底。** 例如断线后的持久化、重复提交去重、历史写入时机，要以服务端协议及实际联调结果为准。
 
 ## 六、后端持久化与 history 聚合（2026-10 更新）

@@ -24,7 +24,6 @@ export const useCollaborationStore = defineStore('collaboration', {
             const target = editor?.target
             if (
                 (isRemote && !localStorage.getItem('ApiToken')) ||
-                (isRemote && !import.meta.env.DEV) ||
                 (!isRemote && !target?.filePath?.toLowerCase().endsWith('.fbn')) ||
                 !target?.id ||
                 !['notebook', 'item'].includes(editor?.type)
