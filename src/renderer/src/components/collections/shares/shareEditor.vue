@@ -118,9 +118,12 @@ export default {
             ]
         },
         magicLink() {
-            return this.share
-                ? `${window.location.origin}${window.location.pathname}#/magic?key=${encodeURIComponent(this.share.key)}`
-                : ''
+            if (!this.share) return ''
+            const baseUrl =
+                window.location.protocol === 'file:'
+                    ? `${new URL(this.$remote_server).origin}/`
+                    : `${window.location.origin}${window.location.pathname}`
+            return `${baseUrl}#/magic?key=${encodeURIComponent(this.share.key)}`
         }
     },
     mounted() {

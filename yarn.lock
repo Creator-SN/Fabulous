@@ -163,10 +163,10 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.16.0.tgz#130eff69a232f29fb4e2b3f8ebbb0b3e0adf5a36"
   integrity sha512-FWa0sPlqYGJgpTs6OxBRcL/AW4JT0OIO+W1ajerluoTVh8CV0B7XM1qsNCRgnkSCkRCgOICKHRQlY17jrsm0+Q==
 
-"@creatorsn/powereditor3@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.5.1.tgz#ad515eefd56a7acd1eafa1f16716ea8bb86c23e9"
-  integrity sha512-dfM2o9gnXnw4b/JGpvaDaLOBUhDJVgBLx2Fs4yGXyTYun7aIH6H4OUmv/jkancRfubOTlZL5w1p43e9FRgIYQQ==
+"@creatorsn/powereditor3@^0.5.5":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.5.6.tgz#94c14f8124beaafa3cb3df183403d0dfed4cafc5"
+  integrity sha512-ghkNcqJZGL8vpWGsyeJDh5SRFWB97seXs37B6zJW8FzPaC0qXAcUFjbCf+ZFl8FWhzL9VLIsHMz8lDjqZLOeBg==
   dependencies:
     "@creatorsn/vfluent3" "^0.3.90"
     "@floating-ui/dom" "^1.0.0"
