@@ -389,7 +389,9 @@ export default {
             ],
             sortDesc: 1,
             editable: false,
-            pid: null,
+            pid: this.listMode === 'partition' && this.$route.name === 'Partition'
+                ? this.$route.params.id || null
+                : null,
             partitionInfo: {
                 id: '',
                 name: ''
@@ -444,7 +446,7 @@ export default {
         },
         $route() {
             if (this.listMode === 'all') this.pid = null
-            else if (this.$route.params.id) {
+            else if (this.$route.name === 'Partition' && this.$route.params.id) {
                 this.pid = this.$route.params.id
             }
         },

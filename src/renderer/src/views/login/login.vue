@@ -1,111 +1,146 @@
 <template>
-    <div class="login-block">
-        <transition name="scale-up-to-up">
+    <div class="auth-block">
+        <div class="auth-card">
             <fv-progress-bar
                 v-show="!lock.login"
                 :loading="true"
                 :foreground="color"
-                style="position: absolute; left: 0px; top: 0px; width: 100%"
+                class="auth-progress"
             ></fv-progress-bar>
-        </transition>
-        <div class="main-block">
-            <div class="s1">
-                <img draggable="false" class="logo-text" src="@/assets/logo.svg" alt="" />
-                <p v-show="step === 0" class="main-title">
-                    {{ local(`Login`) }}
-                </p>
+            <img draggable="false" class="auth-logo" src="@/assets/logo.svg" alt="Fab" />
+            <h1 class="auth-title">{{ local(step === 0 ? 'Login' : 'Verify') }}</h1>
+            <div v-if="step === 0" class="auth-fields">
                 <fv-text-box
-                    v-show="step === 0"
                     v-model="user.id"
-                    :placeholder="local(`Email`)"
-                    borderWidth="2"
-                    :revealBorder="true"
-                    background="whitesmoke"
-                    :border-radius="6"
+                    :placeholder="local('Email')"
+                    type="email"
+                    autocomplete="username"
+                    :aria-label="local('Email')"
                     :theme="theme"
-                    style="
-                        width: 100%;
-                        max-width: 375px;
-                        height: 40px;
-                        margin-top: 45px;
-                        flex-shrink: 0;
-                    "
+                    background="var(--auth-input)"
+                    border-radius="6"
+                    :reveal-border="true"
+                    focus-border-color="#958df1"
+                    :reveal-border-gradient-list="['#958df1', '#b79bef', '#b8c7fa']"
+                    style="width: 100%; height: 38px"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-text-box
-                    v-show="step === 0"
                     v-model="user.password"
-                    :placeholder="local(`Password`)"
+                    :placeholder="local('Password')"
                     type="password"
-                    borderWidth="2"
-                    :revealBorder="true"
-                    background="whitesmoke"
-                    :border-radius="6"
+                    autocomplete="current-password"
+                    :aria-label="local('Password')"
                     :theme="theme"
-                    style="
-                        width: 100%;
-                        max-width: 375px;
-                        height: 40px;
-                        margin-top: 15px;
-                        flex-shrink: 0;
-                    "
+                    background="var(--auth-input)"
+                    border-radius="6"
+                    :reveal-border="true"
+                    focus-border-color="#958df1"
+                    :reveal-border-gradient-list="['#958df1', '#b79bef', '#b8c7fa']"
+                    style="width: 100%; height: 38px"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-button
-                    v-show="step === 0"
-                    :background="color"
-                    theme="dark"
-                    borderRadius="6"
-                    fontSize="12"
-                    fontWeight="600"
+                    background="linear-gradient(100deg, #7673d5, #a578bc, #a578bc)"
+                    foreground="#ffffff"
+                    border-color="#c3afe8"
+                    border-radius="28"
+                    :reveal-border-color="true"
+                    :reveal-border-gradient-list="['#9563df', '#ad7cde', '#c495dc', '#b8c7fa']"
+                    :reveal-background-gradient-list="[
+                        'rgba(210, 193, 250, 0.38)',
+                        'rgba(210, 193, 250, 0.18)',
+                        'rgba(143, 97, 231, 0.12)'
+                    ]"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0"
+                    style="width: 100%; height: 37px"
+                    font-size="13"
+                    font-weight="normal"
                     :disabled="!lock.login || !user.id || !user.password"
                     @click="handleLogin()"
-                    >{{ local(`Continue`) }}</fv-button
+                    >{{ local('Login') }}</fv-button
                 >
-                <p v-show="step === 1" class="main-title">
-                    {{ local(`Verify`) }}
-                </p>
-                <div v-show="step === 1" class="verify-id-block">
-                    <i class="block-btn ms-Icon ms-Icon--ChevronLeft20" @click="step = 0"></i>
-                    <p class="verify-id-span">{{ user.id }}</p>
+            </div>
+            <div v-else class="auth-fields">
+                <div class="verify-id-block">
+                    <button
+                        type="button"
+                        class="auth-back"
+                        :aria-label="local('Email')"
+                        @click="step = 0"
+                    >
+                        <i class="ms-Icon ms-Icon--ChevronLeft20" aria-hidden="true"></i>
+                    </button>
+                    <span>{{ user.id }}</span>
                 </div>
-                <fv-VerifyBox
-                    v-show="step === 1"
+                <fv-text-box
                     v-model="verifyCode"
-                    :length="6"
+                    :placeholder="local('Verification Code')"
+                    :aria-label="local('Verification Code')"
+                    inputmode="numeric"
+                    maxlength="6"
                     :disabled="!lock.login"
                     :theme="theme"
-                    style="width: 100%; flex-shrink: 0"
-                    @confirm="handleLogin"
-                ></fv-VerifyBox>
+                    background="var(--auth-input)"
+                    border-radius="6"
+                    :reveal-border="true"
+                    focus-border-color="#958df1"
+                    :reveal-border-gradient-list="['#958df1', '#b79bef', '#b8c7fa']"
+                    style="width: 100%; height: 38px"
+                    @keyup="handleEnter"
+                ></fv-text-box>
                 <fv-button
-                    v-show="step === 1"
-                    :background="color"
-                    theme="dark"
-                    borderRadius="6"
-                    fontSize="12"
-                    fontWeight="600"
+                    background="linear-gradient(100deg, #7673d5, #a578bc, #a578bc)"
+                    foreground="#ffffff"
+                    border-color="#c3afe8"
+                    border-radius="28"
+                    :reveal-border-color="true"
+                    :reveal-border-gradient-list="['#9563df', '#ad7cde', '#c495dc', '#b8c7fa']"
+                    :reveal-background-gradient-list="[
+                        'rgba(210, 193, 250, 0.38)',
+                        'rgba(210, 193, 250, 0.18)',
+                        'rgba(143, 97, 231, 0.12)'
+                    ]"
                     :is-box-shadow="true"
-                    style="width: 180px; height: 30px; margin-top: 20px; flex-shrink: 0"
+                    style="width: 100%; height: 37px"
+                    font-size="13"
+                    font-weight="normal"
+                    :disabled="!lock.login || verifyCode.length !== 6"
+                    @click="handleLogin()"
+                    >{{ local('Continue') }}</fv-button
+                >
+
+                <fv-button
+                    background="linear-gradient(100deg, #7673d5, #a578bc, #a578bc)"
+                    foreground="#ffffff"
+                    border-color="#c3afe8"
+                    border-radius="28"
+                    :reveal-border-color="true"
+                    :reveal-border-gradient-list="['#9563df', '#ad7cde', '#c495dc', '#b8c7fa']"
+                    :reveal-background-gradient-list="[
+                        'rgba(210, 193, 250, 0.38)',
+                        'rgba(210, 193, 250, 0.18)',
+                        'rgba(143, 97, 231, 0.12)'
+                    ]"
+                    :is-box-shadow="true"
+                    style="width: 100%; height: 37px"
+                    font-size="13"
+                    font-weight="normal"
                     :disabled="!lock.sendCode || counter > 0"
                     @click="sendCode"
-                    >{{ local(`Resend Code`) }}{{ counter > 0 ? ` ${counter}s` : '' }}</fv-button
+                    >{{ local('Resend Code')
+                    }}{{ counter > 0 ? ' ' + counter + 's' : '' }}</fv-button
                 >
-                <div class="s2">
-                    <p class="to-apply" @click="$emit('switch-block', 'forgot')">
-                        {{ local('Forget Password') }}
-                    </p>
-                    <p class="to-apply" style="margin: 0px 8px">·</p>
-                    <p class="to-apply" @click="$emit('switch-block', 'apply')">
-                        {{ local('No account yet?') }}
-                    </p>
-                </div>
             </div>
+            <button type="button" class="auth-link" @click="$emit('switch-block', 'forgot')">
+                {{ local('Forget Password') }}
+            </button>
         </div>
-        <div class="s3">
-            <p>{{ local('Terms and Conditions') }} · {{ local('Privacy Policy') }}</p>
+        <div class="auth-switch">
+            <span>{{ local('No account yet?') }}</span
+            ><button type="button" class="auth-link" @click="$emit('switch-block', 'apply')">
+                {{ local('Apply New Account') }}
+            </button>
         </div>
     </div>
 </template>
@@ -118,7 +153,7 @@ import { useTheme } from '@/stores/theme'
 import { mapActions, mapState } from 'pinia'
 
 export default {
-    name: 'Login',
+    name: 'FabLogin',
     data() {
         return {
             step: 0,
@@ -136,6 +171,9 @@ export default {
                 sendCode: null
             }
         }
+    },
+    beforeUnmount() {
+        clearInterval(this.timer.sendCode)
     },
     watch: {
         step() {
@@ -158,9 +196,9 @@ export default {
             getInfo: 'getInfo',
             getAvatar: 'getAvatar'
         }),
-        async handleLogin(code = null) {
+        async handleLogin(code = this.step === 1 ? this.verifyCode : null) {
             if (!this.lock.login) return
-            if (code && code.length < 6) return
+            if (this.step === 1 && (!code || code.length !== 6)) return
             this.lock.login = false
             let user = {
                 id: this.user.id,
@@ -190,7 +228,7 @@ export default {
                         })
                     } else if (res.code === 40007) {
                         this.sendCode()
-                        this.step++
+                        this.step = 1
                     } else if (res.code === 40008) {
                         this.$barWarning(this.local(`Verify Code Error`), {
                             status: 'warning'
@@ -244,140 +282,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss">
-.login-block {
-    @include FullRelative;
-    @include HcenterC;
-
-    flex: 1;
-
-    .main-block {
-        @include HcenterVcenterC;
-
-        position: relative;
-        width: 100%;
-        height: auto;
-        margin-top: 25px;
-        border-radius: 8px;
-        overflow: hidden;
-
-        .s1 {
-            @include FullRelative;
-            @include HcenterC;
-
-            flex: 1;
-            padding: 25px;
-            overflow: overlay;
-
-            .logo-text {
-                width: 80px;
-                height: auto;
-                margin: 5px;
-                cursor: pointer;
-            }
-
-            .main-title {
-                @include color-pink-blue;
-
-                margin-top: 15px;
-                font-size: 20px;
-                font-weight: bold;
-            }
-
-            .id-field {
-                width: 90%;
-                height: 60px;
-                margin-top: 45px;
-                display: flex;
-            }
-
-            .verify-id-block {
-                @include Vcenter;
-
-                width: 100%;
-                margin: 10px 0px;
-                font-size: 12px;
-
-                .block-btn {
-                    padding: 3px;
-                    border-radius: 6px;
-
-                    &:hover {
-                        background: rgba(200, 200, 200, 0.1);
-                    }
-
-                    &:active {
-                        background: rgba(200, 200, 200, 0.2);
-                    }
-                }
-
-                .verify-id-span {
-                    margin-left: 5px;
-                    font-size: 12px;
-                    color: rgba(36, 36, 36, 1);
-                    user-select: none;
-                }
-            }
-
-            .s2 {
-                @include HcenterVcenter;
-
-                margin-top: 25px;
-
-                .to-apply {
-                    @include a-link;
-                }
-            }
-        }
-    }
-
-    .s3 {
-        @include a-link;
-
-        margin-top: 35px;
-        font-size: 12px;
-    }
-}
-
-.swipe-left-enter-active {
-    animation: swipe-left 0.5s linear;
-}
-
-.swipe-left-leave-active {
-    animation: swipe-left 0.5s linear reverse;
-}
-
-.swipe-right-enter-active {
-    animation: swipe-left 0.5s linear;
-}
-
-.swipe-right-leave-active {
-    animation: swipe-left 0.5s linear reverse;
-}
-
-@keyframes swipe-left {
-    0% {
-        width: 0;
-    }
-    100% {
-        width: 100%;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .login-block {
-        .main-block {
-            width: 100%;
-            overflow: inherit;
-            height: 100%;
-            box-shadow: none;
-
-            .s1 {
-                padding: 0 15px;
-                padding-top: 20px;
-            }
-        }
-    }
-}
-</style>

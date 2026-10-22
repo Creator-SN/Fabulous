@@ -1071,6 +1071,22 @@ export default {
         "en": "Switch whether to watch all extension files on Notebook system",
         "cn": "是否查看Notebook系统上的所有扩展文件"
     },
+    "I have read and agree to": {
+        "en": "I have read and agree to the",
+        "cn": "我已阅读并同意"
+    },
+    "and acknowledge": {
+        "en": "and acknowledge the",
+        "cn": "，并知悉"
+    },
+    "Read and agree to the legal documents": {
+        "en": "Read and agree to the legal documents",
+        "cn": "阅读并确认协议"
+    },
+    "Please read and agree to the legal documents.": {
+        "en": "Please read and agree to the terms and acknowledge the privacy policy.",
+        "cn": "请先阅读并同意服务条款、知悉隐私政策。"
+    },
     "Apply New Account": {
         "en": "Apply New Account",
         "cn": "申请新帐户"
@@ -1150,6 +1166,10 @@ export default {
     "Password Error": {
         "en": "Password Error",
         "cn": "密码错误"
+    },
+    "Verification Code": {
+        "en": "6-digit verification code",
+        "cn": "6位验证码"
     },
     "Verify Code Error": {
         "en": "Verify Code Error",

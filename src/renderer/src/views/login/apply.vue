@@ -1,68 +1,103 @@
 <template>
-    <div class="apply-block">
-        <transition name="scale-up-to-up">
+    <div class="auth-block">
+        <div class="auth-card">
             <fv-progress-bar
                 v-show="Apply.Lock"
                 :loading="true"
                 :foreground="color"
-                style="position: absolute; left: 0px; top: 0px; width: 100%;"
+                class="auth-progress"
             ></fv-progress-bar>
-        </transition>
-        <div class="d-1">
-            <p>{{ local('Apply New Account') }}</p>
-            <p>{{ local('Get the Full Experience by Creating Account.') }}</p>
-        </div>
-        <div class="main-block">
-            <div class="s1">
+            <img draggable="false" class="auth-logo" src="@/assets/logo.svg" alt="Fab" />
+            <h1 class="auth-title">{{ local('Apply New Account') }}</h1>
+            <p class="auth-description">
+                {{ local('Get the Full Experience by Creating Account.') }}
+            </p>
+            <div class="auth-fields">
                 <fv-text-box
                     v-model="Form.email"
-                    placeholder="someone@example.com"
-                    borderWidth="2"
-                    :revealBorder="true"
-                    background="whitesmoke"
-                    :border-radius="6"
+                    :placeholder="local('Email')"
+                    type="email"
+                    autocomplete="username"
+                    :aria-label="local('Email')"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px; flex-shrink: 0;"
+                    background="var(--auth-input)"
+                    border-radius="6"
+                    :reveal-border="true"
+                    focus-border-color="#958df1"
+                    :reveal-border-gradient-list="['#958df1', '#b79bef', '#b8c7fa']"
+                    style="width: 100%; height: 38px"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-text-box
-                    :placeholder="local('Passwords, 8-20 characters')"
                     v-model="Form.password"
+                    :placeholder="local('Passwords, 8-20 characters')"
                     type="password"
-                    borderWidth="2"
-                    :revealBorder="true"
-                    background="whitesmoke"
-                    :border-radius="6"
+                    autocomplete="new-password"
+                    :aria-label="local('Password')"
                     :theme="theme"
-                    style="width: 100%; max-width: 375px; min-height: 40px; margin-top: 15px; flex-shrink: 0;"
+                    background="var(--auth-input)"
+                    border-radius="6"
+                    :reveal-border="true"
+                    focus-border-color="#958df1"
+                    :reveal-border-gradient-list="['#958df1', '#b79bef', '#b8c7fa']"
+                    style="width: 100%; height: 38px"
                     @keyup="handleEnter"
                 ></fv-text-box>
                 <fv-button
-                    :background="gradient"
-                    theme="dark"
-                    borderRadius="50"
-                    fontSize="16"
-                    fontWeight="600"
+                    background="linear-gradient(100deg, #7673d5, #a578bc, #a578bc)"
+                    foreground="#ffffff"
+                    border-color="#c3afe8"
+                    border-radius="28"
+                    :reveal-border-color="true"
+                    :reveal-border-gradient-list="['#9563df', '#ad7cde', '#c495dc', '#b8c7fa']"
+                    :reveal-background-gradient-list="[
+                        'rgba(210, 193, 250, 0.38)',
+                        'rgba(210, 193, 250, 0.18)',
+                        'rgba(143, 97, 231, 0.12)'
+                    ]"
                     :is-box-shadow="true"
-                    style="width: 50px; height: 50px; margin-top: 20px; flex-shrink: 0;"
-                    :disabled="Apply.Lock"
+                    style="width: 100%; height: 37px"
+                    font-size="13"
+                    font-weight="normal"
+                    :disabled="Apply.Lock || !acceptedTerms"
                     @click="handleApply"
+                    >{{ local('Apply New Account') }}</fv-button
                 >
-                    <p class="ms-Icon ms-Icon--ChevronRight"></p>
-                </fv-button>
-                <div class="s2">
-                    <p class="to-apply">
-                        {{ local('I agree to the privacy policy and terms of service of this site by default when registering.') }}
-                    </p>
-                    <p class="to-apply" style="margin: 0px 8px;">·</p>
-                    <p class="to-apply">{{ local('Privacy Policy') }}</p>
-                    <p class="to-apply" style="margin: 0px 8px;">·</p>
-                    <p class="to-apply">{{ local('Term of Service') }}</p>
-                </div>
+            </div>
+            <div class="auth-consent">
+                <fv-check-box
+                    v-model="acceptedTerms"
+                    :theme="theme"
+                    background="#958df1"
+                    role="checkbox"
+                    tabindex="0"
+                    :aria-checked="acceptedTerms"
+                    :aria-label="local('Read and agree to the legal documents')"
+                    @keydown.space.prevent="acceptedTerms = !acceptedTerms"
+                    @keydown.enter.prevent="acceptedTerms = !acceptedTerms"
+                ></fv-check-box>
+                <p>
+                    {{ local('I have read and agree to') }}
+                    <router-link
+                        :to="{ name: 'Login', params: { block: 'terms' } }"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ local('Term of Service') }}</router-link
+                    >
+                    {{ local('and acknowledge') }}
+                    <router-link
+                        :to="{ name: 'Login', params: { block: 'privacy' } }"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ local('Privacy Policy') }}</router-link
+                    >
+                </p>
             </div>
         </div>
-        <div class="s3" @click="$emit('switch-block', 'login')">
-            <p>{{ local('Already have an account? Log in') }}</p>
+        <div class="auth-switch">
+            <button type="button" class="auth-link" @click="$emit('switch-block', 'login')">
+                {{ local('Already have an account? Log in') }}
+            </button>
         </div>
     </div>
 </template>
@@ -74,9 +109,10 @@ import { useTheme } from '@/stores/theme'
 import { mapState } from 'pinia'
 
 export default {
-    name: 'Apply',
+    name: 'FabRegister',
     data() {
         return {
+            acceptedTerms: false,
             Form: {
                 email: '',
                 password: ''
@@ -112,13 +148,19 @@ export default {
             return true
         },
         async handleApply() {
+            if (!this.acceptedTerms) {
+                this.$barWarning(this.local('Please read and agree to the legal documents.'), {
+                    status: 'warning'
+                })
+                return
+            }
             if (!this.verifyInput()) return
             if (this.Apply.Lock) return
             this.Apply.Lock = true
             this.$api.UserController.register(this.Form)
                 .then((res) => {
+                    this.Apply.Lock = false
                     if (res.code === 200) {
-                        this.Apply.Lock = false
                         this.$emit('switch-block', 'login')
                     }
                 })
@@ -137,103 +179,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss">
-.apply-block {
-    @include FullRelative;
-    @include HcenterVcenterC;
-
-    flex: 1;
-    overflow: overlay;
-
-    .d-1 {
-        @include HcenterVcenterC;
-
-        height: 150px;
-        user-select: none;
-
-        p {
-            &:first-child {
-                font-size: 20px;
-                color: rgba(50, 49, 48, 1);
-            }
-
-            &:nth-child(2) {
-                margin-top: 5px;
-                font-size: 13.8px;
-            }
-        }
-    }
-
-    .main-block {
-        @include HcenterVcenterC;
-
-        position: relative;
-        width: 550px;
-        min-height: 330px;
-        height: auto;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-
-        .s1 {
-            @include FullRelative;
-            @include HcenterC;
-
-            flex: 1;
-            padding: 25px;
-
-            .main-title {
-                font-weight: 400;
-            }
-
-            .s2 {
-                @include HcenterVcenter;
-
-                width: 100%;
-                margin-top: 25px;
-                white-space: pre-wrap;
-                flex-wrap: wrap;
-
-                .to-apply {
-                    @include a-link;
-
-                    white-space: pre-wrap;
-                    text-align: center;
-                }
-            }
-        }
-    }
-
-    .s3 {
-        @include a-link;
-
-        height: 150px;
-        margin-top: 35px;
-        font-size: 12px;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .apply-block {
-        overflow: inherit;
-
-        .main-block {
-            width: 100%;
-            overflow: inherit;
-            height: 100%;
-            box-shadow: none;
-
-            .s1 {
-                width: 100%;
-                margin: 0;
-                padding: 0px 15px;
-
-                .s2 {
-                    flex-wrap: wrap;
-                }
-            }
-        }
-    }
-}
-</style>

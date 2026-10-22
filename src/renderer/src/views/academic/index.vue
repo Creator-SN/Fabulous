@@ -53,7 +53,8 @@ export default {
             tmpScrollTop: 0,
             loading: false,
             bindingRequestId: 0,
-            bindingUserId: undefined
+            bindingUserId: undefined,
+            draftBindingKey: null
         }
     },
     computed: {
@@ -120,7 +121,8 @@ export default {
                 this.editorDsId !== this.parsePath.data_path ||
                 this.itemType !== (this.$route.name === 'Template' ? 'template' : 'item') ||
                 this.item?.id !== this.parsePath.parentId ||
-                !this.item?.pages?.some((page) => page.id === this.parsePath.targetId)
+                (this.parsePath.targetId !== 'no-page' &&
+                    !this.item?.pages?.some((page) => page.id === this.parsePath.targetId))
             )
         }
     },
@@ -177,15 +179,18 @@ export default {
             this.loading = true
             try {
                 const { name, data_path, parentId, targetId } = this.parsePath
+                const noPage = name === 'Academic' && targetId === 'no-page'
+                if (!noPage) this.draftBindingKey = null
                 if (
                     this.editorCache &&
                     !identityChanged &&
-                    this.target?.id === targetId &&
+                    this.target?.id === (targetId === 'no-page' ? undefined : targetId) &&
                     this.itemType === (name === 'Template' ? 'template' : 'item') &&
                     this.item?.id === parentId &&
                     this.editorDsId === data_path
                 ) {
-                    if (name === 'Academic' && targetId) {
+                    if (noPage) this.resetDraftContent(bindingKey)
+                    if (name === 'Academic' && targetId && targetId !== 'no-page') {
                         useCollectionStore()
                             .recordRecent({
                                 kind: 'academic',
@@ -203,7 +208,7 @@ export default {
                 if (identityChanged || this.shouldReloadItem) {
                     let parentItem = {}
                     if (name === 'Academic') {
-                        await this.getItem(data_path, parentId, targetId).then((res) => {
+                        await this.getItem(data_path, parentId, targetId === 'no-page' ? undefined : targetId).then((res) => {
                             if (!isCurrent()) return
                             if (res.code === 200 || res.status === 'success') {
                                 parentItem = res.data || {}
@@ -214,7 +219,8 @@ export default {
                             }
                         })
                         if (!isCurrent()) return
-                        let targetItem = parentItem.pages?.find((item) => item.id === targetId) || { id: targetId }
+                        let targetItem = noPage ? {} : parentItem.pages?.find((item) => item.id === targetId) || { id: targetId }
+                        if (noPage) this.resetDraftContent(bindingKey)
                         this.reviseEditor({
                             id: 'academic',
                             dsId: data_path,
@@ -227,7 +233,7 @@ export default {
                                 ...targetItem
                             },
                             scrollTop: 0,
-                            displayMode: 'note',
+                            displayMode: noPage ? 'pdf' : 'note',
                             cache: true
                         })
                     } else {
@@ -263,17 +269,19 @@ export default {
                         })
                     }
                 } else {
-                    let targetItem = this.item?.pages?.find((item) => item.id === targetId) || {}
+                    let targetItem = noPage ? {} : this.item?.pages?.find((item) => item.id === targetId) || {}
+                    if (noPage) this.resetDraftContent(bindingKey)
                     this.reviseEditor({
                         id: 'academic',
                         dsId: data_path,
                         target: {
                             ...targetItem
                         },
-                        scrollTop: 0
+                        scrollTop: 0,
+                        ...(noPage ? { displayMode: 'pdf' } : {})
                     })
                 }
-                if (name === 'Academic' && targetId) {
+                if (name === 'Academic' && targetId && targetId !== 'no-page') {
                     useCollectionStore()
                         .recordRecent({
                             kind: 'academic',
@@ -289,11 +297,27 @@ export default {
                 if (isCurrent()) this.loading = false
             }
         },
+        resetDraftContent(bindingKey) {
+            // Preserve this draft across KeepAlive activation; reset when changing resources or accounts.
+            if (this.draftBindingKey === bindingKey) return
+            this.draftBindingKey = bindingKey
+            this.reviseEditorContent({
+                id: 'academic',
+                title: '',
+                banner: '',
+                description: null,
+                content: { type: 'doc', content: [] },
+                author: [],
+                createDate: null,
+                updateDate: null
+            })
+        },
         async refreshContentTool() {
             if (
                 !this.itemType ||
                 !this.target ||
                 !this.target.id ||
+                this.target.id === 'no-page' ||
                 !this.editorDsId ||
                 (this.itemType !== 'item' && this.itemType !== 'template')
             )
@@ -472,18 +496,19 @@ export default {
             // docInfo: 文档信息
             // wrapCotent: 包装内容函数(json, type), 其中type为fabulous_notebook或json等
             let saveContent = wrapCotent(json, 'fabulous_notebook')
-            if (!this.itemType || this.displayMode === 'pdf')
+            if (!this.itemType)
                 return {
                     res: null,
                     shouldStop: true
                 }
-            if (!this.target?.id) {
+            if (!this.target?.id || this.target.id === 'no-page') {
                 await this.$refs.createPagePanel.open(this.item, saveContent)
                 return {
                     res: null,
                     shouldStop: true
                 }
             }
+            if (this.displayMode === 'pdf') return { res: null, shouldStop: true }
             let resp = null
             if (this.itemType === 'item') {
                 resp = await this.saveRemoteItemPageContent(

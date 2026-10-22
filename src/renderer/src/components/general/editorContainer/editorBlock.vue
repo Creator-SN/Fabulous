@@ -1044,7 +1044,45 @@ export default {
             }
         },
         async commitDiff(result) {
-            console.log(result)
+            if (this.collabSession) {
+                const session = this.collabSession
+                const editor = this.getEditor()?.editor?.()
+                if (this.readonly || !this.collabCanWrite || !editor?.isEditable) {
+                    this.$barWarning(this.collaborationSaveFailureMessage(), { status: 'warning' })
+                    return false
+                }
+                try {
+                    // Validate the complete body before changing either metadata or the shared document.
+                    if (result.content?.type !== 'doc') throw new Error('Invalid history document')
+                    let body = editor.schema.nodeFromJSON(result.content)
+                    if (!body.content.size) body = editor.schema.topNodeType.createAndFill()
+                    body.check()
+                    this.reviseEditorContent({
+                        id: this.editorId,
+                        banner: result.banner,
+                        title: result.title,
+                        content: body.toJSON()
+                    })
+                    // The editor transaction updates the bound Y.Doc and uses the normal sync/undo flow.
+                    editor.commands.setContent(body.toJSON(), {
+                        emitUpdate: true,
+                        errorOnInvalidContent: true
+                    })
+                    await this.$nextTick()
+                    if (session !== this.collabSession || this.getEditor()?.editor?.() !== editor) return false
+                    this.reviseEditor({ id: this.editorId, realtimeContent: editor.getJSON() })
+                    this.$refs.editor_nav.getEditorNavList()
+                    this.toggleUnsave(true)
+                    if (this.autoSave && !this.flushCollaboration()) {
+                        this.$barWarning(this.collaborationSaveFailureMessage(), { status: 'warning' })
+                    }
+                    return true
+                } catch (error) {
+                    console.error('[collaboration] Failed to restore version.', error)
+                    this.$barWarning(this.local('Rollback version failed'), { status: 'error' })
+                    return false
+                }
+            }
             this.reviseEditorContent({
                 id: this.editorId,
                 banner: result.banner,
@@ -1057,12 +1095,9 @@ export default {
             })
             this.toggleUnsave(true)
         },
-        commitDiffAndSave(result) {
-            this.commitDiff(result)
-            setTimeout(() => {
-                let editor = this.getEditor()
-                editor.save()
-            }, 300)
+        async commitDiffAndSave(result) {
+            if ((await this.commitDiff(result)) === false) return
+            this.getEditor()?.save()
         },
         downloadTxtFile(text, filename) {
             // 创建一个新的 Blob 对象，用于存储文本内容
