@@ -100,7 +100,7 @@ export default {
                         key: `user-${idx}`,
                         id: user.id,
                         name: displayName,
-                        image: () => `${this.$server}/users/${user.id}/avatar/content`,
+                        image: `${this.$server}/users/${user.id}/avatar/content`,
                         email: user.email,
                         user,
                         type: 'user',

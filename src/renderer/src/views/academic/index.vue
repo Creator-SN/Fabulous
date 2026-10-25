@@ -145,6 +145,7 @@ export default {
     methods: {
         ...mapActions(useAppConfig, {
             reviseEditor: 'reviseEditor',
+            getEditorNavigationHistory: 'getEditorNavigationHistory',
             reviseEditorContent: 'reviseEditorContent',
             reviseConfig: 'reviseConfig'
         }),
@@ -176,6 +177,14 @@ export default {
             this.bindingUserId = this.userInfo.id
             const isCurrent = () =>
                 requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
+            // 只在绑定成功、实际切换页面时提交 history，过期请求不会改动记录。
+            const reviseBinding = (nextEditor) => this.reviseEditor({
+                ...nextEditor,
+                history: identityChanged ? this.history : this.getEditorNavigationHistory(
+                    nextEditor.id, nextEditor,
+                    this.$refs.editor_container?.getScrollTop?.() ?? this.tmpScrollTop
+                )
+            })
             this.loading = true
             try {
                 const { name, data_path, parentId, targetId } = this.parsePath
@@ -201,7 +210,7 @@ export default {
                             .catch((error) => console.error(error))
                     }
                     this.$nextTick(() => {
-                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
+                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.currentEditor?.scrollTop || 0)
                     })
                     return
                 }
@@ -221,7 +230,7 @@ export default {
                         if (!isCurrent()) return
                         let targetItem = noPage ? {} : parentItem.pages?.find((item) => item.id === targetId) || { id: targetId }
                         if (noPage) this.resetDraftContent(bindingKey)
-                        this.reviseEditor({
+                        reviseBinding({
                             id: 'academic',
                             dsId: data_path,
                             type: 'item',
@@ -253,7 +262,7 @@ export default {
                         })
                         if (!isCurrent()) return
                         let targetItem = parentItem.pages?.find((item) => item.id === targetId) || {}
-                        this.reviseEditor({
+                        reviseBinding({
                             id: 'academic',
                             dsId: data_path,
                             type: 'template',
@@ -271,7 +280,7 @@ export default {
                 } else {
                     let targetItem = noPage ? {} : this.item?.pages?.find((item) => item.id === targetId) || {}
                     if (noPage) this.resetDraftContent(bindingKey)
-                    this.reviseEditor({
+                    reviseBinding({
                         id: 'academic',
                         dsId: data_path,
                         target: {

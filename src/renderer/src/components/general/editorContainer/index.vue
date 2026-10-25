@@ -30,6 +30,7 @@
             v-show="!readDenied && displayMode !== 'pdf'"
             ref="editor_block"
             :editor-id="editorId"
+            :content-agent-enabled="!readDenied && displayMode !== 'pdf'"
             :readonly="readonly || (isRemote && !userInfo.id)"
             :refreshContentTool="refreshContentTool"
             :imgInterceptTool="imgInterceptTool"

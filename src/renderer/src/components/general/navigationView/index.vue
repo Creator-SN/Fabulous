@@ -4,13 +4,14 @@
             v-show="!fullScreen"
             :title="''"
             class="navigation-view"
+            ref="navigationPanel"
             v-model:expand="expand"
             :theme="theme"
             :background="navigationViewBackground"
             :settingTitle="local('Setting')"
             :mobileDisplay="mobileDisplay"
             :flyout-display="mobileDisplay"
-            :expandWidth="350"
+            :expandWidth="presentWidth"
             :showNav="windowWidth < mobileDisplay"
             :show-search="false"
             :show-back="false"
@@ -210,7 +211,7 @@ export default {
     },
     data() {
         return {
-            expand: true,
+            navigationResizeObserver: null,
             pivotList: [
                 {
                     key: 0,
@@ -303,6 +304,8 @@ export default {
             windowWidth: (state) => state.window.width,
             mobileDisplay: (state) => state.window.mobileDisplay,
             fullScreen: (state) => state.fullScreen,
+            navigationViewLayout: (state) => state.navigationViewLayout,
+            presentWidth: (state) => state.navigationViewLayout.presentWidth,
             local: (state) => state.local
         }),
         ...mapState(useUserStore, {
@@ -313,6 +316,14 @@ export default {
             color: (state) => state.color,
             gradient: (state) => state.gradient
         }),
+        expand: {
+            get() {
+                return this.navigationViewLayout.expand
+            },
+            set(value) {
+                this.navigationViewLayout.expand = value
+            }
+        },
         navigationViewBackground() {
             if (this.theme == 'light') return 'rgba(246, 246, 246, 0.7)'
             return 'rgba(5, 9, 15, 0.85)'
@@ -355,8 +366,27 @@ export default {
     },
     mounted() {
         this.localPath = this.lastLocalPath
+        this.navigationResizeObserver = new ResizeObserver(this.updateNavigationWidth)
+        this.navigationResizeObserver.observe(this.$refs.navigationPanel.$el)
+        window.addEventListener('resize', this.updateNavigationWidth)
+        this.updateNavigationWidth()
+    },
+    beforeUnmount() {
+        this.navigationResizeObserver?.disconnect()
+        window.removeEventListener('resize', this.updateNavigationWidth)
+        this.navigationViewLayout.actualDisplayWidth = 0
     },
     methods: {
+        updateNavigationWidth() {
+            const panel = this.$refs.navigationPanel?.$el
+            if (!panel) return
+            // 使用实际占用的可见宽度；浮层模式、隐藏和窄屏不按预设宽度计算。
+            const rect = panel.getBoundingClientRect()
+            this.navigationViewLayout.actualDisplayWidth = Math.max(
+                0,
+                Math.min(rect.right, document.documentElement.clientWidth) - Math.max(0, rect.left)
+            )
+        },
         ...mapActions(useAppConfig, {
             setFullScreen: 'setFullScreen'
         }),

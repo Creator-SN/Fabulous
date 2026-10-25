@@ -67,6 +67,11 @@ export const useAppConfig = defineStore('appConfig', () => {
 
     const clientMode = ref(resolveClientMode())
     const fullScreen = ref(false)
+    const navigationViewLayout = ref({
+        expand: true,
+        presentWidth: 350,
+        actualDisplayWidth: 0
+    })
 
     const progress = ref(0)
     const i18n = ref({})
@@ -100,6 +105,25 @@ export const useAppConfig = defineStore('appConfig', () => {
 
     function setFullScreen(value) {
         fullScreen.value = value
+    }
+
+    // 路由直接切换也要记录上一页；调用方已提前切换 target 时不会重复入栈。
+    function getEditorNavigationHistory(id, nextEditor, scrollTop) {
+        const current = getEditorById(id)
+        const history = current?.history || []
+        if (!current?.target?.id || !nextEditor.target?.id) return history
+        const samePage = current.dsId === (nextEditor.dsId ?? current.dsId)
+            && current.type === (nextEditor.type ?? current.type)
+            && current.item?.id === (nextEditor.item ?? current.item)?.id
+            && current.target.id === nextEditor.target.id
+        if (samePage) return history
+        return history.concat({
+            type: current.type,
+            item: current.item,
+            page: current.target,
+            scrollTop: scrollTop ?? current.scrollTop ?? 0,
+            dsId: current.dsId
+        })
     }
 
     function reviseEditor(obj) {
@@ -225,6 +249,7 @@ export const useAppConfig = defineStore('appConfig', () => {
         window,
         clientMode,
         fullScreen,
+        navigationViewLayout,
         progress,
         i18n,
         local,
@@ -233,6 +258,7 @@ export const useAppConfig = defineStore('appConfig', () => {
         setWindowSize,
         setFullScreen,
         reviseEditor,
+        getEditorNavigationHistory,
         reviseEditorContent,
         editorGo,
         setDraggingEl,

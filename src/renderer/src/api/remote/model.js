@@ -183,6 +183,45 @@ export class ConfigTheme {
         
     }
     
+
+}
+export class ContentPolishRequest {
+
+    /**
+     *
+     * @param {String} prompt
+     * @param {String} selection_html
+     * @param {String} document_html
+     * @param {String} document_markdown
+     */
+    constructor(prompt = undefined,selection = undefined,selection_html = undefined,document_html = undefined,document_markdown = undefined){
+        this.prompt = prompt
+        this.selection = selection
+        this.selection_html = selection_html
+        this.document_html = document_html
+        this.document_markdown = document_markdown
+    }
+
+    /**
+     *
+     * @type {String}
+     */
+    prompt=undefined
+    /**
+     *
+     * @type {String}
+     */
+    selection_html=undefined
+    /**
+     *
+     * @type {String}
+     */
+    document_html=undefined
+    /**
+     *
+     * @type {String}
+     */
+    document_markdown=undefined
     
 }
 export class DataItemCreateRequest {
@@ -625,6 +664,51 @@ export class RoleRequest {
      */
     name=undefined
     
+}
+export class SelectionSnapshot {
+
+    /**
+     *
+     * @param {undefined} selection
+     * @param {Array} content
+     * @param {Number} openStart
+     * @param {Number} openEnd
+     * @param {Array} nodes
+     */
+    constructor(selection = undefined,content = undefined,openStart = undefined,openEnd = undefined,nodes = undefined){
+        this.selection = selection
+        this.content = content
+        this.openStart = openStart
+        this.openEnd = openEnd
+        this.nodes = nodes
+    }
+
+    /**
+     *
+     * @type {undefined}
+     */
+    selection=undefined
+    /**
+     *
+     * @type {Array}
+     */
+    content=undefined
+    /**
+     *
+     * @type {Number}
+     */
+    openStart=undefined
+    /**
+     *
+     * @type {Number}
+     */
+    openEnd=undefined
+    /**
+     *
+     * @type {Array}
+     */
+    nodes=undefined
+
 }
 export class ShareTargetRequest {
   

@@ -362,6 +362,7 @@ export default {
             unsave: (state) => state.editor?.notebook?.unsave || false,
             local: 'local',
             editorItem: (state) => state.editor?.notebook?.item || null,
+            editorDsId: (state) => state.editor?.notebook?.dsId || null,
             target: (state) => state.editor?.notebook?.target || null,
             itemType: (state) => state.editor?.notebook?.type || null,
             history: (state) => state.editor?.notebook?.history || []
@@ -662,15 +663,15 @@ export default {
                         this.comparePath(it.filePath, parentPath.path)
                     )
                     const history =
-                        this.itemType === 'notebook'
+                        this.itemType === 'notebook' && this.target?.id && !this.comparePath(this.target.filePath, item.filePath)
                             ? this.history.concat({
                                   type: this.itemType,
                                   item: this.editorItem,
                                   page: this.target,
                                   scrollTop: this.tryGetScrollTop(),
-                                  dsId: this.currentDataPath
+                                  dsId: this.editorDsId
                               })
-                            : []
+                            : this.itemType === 'notebook' ? this.history : []
                     if (parentItem) {
                         let children = parentItem.children || []
                         let formatChildren = []
@@ -683,6 +684,7 @@ export default {
                             })
                         })
                         this.reviseEditor({
+                            id: 'notebook',
                             type: 'notebook',
                             dsId: this.currentDataPath,
                             item: {
@@ -713,6 +715,7 @@ export default {
                             })
                         })
                         this.reviseEditor({
+                            id: 'notebook',
                             type: 'notebook',
                             dsId: this.currentDataPath,
                             item: {

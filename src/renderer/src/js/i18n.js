@@ -1,4 +1,328 @@
 export default {
+    "Content polishing assistant": {
+        "en": "Content polishing assistant",
+        "cn": "内容润色助手"
+    },
+    "Review changes": {
+        "en": "Review changes",
+        "cn": "审阅变更"
+    },
+    "Polish entire document": {
+        "en": "Polish entire document",
+        "cn": "全文润色"
+    },
+    "Polish selection": {
+        "en": "Polish selection",
+        "cn": "选区润色"
+    },
+    "Changes": {
+        "en": "Changes",
+        "cn": "差异列表"
+    },
+    "{count} pending changes": {
+        "en": "{count} pending changes",
+        "cn": "{count} 项待处理"
+    },
+    "Accept all": {
+        "en": "Accept all",
+        "cn": "全部接受"
+    },
+    "Reject all": {
+        "en": "Reject all",
+        "cn": "全部拒绝"
+    },
+    "Accept": {
+        "en": "Accept",
+        "cn": "接受"
+    },
+    "Reject": {
+        "en": "Reject",
+        "cn": "拒绝"
+    },
+    "Replace": {
+        "en": "Replace",
+        "cn": "替换"
+    },
+    "Insert": {
+        "en": "Insert",
+        "cn": "新增"
+    },
+    "All changes have been reviewed. You can now update the original document.": {
+        "en": "All changes have been reviewed. You can now update the original document.",
+        "cn": "所有变更已处理，可将审阅结果更新到原文。"
+    },
+    "The original document remains unchanged during preview": {
+        "en": "The original document remains unchanged during preview",
+        "cn": "预览期间原文保持不变"
+    },
+    "Do not update": {
+        "en": "Do not update",
+        "cn": "不更新"
+    },
+    "Update original": {
+        "en": "Update original",
+        "cn": "更新原文"
+    },
+    "Execution steps": {
+        "en": "Execution steps",
+        "cn": "执行步骤"
+    },
+    "Step history": {
+        "en": "Step history",
+        "cn": "步骤记录"
+    },
+    "All execution steps": {
+        "en": "All execution steps",
+        "cn": "全部执行步骤"
+    },
+    "Quoted selection": {
+        "en": "Quoted selection",
+        "cn": "已引用选区"
+    },
+    "Quoted selection · {count} characters": {
+        "en": "Quoted selection · {count} characters",
+        "cn": "已引用选区 · {count} 字符"
+    },
+    "Remove quote": {
+        "en": "Remove quote",
+        "cn": "移除引用"
+    },
+    "Polishing instructions": {
+        "en": "Polishing instructions",
+        "cn": "润色要求"
+    },
+    "Tell me how to polish this, e.g. keep the meaning and make it clearer… (Ctrl+Enter to send)": {
+        "en": "Tell me how to polish this, e.g. keep the meaning and make it clearer… (Ctrl+Enter to send)",
+        "cn": "告诉我如何润色，例如：保持原意，让表达更清晰自然…（Ctrl+回车发送）"
+    },
+    "Stop task": {
+        "en": "Stop task",
+        "cn": "中止任务"
+    },
+    "Start polishing": {
+        "en": "Start polishing",
+        "cn": "开始润色"
+    },
+    "Mention": {
+        "en": "Mention",
+        "cn": "提及"
+    },
+    "Quoted selection · Agent determines the editing scope": {
+        "en": "Quoted selection · Agent determines the editing scope",
+        "cn": "已引用选区 · Agent 判断润色范围"
+    },
+    "Polish the document · Select text and click Quote": {
+        "en": "Polish the document · Select text and click Quote",
+        "cn": "可润色全文 · 选中文字后点击引用"
+    },
+    "Preparing document": {
+        "en": "Preparing document",
+        "cn": "正在准备文档"
+    },
+    "Selection context ready": {
+        "en": "Selection context ready",
+        "cn": "已准备选区上下文"
+    },
+    "Planning changes": {
+        "en": "Planning changes",
+        "cn": "正在制定计划"
+    },
+    "Generating review": {
+        "en": "Generating review",
+        "cn": "正在生成审阅结果"
+    },
+    "Polishing content": {
+        "en": "Polishing content",
+        "cn": "正在优化内容"
+    },
+    "Preparing task": {
+        "en": "Preparing task",
+        "cn": "正在准备任务"
+    },
+    "Preparing selection and document context": {
+        "en": "Preparing selection and document context",
+        "cn": "正在准备选区与文档上下文"
+    },
+    "The quoted content has changed. Select and quote it again.": {
+        "en": "The quoted content has changed. Select and quote it again.",
+        "cn": "引用内容已修改，请重新选择并引用"
+    },
+    "The service returned an invalid replacement mode.": {
+        "en": "The service returned an invalid replacement mode.",
+        "cn": "服务返回了无效的替换模式"
+    },
+    "No valid selection is available for replacement.": {
+        "en": "No valid selection is available for replacement.",
+        "cn": "没有可替换的有效选区"
+    },
+    "Some content or formatting was adjusted for this editor. Review the preview before updating.": {
+        "en": "Some content or formatting was adjusted for this editor. Review the preview before updating.",
+        "cn": "部分内容或样式已按编辑器能力调整，请核对预览后更新原文。"
+    },
+    "Some unsupported text styles were skipped.": {
+        "en": "Some unsupported text styles were skipped.",
+        "cn": "已略过部分不支持的文字样式。"
+    },
+    "Some HTML tags were normalized by the editor.": {
+        "en": "Some HTML tags were normalized by the editor.",
+        "cn": "部分标签已由编辑器自动规范化。"
+    },
+    "Some document layout was normalized by the editor.": {
+        "en": "Some document layout was normalized by the editor.",
+        "cn": "部分排版已由编辑器自动规范化。"
+    },
+    "Polishing complete. Review each change.": {
+        "en": "Polishing complete. Review each change.",
+        "cn": "润色完成，请审阅每一项变更"
+    },
+    "Task stopped": {
+        "en": "Task stopped",
+        "cn": "任务已中止"
+    },
+    "Polishing incomplete": {
+        "en": "Polishing incomplete",
+        "cn": "润色未完成"
+    },
+    "Polishing failed. Please try again.": {
+        "en": "Polishing failed. Please try again.",
+        "cn": "润色失败，请重试"
+    },
+    "Stopping task": {
+        "en": "Stopping task",
+        "cn": "正在中止任务"
+    },
+    "Stopped receiving results locally. The server cancellation failed; the task will end at its timeout.": {
+        "en": "Stopped receiving results locally. The server cancellation failed; the task will end at its timeout.",
+        "cn": "本地已停止接收结果；后端取消请求失败，任务将按超时限制结束"
+    },
+    "Unable to resolve this change. Generate a new preview.": {
+        "en": "Unable to resolve this change. Generate a new preview.",
+        "cn": "无法处理这项变更，请重新生成预览"
+    },
+    "Review applied to the original document. You can undo it in the editor.": {
+        "en": "Review applied to the original document. You can undo it in the editor.",
+        "cn": "审阅结果已更新到原文，可使用编辑器撤销"
+    },
+    "Quote in content assistant": {
+        "en": "Quote in content assistant",
+        "cn": "引用到内容助手"
+    },
+    "Quote selection in content assistant": {
+        "en": "Quote selection in content assistant",
+        "cn": "引用选区到内容助手"
+    },
+    "Unsupported text style property.": {
+        "en": "Unsupported text style property.",
+        "cn": "不支持的文字样式属性"
+    },
+    "Invalid text style value.": {
+        "en": "Invalid text style value.",
+        "cn": "无效的文字样式值"
+    },
+    "The editor does not support the {type} text style.": {
+        "en": "The editor does not support the {type} text style.",
+        "cn": "原编辑器不支持 {type} 样式"
+    },
+    "The polishing result is empty.": {
+        "en": "The polishing result is empty.",
+        "cn": "润色结果为空"
+    },
+    "The polishing result contains unsupported HTML.": {
+        "en": "The polishing result contains unsupported HTML.",
+        "cn": "润色结果包含不支持的 HTML 内容"
+    },
+    "The polishing result contains an unauthorized component.": {
+        "en": "The polishing result contains an unauthorized component.",
+        "cn": "润色结果包含未授权的组件"
+    },
+    "The polishing result contains an unsupported HTML attribute.": {
+        "en": "The polishing result contains an unsupported HTML attribute.",
+        "cn": "润色结果包含不支持的 HTML 属性"
+    },
+    "The polishing result duplicated an original node or contains an unknown node ID.": {
+        "en": "The polishing result duplicated an original node or contains an unknown node ID.",
+        "cn": "润色结果复制了原始节点或包含未知节点 ID"
+    },
+    "The polishing result removed or moved a protected component.": {
+        "en": "The polishing result removed or moved a protected component.",
+        "cn": "润色结果移除或移动了受保护组件"
+    },
+    "The polishing HTML does not match the editor component structure. Nodes were dropped or moved.": {
+        "en": "The polishing HTML does not match the editor component structure. Nodes were dropped or moved.",
+        "cn": "润色 HTML 不符合编辑器组件结构，节点被丢弃或移位"
+    },
+    "The polishing HTML contains an unsupported component structure. Nodes were dropped or moved.": {
+        "en": "The polishing HTML contains an unsupported component structure. Nodes were dropped or moved.",
+        "cn": "润色 HTML 包含组件不支持的内容结构，节点被丢弃或移位"
+    },
+    "The editor or component does not support these text styles here. The changes cannot be preserved.": {
+        "en": "The editor or component does not support these text styles here. The changes cannot be preserved.",
+        "cn": "当前编辑器或组件不支持此处的文字样式，无法完整保留修改"
+    },
+    "Unknown text style mapping.": {
+        "en": "Unknown text style mapping.",
+        "cn": "未知文字样式映射"
+    },
+    "An original node type was changed.": {
+        "en": "An original node type was changed.",
+        "cn": "原始节点类型被修改"
+    },
+    "The component structure could not be fully restored.": {
+        "en": "The component structure could not be fully restored.",
+        "cn": "组件结构无法完整恢复"
+    },
+    "Select continuous text or complete paragraphs to polish.": {
+        "en": "Select continuous text or complete paragraphs to polish.",
+        "cn": "请拖选一段连续文本或完整段落后润色"
+    },
+    "Select a continuous range. Multiple table cell selections are not supported yet.": {
+        "en": "Select a continuous range. Multiple table cell selections are not supported yet.",
+        "cn": "请先选择连续的文本区域，暂不支持多单元格选区"
+    },
+    "The selection crosses an incomplete component boundary. Select text in one container or the entire component; clear the quote to polish the whole document.": {
+        "en": "The selection crosses an incomplete component boundary. Select text in one container or the entire component; clear the quote to polish the whole document.",
+        "cn": "选区跨越了不完整的组件边界，请选择同一容器内的正文或整个组件；全文润色可先清除选区"
+    },
+    "The original editor is closed or read-only.": {
+        "en": "The original editor is closed or read-only.",
+        "cn": "原编辑器已关闭或不可编辑"
+    },
+    "Review all pending changes first.": {
+        "en": "Review all pending changes first.",
+        "cn": "请先处理所有待审阅变更"
+    },
+    "The document changed during polishing. Run it again to avoid overwriting new content.": {
+        "en": "The document changed during polishing. Run it again to avoid overwriting new content.",
+        "cn": "原文在润色期间已修改，请重新润色，避免覆盖新内容"
+    },
+    "The selected content changed during polishing. Select it again and retry.": {
+        "en": "The selected content changed during polishing. Select it again and retry.",
+        "cn": "选区内容在润色期间已修改，请重新选取并润色"
+    },
+    "The result changed the selection boundary structure. Select complete paragraphs and retry.": {
+        "en": "The result changed the selection boundary structure. Select complete paragraphs and retry.",
+        "cn": "润色结果改变了选区边界结构，请选择完整段落后重试"
+    },
+    "Invalid replacement scope.": {
+        "en": "Invalid replacement scope.",
+        "cn": "无效的替换范围"
+    },
+    "Unable to create the polishing task.": {
+        "en": "Unable to create the polishing task.",
+        "cn": "无法创建润色任务"
+    },
+    "Polishing failed.": {
+        "en": "Polishing failed.",
+        "cn": "润色失败"
+    },
+    "The polishing connection was lost. Please try again.": {
+        "en": "The polishing connection was lost. Please try again.",
+        "cn": "润色连接已断开，请重试"
+    },
+    "Timed out waiting for the polishing result. Please try again.": {
+        "en": "Timed out waiting for the polishing result. Please try again.",
+        "cn": "等待润色结果超时，请重试"
+    },
     "Parsing file...": {
         "en": "Parsing file...",
         "cn": "正在解析文件…"

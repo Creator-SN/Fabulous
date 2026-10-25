@@ -22,6 +22,14 @@
                     >
                         插入 pdfNote
                     </fv-button>
+                    <fv-button
+                        :theme="theme"
+                        border-radius="8"
+                        @mousedown.prevent
+                        @click="captureSelectionJson"
+                    >
+                        查看选区 JSON
+                    </fv-button>
                     <fv-button :theme="theme" border-radius="8" @click="captureJson">
                         刷新 JSON
                     </fv-button>
@@ -37,6 +45,7 @@
                         :language="language"
                         :placeholder="'Write something for debug...'"
                         :extensions="customExtensions"
+                        :mentionItemAttr="editorMentionItemAttr"
                         :mobileDisplayWidth="0"
                         :toolbarHeight="120"
                         :editablePaddingTop="132"
@@ -50,8 +59,39 @@
                             theme === 'dark' ? 'rgba(29, 33, 36, 1)' : 'rgba(243, 244, 246, 1)'
                         "
                         style="position: relative; width: 100%; height: 100%"
-                        @content-change="captureJson"
-                    />
+                        @on-mounted="bindChatEditor"
+                    >
+                        <template #bubble-custom-buttons-front="{ editor, defaultClass }">
+                            <fv-button
+                                :class="defaultClass"
+                                :theme="theme"
+                                :background="
+                                    theme === 'dark'
+                                        ? 'rgba(50, 50, 50, 1)'
+                                        : 'rgba(239, 239, 239, 1)'
+                                "
+                                :foreground="
+                                    theme === 'dark'
+                                        ? '#7673d5'
+                                        : '#7673d5'
+                                "
+                                border-color="transparent"
+                                :title="local('Quote in content assistant')"
+                                :aria-label="local('Quote selection in content assistant')"
+                                :disabled="
+                                    !editor ||
+                                    editor.state.selection.empty ||
+                                    !chatEditor ||
+                                    $refs.contentChat?.busy ||
+                                    $refs.contentChat?.reviewOpen
+                                "
+                                @mousedown.prevent
+                                @click="$refs.contentChat.quoteSelection(editor)"
+                            >
+                                <i class="ms-Icon ms-Icon--LeftDoubleQuote" aria-hidden="true"></i>
+                            </fv-button>
+                        </template>
+                    </power-editor>
                 </section>
 
                 <aside class="side-panel">
@@ -76,6 +116,52 @@
                         </div>
                     </div>
 
+                    <div class="status-card html-card">
+                        <p class="card-title">HTML 导出 / 插入</p>
+                        <div class="html-actions">
+                            <fv-button :theme="theme" border-radius="8" @click="exportHtml">
+                                导出全文 HTML
+                            </fv-button>
+                            <fv-button
+                                :theme="theme"
+                                border-radius="8"
+                                @mousedown.prevent
+                                @click="insertHtml"
+                            >
+                                插入 HTML 到光标处
+                            </fv-button>
+                            <fv-button
+                                :theme="theme"
+                                border-radius="8"
+                                @mousedown.prevent
+                                @click="replaceWithHtml"
+                            >
+                                用 HTML 替换全文
+                            </fv-button>
+                        </div>
+                        <fv-text-field
+                            v-model="htmlDraft"
+                            :theme="theme"
+                            :border-radius="8"
+                            placeholder="点击导出，或在这里输入、粘贴 HTML 后插入编辑器"
+                            aria-label="HTML 源码"
+                            style="width: 100%; height: 260px"
+                        />
+                        <p class="status-line">
+                            插入会替换编辑器中的选区；未选中文字时插入到光标处。导入后可用编辑器撤销。
+                        </p>
+                        <p v-if="htmlStatus" class="status-line" role="status">{{ htmlStatus }}</p>
+                    </div>
+
+                    <div class="status-card json-card">
+                        <p class="card-title">选区节点 JSON</p>
+                        <p class="status-line">
+                            选取富文本后，点击“查看选区 JSON”。content 为选区内容，nodes
+                            为涉及的完整原始节点。
+                        </p>
+                        <pre>{{ selectionJsonPreview || '尚未读取选区' }}</pre>
+                    </div>
+
                     <div class="status-card json-card">
                         <p class="card-title">当前 JSON</p>
                         <pre>{{ jsonPreview }}</pre>
@@ -83,13 +169,24 @@
                 </aside>
             </div>
         </section>
+        <user-card v-model:show="show.userCard" :model-value="currentMentionUser" />
+        <content-chat-block
+            ref="contentChat"
+            :editor="chatEditor"
+            :extensions="customExtensions"
+            @applied="captureJson"
+        />
     </div>
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { mapState } from 'pinia'
+import contentChatBlock from '@/components/general/chatBlock/index.vue'
 import { useTheme } from '@/stores/theme'
 import { useDataStore } from '@/stores/data'
+import { useAppConfig } from '@/stores/appConfig'
+import editorMention from '@/components/general/editorContainer/editorMention.js'
 import pdfNote from '@/components/general/editorCustom/extension/pdfNote.js'
 import fileAttachment from '@/components/general/editorCustom/extension/fileAttachment.js'
 
@@ -142,11 +239,17 @@ const createDemoDoc = () => ({
 
 export default {
     name: 'DevPowerEditorPage',
+    components: { contentChatBlock },
+    mixins: [editorMention],
     data() {
         return {
             customExtensions: [pdfNote, fileAttachment],
+            chatEditor: null,
             editorContent: createDemoDoc(),
             jsonPreview: '',
+            selectionJsonPreview: '',
+            htmlDraft: '',
+            htmlStatus: '',
             pdfState: {
                 lastOpen: '',
                 lastScroll: ''
@@ -158,8 +261,13 @@ export default {
             theme: (state) => state.theme
         }),
         ...mapState(useDataStore, {
-            language: (state) => state.configState.language
-        })
+            language: (state) => state.configState.language,
+            currentDataPathItem: (state) => state.currentDataPathItem
+        }),
+        ...mapState(useAppConfig, ['local']),
+        editorDsId() {
+            return this.currentDataPathItem?.path || null
+        }
     },
     mounted() {
         this.$nextTick(() => {
@@ -167,7 +275,31 @@ export default {
             this.captureJson()
         })
     },
+    beforeUnmount() {
+        clearTimeout(this.timer.debounceSearch)
+    },
     methods: {
+        bindChatEditor() {
+            this.$nextTick(() => {
+                this.chatEditor = markRaw(this.getPowerEditor())
+            })
+        },
+        searchMentionData(value, oldVal) {
+            if (!this.editorDsId || this.currentDataPathItem.local) {
+                clearTimeout(this.timer.debounceSearch)
+                this.mentionData.finalList = []
+                this.loading.searchMentionData = false
+                return
+            }
+            return editorMention.methods.searchMentionData.call(this, value, oldVal)
+        },
+        mentionClickCallback(item) {
+            if (item.type === 'item') {
+                this.pdfState.lastOpen = `${item.id} / ${item.pdf || '无 PDF'}`
+                return
+            }
+            return editorMention.methods.mentionClickCallback.call(this, item)
+        },
         getPowerEditor() {
             return this.$refs.editor
         },
@@ -186,6 +318,9 @@ export default {
         },
         resetDemoContent() {
             this.editorContent = createDemoDoc()
+            this.selectionJsonPreview = ''
+            this.htmlDraft = ''
+            this.htmlStatus = ''
             this.pdfState.lastOpen = ''
             this.pdfState.lastScroll = ''
             this.$nextTick(() => {
@@ -200,6 +335,84 @@ export default {
                 return
             }
             this.jsonPreview = JSON.stringify(editor.getJSON(), null, 2)
+        },
+        exportHtml() {
+            const editor = this.getTipTapEditor()
+            if (!editor) {
+                this.htmlStatus = '编辑器尚未就绪'
+                return
+            }
+            try {
+                this.htmlDraft = editor.getHTML()
+                this.htmlStatus = '已导出全文 HTML，可直接修改后插入或替换全文'
+            } catch (error) {
+                this.htmlStatus = `导出失败：${error.message}`
+            }
+        },
+        insertHtml() {
+            this.applyHtml(false)
+        },
+        replaceWithHtml() {
+            this.applyHtml(true)
+        },
+        applyHtml(replaceAll) {
+            const editor = this.getTipTapEditor()
+            if (!editor) {
+                this.htmlStatus = '编辑器尚未就绪'
+                return
+            }
+            if (!this.htmlDraft.trim()) {
+                this.htmlStatus = '请先输入或导出 HTML'
+                return
+            }
+            try {
+                const chain = editor.chain().focus()
+                const applied = replaceAll
+                    ? chain.selectAll().insertContent(this.htmlDraft).run()
+                    : chain.insertContent(this.htmlDraft).run()
+                if (!applied) {
+                    this.htmlStatus = 'HTML 未能应用，请检查内容'
+                    return
+                }
+                this.selectionJsonPreview = ''
+                this.captureJson()
+                this.htmlStatus = replaceAll ? '已用 HTML 替换全文' : '已将 HTML 插入编辑器'
+            } catch (error) {
+                this.htmlStatus = `导入失败：${error.message}`
+            }
+        },
+        captureSelectionJson() {
+            const editor = this.getTipTapEditor()
+            if (!editor) {
+                this.selectionJsonPreview = '编辑器尚未就绪'
+                return
+            }
+            const { selection, doc } = editor.state
+            if (selection.empty) {
+                this.selectionJsonPreview = '请先在编辑器中选取一段富文本或选中一个节点'
+                return
+            }
+            const nodes = []
+            // 保留原始节点属性和 marks，便于对照局部选区与完整节点。
+            for (const range of selection.ranges) {
+                doc.nodesBetween(range.$from.pos, range.$to.pos, (node, pos) => {
+                    if (!nodes.some((item) => item.pos === pos)) {
+                        nodes.push({ pos, nodeSize: node.nodeSize, node: node.toJSON() })
+                    }
+                })
+            }
+            const slice = selection.content()
+            this.selectionJsonPreview = JSON.stringify(
+                {
+                    selection: selection.toJSON(),
+                    content: slice.content.toJSON() || [],
+                    openStart: slice.openStart,
+                    openEnd: slice.openEnd,
+                    nodes
+                },
+                null,
+                2
+            )
         },
         insertPdfNote() {
             const editor = this.getTipTapEditor()
@@ -259,7 +472,7 @@ export default {
     position: relative;
     width: 100%;
     min-height: 100%;
-    padding: 24px;
+    padding: 24px 24px 220px;
     box-sizing: border-box;
     background: radial-gradient(circle at top left, rgba(255, 105, 117, 0.16), transparent 30%),
         radial-gradient(circle at top right, rgba(91, 141, 239, 0.14), transparent 28%),
@@ -413,6 +626,25 @@ export default {
 
         .pdf-item:last-child {
             margin-bottom: 0;
+        }
+    }
+
+    .html-card {
+        .html-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        textarea {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .status-line {
+            margin-top: 10px;
         }
     }
 

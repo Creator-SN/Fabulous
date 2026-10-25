@@ -84,6 +84,28 @@
                 @content-change="editorSetContentChange"
                 @container-scroll="$emit('container-scroll', $event)"
             >
+                <template #bubble-custom-buttons-front="{ editor, defaultClass }">
+                    <fv-button
+                        v-if="contentAgentAvailable"
+                        :class="defaultClass"
+                        :theme="theme"
+                        :background="theme === 'dark' ? '#323232' : '#efefef'"
+                        foreground="#7673d5"
+                        border-color="transparent"
+                        :title="local('Quote in content assistant')"
+                        :aria-label="local('Quote selection in content assistant')"
+                        :disabled="
+                            !editor ||
+                            editor.state.selection.empty ||
+                            $refs.contentChat?.busy ||
+                            $refs.contentChat?.reviewOpen
+                        "
+                        @mousedown.prevent
+                        @click="$refs.contentChat?.quoteSelection(editor)"
+                    >
+                        <i class="ms-Icon ms-Icon--LeftDoubleQuote" aria-hidden="true"></i>
+                    </fv-button>
+                </template>
                 <template v-slot:custom-buttons-front="x">
                     <fv-button
                         :theme="theme"
@@ -218,6 +240,13 @@
                 </template>
             </power-editor>
         </div>
+        <content-chat-block
+            v-if="contentAgentAvailable"
+            :key="contentAgentKey"
+            ref="contentChat"
+            :editor="chatEditor"
+            :extensions="contentAgentExtensions"
+        />
         <div v-show="!lock.loading" class="loading-block">
             <fv-progress-ring
                 loading="true"
@@ -307,6 +336,7 @@ defineExpose({
 </script>
 
 <script>
+import { markRaw } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useDataStore } from '@/stores/data'
 import { useAppConfig } from '@/stores/appConfig'
@@ -314,6 +344,7 @@ import { useNotebookConfig } from '@/stores/notebook'
 import { useTheme } from '@/stores/theme'
 import * as Diff from 'diff'
 
+import contentChatBlock from '@/components/general/chatBlock/index.vue'
 import editorNav from '@/components/general/editorContainer/editorNav.vue'
 import saveOptions from '@/components/notebook/saveOptions.vue'
 import diffPreviewer from '@/components/general/editorContainer/diffPreviewer.vue'
@@ -339,6 +370,7 @@ import { fabulous_notebook } from '@/js/data_sample.js'
 export default {
     emits: ['read-permission-change', 'container-scroll', 'editor-mounted'],
     components: {
+        contentChatBlock,
         editorNav,
         saveOptions,
         diffPreviewer,
@@ -347,6 +379,10 @@ export default {
         collaboratorAvatars
     },
     props: {
+        contentAgentEnabled: {
+            type: Boolean,
+            default: true
+        },
         readonly: {
             type: Boolean,
             default: false
@@ -395,6 +431,9 @@ export default {
     data() {
         return {
             visible: false,
+            chatEditor: null,
+            contentAgentExtensions: [pdfNote, fileAttachment],
+            contentAgentProviderReady: false,
             fontSize: 16,
             docInfo: {
                 versionId: null
@@ -444,6 +483,10 @@ export default {
         }
     },
     watch: {
+        contentAgentProviderKey: {
+            immediate: true,
+            handler: 'checkContentAgentProvider'
+        },
         displayMode: {
             handler(newVal, oldVal) {
                 if (!oldVal || oldVal === 'pdf') {
@@ -477,7 +520,8 @@ export default {
             currentDataPathItem: (state) => state.currentDataPathItem,
             autoSave: (state) => state.configState.autoSave,
             editorExpandContent: (state) => state.configState.editorExpandContent,
-            editorShowNav: (state) => state.configState.editorShowNav
+            editorShowNav: (state) => state.configState.editorShowNav,
+            aiOption: (state) => state.configState.aiOption
         }),
         ...mapState(useAppConfig, {
             editorMap: (state) => state.editor,
@@ -485,6 +529,27 @@ export default {
         }),
         ...mapState(useTheme, { theme: 'theme', color: 'color' }),
         ...mapState(useUserStore, ['info']),
+        contentAgentProviderKey() {
+            return this.info.id && this.aiOption ? `${this.info.id}:${this.aiOption}` : ''
+        },
+        contentAgentAvailable() {
+            return Boolean(
+                this.visible &&
+                    this.contentAgentEnabled &&
+                    this.lock.loading &&
+                    this.displayMode !== 'pdf' &&
+                    !this.readonly &&
+                    (!this.collaborationResourceKey || this.collabCanWrite) &&
+                    this.info.id &&
+                    this.aiOption &&
+                    this.contentAgentProviderReady &&
+                    this.chatEditor &&
+                    !this.chatEditor.isDestroyed
+            )
+        },
+        contentAgentKey() {
+            return `${this.contentAgentProviderKey}:${this.target?.id || ''}:${this.collabKey}`
+        },
         currentEditor() {
             return this.editorMap?.[this.editorId] || null
         },
@@ -607,6 +672,19 @@ export default {
         this.bindNativeEditorEvents()
     },
     methods: {
+        async checkContentAgentProvider(key) {
+            this.contentAgentProviderReady = false
+            if (!key) return
+            try {
+                const res = await this.$api.ConfigController.getAIAPI(this.aiOption)
+                if (key !== this.contentAgentProviderKey) return
+                this.contentAgentProviderReady = Boolean(
+                    res.code === 200 && res.data?.api_key?.trim() && res.data?.base_url?.trim()
+                )
+            } catch {
+                // 配置不可用时隐藏助手；由设置页负责配置错误提示。
+            }
+        },
         ...mapActions(useAppConfig, {
             reviseEditor: 'reviseEditor',
             reviseEditorContent: 'reviseEditorContent',
@@ -687,6 +765,10 @@ export default {
             window.addEventListener('keydown', this.shortCutEvent, true)
         },
         onPowerEditorMounted(editor) {
+            this.chatEditor = markRaw(editor)
+            editor.on('destroy', () => {
+                if (this.chatEditor === editor) this.chatEditor = null
+            })
             editor.storage.fileAttachment.getResource = () => this.attachmentResource
             this.$emit('editor-mounted', editor)
             if (!this.collabSession) return
@@ -1476,6 +1558,7 @@ export default {
         window.removeEventListener('keydown', this.shortCutEvent, true)
     },
     activated() {
+        if (!this.visible) this.checkContentAgentProvider(this.contentAgentProviderKey)
         this.visible = true
         if (this.collabRestartNeeded || this.collabResourceKey !== this.collaborationResourceKey)
             this.restartCollaboration()

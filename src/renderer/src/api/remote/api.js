@@ -4719,6 +4719,198 @@ ConfigController.acceptSourcePermissionGroupInvite.fullPath=`${axios.defaults.ba
 */
 ConfigController.acceptSourcePermissionGroupInvite.path=`/configs/permission-groups/invite/accept`
 
+export class ContentAgentController {
+
+  /**
+  * @summary 创建内容润色任务
+  * @param {UserModel.ContentPolishRequest} [contentpolishrequest]
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async createContentPolishTask(contentpolishrequest,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'post',
+        url:'/content-agent/tasks',
+        data:contentpolishrequest,
+        params:{},
+        headers:{
+          "Content-Type":"application/json"
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+
+  /**
+  * @summary 订阅润色步骤和结果
+  * @param {String} [pathtask_id]
+  * @param {String} [ticket]
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async streamContentPolishTask(pathtask_id,ticket,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'get',
+        url:'/content-agent/tasks/'+pathtask_id+'/events',
+        data:{},
+        params:{ticket},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+
+  /**
+  * @summary 中止内容润色任务
+  * @param {String} [pathtask_id]
+  * @param {CancelTokenSource} [cancelSource] Axios Cancel Source 对象，可以取消该请求
+  * @param {Function} [uploadProgress] 上传回调函数
+  * @param {Function} [downloadProgress] 下载回调函数
+  */
+  static async cancelContentPolishTask(pathtask_id,cancelSource,uploadProgress,downloadProgress,baseURL){
+    return await new Promise((resolve,reject)=>{
+      let responseType = "json";
+      let options = {
+        method:'delete',
+        url:'/content-agent/tasks/'+pathtask_id+'',
+        data:{},
+        params:{},
+        headers:{
+          "Content-Type":""
+        },
+        onUploadProgress:uploadProgress,
+        onDownloadProgress:downloadProgress
+      }
+      if (baseURL!==undefined){
+        options.baseURL = baseURL
+      }
+      // support wechat mini program
+      if (cancelSource!=undefined){
+        options.cancelToken = cancelSource.token
+      }
+      if (responseType != "json"){
+        options.responseType = responseType;
+      }
+      axios(options)
+      .then(res=>{
+        if (res.config.responseType=="blob"){
+          resolve(new Blob([res.data],{
+            type: res.headers["content-type"].split(";")[0]
+          }))
+        }else{
+          resolve(res.data);
+          return res.data
+        }
+      }).catch(err=>{
+        if (err.response){
+          if (err.response.data)
+            reject(err.response.data)
+          else
+            reject(err.response);
+        }else{
+          reject(err)
+        }
+      })
+    })
+  }
+}
+
+// class ContentAgentController static method properties bind
+/**
+* @description createContentPolishTask url链接，包含baseURL
+*/
+ContentAgentController.createContentPolishTask.fullPath=`${axios.defaults.baseURL}/content-agent/tasks`
+/**
+* @description createContentPolishTask url链接，不包含baseURL
+*/
+ContentAgentController.createContentPolishTask.path=`/content-agent/tasks`
+/**
+* @description streamContentPolishTask url链接，包含baseURL
+*/
+ContentAgentController.streamContentPolishTask.fullPath=`${axios.defaults.baseURL}/content-agent/tasks/{task_id}/events`
+/**
+* @description streamContentPolishTask url链接，不包含baseURL
+*/
+ContentAgentController.streamContentPolishTask.path=`/content-agent/tasks/{task_id}/events`
+/**
+* @description cancelContentPolishTask url链接，包含baseURL
+*/
+ContentAgentController.cancelContentPolishTask.fullPath=`${axios.defaults.baseURL}/content-agent/tasks/{task_id}`
+/**
+* @description cancelContentPolishTask url链接，不包含baseURL
+*/
+ContentAgentController.cancelContentPolishTask.path=`/content-agent/tasks/{task_id}`
+
 export class NotebookController {
  
   /**

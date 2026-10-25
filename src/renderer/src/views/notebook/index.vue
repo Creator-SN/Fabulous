@@ -147,6 +147,7 @@ export default {
     methods: {
         ...mapActions(useAppConfig, {
             reviseEditor: 'reviseEditor',
+            getEditorNavigationHistory: 'getEditorNavigationHistory',
             reviseEditorContent: 'reviseEditorContent'
         }),
         ...mapActions(useNotebookConfig, {
@@ -182,6 +183,14 @@ export default {
             this.bindingUserId = this.userInfo.id
             const isCurrent = () =>
                 requestId === this.bindingRequestId && this.editorBindingKey === bindingKey
+            // 只在绑定成功、实际切换页面时提交 history，过期请求不会改动记录。
+            const reviseBinding = (nextEditor) => this.reviseEditor({
+                ...nextEditor,
+                history: identityChanged ? this.history : this.getEditorNavigationHistory(
+                    nextEditor.id, nextEditor,
+                    this.$refs.editor_container?.getScrollTop?.() ?? this.tmpScrollTop
+                )
+            })
             this.loading = true
             try {
                 const { data_path, parentId, targetId, parentPath, targetPath } = this.parsePath
@@ -199,7 +208,7 @@ export default {
                             .catch((error) => console.error(error))
                     }
                     this.$nextTick(() => {
-                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.tmpScrollTop)
+                        if (isCurrent()) this.$refs.editor_container?.scrollToTop(this.currentEditor?.scrollTop || 0)
                     })
                     return
                 }
@@ -242,7 +251,7 @@ export default {
                     await Promise.all(promises)
                     if (!isCurrent()) return
                     let targetItem = children.find((item) => item.id === targetId) || { id: targetId }
-                    this.reviseEditor({
+                    reviseBinding({
                         id: 'notebook',
                         dsId: data_path,
                         type: 'notebook',
@@ -262,7 +271,7 @@ export default {
                     })
                 } else {
                     let targetItem = this.item?.pages?.find((item) => item.id === targetId) || { id: targetId }
-                    this.reviseEditor({
+                    reviseBinding({
                         id: 'notebook',
                         dsId: data_path,
                         target: {
