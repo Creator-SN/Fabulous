@@ -20,17 +20,22 @@
                 foreground="rgba(133, 148, 211, 1)"
                 font-weight="bold"
                 :reveal-border-color="['rgba(133, 148, 211, 1)']"
-                style="height: 25px;"
+                style="height: 25px"
                 @click="openRecentCollection"
             >
                 {{ local('Recent') }}
             </fv-button>
+            <i
+                class="ms-Icon more-menu-btn"
+                :class="[
+                    `${show.recentList ? 'ms-Icon--CollapseContentSingle' : 'ms-Icon--ExploreContentSingle'}`
+                ]"
+                :title="local('Collaspe All')"
+                style="color: rgba(133, 148, 211, 1)"
+                @click="show.recentList = !show.recentList"
+            ></i>
         </div>
-        <recent-list
-            :theme="theme"
-            :local="local"
-            :Go="Go"
-        ></recent-list>
+        <recent-list v-show="show.recentList" :theme="theme" :local="local" :Go="Go"></recent-list>
         <div class="navigation-view-mode-block" :class="[{ dark: theme === 'dark' }]">
             <div class="navigation-view-mode-left-block">
                 <img draggable="false" :src="img.notebook" alt="" class="icon-img" />
@@ -336,6 +341,9 @@ export default {
             permissionTarget: null,
             showDeleteConfirmPanel: false,
             deleteTarget: null,
+            show: {
+                recentList: true
+            },
             lock: {
                 loading: true,
                 refresh: true,
@@ -663,7 +671,9 @@ export default {
                         this.comparePath(it.filePath, parentPath.path)
                     )
                     const history =
-                        this.itemType === 'notebook' && this.target?.id && !this.comparePath(this.target.filePath, item.filePath)
+                        this.itemType === 'notebook' &&
+                        this.target?.id &&
+                        !this.comparePath(this.target.filePath, item.filePath)
                             ? this.history.concat({
                                   type: this.itemType,
                                   item: this.editorItem,
@@ -671,7 +681,9 @@ export default {
                                   scrollTop: this.tryGetScrollTop(),
                                   dsId: this.editorDsId
                               })
-                            : this.itemType === 'notebook' ? this.history : []
+                            : this.itemType === 'notebook'
+                              ? this.history
+                              : []
                     if (parentItem) {
                         let children = parentItem.children || []
                         let formatChildren = []
@@ -1104,11 +1116,40 @@ export default {
     }
 
     .remote-tree-view-sections {
-        width: 100%;
-        padding: 4px 20px 8px;
+        position: relative;
+        width: calc(100% - 40px);
+        margin: 1px 20px;
+        padding: 5px 3px;
+        padding-right: 15px;
+        border-radius: 6px;
         box-sizing: border-box;
         display: flex;
         justify-content: space-between;
+
+        &:hover {
+            background: rgba(200, 200, 200, 0.1);
+        }
+
+        &:active {
+            background: rgba(200, 200, 200, 0.3);
+        }
+
+        .more-menu-btn {
+            @include HcenterVcenter;
+
+            width: 25px;
+            height: 25px;
+            font-size: 12px;
+            border-radius: 8px;
+
+            &:hover {
+                background: rgba(200, 200, 200, 0.2);
+            }
+
+            &:active {
+                background: rgba(200, 200, 200, 0.3);
+            }
+        }
     }
 
     .tree-view-custom-item {

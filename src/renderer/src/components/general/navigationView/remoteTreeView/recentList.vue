@@ -149,6 +149,7 @@ export default {
     flex-direction: column;
     align-items: center;
     overflow: auto;
+    user-select: none;
 
     &.dark {
         color: whitesmoke;
