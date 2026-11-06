@@ -163,10 +163,10 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.16.0.tgz#130eff69a232f29fb4e2b3f8ebbb0b3e0adf5a36"
   integrity sha512-FWa0sPlqYGJgpTs6OxBRcL/AW4JT0OIO+W1ajerluoTVh8CV0B7XM1qsNCRgnkSCkRCgOICKHRQlY17jrsm0+Q==
 
-"@creatorsn/powereditor3@^0.5.5":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.5.6.tgz#94c14f8124beaafa3cb3df183403d0dfed4cafc5"
-  integrity sha512-ghkNcqJZGL8vpWGsyeJDh5SRFWB97seXs37B6zJW8FzPaC0qXAcUFjbCf+ZFl8FWhzL9VLIsHMz8lDjqZLOeBg==
+"@creatorsn/powereditor3@^0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@creatorsn/powereditor3/-/powereditor3-0.5.9.tgz#338d20bdd67c34657c0048824eb009896f881533"
+  integrity sha512-N7/W3E2+NFnNIqlY8MpoLy9pRBZg3k2Q1+ukmUJzOP07sBmaQpjZp/Eib5cG/1zvVrXj2n3Mo1Mjf7wA5jnG/g==
   dependencies:
     "@creatorsn/vfluent3" "^0.3.90"
     "@floating-ui/dom" "^1.0.0"
@@ -221,7 +221,19 @@
     y-protocols "1.0.7"
     yjs "13.6.31"
 
-"@creatorsn/vfluent3@^0.3.105", "@creatorsn/vfluent3@^0.3.90":
+"@creatorsn/vfluent3@^0.3.108":
+  version "0.3.108"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.108.tgz#7d9365c5dd5f14d6acd962d0e9489dba450ad372"
+  integrity sha512-rkrXfPRYknhyFGg7itEeZE/ZoNeFEsLDLXiCRhxxb22pM+FyukbYkyS5tEi/a5RQnHBk7fw/MM3adCE9N9qwgg==
+  dependencies:
+    "@vue/shared" "^3.4.20"
+    gsap "3.1.1"
+    onecolor "3.1.0"
+    pinia "^2.1.7"
+    swiper "8.3.2"
+    vue "^3.4.20"
+
+"@creatorsn/vfluent3@^0.3.90":
   version "0.3.105"
   resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.105.tgz#d8db976af1283f46172ce285e578aeb1abbd6f84"
   integrity sha512-Ls6fc9fApE9C66R6LqXOSy63h/763aOtw6ZlVziniKjjE1JN0eep/Wb3fYHkQ1lYSCKytWnbEty1Anx2EzX9CQ==

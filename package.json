@@ -82,8 +82,8 @@
         "release:beta": "npm version prerelease --preid beta"
     },
     "dependencies": {
-        "@creatorsn/powereditor3": "^0.5.5",
-        "@creatorsn/vfluent3": "^0.3.105",
+        "@creatorsn/powereditor3": "^0.5.9",
+        "@creatorsn/vfluent3": "^0.3.108",
         "@electron-toolkit/preload": "^3.0.2",
         "@electron-toolkit/utils": "^4.0.0",
         "@electron/remote": "^2.1.2",

@@ -103,7 +103,7 @@
                         @mousedown.prevent
                         @click="$refs.contentChat?.quoteSelection(editor)"
                     >
-                        <i class="ms-Icon ms-Icon--LeftDoubleQuote" aria-hidden="true"></i>
+                        <img :src="img.quote" alt="" draggable="false" style="width: 16px; height: 16px; object-fit: contain" />
                     </fv-button>
                 </template>
                 <template v-slot:custom-buttons-front="x">
@@ -364,6 +364,7 @@ import pdf from '@/assets/home/pdf.svg'
 import note from '@/assets/home/note.svg'
 import markdown from '@/assets/home/md.svg'
 import openMarkdownImg from '@/assets/home/open_md.svg'
+import quoteImg from '@/assets/editor/quote.svg'
 
 import { fabulous_notebook } from '@/js/data_sample.js'
 
@@ -461,7 +462,8 @@ export default {
                 pdf: pdf,
                 note: note,
                 markdown: markdown,
-                openMarkdown: openMarkdownImg
+                openMarkdown: openMarkdownImg,
+                quote: quoteImg
             },
             lock: {
                 loading: true,
